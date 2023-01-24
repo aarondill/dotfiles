@@ -31,8 +31,3 @@ if zoxide -V &>/dev/null; then
   alias cd='z'
 fi
 
-# import bd
-test -f $bash/exitall && source $bash/bd
-
-# import new bash, exit all, and exitall functions that allow for recursive exiting.
-test -f $bash/exitall && source $bash/exitall
