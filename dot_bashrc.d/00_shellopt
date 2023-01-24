@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-# ~/.bashrc.d/00_shellopt.sh
+# ~/.bashrc.d/00_shellopt
 #
 # Sets useful shell options, such as
 # globstar(**), extended globs
