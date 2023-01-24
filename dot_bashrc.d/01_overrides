@@ -1,0 +1,16 @@
+#! /usr/bin/env bash
+
+# ~/.bashrc.d/01_overrides
+# 
+# Overrides to certain system defaults,
+# such as the less history file location,
+# 
+# May also be a good place for init scripts
+# If required by other files
+#
+
+# Move less History file
+export LESSHISTFILE="${XDG_STATE_HOME:=~/.cache}"/less/history
+
+# Ensure blank prompt command for later commands
+PROMPT_COMMAND=''

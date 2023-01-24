@@ -1,0 +1,12 @@
+#! /usr/bin/env bash
+
+# ~/.bashrc.d/02_path
+#
+# Includes changes to the path variable
+# May include certain paths necessary for
+# programs that install in unusual locations
+#
+
+# fix java path to allow running
+PATH=$PATH:/usr/lib/jvm/jdk-19/bin
+

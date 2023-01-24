@@ -1,0 +1,34 @@
+#! /usr/bin/env bash
+
+# ~/.bashrc.d/60_PS1/git
+#
+# Sets up the __git_ps1 command and creates a function
+# '__set_bash_prompt' to append to PROMPT_COMMAND and
+# set the bash prompt with the current git status, if
+# in a git directory. No git message is displayed if
+# PWD is not inside a git working dir or .git folder.
+#
+# Creates 2 seperate PS1 vars, depending on the terminal
+# width: ShortPS1 if < 90 cols, else LongPS1.
+# Supports color detection and removes color if not
+# supported.
+#
+# Example short:
+#    'aaron:~/.cache/ts-template(main)$ '
+# Example long:
+#     '0|09:49|aaron@hostname:~/vscode/.git(GIT_DIR!)$ '
+#      jobs|time|user@host:PWD(git)$
+# Git Status:
+#   GIT_DIR! : you are inside the .git directory
+#   -branch : you are inside an ignored folder
+#   branch* : you have unstaged changes
+#   branch+ : you have staged changes
+#   branch= : you are caught up with remote
+#   branch[+-]n : you are n commits ahead/behind remote
+#
+
+# Setup the git ps1
+if [[ -f ~/vscode/config/ps1 ]]; then
+  # shellcheck source=/dev/null
+  . ~/vscode/config/ps1
+fi

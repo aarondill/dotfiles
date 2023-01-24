@@ -1,0 +1,24 @@
+# Bashrc Directory
+
+- Files here will be sourced by .bashrc
+- Directories are sourced too!
+- Files starting with an underscore '\_' will not be sourced
+- Files are ordered using the following command:
+  ```bash
+  find ~/.bashrc.d/ -type f -not -name "_*" | sort
+  ```
+
+## Moving files
+
+Moving files here will not break the script, however
+if files are moved, the line containing their path should
+be changed to ensure files don't get lost
+
+## Commenting
+
+- Comments are highly suggested describing each file at the top
+  and throughout to describe particularly cryptic operations
+- Beginning with a \#! is suggested for syntax purposes
+- Including a comment below the she-bang containing the desired
+  path is recomendad to ensure the file is always in the correct
+  location

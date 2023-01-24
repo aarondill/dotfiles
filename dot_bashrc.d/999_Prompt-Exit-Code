@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# ~/.bashrc.d/999_Prompt-Exit-Code
+#
+# Captures the exit code of last command before PROMPT_COMMAND
+# and reissues it after execution for use in other programs,
+# such as PS1 display.
+# MUST be the last program to modify PROMPT_COMMAND to
+# function properly
+#
+
+# Ensure prompt command ends with a ;
+old_prompt="${PROMPT_COMMAND:+${PROMPT_COMMAND/%;/};}"
+
+# Capture exit code before prompt and reinstantiate after
+PROMPT_COMMAND='__EXIT="$?";'"$old_prompt"'(exit $__EXIT)'

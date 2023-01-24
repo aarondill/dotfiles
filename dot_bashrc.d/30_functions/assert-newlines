@@ -1,0 +1,14 @@
+#!/usr/bin/bash
+
+# ~/.bashrc.d/30_functions/assert_newlines
+# 
+# Creates functions that searches all text files
+# and appends a newline '\n' if it doesn't already
+# end in a newline.
+#
+
+assert_newlines() {
+  # change all subdirectories and files to end in newlines
+  "$bash"/assertNewLines "$@"
+}
+

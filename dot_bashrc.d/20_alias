@@ -1,0 +1,35 @@
+#!/usr/bin/bash
+
+# ~/.bashrc.d/20_alias
+#
+# Sets up aliases for user usage
+#
+
+alias backup="~/.backup/dobackup"
+alias lastbackup="/usr/bin/cat ~/.backup/backup-time"
+alias browser="sensible-browser"
+alias fslite="browser fslite.vercel.app 2>/dev/null"
+alias la="ls -A"
+alias ll="ls -hl"
+alias lla="ls -Ahl"
+alias cl='clear'
+
+# Allow usage of `has` with non-defined programs
+alias has='HAS_ALLOW_UNSAFE=y has'
+
+# Replace `cat` with `bat`, if installed
+if bat -V &>/dev/null; then
+  alias cat='bat'
+fi
+
+# if `z` is installed, initiate it and set `cd` to `z`
+if zoxide -V &>/dev/null; then
+  eval "$(zoxide init bash)"
+  alias cd='z'
+fi
+
+# import bd
+test -f $bash/exitall && source $bash/bd
+
+# import new bash, exit all, and exitall functions that allow for recursive exiting.
+test -f $bash/exitall && source $bash/exitall
