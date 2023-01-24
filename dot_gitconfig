@@ -31,3 +31,5 @@
 	branches = branch
 	amend = commit --amend
 	hist = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --
+[rerere]
+	enabled = 1
