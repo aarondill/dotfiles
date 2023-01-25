@@ -13,6 +13,8 @@ alias la="ls -A"
 alias ll="ls -hl"
 alias lla="ls -Ahl"
 alias cl='clear'
+# Alias to remove error messages on opening google-chrome
+alias google-chrome='2>/dev/null google-chrome'
 
 # Alias for dotfile manager and completion
 if command -v chezmoi &>/dev/null; then
