@@ -1,13 +1,13 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
 # ~/.bashrc.d/20_alias
 #
-# Sets up fp function for fuzzy finding. 
+# Sets up fp function for fuzzy finding.
 # Also sets default fzf command for direct invocations
 #
 export FZF_DEFAULT_COMMAND='find .'
 
-fp(){
+fp() {
     FZF_DEFAULT_COMMAND='find ${1:-.}' fzf --preview "bat --style=numbers --color=always --line-range :500 {}"
 }
 export -f fp
