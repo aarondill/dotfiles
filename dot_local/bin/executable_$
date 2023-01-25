@@ -1,0 +1,3 @@
+#!/bin/sh
+printf 'You typed a command begining with %s! Be careful!\n' "'$'" > /dev/tty
+exec "$@"
