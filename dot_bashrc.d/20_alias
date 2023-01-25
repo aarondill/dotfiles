@@ -16,7 +16,7 @@ alias cl='clear'
 
 # Alias for dotfile manager and completion
 alias config='chezmoi'
-
+alias config-update='chezmoi re-add'
 
 # Allow usage of `has` with non-defined programs
 alias has='HAS_ALLOW_UNSAFE=y has'
