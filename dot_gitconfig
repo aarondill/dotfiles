@@ -19,17 +19,49 @@
 [format]
         pretty =format:"%C(yellow)commit %H%C(auto)%d%n%C(reset)%C(brightblue)Author: %an <%ae>%C(reset)%n%C(green)Date:   %ad%C(reset)%n%n%C(brightyellow)%w(0,4,4)%s%n%n%C(reset)%b%n" 
 [alias]
-	last = log -1 HEAD
-	unstage = reset HEAD --
-	commit = commit -v
+        # Create new aliases with git alias 'name' 'cmd'
 	alias = "!_no_user_made_f(){ if [ \"$1\" = \"--unset\" ]; then git config --global --unset \"alias.$2\" ;else local a=$1; shift ; git config --global \"alias.$a\" \"$@\" ; fi ; unset _no_user_made_f ; } ; _no_user_made_f"
-	ci = commit
+        # Last commit
+	last = log -1 HEAD
+        # Remove from staging area
+	unstage = reset HEAD --
+        # Verbose committing
+	commit = commit -v
+        # Abbreviations
+	ci = commit -v
+	co = commit -v
 	st = status
 	br = branch
+	p = !git push origin $(git rev-parse --abbrev-ref HEAD) -u
+        new = checkout -b
+        # Less destructive pushing
 	fpush = push --force-with-lease
 	pushf = push --force-with-lease
+        # Fix my typos
 	branches = branch
 	amend = commit --amend
+	ammend = commit --amend
+        # Pretty log
 	hist = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --
+        history = hist
+        # Things I forget
+        local-branches = "!git branch --format \"%(refname:short) %(upstream)\" | awk '{if (!$2) print $1;}'"
+	rmremotebranch = push --delete 
+        mvbranch = "!__moveit() { git branch -m \"$1\" \"$2\"; git push origin :\"$1\"; git push --set-upstream origin \"$2\"; }; __moveit"
+        local-branches = "!git branch --format \"%(color:red)%(HEAD) \
+%(color:brightblue)%(refname:short)%(color:reset)\
+%(if) %(upstream) %(then) --> %(color:brightgreen)%(upstream:short) \
+u%(upstream:trackshort)%(end)\
+%(if) %(symref) %(then): %(symref:short)%(end)\"" 
+        remote-branches = branch -r
+        all-branches = !git show-remote-branches && git show-local-branches
+
 [rerere]
 	enabled = 1
+[color]
+	ui = auto
+[color "branch"]
+    remote = brightgreen
+    local = brightblue
+    current = brightcyan bold
+    upstream = yellow
