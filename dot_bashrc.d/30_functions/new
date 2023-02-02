@@ -93,7 +93,8 @@ function __update-cached-repo()(
     git remote set-url origin "$gitrepo"
   fi
 
-  # pull for latest changes
-  git fetch -q -n --update-shallow --depth 1 origin main:refs/remotes/origin/main
-  # git reset origin/main -q --hard
+  # fetch latest changes
+  git fetch -n --update-shallow --depth 1 origin main:refs/remotes/origin/main -q
+  # Reset to origin(just pulled)
+  git reset origin/main --hard -q
 )
