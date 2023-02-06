@@ -122,5 +122,6 @@ vnoremap <C-c> "+y
 nnoremap <C-c> "+yy
 inoremap <C-c> <ESC>"+yyi
 
-
+" Quick quit
+nnoremap <C-k> :q<cr>
 
