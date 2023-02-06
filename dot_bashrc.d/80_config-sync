@@ -1,0 +1,13 @@
+#! /usr/bin/env bash
+
+# ~/.bashrc.d/80_config-sync
+#
+# Updates config files with `chezmoi re-add`
+# on login to first shlvl
+#
+#
+
+# Only runs on first shell level if chezmoi is installed
+if [[ $SHLVL -eq 1 ]] && command -v chezmoi &>/dev/null; then
+  chezmoi re-add
+fi

@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# ~/.bashrc.d/45_neofetch_info
+#
+# Displays neofetch if shlvl = 1
+# This should be before backup information
+#
+if [[ $SHLVL -eq 1 ]] && command -v neofetch &>/dev/null; then
+    neofetch
+fi
