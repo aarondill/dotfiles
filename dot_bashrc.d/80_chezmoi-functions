@@ -5,10 +5,19 @@
 # Creates vim function to open chezmoi edit if possible
 # also creates editor function to call the vim()
 #
+# This is not perfect but allows for much easier usage of
+# chezmoi edit, without requiring extra thought about whether
+# a file is managed
 #
 
-# Only runs on first shell level if chezmoi is installed
+# Only runs if chezmoi is installed
 if command -v chezmoi &>/dev/null; then
+
+  # config alias for chezmoi
+  alias config='chezmoi'
+  # Completion for config alias
+  source ~/.local/share/bash-completion/completions/config
+
   vim(){
     if chezmoi source-path "$@"; then
         chezmoi edit -a -- "$@"
