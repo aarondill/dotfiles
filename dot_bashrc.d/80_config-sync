@@ -1,23 +1,19 @@
 #! /usr/bin/env bash
 
-# ~/.bashrc.d/80_config-chezmoi
+# ~/.bashrc.d/80_config-sync
 #
 # Updates config files with `chezmoi re-add`
 # on login to first shlvl
-# Created vim function to open chezmoi edit if possible,
-# else vim 
+#
 #
 
 # Only runs on first shell level if chezmoi is installed
-if command -v chezmoi &>/dev/null; then
-  if [[ $SHLVL -eq 1 ]]; then
-      chezmoi re-add >/dev/null
-  fi
+if [[ $SHLVL -eq 1 ]] && command -v chezmoi &>/dev/null; then
+  chezmoi re-add >/dev/null
   vim(){
     if chezmoi source-path "$1"; then
         chezmoi edit "$1"
     else "$(which vim)" "$1"
     fi
   }
-  export -f vim
 fi
