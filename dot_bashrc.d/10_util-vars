@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# shellcheck disable=SC2034 # allow unused variables
+
+# ~/.bashrc.d/10_utilVars
+#
+# Stores variables useful to end-user usage
+# Includes token keys and common directory variables
+# Any variable declared here is exported automatically
+OLDOPTS=$(set +o)
+set -o allexport
+# Make sure code goes below this
+
+# File locations
+vscode=~/vscode
+bash=$vscode/bashScripts
+js=$vscode/js
+javascript=$js
+java=$vscode/Java
+python=$vscode/Python
+chromeext=$vscode/chromeExtensions
+config=$vscode/config
+backup=/mnt/chromeos/removable/Backup/
+
+# Place Variables above this
+while IFS= read -r line; do
+    eval "$line"
+done < <(printf '%s' "$OLDOPTS")
+unset OLDOPTS
