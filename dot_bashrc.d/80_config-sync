@@ -1,10 +1,11 @@
 #! /usr/bin/env bash
 
-# ~/.bashrc.d/80_config-sync
+# ~/.bashrc.d/80_config-chezmoi
 #
 # Updates config files with `chezmoi re-add`
 # on login to first shlvl
-#
+# Created vim function to open chezmoi edit if possible,
+# else vim 
 #
 
 # Only runs on first shell level if chezmoi is installed
