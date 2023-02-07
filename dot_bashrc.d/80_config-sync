@@ -8,12 +8,15 @@
 #
 
 # Only runs on first shell level if chezmoi is installed
-if [[ $SHLVL -eq 1 ]] && command -v chezmoi &>/dev/null; then
-  chezmoi re-add >/dev/null
+if command -v chezmoi &>/dev/null; then
+  if [[ $SHLVL -eq 1 ]]; then
+      chezmoi re-add >/dev/null
+  fi
   vim(){
     if chezmoi source-path "$1"; then
         chezmoi edit "$1"
     else "$(which vim)" "$1"
     fi
   }
+  export -f vim
 fi
