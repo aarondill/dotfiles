@@ -11,9 +11,9 @@
 if [[ $SHLVL -eq 1 ]] && command -v chezmoi &>/dev/null; then
   chezmoi re-add >/dev/null
   vim(){
-    if chezmoi source-path "$@"; then
-        chezmoi edit -a -- "$@"
-    else "$(which vim)" "$@"
+    if chezmoi source-path "$1"; then
+        chezmoi edit "$1"
+    else "$(which vim)" "$1"
     fi
   }
 fi
