@@ -2,8 +2,8 @@
 
 # ~/.bashrc.d/80_config-sync
 #
-# Updates config files with `chezmoi re-add`
-# on login to first shlvl
+# Creates vim function to open chezmoi edit if possible
+# also creates editor function to call the vim()
 #
 #
 
@@ -15,4 +15,6 @@ if command -v chezmoi &>/dev/null; then
     else "$(which vim)" "$@"
     fi
   }
+  editor(){ vim "$@"; }
+  export -f vim editor
 fi
