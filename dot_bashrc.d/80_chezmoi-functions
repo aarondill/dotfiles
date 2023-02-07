@@ -21,7 +21,10 @@ if command -v chezmoi &>/dev/null; then
   vim(){
     if chezmoi source-path "$@"; then
         chezmoi edit -a -- "$@"
-    else "$(which vim)" "$@"
+        # Re-add files, incase another file was updated locally
+        chezmoi re-add
+    else 
+        "$(which vim)" "$@"
     fi
   }
   editor(){ vim "$@"; }
