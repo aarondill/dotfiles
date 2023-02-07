@@ -16,15 +16,6 @@ alias cl='clear'
 # Alias to remove error messages on opening google-chrome
 alias google-chrome='2>/dev/null google-chrome'
 
-# Alias for dotfile manager and completion
-if command -v chezmoi &>/dev/null; then
-  alias config='chezmoi'
-  # Completion for config alias
-  source ~/.local/share/bash-completion/completions/config
-
-  alias config-update='chezmoi re-add'
-fi
-
 # Allow usage of `has` with non-defined programs
 alias has='HAS_ALLOW_UNSAFE=y has'
 
