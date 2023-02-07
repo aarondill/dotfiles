@@ -9,6 +9,11 @@
 
 # Only runs on first shell level if chezmoi is installed
 if [[ $SHLVL -eq 1 ]] && command -v chezmoi &>/dev/null; then
-  printf '%s\n' "Updating chezmoi repo"
   chezmoi re-add >/dev/null
+  vim(){
+    if chezmoi source-path "$1"; then
+        chezmoi edit "$1"
+    else "$(which vim)" "$1"
+    fi
+  }
 fi
