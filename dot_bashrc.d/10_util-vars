@@ -21,9 +21,6 @@ chromeext=$vscode/chromeExtensions
 config=$vscode/config
 backup=/mnt/chromeos/removable/Backup/
 
-# Overwrite editor variable
-EDITOR="vim"
-
 # Place Variables above this
 while IFS= read -r line; do
     eval "$line"
