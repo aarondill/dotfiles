@@ -7,10 +7,8 @@
 #
 #
 
-echo $SHLVL
-command -v chezmoi
 # Only runs on first shell level if chezmoi is installed
 if [[ $SHLVL -eq 1 ]] && command -v chezmoi &>/dev/null; then
-  echo readding config
-  chezmoi re-add
+  printf '%s\n' "Updating chezmoi repo"
+  chezmoi re-add >/dev/null
 fi
