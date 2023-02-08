@@ -29,3 +29,9 @@ if zoxide -V &>/dev/null; then
   eval "$(zoxide init bash)"
   alias cd='z'
 fi
+
+# if `bc` is installed set aliases for it
+if command -v bc &>/dev/null; then
+  alias bc='bc -l'
+  alias calc='bc -l'
+fi
