@@ -13,6 +13,11 @@ alias la="ls -A"
 alias ll="ls -hl"
 alias lla="ls -Ahl"
 alias cl='clear'
+
+# alias for 7z zipping files that should be hidden 
+alias secret-zip='7z a -r -P -mhe=on'
+alias secret-unzip='7z x'
+
 # Alias to remove error messages on opening google-chrome
 # Also allows css detection of dark mode
 alias google-chrome='2>/dev/null google-chrome --enable-features=WebUIDarkMode --force-dark-mode'
