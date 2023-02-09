@@ -14,7 +14,8 @@ alias ll="ls -hl"
 alias lla="ls -Ahl"
 alias cl='clear'
 # Alias to remove error messages on opening google-chrome
-alias google-chrome='2>/dev/null google-chrome'
+# Also allows css detection of dark mode
+alias google-chrome='2>/dev/null google-chrome --enable-features=WebUIDarkMode --force-dark-mode'
 
 # Allow usage of `has` with non-defined programs
 alias has='HAS_ALLOW_UNSAFE=y has'
