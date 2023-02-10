@@ -1,6 +1,6 @@
 // ~/vscode/.eslintrc.rc
 /** @type {import("eslint").Linter.Config} */
-const baseConfig = {
+const eslintConfig = {
 	root: true,
 	env: {
 		browser: true,
