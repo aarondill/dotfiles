@@ -1,5 +1,4 @@
-// ~/vscode/.eslintrc.rc
-/** @type {import("eslint").Linter.Config} */
+// ~/vscode/.eslintrc.rc /** @type {import("eslint").Linter.Config} */
 const eslintConfig = {
 	root: true,
 	env: {
@@ -102,4 +101,4 @@ const eslintConfig = {
 	},
 };
 
-module.exports = { eslintConfig };
+module.exports = eslintConfig;
