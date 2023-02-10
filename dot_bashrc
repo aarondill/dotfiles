@@ -148,8 +148,8 @@ while IFS= read -r -d '' file; do
 done < <(find ~/.bashrc.d/ -type f -not -name "_*" -print0 | LC_ALL=C sort -z)
 # Above: Find all files not starting with _, and sort, ensuring base lang
 
-# ------------------------------END OF FILE------------------------------
-
 # tabtab source for packages
 # uninstall by removing these lines
 [ -f ~/.config/tabtab/bash/__tabtab.bash ] && . ~/.config/tabtab/bash/__tabtab.bash || true
+
+# ------------------------------END OF FILE------------------------------
