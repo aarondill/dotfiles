@@ -153,8 +153,3 @@ done < <(find ~/.bashrc.d/ -type f -not -name "_*" -print0 | LC_ALL=C sort -z)
 [ -f ~/.config/tabtab/bash/__tabtab.bash ] && . ~/.config/tabtab/bash/__tabtab.bash || true
 
 # ------------------------------END OF FILE------------------------------
-
-# pnpm
-export PNPM_HOME="/home/aaron/.local/share/pnpm"
-export PATH="$PNPM_HOME:$PATH"
-# pnpm end
