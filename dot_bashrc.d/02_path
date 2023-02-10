@@ -10,3 +10,7 @@
 # fix java path to allow running
 PATH=$PATH:/usr/lib/jvm/jdk-19/bin
 
+# allow pnpm bin
+export PNPM_HOME="/home/aaron/.local/share/pnpm"
+export PATH="$PNPM_HOME:$PATH"
+
