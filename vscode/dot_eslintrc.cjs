@@ -12,13 +12,9 @@ const eslintConfig = {
 		sourceType: "module",
 		impliedStrict: true,
 	},
-	plugins: ["no-floating-promise"],
 	// Don't check generated code or node modules
 	ignorePatterns: ["out", "dist", "**/*.d.ts", "node_modules"],
 	rules: {
-		/* Plugins */
-		"no-floating-promise/no-floating-promise": ["warn"],
-
 		/* Javascript Builtin */
 		"use-isnan": ["error", { enforceForIndexOf: true }],
 		"no-unused-expressions": [
