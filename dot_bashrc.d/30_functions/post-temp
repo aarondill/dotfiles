@@ -6,6 +6,10 @@
 #
 #
 function post-temp(){
+  if [ "$1" = "--help"];then
+    printf '%s\n' "post-temp FILE" "" "Hosts a temporary file on the internet for 60 mins at the url."
+    return 0;
+  fi
   if ! [[ -f "$1" ]]; then
       printf "The path given is not a file"
       return 2
@@ -13,7 +17,7 @@ function post-temp(){
   local result="$(curl -F "file=@$1" https://tmpfiles.org/api/v1/upload)"
     # Example output:
     # {"status":"success","data":{"url":"https://tmpfiles.org/######/file"}} 
-  if command -v 'fx'; then 
+  if command -v 'fx' &>/dev/null; then 
     # Print the result thru fx to get the data
     printf '%s' "$result" | fx '.status'
     printf '%s' "$result" | fx '.data.url'
