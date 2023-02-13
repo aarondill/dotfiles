@@ -12,3 +12,5 @@ function new-tty(){
     printf "%s\n" "could not find $terminal"
   fi
 }
+
+export -f new-tty
