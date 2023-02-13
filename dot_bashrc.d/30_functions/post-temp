@@ -2,12 +2,12 @@
 
 # ~/.bashrc.d/30_functions/post-temp
 #
-# Hosts a temporary file on the internet for 60 mins at the url.
+# Hosts a temporary file on the internet for 60 mins and returns the url.
 #
 #
 function post-temp(){
   if [ "$1" = "--help" ];then
-    printf '%s\n' "post-temp FILE" "" "Hosts a temporary file on the internet for 60 mins at the url."
+    printf '%s\n' "post-temp FILE" "" "Hosts a temporary file on the internet for 60 mins and returns the url."
     return 0;
   fi
   if ! [[ -f "$1" ]]; then
