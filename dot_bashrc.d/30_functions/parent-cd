@@ -10,7 +10,7 @@ parent-cd() {
     local path truepath filein
 
     if [ "$1" = "--help" ]; then
-        printf '%s\n\n%s' "parent-cd [mesasge]" "pushds to the parent of a file, calls which if file doesn't exist"
+        printf '%s\n\n%s\n' "parent-cd [mesasge]" "pushds to the parent of a file, calls which if file doesn't exist"
         return 0
     fi
     filein=$1
