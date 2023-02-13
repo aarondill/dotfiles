@@ -8,6 +8,24 @@
 #
 
 assert_newlines() {
-  # change all subdirectories and files to end in newlines
-  "$bash"/assertNewLines "$@"
+  if [ "$1" = "--help" ];then
+    printf '%s\n\n%s' 'assert_newlines [parent_dir]' "searches all text files and appends a newline if it doesn't already end in a one."
+    return 0
+  fi
+  if [[ $# -gt 1 ]];then
+    printf '%s\n' "only one argument is allowed"
+    return 2
+  fi
+  if [[ -n "$1" -a ! -e "$1" ]]; then
+    printf '%s\n' "$1 does not exist"
+  fi
+
+  IFS= readarray -d '' files < <(find "${1:-.}" -not -path '*/.*' -type f -exec grep -Iq . {} \; -print0)
+  for file in "$@"; do
+    # Check if ends in new line
+    if ! [[ $(tail -c1 "$file" | wc -l) -gt 0 ]]; then
+      echo "adding newline to $file"
+      echo "" >> "$file"
+    fi
+  done
 }
