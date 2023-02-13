@@ -7,6 +7,7 @@
 function new-tty(){
   if [ "$1" = "--help"];then
     printf '%s\n' "new-tty" "Creates a new disowned gnome-terminal instance then exits this one"
+    return 0
   fi
   local terminal=gnome-terminal
   if command -v "$terminal" &>/dev/null; then
