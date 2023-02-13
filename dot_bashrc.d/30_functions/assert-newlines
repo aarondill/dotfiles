@@ -18,6 +18,7 @@ assert_newlines() {
   fi
   if [[ -n "$1" && ! -e "$1" ]]; then
     printf '%s\n' "$1 does not exist"
+    return 2
   fi
 
   IFS= readarray -d '' files < <(find "${1:-.}" -not -path '*/.*' -type f -exec grep -Iq . {} \; -print0)
