@@ -6,7 +6,7 @@
 #
 #
 function post-temp(){
-  if [ "$1" = "--help"];then
+  if [ "$1" = "--help" ];then
     printf '%s\n' "post-temp FILE" "" "Hosts a temporary file on the internet for 60 mins at the url."
     return 0;
   fi
