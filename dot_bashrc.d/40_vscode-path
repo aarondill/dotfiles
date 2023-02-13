@@ -9,7 +9,7 @@
 
 if [[ "$IS_IN_VSCODE" = "true" ]]; then
   # shellcheck disable=SC2016
-  prompt_inject='echo -n "$PWD" >| ~/.tmp/vscodePath'
+  prompt_inject='(mkdir -p ~/.tmp/ && echo -n "$PWD" >| ~/.tmp/vscodePath)'
   # Ensure prompt command ends with a ;
   PROMPT_COMMAND="${PROMPT_COMMAND:+${PROMPT_COMMAND/%;/};}$prompt_inject"
   unset prompt_inject
