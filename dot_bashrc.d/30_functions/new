@@ -15,6 +15,11 @@
 
 export __ts_template_folder="${XDG_CACHE_HOME:-$HOME/.cache}/ts-template"
 function new() (
+  printf 'DEPRECIATED: Use "pnpm create @aarondill/ts NAME" instead'
+  if [ "$1" = "--help" ]; then
+    printf '%s\n\n%s' "new NAME" "Creates a new TS-Project"
+    return 0
+  fi
   export yesarg=''
   # If first arg is -y or --yes set yes arg and shift
   if [[ "$1" = '-y' || "$1" = '--yes' ]]; then

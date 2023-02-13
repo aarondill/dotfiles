@@ -5,9 +5,20 @@
 # Sets up fp function for fuzzy finding.
 # Also sets default fzf command for direct invocations
 #
-export FZF_DEFAULT_COMMAND='find .'
 
-fp() {
-    FZF_DEFAULT_COMMAND='find ${1:-.}' fzf --preview "bat --style=numbers --color=always --line-range :500 {}"
-}
-export -f fp
+if command -v fzf; then
+    export FZF_DEFAULT_COMMAND='find .'
+
+    fp() {
+        if [ "$1" = '--help' ]; then
+            printf '%s\n%s' \
+                'fp' \
+                '' \
+                'Uses find with the first argument to output the user'"'"'s choice of files' \
+                "Commonly used as cd \"\$(fp)\""
+            return 0
+        fi
+        FZF_DEFAULT_COMMAND="find ${1:-.}" fzf --preview "bat --style=numbers --color=always --line-range :500 {}"
+    }
+    export -f fp
+fi

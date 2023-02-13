@@ -10,6 +10,11 @@
 #
 
 compush() { # Commit and push to git
+
+  if [ "$1" = "--help" ]; then
+    printf '%s\n\n%s' "compush [mesasge]" "Commits with message given, and pushes to origin"
+    return 0
+  fi
   if ! git rev-parse --git-dir >/dev/null 2>&1; then return 1; fi
   if [[ -n "$1" ]]; then
     git add . &&

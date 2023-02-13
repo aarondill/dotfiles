@@ -1,23 +1,26 @@
 #! /usr/bin/env bash
 
 # ~/.bashrc.d/40_vscodePath
-# 
+#
 # Creates a file ~/.tmp/vscodePath when IS_IN_VSCODE is 'true'
-# on startup. Also creates vspath function which calls cd on 
+# on startup. Also creates vspath function which calls cd on
 # the value contained in that file.
 #
 
 if [[ "$IS_IN_VSCODE" = "true" ]]; then
   # shellcheck disable=SC2016
   prompt_inject='echo -n "$PWD" >| ~/.tmp/vscodePath'
-# Ensure prompt command ends with a ;
+  # Ensure prompt command ends with a ;
   PROMPT_COMMAND="${PROMPT_COMMAND:+${PROMPT_COMMAND/%;/};}$prompt_inject"
   unset prompt_inject
 fi
 
 vspath() {
+  if [ "$1" = "--help" ]; then
+    printf '%s\n\n%s' "vspath" "goes to the last path visited in a VSCode terminal"
+    return 0
+  fi
   if [[ -f ~/.tmp/vscodePath ]]; then
     cd "$(cat ~/.tmp/vscodePath)" || exit $?
   fi
 }
-
