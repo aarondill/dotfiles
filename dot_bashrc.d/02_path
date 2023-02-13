@@ -8,7 +8,8 @@
 #
 
 # fix java path to allow running
-PATH=$PATH:/usr/lib/jvm/jdk-19.0.2/bin
+export JAVA_HOME=/usr/lib/jvm/jdk-19.0.2
+export PATH=$JAVA_HOME/bin:$PATH
 
 # allow pnpm bin
 export PNPM_HOME="/home/aaron/.local/share/pnpm"
