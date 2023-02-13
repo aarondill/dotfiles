@@ -6,7 +6,7 @@
 # Also sets default fzf command for direct invocations
 #
 
-if command -v fzf; then
+if command -v fzf &>/dev/null; then
     export FZF_DEFAULT_COMMAND='find .'
 
     fp() {
