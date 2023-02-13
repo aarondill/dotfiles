@@ -4,6 +4,7 @@
 #
 # Creates a new disowned gnome-terminal instance then exits this one
 #
+echo new-tty
 function new-tty(){
   local terminal=gnome-terminal
   if command -v "$terminal" &>/dev/null;
