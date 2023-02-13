@@ -12,7 +12,8 @@ function new-tty(){
 
   local terminal=gnome-terminal
   if command -v "$terminal" &>/dev/null; then
-    gnome-terminal "$@" & disown & exit
+#    gnome-terminal "$@" & disown & exit
+:
   else 
     printf "%s\n" "could not find $terminal"
   fi
