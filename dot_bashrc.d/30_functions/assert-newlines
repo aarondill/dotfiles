@@ -16,7 +16,7 @@ assert_newlines() {
     printf '%s\n' "only one argument is allowed"
     return 2
   fi
-  if [[ -n "$1" -a ! -e "$1" ]]; then
+  if [[ -n "$1" && ! -e "$1" ]]; then
     printf '%s\n' "$1 does not exist"
   fi
 
