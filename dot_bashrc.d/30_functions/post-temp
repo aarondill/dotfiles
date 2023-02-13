@@ -10,7 +10,7 @@ function post-temp(){
       printf "The path given is not a file"
       return 2
   fi
-  local result = "$(curl -F "file=@$1" https://tmpfiles.org/api/v1/upload)"
+  local result="$(curl -F "file=@$1" https://tmpfiles.org/api/v1/upload)"
     # Example output:
     # {"status":"success","data":{"url":"https://tmpfiles.org/######/file"}} 
   if command -v 'fx'; then 
