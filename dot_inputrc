@@ -78,3 +78,5 @@ C-b:unix-filename-rubout
 "\e\C-o": dabbrev-expand
 # edit in $editor with C-M-e
 "\e\C-e": "\C-x \C-e"
+"\e\C-f": dump-functions
+
