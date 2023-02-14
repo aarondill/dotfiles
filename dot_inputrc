@@ -67,6 +67,8 @@ $endif
 $endif
 
 set colored-stats on
+set colored-completion-prefix on
+
 set completion-map-case on
 set completion-ignore-case on
 C-b:unix-filename-rubout
