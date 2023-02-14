@@ -1,0 +1,12 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhistcnt =3
+let g:netrw_dirhist_3='/home/aaron/vscode/js/create-ts'
+let g:netrw_dirhist_2='/home/aaron/.local/share/chezmoi/dot_bashrc.d'
+let g:netrw_dirhist_1='/home/aaron/.local/share/chezmoi/dot_bashrc.d/30_functions'
+let g:netrw_dirhist_0='/home/aaron/.local/share/chezmoi/dot_bashrc.d'
+let g:netrw_dirhist_9='/home/aaron'
+let g:netrw_dirhist_8='/home/aaron/.local/share/chezmoi'
+let g:netrw_dirhist_7='/home/aaron/.local/share/chezmoi/dot_bashrc.d'
+let g:netrw_dirhist_6='/home/aaron/.local/share/chezmoi/dot_bashrc.d/30_functions'
+let g:netrw_dirhist_5='/home/aaron/.local/share/chezmoi/dot_bashrc.d'
+let g:netrw_dirhist_4='/home/aaron/.local/share/chezmoi/dot_bashrc.d/30_functions'
