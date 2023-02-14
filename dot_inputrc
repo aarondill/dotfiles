@@ -70,4 +70,5 @@ set colored-stats on
 set completion-map-case on
 set completion-ignore-case on
 C-b:unix-filename-rubout
+set editing-mode vi
 
