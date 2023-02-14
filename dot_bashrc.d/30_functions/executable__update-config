@@ -22,7 +22,7 @@ exec chezmoi add "${files[@]}"
 ~/.profile
 ~/.root
 ~/.ssh
-~/.vim
+~/.vim/vimrc
 ~/vscode/.eslintrc.cjs
 ~/vscode/.prettierrc.js
 ~/vscode/.release-it.json
