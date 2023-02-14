@@ -1,0 +1,5 @@
+#! /usr/bin/env bash
+function update-config(){
+    ~/.bashrc.d/30_functions/_update-config "$@"
+}
+export -f update-config

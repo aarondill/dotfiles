@@ -1,0 +1,30 @@
+#! /usr/bin/env bash
+# ~/.bashrc.d/30_functions/_update-config
+#
+# When called, runs this script to add the files starting from line fileStart
+fileStart=9
+readarray -t files <<<"$(tail -n "+$fileStart" "$0")"
+exec chezmoi add "${files[@]}"
+# Files must be below this comment!
+~/.backup/backup.config
+~/.bash_logout
+~/.bashrc
+~/.bashrc.d
+~/.config/gh
+~/.config/tabtab
+~/.gitconfig
+~/.inputrc
+~/.local/bin
+~/.local/etc
+~/.local/share/bash-completion
+~/.npmrc
+~/.pam_environment
+~/.profile
+~/.root
+~/.ssh
+~/.vim
+~/vscode/.eslintrc.cjs
+~/vscode/.prettierrc.js
+~/vscode/.release-it.json
+~/vscode/.shellcheckrc
+~/vscode/js/.gitignore
