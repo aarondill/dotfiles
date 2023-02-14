@@ -71,4 +71,10 @@ set colored-completion-prefix on
 
 set completion-map-case on
 set completion-ignore-case on
+
+# C-b: Remove file name to slash
 C-b:unix-filename-rubout
+#C-M-o: auto complete from history 
+"\e\C-o": dabbrev-expand
+# edit in $editor with C-M-e
+"\e\C-e": "C-x C-e"
