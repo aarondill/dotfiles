@@ -91,7 +91,7 @@ set softtabstop=4
 set expandtab
 
 " Set tab and >> to be 2 spaces in bash files
-autocmd FileType sh setlocal shiftwidth=2 tabstop=2
+autocmd FileType sh setlocal shiftwidth=2 tabstop=2 softtabstop=2 
 
 " Map Y to act like D and C, i.e. to yank until EOL, rather than act as yy,
 " which is the default
