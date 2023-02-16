@@ -14,9 +14,4 @@ if [ -n "$BASH_VERSION" ]; then
   if [ -f "$HOME/.bashrc" ]; then
     . "$HOME/.bashrc"
   fi
-# If not running bash
-elif [ -f "$HOME"/.bashrc.d/*_path ]; then
-  # include .bashrc.d/*_path if it exists
-	. "$HOME"/.bashrc.d/*_path
-fi
- 
+fi 
