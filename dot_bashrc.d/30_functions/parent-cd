@@ -15,11 +15,11 @@ parent-cd() {
     fi
     filein=$1
     # If not a file, try which
-    if ! [[ -e "$filein" ]]; then
+    if [[ ! -e "$filein" ]]; then
         filein=$(which "$filein")
     fi
     # Last chance.
-    if ! [[ -e "$filein" ]]; then
+    if [[ ! -e "$filein" ]]; then
         printf '%s is not a file' "$filein"
         return 1
     fi
