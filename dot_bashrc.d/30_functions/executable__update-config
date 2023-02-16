@@ -28,3 +28,4 @@ exec chezmoi add "${files[@]}"
 ~/vscode/.release-it.json
 ~/vscode/.shellcheckrc
 ~/vscode/js/.gitignore
+~/.config/nvim/ 

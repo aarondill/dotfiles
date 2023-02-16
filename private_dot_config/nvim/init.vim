@@ -1,8 +1,8 @@
-# Setup neovim to use vimrc
+" Setup neovim to use vimrc
 set runtimepath^=~/.vim runtimepath+=~/.vim/after
 let &packpath=&runtimepath
-if filereadable(expand("~/.vimrc"))
+if filereadable(expand('~/.vimrc'))
     source ~/.vimrc
-elseif filereadable(expand("~/.vim/vimrc"))
+elseif filereadable(expand('~/.vim/vimrc'))
     source ~/.vim/vimrc
 endif

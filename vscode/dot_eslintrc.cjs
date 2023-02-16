@@ -16,6 +16,7 @@ const eslintConfig = {
 	ignorePatterns: ["out", "dist", "**/*.d.ts", "node_modules"],
 	rules: {
 		/* Javascript Builtin */
+		eqeqeq: "warn",
 		"use-isnan": ["error", { enforceForIndexOf: true }],
 		"no-unused-expressions": [
 			"warn",
@@ -56,7 +57,7 @@ const eslintConfig = {
 			"error",
 			{
 				functions: false,
-				classes: false,
+				classes: true,
 				variables: true,
 				allowNamedExports: true,
 			},
