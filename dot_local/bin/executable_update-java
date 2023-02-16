@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+# ~/.local/bin/update-java
+#
+# Updates java symlinks to the path specified using update-alternatives
+#
+
+if [ "$1" = --help ] || [ $# -eq 0 ]; then
+  printf '%s\n%s\n' 'update-java <JAVADIR> [priority = 100]' 'Updates java symlinks to the path specified using update-alternatives. Do not include /bin on JAVADIR'
+  [ $# -eq 0 ] && exit 2 || exit 0
+fi
+JAVADIR=$1
+PRIORITY=${2:-100}
+BINDIR=/usr/bin
+if ! [[ -d "$JAVADIR" ]]; then
+  printf '"%s" is not a directory\n' "$JAVADIR"
+  exit 2
+else
+  JAVADIR=$(realpath -- "$JAVADIR")
+fi
+
+if [[ "$JAVADIR" =~ ?(.*)/bin$ ]]; then
+  read -rep "$JAVADIR ends in /bin, would you like to use it's parent? (yes) " confirmation
+  if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
+    JAVADIR=$(dirname -- "$(realpath -- "$JAVADIR")")
+  fi
+fi
+
+# Update sudo timestamp
+sudo --validate || exit
+
+read -rep "Are you sure you would like to link all binaries in $JAVADIR? (yes) " confirmation
+if [[ -n "$confirmation" && ! "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
+  printf '%s\n' "Aborting"
+  exit 1
+fi
+find "$JAVADIR" -perm /u=x,g=x,o=x -type f | while read -sr FP; do
+  FN=$(basename -- "$FP")
+  printf '%s\n' "update-alternatives --install \"$BINDIR/$FN\" \"$FN\" \"$FP\" \"$PRIORITY\""
+  sudo -E -H update-alternatives --install "$BINDIR/$FN" "$FN" "$FP" "$PRIORITY"
+done
