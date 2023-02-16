@@ -20,7 +20,7 @@ parent-cd() {
     fi
     # Last chance.
     if [[ ! -e "$filein" ]]; then
-        printf '%s is not a file\n' "$filein"
+        printf '%s is not a file\n' "$1"
         return 1
     fi
     truepath=$(realpath -e -- "$filein") || return
