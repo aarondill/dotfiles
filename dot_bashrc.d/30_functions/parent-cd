@@ -7,23 +7,23 @@
 #
 
 parent-cd() {
-    local path truepath filein
+  local path truepath filein
 
-    if [ "$1" = "--help" ]; then
-        printf '%s\n\n%s\n' "parent-cd [mesasge]" "pushds to the parent of a file, calls which if file doesn't exist"
-        return 0
-    fi
-    filein=$1
-    # If not a file, try which
+  if [ "$1" = "--help" ]; then
+    printf '%s\n\n%s\n' "parent-cd [mesasge]" "pushds to the parent of a file, calls which if file doesn't exist"
+    return 0
+  fi
+  filein=$1
+  # If not a file, try which
+  if [[ ! -e "$filein" ]]; then
+    filein=$(which "$filein" || printf '%s' "$filein")
+    # If not found path
     if [[ ! -e "$filein" ]]; then
-        filein=$(which "$filein")
+      printf '%s is not a file\n' "$1"
+      return 1
     fi
-    # Last chance.
-    if [[ ! -e "$filein" ]]; then
-        printf '%s is not a file\n' "$1"
-        return 1
-    fi
-    truepath=$(realpath -e -- "$filein") || return
-    path="$(dirname -- "$truepath")" || return
-    pushd -- "$path" || return
+  fi
+  truepath=$(realpath -e -- "$filein") || return
+  path="$(dirname -- "$truepath")" || return
+  pushd -- "$path" || return
 }
