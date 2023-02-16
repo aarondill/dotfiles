@@ -14,19 +14,16 @@ parent-cd() {
         return 0
     fi
     filein=$1
-    echo $filein
     # If not a file, try which
     if [[ ! -e "$filein" ]]; then
         filein=$(which "$filein")
     fi
-    echo $filein
     # Last chance.
     if [[ ! -e "$filein" ]]; then
-        printf '%s is not a file' "$filein"
+        printf '%s is not a file\n' "$filein"
         return 1
     fi
-    echo calling realpath
-    truepath=$(realpath -e -- "$1") || return
+    truepath=$(realpath -e -- "$filein") || return
     path="$(dirname -- "$truepath")" || return
     pushd -- "$path" || return
 }
