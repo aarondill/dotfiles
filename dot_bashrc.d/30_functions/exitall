@@ -21,6 +21,7 @@ bash() {
         echo "Exit $returncode"
     fi
     echo "Shell level $SHLVL"
+    return $returncode
 }
 
 exit() { exitall "$@"; }
