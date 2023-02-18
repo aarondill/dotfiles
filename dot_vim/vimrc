@@ -128,6 +128,9 @@ inoremap <C-c> <ESC>"+yyi
 
 " Quick quit
 nnoremap <C-k> :q<cr>
+" Terminal allow escape to exit insert
+tnoremap <Esc> <C-\><C-n>
+
 if has('autocmd') && has('eval')
     " Install vim-plug
     let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
