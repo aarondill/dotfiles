@@ -15,4 +15,3 @@ else
    " Create warning on :W command if in neovim 
    command W :echom "Running commands in neovim doesn't connect stdin to tty"
 endif
-PlugInstall
