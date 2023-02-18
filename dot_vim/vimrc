@@ -59,7 +59,7 @@ else
     Plug 'SirVer/ultisnips'
     " Snippets are separated from the engine. Add this if you want them:
     Plug 'honza/vim-snippets'
-    let g:UltiSnipsExpandTrigger="<leader><tab>"
+    let g:UltiSnipsExpandTrigger="<tab>"
     let g:UltiSnipsJumpForwardTrigger="<leader>n"
     let g:UltiSnipsJumpBackwardTrigger="<leader><s-n>"
     let g:UltiSnipsSnippetDirectories = ['~/.vim/UltiSnips', 'UltiSnips']
