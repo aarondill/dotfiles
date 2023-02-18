@@ -64,6 +64,6 @@ else
     let g:UltiSnipsJumpBackwardTrigger="<leader><s-n>"
     let g:UltiSnipsSnippetDirectories = ['~/.vim/UltiSnips', 'UltiSnips']
     let g:UltiSnipsEditSplit="vertical"
-   
+
     call plug#end()
 endif
