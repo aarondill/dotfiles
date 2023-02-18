@@ -68,6 +68,8 @@ else
     let g:UltiSnipsJumpBackwardTrigger = "<C-k>"
     let g:UltiSnipsSnippetDirectories = ['~/.vim/UltiSnips', 'UltiSnips']
     let g:UltiSnipsEditSplit="vertical"
+
+    Plug 'raimondi/delimitmate'
     
     call plug#end()
 endif
