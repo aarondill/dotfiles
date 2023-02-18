@@ -102,7 +102,7 @@ nnoremap <C-L> :nohl<CR><C-L>
 
 set relativenumber
 " Change z key in normal mode to undo
-" nnoremap z u
+nnoremap z u
 
 " Change .conf syntax highlighting
 au BufEnter,BufRead *.conf setf dosini
