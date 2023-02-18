@@ -2,9 +2,6 @@
 " have made, as well as sanely reset options when re-sourcing .vimrc
 set nocompatible
 
-" Run the plugins.vim file
-runtime 'plugins.vim'
-
 " Set tab and >> to be 2 spaces in bash files
 autocmd FileType sh setlocal shiftwidth=2 tabstop=2 softtabstop=2 
 
