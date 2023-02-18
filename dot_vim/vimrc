@@ -8,8 +8,8 @@ autocmd FileType sh setlocal shiftwidth=2 tabstop=2 softtabstop=2
 " Change .conf syntax highlighting
 autocmd BufEnter,BufRead *.conf setf dosini
 
+" Create :W command to write as sudo
 if !has('nvim')
-    " Create :W command to write as sudo
     command W :w !sudo tee %  > /dev/null
 else
    " Create warning on :W command if in neovim 
@@ -20,8 +20,7 @@ endif
 "
 "
 
-if !has('autocmd') || !has('eval')
-    echom 'Sorry, autocmd is not supported in this version of vim. Aborting plugin initiation.'
+if !has('autocmd') || !has('eval') | echom 'Sorry, autocmd is not supported in this version of vim. Aborting plugin initiation.'
 else
     " Install vim-plug
     let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
