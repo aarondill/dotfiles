@@ -147,4 +147,6 @@ if has('let')
     call plug#end()
     " Config suda.vim to auto open restricted files
     let g:suda_smart_edit = 1
+else
+    echom 'Sorry, let is not supported in this version of vim. Aborting plugin initiation.'
 endif
