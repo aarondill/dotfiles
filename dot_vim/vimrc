@@ -90,6 +90,7 @@ else
 
     " Install nerdtree for file navigation
     Plug 'scrooloose/nerdtree'
+    nnoremap <C-n> :NERDTreeToggle<CR>
 
     call plug#end()
 endif
