@@ -69,7 +69,15 @@ else
     let g:UltiSnipsSnippetDirectories = ['~/.vim/UltiSnips', 'UltiSnips']
     let g:UltiSnipsEditSplit="vertical"
 
+    " Plugin to add brackets, quotes, etc
     Plug 'raimondi/delimitmate'
+    " Plugin to show unbalanced brackets
+    Plug 'vim-scripts/Highlight-UnMatched-Brackets'
+    " Give motions to sorround values/replace deliminators
+    Plug 'tpope/vim-surround'
     
+    " Shows +- Icons in gutter for git differences
+    Plug 'airblade/vim-gitgutter'
+
     call plug#end()
 endif
