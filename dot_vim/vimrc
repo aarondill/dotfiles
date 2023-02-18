@@ -79,5 +79,6 @@ else
     " Shows +- Icons in gutter for git differences
     Plug 'airblade/vim-gitgutter'
 
+    Plug 'vim-airline/vim-airline'
     call plug#end()
 endif
