@@ -20,6 +20,11 @@ endif
 "
 "
 
+function! Cond(cond, ...)
+  let opts = get(a:000, 0, {})
+  return a:cond ? opts : extend(opts, { 'on': [], 'for': [] })
+endfunction
+
 if !has('autocmd') || !has('eval') | echom 'Sorry, autocmd is not supported in this version of vim. Aborting plugin initiation.'
 else
     " Install vim-plug
@@ -35,12 +40,21 @@ else
     call plug#begin()
     " Plug code here
 
-    if executable('sudo')
-        " Setup suda.vim
-        Plug 'lambdalisue/suda.vim' 
-        " Config suda.vim to auto open restricted files
-        let g:suda_smart_edit = 1
-    endif
+    " Setup suda.vim
+    Plug 'lambdalisue/suda.vim', Cond(executable('sudo'))
+    " Config suda.vim to auto open restricted files
+    let g:suda_smart_edit = 1
+
+    " Install YouCompleteMe for inline-completions
+    Plug 'ycm-core/YouCompleteMe', { 'do': './install.py --all' }
+    
+    " Install ultisnips for snippets.
+    Plug 'SirVer/ultisnips'
+    " Snippets are separated from the engine. Add this if you want them:
+    Plug 'honza/vim-snippets'
+    let g:UltiSnipsExpandTrigger="<tab>s"
+    let g:UltiSnipsJumpForwardTrigger="<c-b>"
+    let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
     call plug#end()
 endif
