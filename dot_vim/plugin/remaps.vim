@@ -26,7 +26,7 @@ inoremap <C-x> <ESC>"+ddi
 " Copy to system clipboard with Ctr + c
 vnoremap <C-c> "+y
 nnoremap <C-c> "+yy
-inoremap <C-c> <ESC>"+yyi
+inoremap <C-c> <ESC>"+yya
 
 " Quick quit
 nnoremap <C-k> :q<cr>
