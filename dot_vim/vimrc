@@ -133,7 +133,6 @@ tnoremap <Esc> <C-\><C-n>
 
 " Set leader key. Any references must be after!
 let mapleader = ','
-set showcmd
 
 if has('autocmd') && has('eval')
     " Install vim-plug
@@ -150,10 +149,14 @@ if has('autocmd') && has('eval')
 
     call plug#begin()
     " Plug code here
-    Plug 'lambdalisue/suda.vim' 
+    
+    if executable('sudo')
+        " Setup suda.vim
+        Plug 'lambdalisue/suda.vim' 
+        " Config suda.vim to auto open restricted files
+        let g:suda_smart_edit = 1
+    endif
     call plug#end()
-    " Config suda.vim to auto open restricted files
-    let g:suda_smart_edit = 1
 else
     echom 'Sorry, autocmd is not supported in this version of vim. Aborting plugin initiation.'
 endif
