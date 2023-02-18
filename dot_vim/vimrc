@@ -60,13 +60,13 @@ else
     " Snippets are separated from the engine. Add this if you want them:
     Plug 'honza/vim-snippets'
 
-    let g:ycm_key_list_select_completion = ['<C-j>']
-    let g:ycm_key_list_previous_completion = ['<C-k>']
+    let g:ycm_key_list_select_completion = ['<C-j>', '<UP>']
+    let g:ycm_key_list_previous_completion = ['<C-k>', '<DOWN>']
 
     let g:UltiSnipsExpandTrigger = "<C-l>"
     let g:UltiSnipsJumpForwardTrigger = "<C-j>"
     let g:UltiSnipsJumpBackwardTrigger = "<C-k>"
-
+    
     let g:UltiSnipsSnippetDirectories = ['~/.vim/UltiSnips', 'UltiSnips']
     let g:UltiSnipsEditSplit="vertical"
     
