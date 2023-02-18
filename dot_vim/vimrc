@@ -79,6 +79,15 @@ else
     " Shows +- Icons in gutter for git differences
     Plug 'airblade/vim-gitgutter'
 
+    " The status bar
     Plug 'vim-airline/vim-airline'
+
+    Plug 'ctrlpvim/ctrlp.vim'
+    let g:ctrlp_working_path_mode = 'ra'
+    let g:ctrlp_root_markers = ['package.json', 'node_modules']
+    let g:ctrlp_switch_buffer = 'et'
+
+    let g:ctrlp_custom_ignore = '^(\.git|node_modules)$'
+
     call plug#end()
 endif
