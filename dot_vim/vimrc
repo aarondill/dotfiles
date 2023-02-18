@@ -2,6 +2,9 @@
 " have made, as well as sanely reset options when re-sourcing .vimrc
 set nocompatible
 
+" Set leader key. Any references must be after!
+let mapleader = ','
+
 " Stop recording of dir history
 let g:netrw_dirhistmax=0
 
@@ -50,16 +53,17 @@ else
 
     " Install YouCompleteMe for inline-completions
     Plug 'ycm-core/YouCompleteMe', { 'do': './install.py --all' }
+    let g:ycm_key_list_stop_completion="<Enter>"
     
     " Install ultisnips for snippets.
     Plug 'SirVer/ultisnips'
     " Snippets are separated from the engine. Add this if you want them:
     Plug 'honza/vim-snippets'
-    let g:UltiSnipsExpandTrigger="<C-`>"
-    let g:UltiSnipsJumpForwardTrigger="<C-b>"
-    let g:UltiSnipsJumpBackwardTrigger="<C-z>"
-let g:UltiSnipsSnippetDirectories = ['~/.vim/UltiSnips', 'UltiSnips']
-let g:UltiSnipsEditSplit="vertical"
+    let g:UltiSnipsExpandTrigger="<leader><tab>"
+    let g:UltiSnipsJumpForwardTrigger="<leader>n"
+    let g:UltiSnipsJumpBackwardTrigger="<leader><s-n>"
+    let g:UltiSnipsSnippetDirectories = ['~/.vim/UltiSnips', 'UltiSnips']
+    let g:UltiSnipsEditSplit="vertical"
    
     call plug#end()
 endif
