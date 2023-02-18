@@ -53,7 +53,7 @@ else
 
     " Install YouCompleteMe for inline-completions
     Plug 'ycm-core/YouCompleteMe', { 'do': './install.py --all' }
-    let g:ycm_key_list_stop_completion="<Enter>"
+    " let g:ycm_key_list_stop_completion="<Enter>"
     
     " Install ultisnips for snippets.
     Plug 'SirVer/ultisnips'
