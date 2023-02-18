@@ -128,7 +128,7 @@ inoremap <C-c> <ESC>"+yyi
 
 " Quick quit
 nnoremap <C-k> :q<cr>
-if has('autocmd')
+if has('autocmd') && has('eval')
     " Install vim-plug
     let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
     if empty(glob(data_dir . '/autoload/plug.vim'))
@@ -148,5 +148,5 @@ if has('autocmd')
     " Config suda.vim to auto open restricted files
     let g:suda_smart_edit = 1
 else
-    echom 'Sorry, let is not supported in this version of vim. Aborting plugin initiation.'
+    echom 'Sorry, autocmd is not supported in this version of vim. Aborting plugin initiation.'
 endif
