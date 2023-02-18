@@ -147,3 +147,4 @@ if has('let')
     call plug#end()
     " Config suda.vim to auto open restricted files
     let g:suda_smart_edit = 1
+endif
