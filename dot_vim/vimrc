@@ -53,13 +53,13 @@ else
 
     " Install YouCompleteMe for inline-completions
     Plug 'ycm-core/YouCompleteMe', { 'do': './install.py --all' }
-    " let g:ycm_key_list_stop_completion="<Enter>"
+    let g:ycm_key_list_stop_completion = ["<Enter>", "<leader><tab>"]
     
     " Install ultisnips for snippets.
     Plug 'SirVer/ultisnips'
     " Snippets are separated from the engine. Add this if you want them:
     Plug 'honza/vim-snippets'
-    let g:UltiSnipsExpandTrigger="<leader><tab>"
+    let g:UltiSnipsExpandTrigger="<tab>"
     let g:UltiSnipsJumpForwardTrigger="<leader>n"
     let g:UltiSnipsJumpBackwardTrigger="<leader><s-n>"
     let g:UltiSnipsSnippetDirectories = ['~/.vim/UltiSnips', 'UltiSnips']
