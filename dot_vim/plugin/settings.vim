@@ -85,3 +85,6 @@ set pastetoggle=<F11>
 set shiftwidth=4
 set softtabstop=4
 set expandtab
+
+" Decrease updatetime for vim-gitgutter. Impacts swp file delay.
+set updatetime=100
