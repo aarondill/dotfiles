@@ -131,6 +131,10 @@ nnoremap <C-k> :q<cr>
 " Terminal allow escape to exit insert
 tnoremap <Esc> <C-\><C-n>
 
+" Set leader key. Any references must be after!
+let mapleader = ','
+set showcmd
+
 if has('autocmd') && has('eval')
     " Install vim-plug
     let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
