@@ -161,5 +161,4 @@ if has('autocmd') && has('eval')
 else
     echom 'Sorry, autocmd is not supported in this version of vim. Aborting plugin initiation.'
 endif
-nnoremap ax :<C-U>call StripTrailingWhitespace()<CR>
 
