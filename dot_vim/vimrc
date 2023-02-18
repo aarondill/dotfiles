@@ -145,3 +145,5 @@ call plug#begin()
 " Plug code here
 Plug 'lambdalisue/suda.vim' 
 call plug#end()
+" Config suda.vim to auto open restricted files
+let g:suda_smart_edit = 1
