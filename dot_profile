@@ -22,10 +22,12 @@ export NODE_REPL_HISTORY="$XDG_DATA_HOME"/node_repl_history
 export NPM_CONFIG_USERCONFIG="$XDG_CONFIG_HOME"/npm/npmrc
 export INPUTRC="$XDG_CONFIG_HOME"/readline/inputrc
 export W3M_DIR="$XDG_DATA_HOME"/w3m
-export WWW_HOME="$XDG_DATA_HOME"/w3m
 export _JAVA_OPTIONS=-Djava.util.prefs.userRoot="$XDG_CONFIG_HOME"/java
 export HISTFILE="${XDG_STATE_HOME}"/bash/history
+
+export WGETRC="$XDG_CONFIG_HOME/wgetrc"
 alias wget="wget --hsts-file=$XDG_DATA_HOME/wget-hsts"
+
 export ASPELL_CONF="per-conf $XDG_CONFIG_HOME/aspell/aspell.conf; personal $XDG_CONFIG_HOME/aspell/en.pws; repl $XDG_CONFIG_HOME/aspell/en.prepl"
 
 
