@@ -9,8 +9,8 @@
 # If required by other files
 #
 
-# Move less History file
-export LESSHISTFILE="${XDG_STATE_HOME:=~/.cache}"/less/history
+# Stop less from saving it's history
+export LESSHISTFILE=-
 
 # Ensure blank prompt command for later commands
 PROMPT_COMMAND=''
