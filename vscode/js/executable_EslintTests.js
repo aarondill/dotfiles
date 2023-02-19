@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env node
 function main() {
 	a;
 	const obj = { ["a"]: 1 };
