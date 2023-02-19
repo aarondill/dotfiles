@@ -90,20 +90,31 @@ else
 
     " Install nerdtree for file navigation
     Plug 'scrooloose/nerdtree'
+    " Set default NERDTree size to min of 1/3 winwidth and 20
+    let NERDTreeWinSize = min([winwidth(0) / 3, 20]) 
     " Set Ctrl+b to toggle the tree
     nnoremap <C-b> :NERDTreeToggle<CR>
-    " Start NERDTree and put the cursor back in the other window.
+    " Start NERDTree and put the cursor back in the other window. If given a directory then is automatic.
     autocmd VimEnter * if argc() == 0 || (argc() == 1 && !isdirectory(argv()[0])) | NERDTree | wincmd p | endif
-    
-    " Start NERDTree when Vim doesn't start with a directory argument.
-    " autocmd StdinReadPre * let s:std_in=1
-    " autocmd VimEnter * if argc() == 1 && !isdirectory(argv()[0]) && !exists('s:std_in') |
-    " \ execute 'NERDTree' argv()[0] | wincmd p | enew | execute 'cd '.argv()[0] | endif
-
     " Close the tab if NERDTree is the only window remaining in it.
     autocmd BufEnter * if winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
+    " Exit Vim if NERDTree is the only window remaining in the only tab.
+    autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
     " Open the existing NERDTree on each new tab.
-    " autocmd BufWinEnter * if getcmdwintype() == '' | silent NERDTreeMirror | endif
+    autocmd BufWinEnter * if getcmdwintype() == '' | silent NERDTreeMirror | endif
+
+    " Install vim-bufkill to not close windows when killing buffers
+    Plug 'qpkorr/vim-bufkill'
+    " Override the native commands.
+    cnoreabbrev bd <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'BD' : 'bdelete')<CR>
+    cnoreabbrev bun <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'BUN' : 'bunload')<CR>
+    cnoreabbrev bw <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'BW' : 'bwipeout')<CR>
+
+    " Add vim-devicons to add icons to NERDTree. Suggested to be last.
+    Plug 'ryanoasis/vim-devicons'
+    " Ensure encoding is set right for icons
+    set encoding=UTF-8
+
 
     call plug#end()
 endif
