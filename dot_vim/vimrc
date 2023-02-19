@@ -90,6 +90,8 @@ else
 
   " Install nerdtree for file navigation
   Plug 'scrooloose/nerdtree'
+  let NERDTreeShowHidden=1
+  let NERDTreeNaturalSort=1
   " Set default NERDTree size to min of 1/3 winwidth and 20
   let NERDTreeWinSize = min([winwidth(0) / 3, 20]) 
   " Set Ctrl+b to toggle the tree
@@ -117,7 +119,10 @@ else
 
   " add vim-nerdtree-syntax-highlight for colors 
   Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
-  
+  let g:NERDTreeFileExtensionHighlightFullName = 1
+  let g:NERDTreeExactMatchHighlightFullName = 1
+  let g:NERDTreePatternMatchHighlightFullName = 1
+
   
   call plug#end()
 endif
