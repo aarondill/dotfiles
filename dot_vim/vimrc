@@ -93,7 +93,7 @@ else
     " Set Ctrl+b to toggle the tree
     nnoremap <C-b> :NERDTreeToggle<CR>
     " Start NERDTree and put the cursor back in the other window.
-    autocmd VimEnter * if argc() == 1 && !isdirectory(argv()[0]) | NERDTree | wincmd p | endif
+    autocmd VimEnter * if argc() == 0 || (argc() == 1 && !isdirectory(argv()[0])) | NERDTree | wincmd p | endif
     
     " Start NERDTree when Vim doesn't start with a directory argument.
     " autocmd StdinReadPre * let s:std_in=1
