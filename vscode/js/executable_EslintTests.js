@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 function main() {
 	a;
 	const obj = { ["a"]: 1 };
