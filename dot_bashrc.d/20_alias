@@ -5,6 +5,9 @@
 # Sets up aliases for user usage
 #
 
+# Alias sudo to call sudo with *my* $HOME/ENV
+alias sudo="sudo -E"
+
 alias backup="~/.backup/dobackup"
 alias lastbackup="/usr/bin/cat ~/.backup/backup-time"
 alias browser="sensible-browser"
