@@ -2,7 +2,7 @@
 function update-config() (
     ~/.bashrc.d/30_functions/_update-config "$@"
     # Finds files line-by-line, ignoring the first 3 lines
-    readarray -t files <<<"$(tail -n+3 -- ~/.bashrc.d/30_functions/_update-config)"
+    readarray -t files <<<"$(tail -n+4 -- ~/.bashrc.d/30_functions/_update-config)"
     cd ~ || return
     chezmoi add "${files[@]}"
 )
