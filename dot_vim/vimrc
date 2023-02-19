@@ -33,88 +33,91 @@ endfunction
 
 if !has('autocmd') || !has('eval') | echom 'Sorry, autocmd is not supported in this version of vim. Aborting plugin initiation.'
 else
-    " Install vim-plug
-    let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
-    if empty(glob(data_dir . '/autoload/plug.vim'))
-      silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-      autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
-    endif
+  " Install vim-plug
+  let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
+  if empty(glob(data_dir . '/autoload/plug.vim'))
+    silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+  endif
 
-    " Run PlugInstall if there are missing plugins
-    autocmd VimEnter * if len(filter(values(g:plugs), '!isdirectory(v:val.dir)')) | PlugInstall --sync | source $MYVIMRC | endif
+  " Run PlugInstall if there are missing plugins
+  autocmd VimEnter * if len(filter(values(g:plugs), '!isdirectory(v:val.dir)')) | PlugInstall --sync | source $MYVIMRC | endif
 
-    call plug#begin()
-    " Plug code here
+  call plug#begin()
+  " Plug code here
 
-    " Setup suda.vim
-    Plug 'lambdalisue/suda.vim', Cond(executable('sudo'))
-    " Config suda.vim to auto open restricted files
-    let g:suda_smart_edit = 1
+  " Setup suda.vim
+  Plug 'lambdalisue/suda.vim', Cond(executable('sudo'))
+  " Config suda.vim to auto open restricted files
+  let g:suda_smart_edit = 1
 
-    " Install YouCompleteMe for inline-completions
-    Plug 'ycm-core/YouCompleteMe', { 'do': './install.py --all' }
-    " Handle completion keys
-    let g:ycm_key_list_select_completion = ['<C-j>', '<DOWN>']
-    let g:ycm_key_list_previous_completion = ['<C-k>', '<UP>']
-    let g:ycm_key_list_stop_completion = ["<Enter>"]
-    
-    " Install ultisnips for snippets.
-    Plug 'SirVer/ultisnips'
-    " Snippets are separated from the engine. Add this if you want them:
-    Plug 'honza/vim-snippets'
-    " Handle snippet keys. Avoid conflict with YCM
-    let g:UltiSnipsExpandTrigger = "<C-l>"
-    let g:UltiSnipsJumpForwardTrigger = "<C-j>"
-    let g:UltiSnipsJumpBackwardTrigger = "<C-k>"
-    let g:UltiSnipsSnippetDirectories = ['~/.vim/UltiSnips', 'UltiSnips']
-    let g:UltiSnipsEditSplit="vertical"
+  " Install YouCompleteMe for inline-completions
+  Plug 'ycm-core/YouCompleteMe', { 'do': './install.py --all' }
+  " Handle completion keys
+  let g:ycm_key_list_select_completion = ['<C-j>', '<DOWN>']
+  let g:ycm_key_list_previous_completion = ['<C-k>', '<UP>']
+  let g:ycm_key_list_stop_completion = ["<Enter>"]
+  
+  " Install ultisnips for snippets.
+  Plug 'SirVer/ultisnips'
+  " Snippets are separated from the engine. Add this if you want them:
+  Plug 'honza/vim-snippets'
+  " Handle snippet keys. Avoid conflict with YCM
+  let g:UltiSnipsExpandTrigger = "<C-l>"
+  let g:UltiSnipsJumpForwardTrigger = "<C-j>"
+  let g:UltiSnipsJumpBackwardTrigger = "<C-k>"
+  let g:UltiSnipsSnippetDirectories = ['~/.vim/UltiSnips', 'UltiSnips']
+  let g:UltiSnipsEditSplit="vertical"
 
-    " Plugin to add brackets, quotes, etc
-    Plug 'raimondi/delimitmate'
-    " Plugin to show unbalanced brackets
-    Plug 'vim-scripts/Highlight-UnMatched-Brackets'
-    " Give motions to sorround values/replace deliminators
-    Plug 'tpope/vim-surround'
-    
-    " Shows +- Icons in gutter for git differences
-    Plug 'airblade/vim-gitgutter'
+  " Plugin to add brackets, quotes, etc
+  Plug 'raimondi/delimitmate'
+  " Plugin to show unbalanced brackets
+  Plug 'vim-scripts/Highlight-UnMatched-Brackets'
+  " Give motions to sorround values/replace deliminators
+  Plug 'tpope/vim-surround'
+  
+  " Shows +- Icons in gutter for git differences
+  Plug 'airblade/vim-gitgutter'
 
-    " The status bar
-    Plug 'vim-airline/vim-airline'
+  " The status bar
+  Plug 'vim-airline/vim-airline'
 
-    Plug 'ctrlpvim/ctrlp.vim'
-    let g:ctrlp_working_path_mode = 'ra'
-    let g:ctrlp_root_markers = ['package.json', 'node_modules']
-    let g:ctrlp_switch_buffer = 'et'
-    let g:ctrlp_custom_ignore = '^(\.git|node_modules)$'
+  Plug 'ctrlpvim/ctrlp.vim'
+  let g:ctrlp_working_path_mode = 'ra'
+  let g:ctrlp_root_markers = ['package.json', 'node_modules']
+  let g:ctrlp_switch_buffer = 'et'
+  let g:ctrlp_custom_ignore = '^(\.git|node_modules)$'
 
-    " Install nerdtree for file navigation
-    Plug 'scrooloose/nerdtree'
-    " Set default NERDTree size to min of 1/3 winwidth and 20
-    let NERDTreeWinSize = min([winwidth(0) / 3, 20]) 
-    " Set Ctrl+b to toggle the tree
-    nnoremap <C-b> :NERDTreeToggle<CR>
-    " Start NERDTree and put the cursor back in the other window. If given a directory then is automatic.
-    autocmd VimEnter * if argc() == 0 || (argc() == 1 && !isdirectory(argv()[0])) | NERDTree | wincmd p | endif
-    " Close the tab if NERDTree is the only window remaining in it.
-    autocmd BufEnter * if winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
-    " Exit Vim if NERDTree is the only window remaining in the only tab.
-    autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
-    " Open the existing NERDTree on each new tab.
-    autocmd BufWinEnter * if getcmdwintype() == '' | silent NERDTreeMirror | endif
+  " Install nerdtree for file navigation
+  Plug 'scrooloose/nerdtree'
+  " Set default NERDTree size to min of 1/3 winwidth and 20
+  let NERDTreeWinSize = min([winwidth(0) / 3, 20]) 
+  " Set Ctrl+b to toggle the tree
+  nnoremap <C-b> :NERDTreeToggle<CR>
+  " Start NERDTree and put the cursor back in the other window. If given a directory then is automatic.
+  autocmd VimEnter * if argc() == 0 || (argc() == 1 && !isdirectory(argv()[0])) | NERDTree | wincmd p | endif
+  " Close the tab if NERDTree is the only window remaining in it.
+  autocmd BufEnter * if winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
+  " Exit Vim if NERDTree is the only window remaining in the only tab.
+  autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
+  " Open the existing NERDTree on each new tab.
+  autocmd BufWinEnter * if getcmdwintype() == '' | silent NERDTreeMirror | endif
 
-    " Install vim-bufkill to not close windows when killing buffers
-    Plug 'qpkorr/vim-bufkill'
-    " Override the native commands.
-    cnoreabbrev bd <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'BD' : 'bdelete')<CR>
-    cnoreabbrev bun <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'BUN' : 'bunload')<CR>
-    cnoreabbrev bw <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'BW' : 'bwipeout')<CR>
+  " Install vim-bufkill to not close windows when killing buffers
+  Plug 'qpkorr/vim-bufkill'
+  " Override the native commands.
+  cnoreabbrev bd <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'BD' : 'bdelete')<CR>
+  cnoreabbrev bun <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'BUN' : 'bunload')<CR>
+  cnoreabbrev bw <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'BW' : 'bwipeout')<CR>
 
-    " Add vim-devicons to add icons to NERDTree. Suggested to be last.
-    Plug 'ryanoasis/vim-devicons'
-    " Ensure encoding is set right for icons
-    set encoding=UTF-8
+  " Add vim-devicons to add icons to NERDTree. Suggested to be last.
+  Plug 'ryanoasis/vim-devicons'
+  " Ensure encoding is set right for icons
+  set encoding=UTF-8
 
-
-    call plug#end()
+  " add vim-nerdtree-syntax-highlight for colors 
+  Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
+  
+  
+  call plug#end()
 endif
