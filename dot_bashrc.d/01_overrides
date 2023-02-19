@@ -9,11 +9,5 @@
 # If required by other files
 #
 
-# Stop less from saving it's history
-export LESSHISTFILE=-
-# Move gnupg home out of my $HOME
-export GNUPGHOME=${XDG_CONFIG_HOME}/gnupg
-
-
 # Ensure blank prompt command for later commands
 PROMPT_COMMAND=''
