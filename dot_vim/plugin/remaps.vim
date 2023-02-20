@@ -32,3 +32,20 @@ inoremap <C-c> <ESC>"+yya
 nnoremap <C-k> :q<cr>
 " Terminal allow escape to exit insert
 tnoremap <Esc> <C-\><C-n>
+
+
+function! s:ToggleMovement(firstOp, thenOp)
+  let pos = getpos('.')
+  execute "normal! " . a:firstOp
+  if pos == getpos('.')
+    execute "normal! " . a:thenOp
+  endif
+endfunction
+
+" Map some things to do different things when clicked twice 
+nnoremap <silent> 0 :call s:ToggleMovement('^', '0')<CR>
+nnoremap <silent> H :call s:ToggleMovement('H', 'L')<CR>
+nnoremap <silent> L :call s:ToggleMovement('L', 'H')<CR>
+nnoremap <silent> G :call s:ToggleMovement('G', 'gg')<CR>
+nnoremap <silent> gg :call s:ToggleMovement('gg', 'G')<CR>
+
