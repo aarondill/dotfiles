@@ -101,3 +101,5 @@ set directory=$HOME/.cache/vimtmp   " Directory for swap files
 " Improve scrolling with nowrap
 set sidescroll=1
 
+" Set the fold method to obey comments
+set foldmethod=marker
