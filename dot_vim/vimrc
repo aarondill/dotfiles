@@ -126,5 +126,8 @@ else
   let g:NERDTreeExactMatchHighlightFullName = 1
   let g:NERDTreePatternMatchHighlightFullName = 1
   
+  " Add better node support
+  Plug 'moll/vim-node'
+  
   call plug#end()
 endif
