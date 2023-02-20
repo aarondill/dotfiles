@@ -126,7 +126,7 @@ else
   let g:NERDTreeExactMatchHighlightFullName = 1
   let g:NERDTreePatternMatchHighlightFullName = 1
   
-  Plug "scrooloose/nerdtree-project-plugin"
+  Plug 'scrooloose/nerdtree-project-plugin'
 
   
   call plug#end()
