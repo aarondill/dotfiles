@@ -6,7 +6,7 @@ set nocompatible
 if !has('eval') | finish | endif
 
 " Assign autocmds to this to reset on startup
-augroup MyAutoCmd
+augroup VimRCAutoCmds
     autocmd!
 augroup END
 
@@ -17,7 +17,7 @@ let mapleader = ','
 let g:netrw_dirhistmax=0
 
 " Change .conf syntax highlighting to an aproximate
-autocmd MyAutoCmd BufEnter,BufRead *.conf setf dosini
+autocmd VimRCAutoCmds BufEnter,BufRead *.conf setf dosini
 
 " Create :W command to write as sudo
 if !has('nvim')
@@ -40,11 +40,11 @@ endfunction
 let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
 if empty(glob(data_dir . '/autoload/plug.vim'))
   silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-  autocmd MyAutoCmd VimEnter * PlugInstall --sync | source $MYVIMRC
+  autocmd VimRCAutoCmds VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
 " Run PlugInstall if there are missing plugins
-autocmd MyAutoCmd VimEnter * if len(filter(values(g:plugs), '!isdirectory(v:val.dir)')) | PlugInstall --sync | source $MYVIMRC | endif
+autocmd VimRCAutoCmds VimEnter * if len(filter(values(g:plugs), '!isdirectory(v:val.dir)')) | PlugInstall --sync | source $MYVIMRC | endif
 
 call plug#begin()
 " Plug code here
@@ -102,11 +102,11 @@ nnoremap <C-b> :NERDTreeToggle<CR>
 " Start NERDTree and put the cursor back in the other window. If given a directory then is automatic.
 "  autocmd VimEnter * if argc() == 0 || (argc() == 1 && !isdirectory(argv()[0])) | NERDTree | wincmd p | endif
 " Close the tab if NERDTree is the only window remaining in it.
-autocmd BufEnter * if winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
+autocmd VimRCAutoCmds BufEnter * if winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
 " Exit Vim if NERDTree is the only window remaining in the only tab.
-autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
+autocmd VimRCAutoCmds BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
 " Open the existing NERDTree on each new tab.
-autocmd BufWinEnter * if getcmdwintype() == '' | silent NERDTreeMirror | endif
+autocmd VimRCAutoCmds BufWinEnter * if getcmdwintype() == '' | silent NERDTreeMirror | endif
 
 " Install vim-bufkill to not close windows when killing buffers
 Plug 'qpkorr/vim-bufkill'
