@@ -2,8 +2,11 @@
 
 # ~/.bashrc.d/20_alias
 #
-# Sets up fp function for fuzzy finding.
+# Sets up fp function for fuzzy finding files, and
+# fpd function to fuzzy find directories. Each command displays a
+# preview through bat/cat and tree/ls respectively.
 # Also sets default fzf command for direct invocations
+# 
 #
 
 # only do these if fzf exists
@@ -23,7 +26,7 @@ else
 fi
 
 # Use better cat if installed
-if command -v bat; then
+if command -v bat &>/dev/null; then
   export FZF_BAT_CMD="bat --style=numbers --color=always"
   export FZF_BAT_CMD_JSON="$FZF_BAT_CMD --language JSON"
 else
@@ -31,14 +34,19 @@ else
   export FZF_BAT_CMD_JSON="$FZF_BAT_CMD"
 fi
 
-export FZF_DIR_PREVIEW='tree -C {} | head -n 200'
+if command -v tree &>/dev/null; then
+  export FZF_DIR_PREVIEW='tree -C {}'
+else
+  export FZF_DIR_PREVIEW='ls {}'
+fi
 FZF_FILE_PREVIEW () {
   local json
   # Attempt to prettify json before display
+  # will return false if prettier isn't installed
   if json=$(cat "$1" | prettier --parser json5 2>/dev/null); then
     # Shows first 500 lines
-    printf '%s' "$json" | $FZF_BAT_CMD_JSON | head -n 500
-  else $FZF_BAT_CMD "$1" | head -n 500
+    printf '%s' "$json" | $FZF_BAT_CMD_JSON
+  else $FZF_BAT_CMD "$1"
   fi
 }
 export -f FZF_FILE_PREVIEW
@@ -57,7 +65,7 @@ fp() {
   fi
   local path=${1:-.}
   # Call with the path given, if applicable, and find all files
-  FZF_DEFAULT_COMMAND="${FZF_FIND_FILE//\{\}/$path}" fzf --preview "FZF_FILE_PREVIEW {}" "${@:2}"
+  FZF_DEFAULT_COMMAND="${FZF_FIND_FILE//\{\}/$path}" fzf --preview "FZF_FILE_PREVIEW {} | head -n500" "${@:2}"
 }
 
 # For finding directories
@@ -72,5 +80,5 @@ fpd() {
   fi
   local path=${1:-.}
   # Call with the path given, if applicable, and find all directories
-  FZF_DEFAULT_COMMAND="${FZF_FIND_DIR//\{\}/$path}" fzf --preview "$FZF_DIR_PREVIEW" "${@:2}"
+  FZF_DEFAULT_COMMAND="${FZF_FIND_DIR//\{\}/$path}" fzf --preview "$FZF_DIR_PREVIEW | head -n200" "${@:2}"
 }
