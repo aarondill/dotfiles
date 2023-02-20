@@ -6,50 +6,54 @@
 # Also sets default fzf command for direct invocations
 #
 
-if command -v fzf &>/dev/null; then
-  FZF_BASE_COMMAND='fd  --color=always --follow --hidden --exclude .git'
-  export FZF_DEFAULT_COMMAND="$FZF_BASE_COMMAND --type file"
-  # ALlow color
-  export FZF_DEFAULT_OPTS="--ansi"
-
-  fp() {
-    if [ "$1" = '--help' ]; then
-      printf '%s\n%s' \
-        'fp' \
-        '' \
-        'Uses find with the first argument to output the user'"'"'s choice of files' \
-        "Commonly used as vim \"\$(fp)\""
-      return 0
-    fi
-    fzf_preview () {
-      local json BAT_CMD
-      BAT_CMD="bat --style=numbers --color=always --line-range :500"
-      if json=$(cat "$1" | prettier --parser json5); then
-        printf '%s\n\n' PRETTIER
-        printf '%s' "$json" | $BAT_CMD --language JSON
-      else
-        printf '%s\n\n' "$json"
-        printf '%s\n\n' BAT
-        $BAT_CMD "$1"
-      fi
-    }
-    export -f fzf_preview
-
-    # Call with the path given, if applicable, and find all files
-    FZF_DEFAULT_COMMAND="$FZF_DEFAULT_COMMAND . \"${1:-.}\"" fzf --preview "fzf_preview {}" #"bat --style=numbers --color=always --line-range :500 {}"
-  }
-  #
-  # For finding directories
-  fpd() {
-    if [ "$1" = '--help' ]; then
-        printf '%s\n%s' \
-            'fp' \
-            '' \
-            'Uses find with the first argument to output the user'"'"'s choice of folders' \
-            "Commonly used as cd \"\$(fp)\""
-        return 0
-      fi
-      # Call with the path given, if applicable, and find all directories
-      FZF_DEFAULT_COMMAND="$FZF_BASE_COMMAND --type d . \"${1:-.}\"" fzf --preview 'tree -C {} | head -n 200'
-  }
+# only do these if fzf exists
+if ! command -v fzf &>/dev/null; then
+  return
 fi
+
+FZF_BASE_COMMAND='fd  --color=always --follow --hidden --exclude .git'
+FZF_FIND_DIR="$FZF_BASE_COMMAND --type d ."
+FZF_FIND_FILE="$FZF_BASE_COMMAND . \"${1:-.}\""
+FZF_BAT_CMD="bat --style=numbers --color=always --line-range :500"
+FZF_BAT_CMD_JSON="$FZF_BAT_CMD --language JSON"
+
+export FZF_DEFAULT_COMMAND="$FZF_FIND_FILE"
+export FZF_DEFAULT_OPTS="--ansi"
+
+
+fp() ( 
+  if [ "$1" = '--help' ]; then
+    printf '%s\n%s' \
+      'fp' \
+      '' \
+      'Uses find with the first argument to output the user'"'"'s choice of files' \
+      "Commonly used as vim \"\$(fp)\""
+      return 0
+  fi
+  fzf_preview () {
+    local json
+    # Attempt to prettify json before display
+    if json=$(cat "$1" | prettier --parser json5); then
+      printf '%s' "$json" | $FZF_BAT_CMD_JSON
+    else $FZF_BAT_CMD "$1"
+    fi
+  }
+  # Call with the path given, if applicable, and find all files
+  export -f fzf_preview
+  FZF_DEFAULT_COMMAND="$FZF_FIND_FILE \"${1:-.}\"" fzf --preview "fzf_preview {}" 
+)
+
+# For finding directories
+fpd() ( 
+  if [ "$1" = '--help' ]; then
+    printf '%s\n%s' \
+      'fp' \
+      '' \
+      'Uses find with the first argument to output the user'"'"'s choice of folders' \
+      'Commonly used as cd "$(fp)"'
+      return 0
+  fi
+  FZF_DIR_PREVIEW='tree -C {} | head -n 200'
+  # Call with the path given, if applicable, and find all directories
+  FZF_DEFAULT_COMMAND="$FZF_FIND_DIR \"${1:-.}\"" fzf --preview "$FZF_DIR_PREVIEW"
+)
