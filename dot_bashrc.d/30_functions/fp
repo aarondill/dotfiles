@@ -82,10 +82,17 @@ fpd() {
     \  'fp'
     \  ''
     \  'Uses find with the first argument to output the user'"'"'s choice of folders'
-    \  'Commonly used as cd "$(fp)"'
+    \  'calls cd if stdout is connected to a tty'
     return 0
   fi
-  local path=${1:-.}
+  local output path
+  path=${1:-.}
   # Call with the path given, if applicable, and find all directories
+  output=$(
   FZF_DEFAULT_COMMAND="${FZF_FIND_DIR//\{\}/$path}" fzf --preview "$FZF_DIR_PREVIEW | head -n200" "${@:2}"
+  )
+  if [[ -t 1 ]]; then
+    builtin cd "$output"
+  else printf '%s' "$output"
+  fi
 }
