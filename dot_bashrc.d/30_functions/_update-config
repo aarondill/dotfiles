@@ -27,3 +27,4 @@ vscode/.shellcheckrc
 vscode/js/.gitignore
 vscode/js/EslintTests.js
 .local/share/fonts
+.local/share/pnpm/global/5/package.json
