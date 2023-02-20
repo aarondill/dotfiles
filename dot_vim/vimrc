@@ -124,10 +124,29 @@ Plug 'ryanoasis/vim-devicons'
 set encoding=UTF-8
 
 " add vim-nerdtree-syntax-highlight for colors 
-Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
-let g:NERDTreeFileExtensionHighlightFullName = 1
-let g:NERDTreeExactMatchHighlightFullName = 1
-let g:NERDTreePatternMatchHighlightFullName = 1
+" Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
+" let g:NERDTreeFileExtensionHighlightFullName = 1
+" let g:NERDTreeExactMatchHighlightFullName = 1
+" let g:NERDTreePatternMatchHighlightFullName = 1
+
+" NERDTrees File highlighting
+" https://github.com/ryanoasis/vim-devicons/wiki/FAQ-&-Troubleshooting#how-did-you-get-color-matching-based-on-file-type-in-nerdtree
+function! NERDTreeHighlightFile(extension, fg, bg, guifg, guibg)
+ exec 'autocmd FileType nerdtree silent highlight ' . a:extension .' ctermbg='. a:bg .' ctermfg='. a:fg .' guibg='. a:guibg .' guifg='. a:guifg
+ exec 'autocmd FileType nerdtree silent syn match ' . a:extension .' #^\s\+.*'. a:extension .'$#'
+endfunction
+
+call NERDTreeHighlightFile('md', 'blue', 'NONE', '#5ca4ef', 'NONE')
+call NERDTreeHighlightFile('yml', 'yellow', 'NONE', '#e25141', 'NONE')
+call NERDTreeHighlightFile('json', 'yellow', 'NONE', '#f3c14f', 'NONE')
+call NERDTreeHighlightFile('html', 'yellow', 'NONE', '#d45735', 'NONE')
+call NERDTreeHighlightFile('css', 'cyan', 'NONE', '#5ca4ef', 'NONE')
+call NERDTreeHighlightFile('js', 'Red', 'NONE', '#f7cb4f', 'NONE')
+call NERDTreeHighlightFile('ts', 'cyan', 'NONE', 'cyan', 'NONE')
+call NERDTreeHighlightFile('test.ts', 'cyan', 'NONE', '#e25c33', 'NONE')
+call NERDTreeHighlightFile('gitconfig', 'Gray', 'NONE', '#686868', 'NONE')
+call NERDTreeHighlightFile('gitignore', 'Gray', 'NONE', '#686868', 'NONE')
+call NERDTreeHighlightFile('editorconfig', 'Gray', 'NONE', '#fdfdfd', 'NONE')
 
 " Add better node support
 Plug 'moll/vim-node'
