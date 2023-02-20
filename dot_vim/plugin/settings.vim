@@ -97,8 +97,10 @@ if !isdirectory($HOME . "/.cache/vimtmp")
     call mkdir($HOME . "/.cache/vimtmp", "p")
 endif
 set directory=$HOME/.cache/vimtmp   " Directory for swap files
-" Move .viminfo file
-set viminfo=%,<800,'10,/50,:100,h,f0,n$HOME/.cache/vimtmp
+if !has('nvim')
+  " Move .viminfo file
+  set viminfo=%,<800,'10,/50,:100,h,f0,n$HOME/.cache/vimtmp
+endif
 
 " Improve scrolling with nowrap
 set sidescroll=1
