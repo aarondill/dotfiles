@@ -60,12 +60,19 @@ fp() {
     \  'fp'
     \  ''
     \  'Uses find with the first argument to output the user'"'"'s choice of files'
-    \  'Commonly used as vim "$(fp)"'
+    \  'Opens editor if stdout is connected to a tty'
     return 0
   fi
-  local path=${1:-.}
+  local output path
+  path=${1:-.}
   # Call with the path given, if applicable, and find all files
-  FZF_DEFAULT_COMMAND="${FZF_FIND_FILE//\{\}/$path}" fzf --preview "FZF_FILE_PREVIEW {} | head -n500" "${@:2}"
+  output=$(
+    FZF_DEFAULT_COMMAND="${FZF_FIND_FILE//\{\}/$path}" fzf --preview "FZF_FILE_PREVIEW {} | head -n500" "${@:2}"
+  )
+  if [[ -t 1 ]]; then
+    editor "$output"
+  else printf '%s' "$output"
+  fi
 }
 
 # For finding directories
