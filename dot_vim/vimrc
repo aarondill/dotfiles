@@ -8,10 +8,7 @@ let mapleader = ','
 " Stop recording of dir history
 let g:netrw_dirhistmax=0
 
-" Set tab and >> to be 2 spaces in bash files
-autocmd FileType sh setlocal shiftwidth=2 tabstop=2 softtabstop=2 
-
-" Change .conf syntax highlighting
+" Change .conf syntax highlighting to an aproximate
 autocmd BufEnter,BufRead *.conf setf dosini
 
 " Create :W command to write as sudo
