@@ -14,15 +14,26 @@ if command -v fzf &>/dev/null; then
 
   fp() {
     if [ "$1" = '--help' ]; then
-        printf '%s\n%s' \
-            'fp' \
-            '' \
-            'Uses find with the first argument to output the user'"'"'s choice of files' \
-            "Commonly used as vim \"\$(fp)\""
-        return 0
+      printf '%s\n%s' \
+        'fp' \
+        '' \
+        'Uses find with the first argument to output the user'"'"'s choice of files' \
+        "Commonly used as vim \"\$(fp)\""
+      return 0
+    fi
+    fzf_preview () {
+      local json BAT_CMD
+      if json=$(fx "$1");then
+      printf '%s' "$json" | $BAT_CMD
+      else
+        $BAT_CMD "$1"
       fi
-      # Call with the path given, if applicable, and find all files
-      FZF_DEFAULT_COMMAND="$FZF_DEFAULT_COMMAND . \"${1:-.}\"" fzf --preview "fx {}" #"bat --style=numbers --color=always --line-range :500 {}"
+    }
+
+
+    export -f fzf_preview
+    # Call with the path given, if applicable, and find all files
+    FZF_DEFAULT_COMMAND="$FZF_DEFAULT_COMMAND . \"${1:-.}\"" fzf --preview "fzf_preview" #"bat --style=numbers --color=always --line-range :500 {}"
   }
   #
   # For finding directories
