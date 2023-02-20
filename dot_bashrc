@@ -119,13 +119,13 @@ if ! shopt -oq posix; then
 fi
 
 # set PATH so it includes user's private bin if it exists
-if [ -d "$HOME/bin" ] ; then
-    PATH="$HOME/bin:$PATH"
+if [ -d "$HOME/bin" ]; then
+  PATH="$HOME/bin:$PATH"
 fi
 
 # set PATH so it includes user's private bin if it exists
-if [ -d "$HOME/.local/bin" ] ; then
-    PATH="$HOME/.local/bin:$PATH"
+if [ -d "$HOME/.local/bin" ]; then
+  PATH="$HOME/.local/bin:$PATH"
 fi
 
 # ---------------------------BEGIN CUSTOM CODE---------------------------
@@ -136,37 +136,20 @@ fi
 
 # Initialize `~/.bashrc.d`
 while IFS= read -r -d '' file; do
-    # For each file, if bench var is assigned,
-    # then call time and output benchmark
-    if [[ $__bashrc_bench ]]; then
-        TIMEFORMAT="$file: %R"
-        time . "$file"
-        unset TIMEFORMAT
-    else
-        . "$file"
-    fi
+  # For each file, if bench var is assigned,
+  # then call time and output benchmark
+  if [[ $__bashrc_bench ]]; then
+    TIMEFORMAT="$file: %R"
+    time . "$file"
+    unset TIMEFORMAT
+  else
+    . "$file"
+  fi
 done < <(find ~/.bashrc.d/ -type f -not -name "_*" -print0 | LC_ALL=C sort -z)
 # Above: Find all files not starting with _, and sort, ensuring base lang
 
 # tabtab source for packages
 # uninstall by removing these lines
 [ -f ~/.config/tabtab/bash/__tabtab.bash ] && . ~/.config/tabtab/bash/__tabtab.bash || true
-
-# Add fzf key bindings
-source /usr/share/doc/fzf/examples/key-bindings.bash
-# Advanced customization of fzf options via _fzf_comprun function
-# - The first argument to the function is the name of the command.
-# - You should make sure to pass the rest of the arguments to fzf.
-_fzf_comprun() {
-  local command=$1
-  shift
-
-  case "$command" in
-    cd)           fzf --preview 'tree -C {} | head -200'   "$@" ;;
-    export|unset) fzf --preview "eval 'echo \$'{}"         "$@" ;;
-    ssh)          fzf --preview 'dig {}'                   "$@" ;;
-    *)            fzf --preview 'bat -n --color=always {}' "$@" ;;
-  esac
-}
 
 # ------------------------------END OF FILE------------------------------
