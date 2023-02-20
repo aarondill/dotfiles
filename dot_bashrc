@@ -152,4 +152,6 @@ done < <(find ~/.bashrc.d/ -type f -not -name "_*" -print0 | LC_ALL=C sort -z)
 # uninstall by removing these lines
 [ -f ~/.config/tabtab/bash/__tabtab.bash ] && . ~/.config/tabtab/bash/__tabtab.bash || true
 
+# Add fzf key bindings
+source /usr/share/doc/fzf/examples/key-bindings.bash
 # ------------------------------END OF FILE------------------------------
