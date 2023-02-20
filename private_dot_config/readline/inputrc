@@ -76,5 +76,5 @@ set completion-ignore-case on
 C-b:unix-filename-rubout
 #C-M-o: auto complete from history 
 "\e\C-o": dabbrev-expand
-# edit in $editor with C-M-e
-# "\e\C-e": edit-and-execute-command
+# edit in $editor with S-M-e
+"\C-E": edit-and-execute-command
