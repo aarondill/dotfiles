@@ -71,7 +71,8 @@ fp() {
   )
   if [[ -t 1 ]]; then
     editor "$output"
-  else printf '%s' "$output"
+  else 
+    printf '%s' "$output"
   fi
 }
 
@@ -92,7 +93,8 @@ fpd() {
   FZF_DEFAULT_COMMAND="${FZF_FIND_DIR//\{\}/$path}" fzf --preview "$FZF_DIR_PREVIEW | head -n200" "${@:2}"
   )
   if [[ -t 1 ]]; then
-    builtin cd "$output"
-  else printf '%s' "$output"
+    cd "$output"
+  else 
+    printf '%s' "$output"
   fi
 }
