@@ -11,49 +11,66 @@ if ! command -v fzf &>/dev/null; then
   return
 fi
 
-FZF_BASE_COMMAND='fd  --color=always --follow --hidden --exclude .git'
-FZF_FIND_DIR="$FZF_BASE_COMMAND --type d ."
-FZF_FIND_FILE="$FZF_BASE_COMMAND . \"${1:-.}\""
-FZF_BAT_CMD="bat --style=numbers --color=always --line-range :500"
-FZF_BAT_CMD_JSON="$FZF_BAT_CMD --language JSON"
+# Use better find if installed
+if command -v fd &>/dev/null; then
+  export FZF_BASE_COMMAND='fd  --color=always --follow --hidden --exclude .git'
+  export FZF_FIND_DIR="$FZF_BASE_COMMAND --type d . {}"
+  export FZF_FIND_FILE="$FZF_BASE_COMMAND --type f . {}"
+else
+  export FZF_BASE_COMMAND='find'
+  export FZF_FIND_DIR="$FZF_BASE_COMMAND {} --type d"
+  export FZF_FIND_FILE="$FZF_BASE_COMMAND {} --type f"
+fi
 
-export FZF_DEFAULT_COMMAND="$FZF_FIND_FILE"
+# Use better cat if installed
+if command -v bat; then
+  export FZF_BAT_CMD="bat --style=numbers --color=always"
+  export FZF_BAT_CMD_JSON="$FZF_BAT_CMD --language JSON"
+else
+  export FZF_BAT_CMD="cat"
+  export FZF_BAT_CMD_JSON="$FZF_BAT_CMD"
+fi
+
+export FZF_DIR_PREVIEW='tree -C {} | head -n 200'
+FZF_FILE_PREVIEW () {
+  local json
+  # Attempt to prettify json before display
+  if json=$(cat "$1" | prettier --parser json5); then
+    # Shows first 500 lines
+    printf '%s' "$json" | $FZF_BAT_CMD_JSON | head -n 500
+  else $FZF_BAT_CMD "$1" | head -n 500
+  fi
+}
+export -f FZF_FILE_PREVIEW
+
+export FZF_DEFAULT_COMMAND="${FZF_FIND_FILE//{}/.}"
 export FZF_DEFAULT_OPTS="--ansi"
 
-
-fp() ( 
+fp() {
   if [ "$1" = '--help' ]; then
-    printf '%s\n%s' \
-      'fp' \
-      '' \
-      'Uses find with the first argument to output the user'"'"'s choice of files' \
-      "Commonly used as vim \"\$(fp)\""
-      return 0
+    printf '%s\n%s'
+    \  'fp'
+    \  ''
+    \  'Uses find with the first argument to output the user'"'"'s choice of files'
+    \  'Commonly used as vim "$(fp)"'
+    return 0
   fi
-  fzf_preview () {
-    local json
-    # Attempt to prettify json before display
-    if json=$(cat "$1" | prettier --parser json5); then
-      printf '%s' "$json" | $FZF_BAT_CMD_JSON
-    else $FZF_BAT_CMD "$1"
-    fi
-  }
+  local path=${1:-.}
   # Call with the path given, if applicable, and find all files
-  export -f fzf_preview
-  FZF_DEFAULT_COMMAND="$FZF_FIND_FILE \"${1:-.}\"" fzf --preview "fzf_preview {}" 
-)
+  FZF_DEFAULT_COMMAND="${FZF_FIND_FILE//{}/$path}" fzf --preview "FZF_FILE_PREVIEW {}"
+}
 
 # For finding directories
-fpd() ( 
+fpd() {
   if [ "$1" = '--help' ]; then
-    printf '%s\n%s' \
-      'fp' \
-      '' \
-      'Uses find with the first argument to output the user'"'"'s choice of folders' \
-      'Commonly used as cd "$(fp)"'
-      return 0
+    printf '%s\n%s'
+    \  'fp'
+    \  ''
+    \  'Uses find with the first argument to output the user'"'"'s choice of folders'
+    \  'Commonly used as cd "$(fp)"'
+    return 0
   fi
-  FZF_DIR_PREVIEW='tree -C {} | head -n 200'
+  local path=${1:-.}
   # Call with the path given, if applicable, and find all directories
-  FZF_DEFAULT_COMMAND="$FZF_FIND_DIR \"${1:-.}\"" fzf --preview "$FZF_DIR_PREVIEW"
-)
+  FZF_DEFAULT_COMMAND="${FZF_FIND_DIR//{}/$path}" fzf --preview "$FZF_DIR_PREVIEW"
+}
