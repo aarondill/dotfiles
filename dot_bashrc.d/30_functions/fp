@@ -43,7 +43,7 @@ FZF_FILE_PREVIEW () {
 }
 export -f FZF_FILE_PREVIEW
 
-export FZF_DEFAULT_COMMAND="${FZF_FIND_FILE//{}/.}"
+export FZF_DEFAULT_COMMAND="${FZF_FIND_FILE//\{\}/.}"
 export FZF_DEFAULT_OPTS="--ansi"
 
 fp() {
@@ -57,7 +57,7 @@ fp() {
   fi
   local path=${1:-.}
   # Call with the path given, if applicable, and find all files
-  FZF_DEFAULT_COMMAND="${FZF_FIND_FILE//{}/$path}" fzf --preview "FZF_FILE_PREVIEW {}" "${@:2}"
+  FZF_DEFAULT_COMMAND="${FZF_FIND_FILE//\{\}/$path}" fzf --preview "FZF_FILE_PREVIEW {}" "${@:2}"
 }
 
 # For finding directories
@@ -72,5 +72,5 @@ fpd() {
   fi
   local path=${1:-.}
   # Call with the path given, if applicable, and find all directories
-  FZF_DEFAULT_COMMAND="${FZF_FIND_DIR//{}/$path}" fzf --preview "$FZF_DIR_PREVIEW" "${@:2}"
+  FZF_DEFAULT_COMMAND="${FZF_FIND_DIR//\{\}/$path}" fzf --preview "$FZF_DIR_PREVIEW" "${@:2}"
 }
