@@ -3,8 +3,7 @@
 set nocompatible
 
 " Don't do *anything* on vim.tiny
-if !has('autocmd') || !has('eval') | echom 'Sorry, autocmd is not supported in this version of vim. Aborting plugin initiation.'
-else
+if !has('autocmd') || !has('eval') | finish | endif
   " Set leader key. Any references must be after!
   let mapleader = ','
 
@@ -174,5 +173,3 @@ else
   call submode#map('WindowsMode', 'n', '', '-', '3<C-w>-')
   call submode#map('WindowsMode', 'n', '', '<', '10<C-w><')
   call submode#map('WindowsMode', 'n', '', '>', '10<C-w>>')
-
-endif
