@@ -9,13 +9,16 @@
 # Also sets default fzf command for direct invocations
 #
 # By default is colorized, but can be disabled by unsetting FZF_USE_COLOR
+# Important: Also unset FZF_DEFAULT_OPTS to accelerate scanning!
 #
 
 # only do these if fzf exists
 if ! command -v fzf &>/dev/null; then
   return
 fi
+# Allow color, slows down scanning!
 export FZF_USE_COLOR=true
+export FZF_DEFAULT_OPTS='--ansi'
 
 # Use better find if installed
 if command -v fd &>/dev/null; then
@@ -31,7 +34,7 @@ fi
 
 # Use better cat if installed
 if command -v bat &>/dev/null; then
-  export FZF_BAT_CMD="bat --style=numbers --color=always"
+  export FZF_BAT_CMD='bat --style=numbers "$(test "$FZF_USE_COLOR" && echo --color=always)"'
   export FZF_BAT_CMD_JSON="$FZF_BAT_CMD --language JSON"
 else
   export FZF_BAT_CMD="cat"
@@ -56,8 +59,6 @@ FZF_FILE_PREVIEW () {
 export -f FZF_FILE_PREVIEW
 
 export FZF_DEFAULT_COMMAND="${FZF_FIND_FILE//\{\}/.}"
-# test if FZF_USE_COLOR is set
-export FZF_DEFAULT_OPTS='$(test "$FZF_USE_COLOR" && printf -- "--ansi")'
 
 fp() {
   if [ "$1" = '--help' ]; then
