@@ -145,20 +145,20 @@ call submode#enter_with('window', 'n', '', '<C-w>')
 call submode#leave_with('window', 'n', '', '<ESC>')
 
 " Go through every letter
-for key in ['a','b','c','d','e','f','g','h','i','j','k','l','m',
-\           'n','o','p','q','r','s','t','u','v','w','x','y','z']
+"for key in ['a','b','c','d','e','f','g','h','i','j','k','l','m',
+"\           'n','o','p','q','r','s','t','u','v','w','x','y','z']
   " maps lowercase, uppercase and <C-key>
-  call submode#map('window', 'n', '', key, '<C-w>' . key)
-  call submode#map('window', 'n', '', toupper(key), '<C-w>' . toupper(key))
-  call submode#map('window', 'n', '', '<C-' . key . '>', '<C-w>' . '<C-'.key . '>')
-endfor
+"  call submode#map('window', 'n', '', key, '<C-w>' . key)
+"  call submode#map('window', 'n', '', toupper(key), '<C-w>' . toupper(key))
+"  call submode#map('window', 'n', '', '<C-' . key . '>', '<C-w>' . '<C-'.key . '>')
+"endfor
 " Go through symbols. Sadly, '|', not supported in submode plugin.
-for key in ['=','_','+','-','<','>']
-  call submode#map('window', 'n', '', key, '<C-w>' . key)
-endfor
+"for key in ['=','_','+','-','<','>']
+"  call submode#map('window', 'n', '', key, '<C-w>' . key)
+"endfor
 
 " Old way, just in case.
-nnoremap <Leader>w <C-w>
+"nnoremap <Leader>w <C-w>
 
   call plug#end()
 endif
