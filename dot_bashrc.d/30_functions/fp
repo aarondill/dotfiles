@@ -22,7 +22,7 @@ if command -v fzf &>/dev/null; then
         return 0
       fi
       # Call with the path given, if applicable, and find all files
-      FZF_DEFAULT_COMMAND="$FZF_DEFAULT_COMMAND . \"${1:-.}\"" fzf --preview "prettier {}" #"bat --style=numbers --color=always --line-range :500 {}"
+      FZF_DEFAULT_COMMAND="$FZF_DEFAULT_COMMAND . \"${1:-.}\"" fzf --preview "fx {}" #"bat --style=numbers --color=always --line-range :500 {}"
   }
   #
   # For finding directories
