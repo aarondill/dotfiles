@@ -107,3 +107,6 @@ set sidescroll=1
 
 " Set the fold method to obey comments
 set foldmethod=marker
+
+" Turn on incremenetal search in vim
+set incsearch
