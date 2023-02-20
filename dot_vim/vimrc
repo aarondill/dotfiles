@@ -2,34 +2,35 @@
 " have made, as well as sanely reset options when re-sourcing .vimrc
 set nocompatible
 
-" Set leader key. Any references must be after!
-let mapleader = ','
-
-" Stop recording of dir history
-let g:netrw_dirhistmax=0
-
-" Change .conf syntax highlighting to an aproximate
-autocmd BufEnter,BufRead *.conf setf dosini
-
-" Create :W command to write as sudo
-if !has('nvim')
-    command! W :w !sudo tee %  > /dev/null
-else
-   " Create warning on :W command if in neovim 
-   command! W :echom "Running commands in neovim doesn't connect stdin to tty"
-endif
-
-" Plugins using vim-plug
-"
-"
-
-function! Cond(cond, ...)
-  let opts = get(a:000, 0, {})
-  return a:cond ? opts : extend(opts, { 'on': [], 'for': [] })
-endfunction
-
+" Don't do *anything* on vim.tiny
 if !has('autocmd') || !has('eval') | echom 'Sorry, autocmd is not supported in this version of vim. Aborting plugin initiation.'
 else
+  " Set leader key. Any references must be after!
+  let mapleader = ','
+
+  " Stop recording of dir history
+  let g:netrw_dirhistmax=0
+
+  " Change .conf syntax highlighting to an aproximate
+  autocmd BufEnter,BufRead *.conf setf dosini
+
+  " Create :W command to write as sudo
+  if !has('nvim')
+      command! W :w !sudo tee %  > /dev/null
+  else
+     " Create warning on :W command if in neovim 
+     command! W :echom "Running commands in neovim doesn't connect stdin to tty"
+  endif
+
+  " Plugins using vim-plug
+  "
+  "
+
+  function! Cond(cond, ...)
+    let opts = get(a:000, 0, {})
+    return a:cond ? opts : extend(opts, { 'on': [], 'for': [] })
+  endfunction
+
   " Install vim-plug
   let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
   if empty(glob(data_dir . '/autoload/plug.vim'))
