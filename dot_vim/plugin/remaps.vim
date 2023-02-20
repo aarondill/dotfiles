@@ -47,5 +47,5 @@ nnoremap <silent> 0 :call <SID>ToggleMovement('^', '0')<CR>
 nnoremap <silent> H :call <SID>ToggleMovement('H', 'L')<CR>
 nnoremap <silent> L :call <SID>ToggleMovement('L', 'H')<CR>
 nnoremap <silent> G :call <SID>ToggleMovement('G', 'gg')<CR>
-nnoremap <silent> gg :call <SID>ToggleMovement('gg', 'G')<CR>
+# nnoremap <silent> gg :call <SID>ToggleMovement('gg', 'G')<CR>
 
