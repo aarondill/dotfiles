@@ -134,7 +134,7 @@ else
 
   call plug#end()
   " Config vim-submode
-  let g:submode_keep_leaving_key = 1
+  let g:submode_keep_leaving_key = 0
   let g:submode_always_show_submode = 1
   " Stop timeouts
   let g:submode_timeout = 0
@@ -146,7 +146,7 @@ else
 
   " Taking over the default <C-w> setting.
   call submode#enter_with('window', 'n', '', '<C-w>')
-  " <C-c>, <ESC>, and <C-[> all exit
+  " <ESC> (or <C-[>) exits
   call submode#leave_with('window', 'n', '', '<ESC>')
   " Go through every letter
   for i in range(65,90) " ASCII codes / lowercase
