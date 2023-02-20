@@ -7,18 +7,35 @@
 #
 
 if command -v fzf &>/dev/null; then
-    export FZF_DEFAULT_COMMAND='find .'
+  FZF_BASE_COMMAND='fd  --color=always --follow --hidden --exclude .git'
+  export FZF_DEFAULT_COMMAND="$FZF_BASE_COMMAND --type file"
+  # ALlow color
+  export FZF_DEFAULT_OPTS="--ansi"
 
-    fp() {
-        if [ "$1" = '--help' ]; then
-            printf '%s\n%s' \
-                'fp' \
-                '' \
-                'Uses find with the first argument to output the user'"'"'s choice of files' \
-                "Commonly used as cd \"\$(fp)\""
-            return 0
-        fi
-        FZF_DEFAULT_COMMAND="find ${1:-.}" fzf --preview "bat --style=numbers --color=always --line-range :500 {}"
-    }
-    export -f fp
+  fp() {
+    if [ "$1" = '--help' ]; then
+        printf '%s\n%s' \
+            'fp' \
+            '' \
+            'Uses find with the first argument to output the user'"'"'s choice of files' \
+            "Commonly used as vim \"\$(fp)\""
+        return 0
+      fi
+      # Call with the path given, if applicable, and find all files
+      FZF_DEFAULT_COMMAND="$FZF_DEFAULT_COMMAND . \"${1:-.}\"" fzf --preview "bat --style=numbers --color=always --line-range :500 {}"
+  }
+  #
+  # For finding directories
+  fpd() {
+    if [ "$1" = '--help' ]; then
+        printf '%s\n%s' \
+            'fp' \
+            '' \
+            'Uses find with the first argument to output the user'"'"'s choice of folders' \
+            "Commonly used as cd \"\$(fp)\""
+        return 0
+      fi
+      # Call with the path given, if applicable, and find all directories
+      FZF_DEFAULT_COMMAND="$FZF_BASE_COMMAND --type d . \"${1:-.}\"" fzf
+  }
 fi
