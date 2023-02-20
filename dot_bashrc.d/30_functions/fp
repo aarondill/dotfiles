@@ -13,7 +13,7 @@ fi
 
 # Use better find if installed
 if command -v fd &>/dev/null; then
-  export FZF_BASE_COMMAND='fd  --color=always --follow --hidden --exclude .git'
+  export FZF_BASE_COMMAND='fd --color=always --follow --hidden --exclude .git'
   export FZF_FIND_DIR="$FZF_BASE_COMMAND --type d . {}"
   export FZF_FIND_FILE="$FZF_BASE_COMMAND --type f . {}"
 else
@@ -57,7 +57,7 @@ fp() {
   fi
   local path=${1:-.}
   # Call with the path given, if applicable, and find all files
-  FZF_DEFAULT_COMMAND="${FZF_FIND_FILE//{}/$path}" fzf --preview "FZF_FILE_PREVIEW {}"
+  FZF_DEFAULT_COMMAND="${FZF_FIND_FILE//{}/$path}" fzf --preview "FZF_FILE_PREVIEW {}" "${@:2}"
 }
 
 # For finding directories
@@ -72,5 +72,5 @@ fpd() {
   fi
   local path=${1:-.}
   # Call with the path given, if applicable, and find all directories
-  FZF_DEFAULT_COMMAND="${FZF_FIND_DIR//{}/$path}" fzf --preview "$FZF_DIR_PREVIEW"
+  FZF_DEFAULT_COMMAND="${FZF_FIND_DIR//{}/$path}" fzf --preview "$FZF_DIR_PREVIEW" "${@:2}"
 }
