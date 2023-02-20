@@ -28,7 +28,7 @@ if command -v fzf &>/dev/null; then
         printf '%s\n\n' FX
         printf '%s' "$json" | $BAT_CMD
       else
-        print '%s\n\n' "$json"
+        printf '%s\n\n' "$json"
         printf '%s\n\n' BAT
         $BAT_CMD "$1"
       fi
