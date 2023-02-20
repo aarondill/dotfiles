@@ -23,7 +23,7 @@ if command -v fzf &>/dev/null; then
     fi
     fzf_preview () {
       local json BAT_CMD
-      BAT_CMD="bat --style=numbers --color=always --line-range :500 {}"
+      BAT_CMD="bat --style=numbers --color=always --line-range :500"
 
       printf '%s\n' PREVIEW
       if json=$(fx "$1");then
