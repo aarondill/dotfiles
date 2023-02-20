@@ -34,7 +34,7 @@ nnoremap <C-k> :q<cr>
 tnoremap <Esc> <C-\><C-n>
 
 
-function! <SID>ToggleMovement(firstOp, thenOp)
+function! s:ToggleMovement(firstOp, thenOp)
   let pos = getpos('.')
   execute "normal! " . a:firstOp
   if pos == getpos('.')
@@ -43,9 +43,9 @@ function! <SID>ToggleMovement(firstOp, thenOp)
 endfunction
 
 " Map some things to do different things when clicked twice 
-nnoremap <silent> 0 :call s:ToggleMovement('^', '0')<CR>
-nnoremap <silent> H :call s:ToggleMovement('H', 'L')<CR>
-nnoremap <silent> L :call s:ToggleMovement('L', 'H')<CR>
-nnoremap <silent> G :call s:ToggleMovement('G', 'gg')<CR>
-nnoremap <silent> gg :call s:ToggleMovement('gg', 'G')<CR>
+nnoremap <silent> 0 :call <SID>ToggleMovement('^', '0')<CR>
+nnoremap <silent> H :call <SID>ToggleMovement('H', 'L')<CR>
+nnoremap <silent> L :call <SID>ToggleMovement('L', 'H')<CR>
+nnoremap <silent> G :call <SID>ToggleMovement('G', 'gg')<CR>
+nnoremap <silent> gg :call <SID>ToggleMovement('gg', 'G')<CR>
 
