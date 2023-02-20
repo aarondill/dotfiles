@@ -5,18 +5,22 @@
 # Sets up fp function for fuzzy finding files, and
 # fpd function to fuzzy find directories. Each command displays a
 # preview through bat/cat and tree/ls respectively.
+#
 # Also sets default fzf command for direct invocations
-# 
+#
+# By default is colorized, but can be disabled by unsetting FZF_USE_COLOR
 #
 
 # only do these if fzf exists
 if ! command -v fzf &>/dev/null; then
   return
 fi
+export FZF_USE_COLOR=true
 
 # Use better find if installed
 if command -v fd &>/dev/null; then
-  export FZF_BASE_COMMAND='fd --color=always --follow --hidden --exclude .git'
+  # Echo if FZF_USE_COLOR is set
+  export FZF_BASE_COMMAND='fd "$(test "$FZF_USE_COLOR" && echo --color=always)" --follow --hidden --exclude .git'
   export FZF_FIND_DIR="$FZF_BASE_COMMAND --type d . {}"
   export FZF_FIND_FILE="$FZF_BASE_COMMAND --type f . {}"
 else
@@ -52,7 +56,7 @@ FZF_FILE_PREVIEW () {
 export -f FZF_FILE_PREVIEW
 
 export FZF_DEFAULT_COMMAND="${FZF_FIND_FILE//\{\}/.}"
-# export FZF_DEFAULT_OPTS="--ansi"
+export FZF_DEFAULT_OPTS="--ansi"
 
 fp() {
   if [ "$1" = '--help' ]; then
