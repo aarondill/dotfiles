@@ -138,6 +138,10 @@ Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 " Install vim-submode. This is used to create window mode
 Plug 'kana/vim-submode'
 
+" Add fzf support to vim
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+
 call plug#end()
 " Config vim-submode
 let g:submode_keep_leaving_key = 0
@@ -181,6 +185,6 @@ call submode#map('WindowsMode', 'n', '', '<', '10<C-w><')
 call submode#map('WindowsMode', 'n', '', '>', '10<C-w>>')
 
 " Add fzf to vim
-if(filereadable('/usr/share/doc/fzf/examples/fzf.vim'))
-  source /usr/share/doc/fzf/examples/fzf.vim
-endif
+" if(filereadable('/usr/share/doc/fzf/examples/fzf.vim'))
+"   source /usr/share/doc/fzf/examples/fzf.vim
+" endif
