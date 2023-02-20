@@ -7,6 +7,9 @@
 
 # Alias sudo to call sudo with *my* $HOME/ENV
 alias sudo="sudo -E"
+# Ask before overwriting
+alias mv="mv -i"
+alias cp="cp -ai"
 
 alias backup="~/.backup/dobackup"
 alias lastbackup="/usr/bin/cat ~/.backup/backup-time"
