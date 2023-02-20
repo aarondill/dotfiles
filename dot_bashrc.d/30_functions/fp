@@ -24,12 +24,11 @@ if command -v fzf &>/dev/null; then
     fzf_preview () {
       local json BAT_CMD
       BAT_CMD="bat --style=numbers --color=always --line-range :500"
-
-      printf '%s\n' PREVIEW
       if json=$(fx "$1");then
         printf '%s\n\n' FX
         printf '%s' "$json" | $BAT_CMD
       else
+        print '%s\n\n' "$json"
         printf '%s\n\n' BAT
         $BAT_CMD "$1"
       fi
