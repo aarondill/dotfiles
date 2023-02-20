@@ -81,9 +81,9 @@ set notimeout ttimeout ttimeoutlen=200
 " Use <F11> to toggle between 'paste' and 'nopaste'
 set pastetoggle=<F11>
 
-" Set tab and >> to be 4 spaces
-set shiftwidth=4
-set softtabstop=4
+" Set tab and >> to be 2 spaces
+set shiftwidth=2
+set softtabstop=2
 set expandtab
 
 " Decrease updatetime for vim-gitgutter. Impacts swp file delay.
