@@ -16,10 +16,10 @@ autocmd BufEnter,BufRead *.conf setf dosini
 
 " Create :W command to write as sudo
 if !has('nvim')
-    command W :w !sudo tee %  > /dev/null
+    command! W :w !sudo tee %  > /dev/null
 else
    " Create warning on :W command if in neovim 
-   command W :echom "Running commands in neovim doesn't connect stdin to tty"
+   command! W :echom "Running commands in neovim doesn't connect stdin to tty"
 endif
 
 " Plugins using vim-plug
@@ -129,5 +129,8 @@ else
   " Add better node support
   Plug 'moll/vim-node'
   
+  " Allow multiple cursers!
+  Plug 'mg979/vim-visual-multi', {'branch': 'master'}
+
   call plug#end()
 endif
