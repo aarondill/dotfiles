@@ -52,7 +52,7 @@ FZF_FILE_PREVIEW () {
 export -f FZF_FILE_PREVIEW
 
 export FZF_DEFAULT_COMMAND="${FZF_FIND_FILE//\{\}/.}"
-export FZF_DEFAULT_OPTS="--ansi"
+# export FZF_DEFAULT_OPTS="--ansi"
 
 fp() {
   if [ "$1" = '--help' ]; then
