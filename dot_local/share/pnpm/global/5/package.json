@@ -6,6 +6,7 @@
 		"auto-changelog": "^2.4.0",
 		"depcheck": "^1.4.3",
 		"eslint": "^8.34.0",
+		"fd-find": "^1.0.7",
 		"jest": "^29.4.3",
 		"live-server": "^1.2.2",
 		"n": "^9.0.1",
