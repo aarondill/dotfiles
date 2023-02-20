@@ -88,3 +88,6 @@ set expandtab
 
 " Decrease updatetime for vim-gitgutter. Impacts swp file delay.
 set updatetime=100
+
+" Auto-scroll up or down to keep context above/below cursor
+set scrolloff=5  
