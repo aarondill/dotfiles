@@ -149,7 +149,7 @@ else
   " <ESC> (or <C-[>) exits
   call submode#leave_with('window', 'n', '', '<ESC>')
   " Go through every letter
-  for i in range(65,90) " ASCII codes / lowercase
+  for i in range(97,122) " ASCII codes / lowercase
     let key = nr2char(i)  " Character
     " maps lowercase, uppercase and <C-key>
     call submode#map('window', 'n', '', key, '<C-w>' . key)
