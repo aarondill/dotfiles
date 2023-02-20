@@ -132,7 +132,7 @@ else
   " Install vim-submode. This is used to create window mode
   Plug 'kana/vim-submode'
   call plug#end()
-  let g:submode_keep_leaving_key = true
+  let g:submode_keep_leaving_key = 1
   let g:submode_always_show_submode = 1
 
   " Taking over the default <C-w> setting.
