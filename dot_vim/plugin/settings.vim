@@ -99,7 +99,7 @@ endif
 set directory=$HOME/.cache/vimtmp   " Directory for swap files
 if !has('nvim')
   " Move .viminfo file
-  set viminfo=%,<800,'10,/50,:100,h,f0,n$HOME/.cache/vimtmp
+  set viminfo=%,<800,'10,/50,:100,h,f0,n$HOME/.cache/vimtmp/viminfo
 endif
 
 " Improve scrolling with nowrap
