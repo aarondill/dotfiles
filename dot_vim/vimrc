@@ -3,173 +3,174 @@
 set nocompatible
 
 " Don't do *anything* on vim.tiny
-if !has('autocmd') || !has('eval') | finish | endif
-  " Set leader key. Any references must be after!
-  let mapleader = ','
+if !has('eval') | finish | endif
 
-  " Stop recording of dir history
-  let g:netrw_dirhistmax=0
+" Set leader key. Any references must be after!
+let mapleader = ','
 
-  " Change .conf syntax highlighting to an aproximate
-  autocmd BufEnter,BufRead *.conf setf dosini
+" Stop recording of dir history
+let g:netrw_dirhistmax=0
 
-  " Create :W command to write as sudo
-  if !has('nvim')
-      command! W :w !sudo tee %  > /dev/null
-  else
-     " Create warning on :W command if in neovim 
-     command! W :echom "Running commands in neovim doesn't connect stdin to tty"
-  endif
+" Change .conf syntax highlighting to an aproximate
+autocmd BufEnter,BufRead *.conf setf dosini
 
-  " Plugins using vim-plug
-  "
-  "
+" Create :W command to write as sudo
+if !has('nvim')
+    command! W :w !sudo tee %  > /dev/null
+else
+   " Create warning on :W command if in neovim 
+   command! W :echom "Running commands in neovim doesn't connect stdin to tty"
+endif
 
-  function! Cond(cond, ...)
-    let opts = get(a:000, 0, {})
-    return a:cond ? opts : extend(opts, { 'on': [], 'for': [] })
-  endfunction
+" Plugins using vim-plug
+"
+"
 
-  " Install vim-plug
-  let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
-  if empty(glob(data_dir . '/autoload/plug.vim'))
-    silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
-  endif
+function! Cond(cond, ...)
+  let opts = get(a:000, 0, {})
+  return a:cond ? opts : extend(opts, { 'on': [], 'for': [] })
+endfunction
 
-  " Run PlugInstall if there are missing plugins
-  autocmd VimEnter * if len(filter(values(g:plugs), '!isdirectory(v:val.dir)')) | PlugInstall --sync | source $MYVIMRC | endif
+" Install vim-plug
+let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
+if empty(glob(data_dir . '/autoload/plug.vim'))
+  silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
 
-  call plug#begin()
-  " Plug code here
+" Run PlugInstall if there are missing plugins
+autocmd VimEnter * if len(filter(values(g:plugs), '!isdirectory(v:val.dir)')) | PlugInstall --sync | source $MYVIMRC | endif
 
-  " Setup suda.vim
-  Plug 'lambdalisue/suda.vim', Cond(executable('sudo'))
-  " Config suda.vim to auto open restricted files
-  let g:suda_smart_edit = 1
+call plug#begin()
+" Plug code here
 
-  " Install YouCompleteMe for inline-completions
-  Plug 'ycm-core/YouCompleteMe', { 'do': './install.py --all' }
-  " Handle completion keys
-  let g:ycm_key_list_select_completion = ['<C-j>', '<DOWN>']
-  let g:ycm_key_list_previous_completion = ['<C-k>', '<UP>']
-  let g:ycm_key_list_stop_completion = ["<Enter>"]
-  
-  " Install ultisnips for snippets.
-  Plug 'SirVer/ultisnips'
-  " Snippets are separated from the engine. Add this if you want them:
-  Plug 'honza/vim-snippets'
-  " Handle snippet keys. Avoid conflict with YCM
-  let g:UltiSnipsExpandTrigger = "<C-l>"
-  let g:UltiSnipsJumpForwardTrigger = "<C-j>"
-  let g:UltiSnipsJumpBackwardTrigger = "<C-k>"
-  let g:UltiSnipsSnippetDirectories = ['~/.vim/UltiSnips', 'UltiSnips']
-  let g:UltiSnipsEditSplit="vertical"
+" Setup suda.vim
+Plug 'lambdalisue/suda.vim', Cond(executable('sudo'))
+" Config suda.vim to auto open restricted files
+let g:suda_smart_edit = 1
 
-  " Plugin to add brackets, quotes, etc
-  Plug 'raimondi/delimitmate'
-  " Plugin to show unbalanced brackets
-  Plug 'vim-scripts/Highlight-UnMatched-Brackets'
-  " Give motions to sorround values/replace deliminators
-  Plug 'tpope/vim-surround'
-  
-  " Shows +- Icons in gutter for git differences
-  Plug 'airblade/vim-gitgutter'
+" Install YouCompleteMe for inline-completions
+Plug 'ycm-core/YouCompleteMe', { 'do': './install.py --all' }
+" Handle completion keys
+let g:ycm_key_list_select_completion = ['<C-j>', '<DOWN>']
+let g:ycm_key_list_previous_completion = ['<C-k>', '<UP>']
+let g:ycm_key_list_stop_completion = ["<Enter>"]
 
-  " The status bar
-  Plug 'vim-airline/vim-airline'
+" Install ultisnips for snippets.
+Plug 'SirVer/ultisnips'
+" Snippets are separated from the engine. Add this if you want them:
+Plug 'honza/vim-snippets'
+" Handle snippet keys. Avoid conflict with YCM
+let g:UltiSnipsExpandTrigger = "<C-l>"
+let g:UltiSnipsJumpForwardTrigger = "<C-j>"
+let g:UltiSnipsJumpBackwardTrigger = "<C-k>"
+let g:UltiSnipsSnippetDirectories = ['~/.vim/UltiSnips', 'UltiSnips']
+let g:UltiSnipsEditSplit="vertical"
 
-  Plug 'ctrlpvim/ctrlp.vim'
-  let g:ctrlp_working_path_mode = 'ra'
-  let g:ctrlp_root_markers = ['package.json', 'node_modules']
-  let g:ctrlp_switch_buffer = 'et'
-  let g:ctrlp_custom_ignore = '^(\.git|node_modules)$'
+" Plugin to add brackets, quotes, etc
+Plug 'raimondi/delimitmate'
+" Plugin to show unbalanced brackets
+Plug 'vim-scripts/Highlight-UnMatched-Brackets'
+" Give motions to sorround values/replace deliminators
+Plug 'tpope/vim-surround'
 
-  " Install nerdtree for file navigation
-  Plug 'scrooloose/nerdtree'
-  let NERDTreeShowHidden=1
-  let NERDTreeNaturalSort=1
-  " Set default NERDTree size to min of 1/3 winwidth and 20
-  let NERDTreeWinSize = min([winwidth(0) / 3, 20]) 
-  " Set Ctrl+b to toggle the tree
-  nnoremap <C-b> :NERDTreeToggle<CR>
-  " Start NERDTree and put the cursor back in the other window. If given a directory then is automatic.
+" Shows +- Icons in gutter for git differences
+Plug 'airblade/vim-gitgutter'
+
+" The status bar
+Plug 'vim-airline/vim-airline'
+
+Plug 'ctrlpvim/ctrlp.vim'
+let g:ctrlp_working_path_mode = 'ra'
+let g:ctrlp_root_markers = ['package.json', 'node_modules']
+let g:ctrlp_switch_buffer = 'et'
+let g:ctrlp_custom_ignore = '^(\.git|node_modules)$'
+
+" Install nerdtree for file navigation
+Plug 'scrooloose/nerdtree'
+let NERDTreeShowHidden=1
+let NERDTreeNaturalSort=1
+" Set default NERDTree size to min of 1/3 winwidth and 20
+let NERDTreeWinSize = min([winwidth(0) / 3, 20]) 
+" Set Ctrl+b to toggle the tree
+nnoremap <C-b> :NERDTreeToggle<CR>
+" Start NERDTree and put the cursor back in the other window. If given a directory then is automatic.
 "  autocmd VimEnter * if argc() == 0 || (argc() == 1 && !isdirectory(argv()[0])) | NERDTree | wincmd p | endif
-  " Close the tab if NERDTree is the only window remaining in it.
-  autocmd BufEnter * if winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
-  " Exit Vim if NERDTree is the only window remaining in the only tab.
-  autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
-  " Open the existing NERDTree on each new tab.
-  autocmd BufWinEnter * if getcmdwintype() == '' | silent NERDTreeMirror | endif
+" Close the tab if NERDTree is the only window remaining in it.
+autocmd BufEnter * if winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
+" Exit Vim if NERDTree is the only window remaining in the only tab.
+autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
+" Open the existing NERDTree on each new tab.
+autocmd BufWinEnter * if getcmdwintype() == '' | silent NERDTreeMirror | endif
 
-  " Install vim-bufkill to not close windows when killing buffers
-  Plug 'qpkorr/vim-bufkill'
-  " Override the native commands.
-  cnoreabbrev bd <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'BD' : 'bdelete')<CR>
-  cnoreabbrev bun <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'BUN' : 'bunload')<CR>
-  cnoreabbrev bw <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'BW' : 'bwipeout')<CR>
+" Install vim-bufkill to not close windows when killing buffers
+Plug 'qpkorr/vim-bufkill'
+" Override the native commands.
+cnoreabbrev bd <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'BD' : 'bdelete')<CR>
+cnoreabbrev bun <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'BUN' : 'bunload')<CR>
+cnoreabbrev bw <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'BW' : 'bwipeout')<CR>
 
-  " Add symbols for git status. MUST BE BEFORE DEVICONS!!
-  Plug 'Xuyuanp/nerdtree-git-plugin'
+" Add symbols for git status. MUST BE BEFORE DEVICONS!!
+Plug 'Xuyuanp/nerdtree-git-plugin'
 
-  " Add vim-devicons to add icons to NERDTree. Suggested to be last.
-  Plug 'ryanoasis/vim-devicons'
-  " Ensure encoding is set right for icons
-  set encoding=UTF-8
+" Add vim-devicons to add icons to NERDTree. Suggested to be last.
+Plug 'ryanoasis/vim-devicons'
+" Ensure encoding is set right for icons
+set encoding=UTF-8
 
-  " add vim-nerdtree-syntax-highlight for colors 
-  Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
-  let g:NERDTreeFileExtensionHighlightFullName = 1
-  let g:NERDTreeExactMatchHighlightFullName = 1
-  let g:NERDTreePatternMatchHighlightFullName = 1
-  
-  " Add better node support
-  Plug 'moll/vim-node'
-  
-  " Allow multiple cursers!
-  Plug 'mg979/vim-visual-multi', {'branch': 'master'}
+" add vim-nerdtree-syntax-highlight for colors 
+Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
+let g:NERDTreeFileExtensionHighlightFullName = 1
+let g:NERDTreeExactMatchHighlightFullName = 1
+let g:NERDTreePatternMatchHighlightFullName = 1
 
-  " Install vim-submode. This is used to create window mode
-  Plug 'kana/vim-submode'
+" Add better node support
+Plug 'moll/vim-node'
 
-  call plug#end()
-  " Config vim-submode
-  let g:submode_keep_leaving_key = 0
-  let g:submode_always_show_submode = 1
-  " Stop timeouts
-  let g:submode_timeout = 0
-  let g:submode_timeoutlen = 9999
+" Allow multiple cursers!
+Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 
-  "
-  " Window mode!
-  "
+" Install vim-submode. This is used to create window mode
+Plug 'kana/vim-submode'
 
-  " Taking over the default <C-w> setting.
-  call submode#enter_with('WindowsMode', 'n', '', '<C-w>')
-  " <ESC> (or <C-[>) exits
-  call submode#leave_with('WindowsMode', 'n', '', '<ESC>')
-  " Go through every letter
-  for i in range(97,122) " ASCII codes / lowercase
-    let key = nr2char(i)  " Character
-    " maps lowercase, uppercase and <C-key>
-    call submode#map('WindowsMode', 'n', '', key, '<C-w>' . key)
-    call submode#map('WindowsMode', 'n', '', toupper(key), '<C-w>' . toupper(key))
-    call submode#map('WindowsMode', 'n', '', '<C-' . key . '>', '<C-w>' . '<C-'.key . '>')
-  endfor
-  " Go through symbols. Sadly, '|', not supported in submode plugin.
-  for key in ['=','_','+','-','<','>']
-    call submode#map('WindowsMode', 'n', '', key, '<C-w>' . key)
-  endfor
-  " I don't like <C-w>q, <C-w>c won't exit Vim when it's the last window.
-  call submode#map('WindowsMode', 'n', '', 'q', '<C-w>c')
-  call submode#map('WindowsMode', 'n', '', '<C-q>', '<C-w>c')
+call plug#end()
+" Config vim-submode
+let g:submode_keep_leaving_key = 0
+let g:submode_always_show_submode = 1
+" Stop timeouts
+let g:submode_timeout = 0
+let g:submode_timeoutlen = 9999
 
-  " <lowercase-pipe> sets the width to 80 columns, pipe (<S-\>) by default
-  " maximizes the width.
-  call submode#map('WindowsMode', 'n', '', '\', ':vertical resize 80<CR>')
+"
+" Window mode!
+"
 
-  " Resize faster
-  call submode#map('WindowsMode', 'n', '', '+', '3<C-w>+')
-  call submode#map('WindowsMode', 'n', '', '-', '3<C-w>-')
-  call submode#map('WindowsMode', 'n', '', '<', '10<C-w><')
-  call submode#map('WindowsMode', 'n', '', '>', '10<C-w>>')
+" Taking over the default <C-w> setting.
+call submode#enter_with('WindowsMode', 'n', '', '<C-w>')
+" <ESC> (or <C-[>) exits
+call submode#leave_with('WindowsMode', 'n', '', '<ESC>')
+" Go through every letter
+for i in range(97,122) " ASCII codes / lowercase
+  let key = nr2char(i)  " Character
+  " maps lowercase, uppercase and <C-key>
+  call submode#map('WindowsMode', 'n', '', key, '<C-w>' . key)
+  call submode#map('WindowsMode', 'n', '', toupper(key), '<C-w>' . toupper(key))
+  call submode#map('WindowsMode', 'n', '', '<C-' . key . '>', '<C-w>' . '<C-'.key . '>')
+endfor
+" Go through symbols. Sadly, '|', not supported in submode plugin.
+for key in ['=','_','+','-','<','>']
+  call submode#map('WindowsMode', 'n', '', key, '<C-w>' . key)
+endfor
+" I don't like <C-w>q, <C-w>c won't exit Vim when it's the last window.
+call submode#map('WindowsMode', 'n', '', 'q', '<C-w>c')
+call submode#map('WindowsMode', 'n', '', '<C-q>', '<C-w>c')
+
+" <lowercase-pipe> sets the width to 80 columns, pipe (<S-\>) by default
+" maximizes the width.
+call submode#map('WindowsMode', 'n', '', '\', ':vertical resize 80<CR>')
+
+" Resize faster
+call submode#map('WindowsMode', 'n', '', '+', '3<C-w>+')
+call submode#map('WindowsMode', 'n', '', '-', '3<C-w>-')
+call submode#map('WindowsMode', 'n', '', '<', '10<C-w><')
+call submode#map('WindowsMode', 'n', '', '>', '10<C-w>>')
