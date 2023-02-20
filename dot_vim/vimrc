@@ -181,4 +181,6 @@ call submode#map('WindowsMode', 'n', '', '<', '10<C-w><')
 call submode#map('WindowsMode', 'n', '', '>', '10<C-w>>')
 
 " Add fzf to vim
-source /usr/share/doc/fzf/examples/fzf.vim
+if(filereadable('/usr/share/doc/fzf/examples/fzf.vim'))
+  source /usr/share/doc/fzf/examples/fzf.vim
+endif
