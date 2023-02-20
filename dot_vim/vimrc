@@ -123,11 +123,11 @@ Plug 'ryanoasis/vim-devicons'
 " Ensure encoding is set right for icons
 set encoding=UTF-8
 
-" " add vim-nerdtree-syntax-highlight for colors 
-" Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
-" let g:NERDTreeFileExtensionHighlightFullName = 1
-" let g:NERDTreeExactMatchHighlightFullName = 1
-" let g:NERDTreePatternMatchHighlightFullName = 1
+" add vim-nerdtree-syntax-highlight for colors 
+Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
+let g:NERDTreeFileExtensionHighlightFullName = 1
+let g:NERDTreeExactMatchHighlightFullName = 1
+let g:NERDTreePatternMatchHighlightFullName = 1
 
 " Add better node support
 Plug 'moll/vim-node'
