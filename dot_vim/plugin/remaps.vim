@@ -34,7 +34,7 @@ nnoremap <C-k> :q<cr>
 tnoremap <Esc> <C-\><C-n>
 
 
-function! s:ToggleMovement(firstOp, thenOp)
+function! <SID>ToggleMovement(firstOp, thenOp)
   let pos = getpos('.')
   execute "normal! " . a:firstOp
   if pos == getpos('.')
