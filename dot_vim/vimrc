@@ -132,12 +132,11 @@ else
   " Install vim-submode. This is used to create window mode
   Plug 'kana/vim-submode'
   call plug#end()
-  " We're taking over the default <C-w> setting. Don't worry we'll do
-  " " our best to put back the default functionality.
+
+  " We're taking over the default <C-w> setting.
   call submode#enter_with('window', 'n', '', '<C-w>')
-  "
-  " " Note: <C-c> will also get you out to the mode without this mapping.
-  " " Note: <C-[> also behaves as <ESC>
+  " Note: <C-c> will also get you out to the mode without this mapping.
+  " Note: <C-[> also behaves as <ESC>
   call submode#leave_with('window', 'n', '', '<ESC>')
-  "
+
 endif
