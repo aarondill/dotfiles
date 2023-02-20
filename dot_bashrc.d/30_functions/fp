@@ -35,7 +35,7 @@ export FZF_DIR_PREVIEW='tree -C {} | head -n 200'
 FZF_FILE_PREVIEW () {
   local json
   # Attempt to prettify json before display
-  if json=$(cat "$1" | prettier --parser json5); then
+  if json=$(cat "$1" | prettier --parser json5 2>/dev/null); then
     # Shows first 500 lines
     printf '%s' "$json" | $FZF_BAT_CMD_JSON | head -n 500
   else $FZF_BAT_CMD "$1" | head -n 500
