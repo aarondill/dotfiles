@@ -112,6 +112,10 @@ else
   cnoreabbrev bun <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'BUN' : 'bunload')<CR>
   cnoreabbrev bw <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'BW' : 'bwipeout')<CR>
 
+  " Add symbols for git status. MUST BE BEFORE DEVICONS!!
+    Plug 'Xuyuanp/nerdtree-git-plugin'
+
+
   " Add vim-devicons to add icons to NERDTree. Suggested to be last.
   Plug 'ryanoasis/vim-devicons'
   " Ensure encoding is set right for icons
