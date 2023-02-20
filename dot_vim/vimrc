@@ -132,5 +132,10 @@ else
   " Allow multiple cursers!
   Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 
+  " Install vim-submode. This is used to create window mode
+
+
+
+
   call plug#end()
 endif
