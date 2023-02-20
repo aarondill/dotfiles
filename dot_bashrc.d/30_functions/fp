@@ -60,43 +60,59 @@ export -f FZF_FILE_PREVIEW
 
 export FZF_DEFAULT_COMMAND="${FZF_FIND_FILE//\{\}/.}"
 
-fp() {
+fp() ( 
+  local output path
   if [ "$1" = '--help' ]; then
     printf '%s\n%s'
-    \  'fp'
+    \  'fp [--disable-color|-C] [PATH]'
     \  ''
-    \  'Uses find with the first argument to output the user'"'"'s choice of files'
+    \  'find files in PATH to output the user'"'"'s choice'
     \  'Opens editor if stdout is connected to a tty'
     return 0
   fi
-  local output path
+  if [ "$1" = '--disable-color' || "$1" - '-C' ]; then
+    unset FZF_USE_COLOR
+    FZF_DEFAULT_OPTS=''
+    shift 1
+  fi
   path=${1:-.}
+  # set the command to call with
+  FZF_DEFAULT_COMMAND="${FZF_FIND_FILE//\{\}/$path}" 
+
   # Call with the path given, if applicable, and find all files
   output=$(
-    FZF_DEFAULT_COMMAND="${FZF_FIND_FILE//\{\}/$path}" fzf --preview "FZF_FILE_PREVIEW {} | head -n500" "${@:2}"
+    fzf --preview "FZF_FILE_PREVIEW {} | head -n500" "${@:2}"
   )
   if [[ -t 1 ]]; then
     editor "$output"
   else 
     printf '%s' "$output"
   fi
-}
+)
 
 # For finding directories
 fpd() {
+  local output path
   if [ "$1" = '--help' ]; then
     printf '%s\n%s'
-    \  'fp'
+    \  'fpd [--disable-color|-C] [PATH]'
     \  ''
-    \  'Uses find with the first argument to output the user'"'"'s choice of folders'
+    \  'find directories in PATH to output the user'"'"'s choice'
     \  'calls cd if stdout is connected to a tty'
     return 0
   fi
-  local output path
+  if [ "$1" = '--disable-color' || "$1" - '-C' ]; then
+    unset FZF_USE_COLOR
+    FZF_DEFAULT_OPTS=''
+    shift 1
+  fi
   path=${1:-.}
+  # set the command to call with
+  FZF_DEFAULT_COMMAND="${FZF_FIND_DIR//\{\}/$path}" 
+
   # Call with the path given, if applicable, and find all directories
   output=$(
-  FZF_DEFAULT_COMMAND="${FZF_FIND_DIR//\{\}/$path}" fzf --preview "$FZF_DIR_PREVIEW | head -n200" "${@:2}"
+  fzf --preview "$FZF_DIR_PREVIEW | head -n200" "${@:2}"
   )
   if [[ -t 1 ]]; then
     cd "$output"
