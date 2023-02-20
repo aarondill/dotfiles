@@ -99,11 +99,6 @@ let NERDTreeNaturalSort=1
 let NERDTreeWinSize = min([winwidth(0) / 3, 20]) 
 " Set Ctrl+b to toggle the tree
 nnoremap <silent> <C-b> :NERDTreeToggle<CR>
-autocmd VimRCAutoCmds VimEnter * if argc() == 0 || (argc() == 1 && !isdirectory(argv()[0])) |
-      \ cd %:p:h | 
-      \ NERDTreeCWD |
-      \ NERDTreeClose |
-      \ endif
 " Start NERDTree and put the cursor back in the other window. If given a directory then is automatic.
 "  autocmd VimEnter * if argc() == 0 || (argc() == 1 && !isdirectory(argv()[0])) | NERDTree | wincmd p | endif
 " Close the tab if NERDTree is the only window remaining in it.
