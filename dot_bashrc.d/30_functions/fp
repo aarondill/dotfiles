@@ -57,7 +57,7 @@ export -f FZF_FILE_PREVIEW
 
 export FZF_DEFAULT_COMMAND="${FZF_FIND_FILE//\{\}/.}"
 # test if FZF_USE_COLOR is set
-export FZF_DEFAULT_OPTS='"$(test "$FZF_USE_COLOR" && printf -- "--ansi")"'
+export FZF_DEFAULT_OPTS='$(test "$FZF_USE_COLOR" && printf -- "--ansi")'
 
 fp() {
   if [ "$1" = '--help' ]; then
