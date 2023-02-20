@@ -93,3 +93,7 @@ set scrolloff=5  " Auto-scroll up or down to keep context above/below cursor
 set nowrap       " turn off word-wrap
 set sidescrolloff=5 " Auto-scroll L/R to keep context in view
 
+if !isdirectory($HOME . "/.cache/vimtmp")
+    call mkdir($HOME . "/.cache/vimtmp", "p")
+endif
+set directory=$HOME/.cache/vimtmp   " Directory for swap files
