@@ -1,5 +1,5 @@
 # ~/.bashrc.d/30_functions/_update-config
-# A list of files to backup. The first *three* lines are ignored. Empty lines are counted! 
+# A list of files to backup. The first *three* lines are ignored. Empty lines are counted!
 # Files must be below this line!
 .backup/backup.config
 .bash_logout
@@ -7,6 +7,7 @@
 .bashrc.d
 .config/gh
 .config/git
+.config/neofetch
 .config/npm
 .config/nvim
 .config/readline
@@ -15,6 +16,8 @@
 .local/bin
 .local/etc
 .local/share/bash-completion
+.local/share/fonts
+.local/share/pnpm/global/5/package.json
 .pam_environment
 .profile
 .root
@@ -26,5 +29,3 @@ vscode/.release-it.json
 vscode/.shellcheckrc
 vscode/js/.gitignore
 vscode/js/EslintTests.js
-.local/share/fonts
-.local/share/pnpm/global/5/package.json
