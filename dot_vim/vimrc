@@ -130,7 +130,7 @@ else
   Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 
   " Install vim-submode. This is used to create window mode
-"  Plug 'kana/vim-submode'
+  Plug 'kana/vim-submode'
 
 
   " A message will appear in the message line when you're in a submode
