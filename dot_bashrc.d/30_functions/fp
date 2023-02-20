@@ -23,15 +23,17 @@ if command -v fzf &>/dev/null; then
     fi
     fzf_preview () {
       local json BAT_CMD
+      printf '%s\n' PREVIEW
       if json=$(fx "$1");then
-      printf '%s' "$json" | $BAT_CMD
+        printf '%s\n\n' FX
+        printf '%s' "$json" | $BAT_CMD
       else
+        printf '%s\n\n' BAT
         $BAT_CMD "$1"
       fi
     }
-
-
     export -f fzf_preview
+
     # Call with the path given, if applicable, and find all files
     FZF_DEFAULT_COMMAND="$FZF_DEFAULT_COMMAND . \"${1:-.}\"" fzf --preview "fzf_preview {}" #"bat --style=numbers --color=always --line-range :500 {}"
   }
