@@ -24,7 +24,7 @@ if command -v fzf &>/dev/null; then
     fzf_preview () {
       local json BAT_CMD
       BAT_CMD="bat --style=numbers --color=always --line-range :500"
-      if json=$(cat "$1" | prettier);then
+      if json=$(cat "$1" | prettier --parser json5); then
         printf '%s\n\n' PRETTIER
         printf '%s' "$json" | $BAT_CMD
       else
