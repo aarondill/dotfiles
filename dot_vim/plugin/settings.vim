@@ -97,3 +97,7 @@ if !isdirectory($HOME . "/.cache/vimtmp")
     call mkdir($HOME . "/.cache/vimtmp", "p")
 endif
 set directory=$HOME/.cache/vimtmp   " Directory for swap files
+
+" Improve scrolling with nowrap
+set sidescroll=1
+
