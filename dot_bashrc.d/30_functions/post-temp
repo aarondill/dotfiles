@@ -20,7 +20,9 @@ function post-temp(){
     # {"status":"success","data":{"url":"https://tmpfiles.org/######/file"}} 
   if command -v 'fx' &>/dev/null; then 
     local status url message
-    printf '%s' "$result"
+    if [ "$2" = -v ] || [ "$2" = --verbose ]; then
+      printf '%s\n' "$result"
+    fi
     # Print the result thru fx to get the data
     # Already strings, if present, but trying to error
     status="$(fx '.status.toString()'  <<< "$result" 2>/dev/null)" \
