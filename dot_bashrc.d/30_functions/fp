@@ -81,7 +81,7 @@ FZF_FILE_PREVIEW() {
 # Export the functions for subshell usage (IE, FZF)
 export -f FZF_FIND_DIR FZF_FIND_FILE FZF_CAT_CMD FZF_CAT_CMD_JSON FZF_DIR_PREVIEW FZF_FILE_PREVIEW FZF_BASE_COMMAND
 
-export FZF_DEFAULT_COMMAND="${FZF_FIND_FILE//\{\}/.}"
+export FZF_DEFAULT_COMMAND="FZF_FIND_FILE ."
 
 fp() (
   local output

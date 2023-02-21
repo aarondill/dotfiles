@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+
+# ~/.bashrc.d/40-fzf
+#
+# Sets up fzf bindings and customization
+#
+#
+
+FZF_KEY_BIND_FILE=/home/aaron/.config/readline/fzf-key-bindings.bash
+FZF_COMPLETION_FILE=/home/aaron/.local/share/bash-completion/completions/fzf
+# Ensure fzf is installed, and key-bindings are reachable
+if ! command -v fzf &>/dev/null; then
+  return
+fi
+
+# Add fzf key bindings
+if [ -r "$FZF_KEY_BIND_FILE" ]; then
+  # shellcheck source=/home/aaron/.config/readline/fzf-key-bindings.bash
+  source "$FZF_KEY_BIND_FILE"
+
+fi
+
+# This would be done automatically, but only on fzf<tab>, includes kill **<tab>, etc
+# TODO, seperate fzf<tab> from kill **<tab>
+if [ -r "$FZF_COMPLETION_FILE" ]; then
+  # shellcheck source=/home/aaron/.local/share/bash-completion/completions/fzf
+  source "$FZF_COMPLETION_FILE"
+else
+  # Stop if can't access completion. Everything after this relies on it
+
+  return
+fi
+
+# Use fd (https://github.com/sharkdp/fd) instead of the default find
+# command for listing path candidates.
+# - The first argument to the function ($1) is the base path to start traversal
+# - See the source code (completion.{bash,zsh}) for the details.
+_fzf_compgen_path() {
+  fd --hidden --follow --exclude ".git" . "$1"
+}
+
+# Use fd to generate the list for directory completion
+_fzf_compgen_dir() {
+  fd --type d --hidden --follow --exclude ".git" . "$1"
+}
+
+# Advanced customization of fzf options via _fzf_comprun function
+# - The first argument to the function is the name of the command.
+# - You should make sure to pass the rest of the arguments to fzf.
+_fzf_comprun() {
+  local aliases command=$1
+  shift
+  aliases=$(alias -p)
+  case "$command" in
+  cd | pushd | tree | rmdir) fzf --preview 'tree -C {} | head -200' "$@" ;;
+  export | unset | printenv) fzf --preview "eval 'echo \$'{}" "$@" ;;
+  ssh | telnet) fzf --preview 'dig {}' "$@" ;;
+  unalias) fzf --preview "echo ${aliases@Q} | grep 'alias {}='" "$@" --preview-window down:70%:wrap --min-height 20 ;;
+  *) fzf --preview 'bat -n --color=always {}' "$@" ;;
+  esac
+}
+
+export _fzf_comprun
+
+# A few extras
+complete -d -F _longopt tree
+_fzf_setup_completion dir tree
