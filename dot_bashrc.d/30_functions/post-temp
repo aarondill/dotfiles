@@ -23,10 +23,11 @@ function post-temp(){
     # Print the result thru fx to get the data
     (
     # Already strings, if present, but trying to error
-    fx '.status.toString()'  <<< "$result"
-    fx '.data.url.toString()' <<< "$result"
+    fx '.status.toString()'  <<< "$result" 2>/dev/null
+    fx '.data.url.toString()' <<< "$result" 2>/dev/null
     ) && return 0 
-    fx '.message.toString()' <<<"$result" && return 2
+    # On error: (if failed, just continue and print it all)
+    fx '.message.toString()' <<<"$result" 2>/dev/null && return 2
   fi
     # If fx isn't installed, print the pure json
     printf '%s\n' "$result"
