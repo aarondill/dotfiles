@@ -20,14 +20,16 @@ function post-temp(){
     # {"status":"success","data":{"url":"https://tmpfiles.org/######/file"}} 
   if command -v 'fx' &>/dev/null; then 
     printf '%s\n' "$result"
+    local status url message
     # Print the result thru fx to get the data
     (
     # Already strings, if present, but trying to error
-    fx '.status.toString()'  <<< "$result" 2>/dev/null
-    fx '.data.url.toString()' <<< "$result" 2>/dev/null
-    ) && return 0 
+    status="$(fx '.status.toString()'  <<< "$result" 2>/dev/null)"
+    url="$(fx '.data.url.toString()' <<< "$result" 2>/dev/null)"
+    ) && printf '%s\n' "$status" "$url" && return 0 
     # On error: (if failed, just continue and print it all)
-    fx '.message.toString()' <<<"$result" 2>/dev/null && return 2
+    message="$(fx '.message.toString()' <<<"$result" 2>/dev/null)" \
+     && printf '%s\n' "$message" && return 2
   fi
     # If fx isn't installed, print the pure json
     printf '%s\n' "$result"
