@@ -15,7 +15,8 @@ function post-temp(){
       return 2
   fi
   local result="$(curl -F "file=@$1" https://tmpfiles.org/api/v1/upload)"
-    # Example output:
+    # Example outputs:
+    # {"message": "server error"}
     # {"status":"success","data":{"url":"https://tmpfiles.org/######/file"}} 
   if command -v 'fx' &>/dev/null; then 
     printf '%s\n' "$result"
