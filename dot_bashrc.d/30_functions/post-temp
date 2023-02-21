@@ -19,7 +19,6 @@ function post-temp(){
     # {"message": "server error"}
     # {"status":"success","data":{"url":"https://tmpfiles.org/######/file"}} 
   if command -v 'fx' &>/dev/null; then 
-    printf '%s\n' "$result"
     local status url message
     # Print the result thru fx to get the data
     (
