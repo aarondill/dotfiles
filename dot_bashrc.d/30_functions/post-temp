@@ -20,12 +20,13 @@ function post-temp(){
     # {"status":"success","data":{"url":"https://tmpfiles.org/######/file"}} 
   if command -v 'fx' &>/dev/null; then 
     local status url message
+    printf '%s' "$result"
     # Print the result thru fx to get the data
-    (
     # Already strings, if present, but trying to error
-    status="$(fx '.status.toString()'  <<< "$result" 2>/dev/null)"
-    url="$(fx '.data.url.toString()' <<< "$result" 2>/dev/null)"
-    ) && printf '%s\n' "$status" "$url" && return 0 
+    status="$(fx '.status.toString()'  <<< "$result" 2>/dev/null)" \
+      && url="$(fx '.data.url.toString()' <<< "$result" 2>/dev/null)" \
+      && printf '%s\n' "$status" "$url" \
+      && return 0 
     # On error: (if failed, just continue and print it all)
     RED="\e[1;41m"
     BLANK="\e[0m"
