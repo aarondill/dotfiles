@@ -18,13 +18,13 @@ function post-temp(){
     # Example output:
     # {"status":"success","data":{"url":"https://tmpfiles.org/######/file"}} 
   if command -v 'fx' &>/dev/null; then 
+    printf '%s\n' "$result"
     # Print the result thru fx to get the data
     printf '%s' "$result" | fx '.status' 
-    (printf '%s' "$result" | fx '.data.url') \
-      || printf '%s\n' "$result"
+    printf '%s' "$result" | fx '.data.url'
     return 0
   fi
     # If fx isn't installed, print the pure json
-    printf '%s' "$result"
+    printf '%s\n' "$result"
 }
 
