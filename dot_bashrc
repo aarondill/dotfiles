@@ -153,5 +153,3 @@ done < <(find ~/.bashrc.d/ -type f -not -name "_*" -print0 | LC_ALL=C sort -z)
 [ -f ~/.config/tabtab/bash/__tabtab.bash ] && . ~/.config/tabtab/bash/__tabtab.bash || true
 
 # ------------------------------END OF FILE------------------------------
-
-[ -f "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.bash ] && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.bash
