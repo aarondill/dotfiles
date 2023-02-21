@@ -48,20 +48,37 @@ _fzf_compgen_dir() {
 # - The first argument to the function is the name of the command.
 # - You should make sure to pass the rest of the arguments to fzf.
 _fzf_comprun() {
-  local aliases command=$1
+  local aliases fzf_tree fzf_bat command=$1
   shift
   aliases=$(alias -p)
+  command -v bat &>/dev/null && fzf_bat="bat -n --color=always -- {}" || fzf_bat="cat -- {}"
+  command -v tree &>/dev/null && fzf_tree="tree -C -- {}" || fzf_tree="ls --color=always -- {}"
+
   case "$command" in
-  cd | pushd | tree | rmdir) fzf --preview 'tree -C {} | head -200' "$@" ;;
-  export | unset | printenv) fzf --preview "eval 'echo \$'{}" "$@" ;;
-  ssh | telnet) fzf --preview 'dig {}' "$@" ;;
-  unalias) fzf --preview "echo ${aliases@Q} | grep 'alias {}='" "$@" --preview-window down:70%:wrap --min-height 20 ;;
-  *) fzf --preview 'bat -n --color=always {}' "$@" ;;
+  cd | pushd | rmdir | "${dir_completeds[@]}") fzf --preview 'tree -C {} | head -200' "$@" ;;
+  export | unset | printenv) fzf --preview "eval 'printf \"%s \" \${{}[@]}'" "$@" ;;
+  ssh | telnet) fzf --preview 'dig -- {}' "$@" ;;
+  unalias) fzf --preview "printf '%s' ${aliases@Q} | grep -- 'alias {}='" "$@" --preview-window down:70%:wrap --min-height 20 ;;
+  # Call fzf_tree if it's a dir, else fzf_bat
+  *) fzf --preview "[ -d {} ] && ($fzf_tree) || ($fzf_bat)" "$@" ;;
   esac
 }
 
 export _fzf_comprun
 
 # A few extras
+# path | dir | var | alias | host | proc
 complete -d -F _longopt tree
-_fzf_setup_completion dir tree
+
+dir_completeds=(dir live-server nautilus rmdir tree wipe-modules)
+for cmd in "${dir_completeds[@]}"; do
+  _fzf_setup_completion dir "$cmd"
+done
+
+path_completeds=(basename cat chattr chmod chown code diff diff3 dirname
+  editor javac ln ls node nodejs nvim prettier readlink realpath rm rsync
+  sh tail tar tee totem ts-node ts-node-esm uglifyjs vim vim.tiny vsce wc)
+
+for cmd in "${path_completeds[@]}"; do
+  _fzf_setup_completion path "$cmd"
+done
