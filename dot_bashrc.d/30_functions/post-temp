@@ -28,8 +28,10 @@ function post-temp(){
     url="$(fx '.data.url.toString()' <<< "$result" 2>/dev/null)"
     ) && printf '%s\n' "$status" "$url" && return 0 
     # On error: (if failed, just continue and print it all)
+    RED="\e[1;41m"
+    BLANK="\e[0m"
     message="$(fx '.message.toString()' <<<"$result" 2>/dev/null)" \
-     && printf '\e[1;41Dh%s\e[0m\n' "$message" >&2 && return 2
+     && printf "$RED%s$BLANK\n" "$message" >&2 && return 2
   fi
     # If fx isn't installed, print the pure json
     printf '%s\n' "$result"
