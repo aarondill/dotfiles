@@ -145,6 +145,9 @@ Plug 'kana/vim-submode'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 
+# Enable better pasting
+Plug 'ConradIrwin/vim-bracketed-paste'
+
 call plug#end()
 " Config vim-submode
 let g:submode_keep_leaving_key = 0
