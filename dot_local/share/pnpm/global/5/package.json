@@ -1,7 +1,7 @@
 {
 	"dependencies": {
 		"@aarondill/create-ts": "^2.1.0",
-		"@types/node": "^18.14.0",
+		"@types/node": "^18.14.1",
 		"@vscode/vsce": "^2.17.0",
 		"auto-changelog": "^2.4.0",
 		"depcheck": "^1.4.3",
@@ -17,7 +17,7 @@
 		"ts-node": "^10.9.1",
 		"typescript": "^4.9.5",
 		"uglify-js": "^3.17.4",
-		"vercel": "^28.16.2",
+		"vercel": "^28.16.6",
 		"wipe-modules": "^1.2.0"
 	}
 }
