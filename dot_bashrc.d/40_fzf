@@ -27,8 +27,40 @@ if [ -r "$FZF_COMPLETION_FILE" ]; then
   source "$FZF_COMPLETION_FILE"
 else
   # Stop if can't access completion. Everything after this relies on it
-
   return
+fi
+
+# CTRL-/ to toggle small preview window to see the full command
+# CTRL-Y to copy the command into clipboard using pbcopy
+export FZF_CTRL_R_OPTS="
+  --preview 'echo {}' --preview-window up:3:hidden:wrap
+  --bind 'ctrl-/:toggle-preview'
+  --bind 'ctrl-y:execute-silent(echo -n {2..} | pbcopy)+abort'
+  --color header:italic
+  --header 'Press CTRL-Y to copy command into clipboard'"
+
+
+if command -v fd; then
+export FZF_CTRL_T_COMMAND='fd --hidden --follow --exclude ".git" .'  
+export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude ".git" .'
+else 
+export FZF_CTRL_T_COMMAND='find .'  
+export FZF_ALT_C_COMMAND='find . -type d '
+fi
+
+if command -v bat &>/dev/null; then
+export FZF_CTRL_T_OPTS="
+  --preview 'bat -n --color=always {}'
+  --bind 'ctrl-/:change-preview-window(down|hidden|)'"
+else export FZF_CTRL_T_OPTS="
+  --preview 'cat {}'
+  --bind 'ctrl-/:change-preview-window(down|hidden|)'"
+fi
+
+if command -v tree &>/dev/null; then
+export FZF_ALT_C_OPTS="--preview 'tree -C {}'"
+else
+export FZF_ALT_C_OPTS="--preview 'ls --color=always {}'"
 fi
 
 # Use fd (https://github.com/sharkdp/fd) instead of the default find
