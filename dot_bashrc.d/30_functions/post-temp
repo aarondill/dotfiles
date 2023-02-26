@@ -33,7 +33,7 @@ function post-temp(){
     RED="\e[1;41m"
     BLANK="\e[0m"
     message="$(fx '.message.toString()' <<<"$result" 2>/dev/null)" \
-     && printf "$RED%s$BLANK\n" "$message" >&2 && return 2
+     && printf "$RED%s$BLANK\n" "$message" >&2 
   fi
     # If fx isn't installed, print the pure json
     printf '%s\n' "$result"
