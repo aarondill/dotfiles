@@ -40,7 +40,7 @@ export FZF_CTRL_R_OPTS="
   --header 'Press CTRL-Y to copy command into clipboard'"
 
 
-if command -v fd; then
+if command -v fd &>/dev/null; then
 export FZF_CTRL_T_COMMAND='fd --hidden --follow --exclude ".git" .'  
 export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude ".git" .'
 else 
