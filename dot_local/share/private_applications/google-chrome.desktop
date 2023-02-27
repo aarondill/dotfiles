@@ -1,0 +1,31 @@
+# This file overrides the default behavior in order to force dark mode
+
+[Desktop Entry]
+Version=1.0
+Name=Google Chrome
+# Only KDE 4 seems to use GenericName, so we reuse the KDE strings.
+# From Ubuntu's language-pack-kde-XX-base packages, version 9.04-20090413.
+GenericName=Web Browser
+GenericName[es]=Navegador web
+# Gnome and KDE 3 uses Comment.
+Comment=Access the Internet
+Comment[es]=Accede a Internet.
+# Override to force dark mode
+Exec=/usr/bin/google-chrome-stable --enable-features=WebUIDarkMode --force-dark-mode %U
+StartupNotify=true
+Terminal=false
+Icon=google-chrome
+Type=Application
+Categories=Network;WebBrowser;
+MimeType=application/pdf;application/rdf+xml;application/rss+xml;application/xhtml+xml;application/xhtml_xml;application/xml;image/gif;image/jpeg;image/png;image/webp;text/html;text/xml;x-scheme-handler/http;x-scheme-handler/https;
+Actions=new-window;new-private-window;
+
+[Desktop Action new-window]
+Name=New Window
+Name[es]=Nueva ventana
+Exec=/usr/bin/google-chrome-stable --enable-features=WebUIDarkMode --force-dark-mode
+
+[Desktop Action new-private-window]
+Name=New Incognito Window
+Name[es]=Nueva ventana de incógnito
+Exec=/usr/bin/google-chrome-stable --enable-features=WebUIDarkMode --force-dark-mode --incognito

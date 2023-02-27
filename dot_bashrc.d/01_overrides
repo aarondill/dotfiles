@@ -1,13 +1,20 @@
 #! /usr/bin/env bash
 
 # ~/.bashrc.d/01_overrides
-# 
+#
 # Overrides to certain system defaults,
 # such as the less history file location,
-# 
+#
 # May also be a good place for init scripts
 # If required by other files
 #
 
 # Ensure blank prompt command for later commands
 PROMPT_COMMAND=''
+
+# Rm the stupid files in HOME from chrome
+rm -r ~/.pki ~/.dotnet/ 2>/dev/null
+# RM the firefox files
+rm -r ~/.mozilla 2>/dev/null
+# RM the hplip files
+rm -r ~/.hplip 2>/dev/null

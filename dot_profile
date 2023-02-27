@@ -28,6 +28,15 @@ export WGETRC="$XDG_CONFIG_HOME/wgetrc"
 export ASPELL_CONF="per-conf $XDG_CONFIG_HOME/aspell/aspell.conf; personal $XDG_CONFIG_HOME/aspell/en.pws; repl $XDG_CONFIG_HOME/aspell/en.prepl"
 export TS_NODE_HISTORY="$XDG_STATE_HOME"/node/ts_node_repl_history
 
+# Also set in .bashrc
+# set PATH so it includes user's private bin if it exists
+if [ -d "$HOME/bin" ]; then
+  PATH="$HOME/bin:$PATH"
+fi
+# set PATH so it includes user's private bin if it exists
+if [ -d "$HOME/.local/bin" ]; then
+  PATH="$HOME/.local/bin:$PATH"
+fi
 
 # if running bash
 if [ -n "$BASH_VERSION" ]; then
@@ -35,4 +44,4 @@ if [ -n "$BASH_VERSION" ]; then
   if [ -f "$HOME/.bashrc" ]; then
     . "$HOME/.bashrc"
   fi
-fi 
+fi

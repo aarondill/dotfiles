@@ -1,38 +1,99 @@
 #! /usr/bin/env bash
 # Installs frequently used packages. Must be manually editted!
-
+function remove_if_installed_apt() {
+  local package
+  for package in; do
+    if dpkg -s "$package" &>/dev/null; then
+      sudo apt remove -y -- "$package"
+    fi
+  done
+}
+function install_if_available_apt() {
+  local package
+  for package in; do
+    if is_available_apt "$package"; then
+      sudo apt install -y -- "$package"
+    else
+      echo "It appears that $package is not available from the apt repositories."
+    fi
+  done
+}
+function is_available_apt() {
+  test -n "$(apt info "$1")"
+}
+function is_accessible_cmd() {
+  command -v "$1" &>/dev/null
+}
+function log() {
+  printf '%s\n' "$@"
+}
 read -rep "Would you like to install some things? (yes) " confirmation
 if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
-    # Get user password
-    sudo -v
-    sudo apt install age apt-clone autopoint bat curl dconf-editor \
-        debian-archive-keyring duf flatpak fwts gh git \
-        gnome-shell-extension-manager grub-editor gucharmap ifupdown \
-        inotify-tools libsnmp-dev libtool-bin make meson neofetch neovim \
-        net-tools npm pdfsam python3-neovim python3-pip tlp tree vim-scripts \
-        xclip xsane zeal zoxide nodejs command-not-found
-    # Maintain sudo after long install
-    sudo -v
-    # Install some snaps, if snap is installed
-    if command -v snap &>/dev/null; then
-        sudo snap install bitwarden
-        sudo snap install code
-        sudo snap install firefox
-        sudo snap install fx
-        sudo snap install httpie
-        sudo snap install spotify
-    else
-        printf '%s\n' "Snap is not installed, not installing snaps."
-    fi
+  # Get user password
+  sudo -v
+  # TODO, make this still work if one of these isn't available
+  install_if_available_apt age anacron apt apt-clone autopoint bat command-not-found \
+    curl dconf-editor duf flatpak fwts gh gimp git gnome-shell-extension-manager \
+    golang-go gparted grep gucharmap httpie ifupdown inotify-tools \
+    less luckybackup make neofetch neovim net-tools nodejs okular openvpn \
+    python3-neovim qtqr rsync shfmt tlp trash-cli tree util-linux xclip httpie \
+    xdg-utils zeal zip zoxide gnome-software gnome-software-plugin-flatpak
+  # Maintain sudo after long install
+  sudo -v
+  remove_if_installed_apt gnome-characters
 
-    # Install flatpaks, if flatpak is installed
-    if command -v flatpak &>/dev/null; then
-        sudo flatpak install com.github.alainm23.planner \
-            com.github.tchx84.Flatseal \
-            io.mrarm.mcpelauncher \
-            org.gnome.Cheese \
-            org.libretro.RetroArch
-    else
-        printf '%s\n' "Flatpak is not installed, not installing Flatpaks."
-    fi
+  # Require custom ppas
+  log 'installing spotify ppa'
+  curl -sS https://download.spotify.com/debian/pubkey_7A3A762FAFD4A51F.gpg | sudo gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/spotify.gpg
+  echo "deb http://repository.spotify.com stable non-free" | sudo tee /etc/apt/sources.list.d/spotify.list >/dev/null
+
+  log 'installing vscode ppa'
+  sudo apt-get install wget gpg
+  wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor --yes -o /etc/apt/keyrings/packages.microsoft.gpg
+  echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | sudo tee /etc/apt/sources.list.d/vscode.list >/dev/null
+
+  log 'installing google-chrome ppa'
+  wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/google-chrome.gpg
+  echo "deb https://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google.list >/dev/null
+
+  sudo apt update
+  install_if_available_apt spotify-client code google-chrome-stable
+  sudo apt-get install -f
+
+  # Maintain sudo
+  sudo -v
+  # Install some snaps, if snap is installed
+  if is_accessible_cmd snap &>/dev/null; then
+    log "No snaps to install, skipping"
+    # sudo snap install bitwarden
+  else
+    log "Snap is not installed, skipping snap installations."
+  fi
+
+  # Install flatpaks, if flatpak is installed
+  if is_accessible_cmd flatpak &>/dev/null; then
+    # remove cheese if present
+    flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+    remove_if_installed_apt cheese
+    sudo flatpak install com.github.johnfactotum.Foliate \
+      com.github.tchx84.Flatseal \
+      com.valvesoftware.Steam \
+      io.mrarm.mcpelauncher \
+      org.gnome.Boxes \
+      org.gnome.Cheese \
+      org.libretro.RetroArch \
+      com.github.alainm23.planner
+  else
+    log "Flatpak is not installed, skipping flatpak installations."
+  fi
+  if ! is_accessible_cmd bitwarden &>/dev/null; then
+    log "The bitwarden appimage can be installed from their website and should be placed in /usr/local/bin/bitwarden"
+  fi
+
+  if ! is_accessible_cmd fzf &>/dev/null; then
+    log "fzf should be downloaded from the git repo and placed in /usr/bin/fzf"
+  fi
+  if ! is_available_apt grub-editor; then
+    log 'grub-editor can be downloaded from the git repo at https://github.com/Thenujan-0/grub-editor/releases/latest'
+  fi
 fi

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=FATE: The Traitor Soul
+Comment=Play this game on Steam
+Exec=flatpak run com.valveSoftware.Steam steam://rungameid/303680
+Icon=steam_icon_303680
+Terminal=false
+Type=Application
+Categories=Game;
+

@@ -7,6 +7,8 @@
 
 # Alias sudo to call sudo with *my* $HOME/ENV
 alias sudo="sudo -E"
+# Unrestrict fd by default
+alias fd="fd -u"
 # Ask before overwriting
 alias mv="mv -i"
 alias cp="cp -ai"
@@ -20,7 +22,7 @@ alias ll="ls -hl"
 alias lla="ls -Ahl"
 alias cl='clear'
 
-# alias for 7z zipping files that should be hidden 
+# alias for 7z zipping files that should be hidden
 alias secret-zip='7z a -r -P -mhe=on'
 alias secret-unzip='7z x'
 

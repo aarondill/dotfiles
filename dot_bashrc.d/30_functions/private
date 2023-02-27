@@ -3,10 +3,10 @@
 # ~/.bashrc.d/30_functions/private
 #
 # Unsets histfile and opens a shell
-function private(){
+function private() {
   HISTFILE='' bash -i
   # If is in history
   if history | tail -n1 | grep -q 'private'; then
-  history -d $HISTCMD
+    history -d $HISTCMD
   fi
 }

@@ -34,15 +34,16 @@ be changed to ensure files don't get lost
 - 03_secrets
   - Anything that needs to be encrypted in the chezmoi repo
   - Includes API keys
+- 05_ENV
+  - stores miscellaneous environment variables
 - 10_util-vars
   - Useful vars for usage, such as $js
 - 20_alias
   - Sets aliases for easy shell usage, such as la
 - 30_functions/
   - A folder containing useful functions
-- 40_vscode-path
-  - Creates the vspath function
-  - Sets up the promptcommand to save the path if in vscode
+- 40_fzf
+  - sets up defaults for use of fzf, and ctrl+r, etc
 - 45_neofetch-info
   - Calls neofetch to display useful information
 - 50_backup

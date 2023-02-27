@@ -19,9 +19,9 @@
 [push]
 	default = current
 [pull]
-        ff = only
+        ff = yes
 [merge]
-        ff = only
+        ff = no
 [rebase]
         autosquash = true
 [rerere]
@@ -94,4 +94,5 @@ u%(upstream:trackshort)%(end)\
         # Commit a fixup
         fixup = commit --fixup
         merge-remote = "!git fetch --all && git merge"
+	pf = push --force-with-lease
 

@@ -5,37 +5,36 @@
 # Hosts a temporary file on the internet for 60 mins and returns the url.
 #
 #
-function post-temp(){
-  if [ "$1" = "--help" ];then
+function post-temp() {
+  if [ "$1" = "--help" ]; then
     printf '%s\n' "post-temp FILE" "" "Hosts a temporary file on the internet for 60 mins and returns the url."
-    return 0;
+    return 0
   fi
   if ! [[ -f "$1" ]]; then
-      printf "The path given is not a file"
-      return 2
+    printf "The path given is not a file\n"
+    return 2
   fi
   local result="$(curl -F "file=@$1" https://tmpfiles.org/api/v1/upload)"
-    # Example outputs:
-    # {"message": "server error"}
-    # {"status":"success","data":{"url":"https://tmpfiles.org/######/file"}} 
-  if command -v 'fx' &>/dev/null; then 
+  # Example outputs:
+  # {"message": "server error"}
+  # {"status":"success","data":{"url":"https://tmpfiles.org/######/file"}}
+  if command -v 'fx' &>/dev/null; then
     local status url message
     if [ "$2" = -v ] || [ "$2" = --verbose ]; then
       printf '%s\n' "$result"
     fi
     # Print the result thru fx to get the data
     # Already strings, if present, but trying to error
-    status="$(fx '.status.toString()'  <<< "$result" 2>/dev/null)" \
-      && url="$(fx '.data.url.toString()' <<< "$result" 2>/dev/null)" \
-      && printf '%s\n' "$status" "$url" \
-      && return 0 
+    status="$(fx '.status.toString()' <<<"$result" 2>/dev/null)" &&
+      url="$(fx '.data.url.toString()' <<<"$result" 2>/dev/null)" &&
+      printf '%s\n' "$status" "$url" &&
+      return 0
     # On error: (if failed, just continue and print it all)
     RED="\e[1;41m"
     BLANK="\e[0m"
-    message="$(fx '.message.toString()' <<<"$result" 2>/dev/null)" \
-     && printf "$RED%s$BLANK\n" "$message" >&2 
+    message="$(fx '.message.toString()' <<<"$result" 2>/dev/null)" &&
+      printf "$RED%s$BLANK\n" "$message" >&2
   fi
-    # If fx isn't installed, print the pure json
-    printf '%s\n' "$result"
+  # If fx isn't installed, print the pure json
+  printf '%s\n' "$result"
 }
-

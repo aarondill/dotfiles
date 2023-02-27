@@ -3,7 +3,7 @@
 # ~/.bashrc.d/50_backup
 #
 # If on first shell,
-# 
+#
 # Echos an error message to the user from
 # ~/.backup/BACKUPFAILURE or ~/.backup/BACKUPCHECKFAILURE
 # backup scripts should create a file there if failed.

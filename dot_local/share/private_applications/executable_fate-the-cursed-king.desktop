@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=FATE: The Cursed King
+Comment=Play this game on Steam
+Exec=flatpak run com.valvesoftware.Steam steam://rungameid/303690
+Icon=steam_icon_303690
+Terminal=false
+Type=Application
+Categories=Game;

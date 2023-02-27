@@ -26,6 +26,6 @@ EDITOR='vim'
 
 # Place Variables above this
 while IFS= read -r line; do
-    eval "$line"
+  eval "$line"
 done < <(printf '%s' "$OLDOPTS")
 unset OLDOPTS

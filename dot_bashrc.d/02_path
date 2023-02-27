@@ -7,6 +7,14 @@
 # programs that install in unusual locations
 #
 
+# Add the bin files if not already added from the .profile
+if [[ -d "$HOME/bin" ]] && [[ ! "$PATH" == *"$HOME/bin"* ]]; then
+  PATH="$HOME/bin:$PATH"
+fi
+if [[ -d "$HOME/.local/bin" ]] && [[ ! "$PATH" == *"$HOME/.local/bin"* ]]; then
+  PATH="$HOME/.local/bin:$PATH"
+fi
+
 # fix java path to allow running
 export JAVA_HOME=/usr/lib/jvm/jdk-19.0.2
 export PATH=$JAVA_HOME/bin:$PATH
@@ -17,5 +25,3 @@ export PATH="$PNPM_HOME:$PATH"
 
 # include flatpaks in path. (Have org.example.app names)
 export PATH=${PATH:+$PATH:}/var/lib/flatpak/exports/bin
-
-

@@ -10,27 +10,27 @@
 #
 
 bash() {
-    # trap "echo $? $! && [[ $SHLVL -gt 1 ]] && exit $?" SIGCHLD
-    /usr/bin/bash "$@"
-    local returncode=$?
-    if [[ $returncode -eq 196 && $SHLVL -gt 1 ]]; then #if not oldest parent
-        exit $returncode 2>/dev/null                   #redir "exit" msg to null
-    elif [[ $returncode -eq 196 ]]; then               #if oldest parent
-        echo "Successfully closed all subshells"
-    else
-        echo "Exit $returncode"
-    fi
-    echo "Shell level $SHLVL"
-    return $returncode
+  # trap "echo $? $! && [[ $SHLVL -gt 1 ]] && exit $?" SIGCHLD
+  /usr/bin/bash "$@"
+  local returncode=$?
+  if [[ $returncode -eq 196 && $SHLVL -gt 1 ]]; then #if not oldest parent
+    exit $returncode 2>/dev/null                     #redir "exit" msg to null
+  elif [[ $returncode -eq 196 ]]; then               #if oldest parent
+    echo "Successfully closed all subshells"
+  else
+    echo "Exit $returncode"
+  fi
+  echo "Shell level $SHLVL"
+  return $returncode
 }
 
 exit() { exitall "$@"; }
 exitall() {
-    [[ ! $(caller 0) ]] && set -- all # if exitall called directly, set $1 to all
-    if [[ ${1,,} == "all" ]]; then    #if first argument is "all"
-        builtin exit 196 2>/dev/null  # code to close recursively
-    else
-        builtin exit "$@" 2>/dev/null # passthrough argument to exit
-    fi
+  [[ ! $(caller 0) ]] && set -- all # if exitall called directly, set $1 to all
+  if [[ ${1,,} == "all" ]]; then    #if first argument is "all"
+    builtin exit 196 2>/dev/null    # code to close recursively
+  else
+    builtin exit "$@" 2>/dev/null # passthrough argument to exit
+  fi
 }
 export -f "bash" "exit" "exitall"
