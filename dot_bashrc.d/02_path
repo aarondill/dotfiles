@@ -15,3 +15,7 @@ export PATH=$JAVA_HOME/bin:$PATH
 export PNPM_HOME="/home/aaron/.local/share/pnpm"
 export PATH="$PNPM_HOME:$PATH"
 
+# include flatpaks in path. (Have org.example.app names)
+export PATH=${PATH:+$PATH:}/var/lib/flatpak/exports/bin
+
+
