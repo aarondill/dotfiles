@@ -1,0 +1,14 @@
+[Desktop Entry]
+X-SnapInstanceName=snap-store
+Name=Snap Store
+Comment=Add, remove or update software on this computer
+Icon=io.snapcraft.Store.png
+Exec=env BAMF_DESKTOP_FILE_HINT=/var/lib/snapd/desktop/applications/snap-store_ubuntu-software.desktop /snap/bin/snap-store.ubuntu-software %U
+Terminal=false
+Type=Application
+Categories=GNOME;GTK;System;PackageManager;
+Keywords=Updates;Upgrade;Sources;Repositories;Preferences;Install;Uninstall;Program;Software;App;Store;
+OnlyShowIn=ubuntu
+StartupNotify=true
+MimeType=x-scheme-handler/appstream;x-scheme-handler/apt;x-scheme-handler/snap;
+

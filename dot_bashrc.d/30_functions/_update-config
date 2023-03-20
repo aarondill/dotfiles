@@ -33,3 +33,4 @@ vscode/.release-it.json
 vscode/.shellcheckrc
 vscode/js/.gitignore
 vscode/js/EslintTests.js
+.local/share/icons/io.snapcraft.Store.png
