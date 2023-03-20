@@ -8,7 +8,7 @@
 # and calls chezmoi add on it.
 #
 
-function update-config() {
+function update-config() ( 
   declare -a files
   declare target
   # Finds files line-by-line, ignoring the first 3 lines
@@ -23,7 +23,7 @@ function update-config() {
   else
     return 2
   fi
-}
+)
 
 # Copies the files to $HOME/.root/FILEPATH. `.root` should be backed up
 function cproot() {
