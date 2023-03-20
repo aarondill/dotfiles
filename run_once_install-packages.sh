@@ -31,7 +31,7 @@ read -rep "Would you like to install some things? (yes) " confirmation
 if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
   # Get user password
   sudo -v
-  # TODO, make this still work if one of these isn't available
+  # TODO, make this count which are available and install at once
   install_if_available_apt age anacron apt apt-clone autopoint bat command-not-found \
     curl dconf-editor duf flatpak fwts gh gimp git gnome-shell-extension-manager \
     golang-go gparted grep gucharmap httpie ifupdown inotify-tools \
