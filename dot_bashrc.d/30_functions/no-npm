@@ -19,14 +19,14 @@ function npm() {
   fi
 
   if [[ -n "$OUTPUT" ]]; then
-  printf "%b" "$message" >"$OUTPUT"
-  # Defaults to no
-  read -rep "Are you sure you want to use NPM? (y/N) " confirmation
-  if [[ -n "$confirmation" && "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
+    printf "%b" "$message" >"$OUTPUT"
+    # Defaults to no
+    read -rep "Are you sure you want to use NPM? (y/N) " confirmation
+    if [[ -n "$confirmation" && "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
+      "$(which npm)" "$@"
+    fi
+  else
     "$(which npm)" "$@"
-  fi
-else
-  "$(which npm)" "$@"
   fi
 
 }
