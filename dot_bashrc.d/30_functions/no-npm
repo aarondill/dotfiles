@@ -10,6 +10,7 @@ function npm() {
   local RED='\033[0;31m'
   local NONE='\033[0m' # No Color
   local message="no-npm: ${RED}Perhaps you meant pnpm?${NONE}\n"
+  local OUTPUT=""
   # Print to stderr if possible, else stdout if possible
   if [[ -t 2 ]]; then
     OUTPUT=/proc/self/fd/2
@@ -17,11 +18,15 @@ function npm() {
     OUTPUT=/proc/self/fd/1
   fi
 
+  if [[ -n "$OUTPUT" ]]; then
   printf "%b" "$message" >"$OUTPUT"
   # Defaults to no
   read -rep "Are you sure you want to use NPM? (y/N) " confirmation
   if [[ -n "$confirmation" && "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
     "$(which npm)" "$@"
+  fi
+else
+  "$(which npm)" "$@"
   fi
 
 }
