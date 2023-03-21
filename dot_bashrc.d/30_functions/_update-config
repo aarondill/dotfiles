@@ -33,3 +33,4 @@ vscode/.shellcheckrc
 vscode/js/.gitignore
 vscode/js/EslintTests.js
 .local/share/icons/io.snapcraft.Store.png
+.local/share/icons/bitwarden.png
