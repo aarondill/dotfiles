@@ -19,7 +19,6 @@
 .local/share/bash-completion
 .local/share/fonts
 .local/share/icons/fslite.ico
-.local/share/icons/hicolor/1024x1024/apps/bitwarden.png
 .local/share/pnpm/global/5/package.json
 .pam_environment
 .profile
