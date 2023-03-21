@@ -35,11 +35,13 @@ if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
   install_if_available_apt age anacron apt apt-clone autopoint bat command-not-found \
     curl dconf-editor duf flatpak fwts gh gimp git gnome-shell-extension-manager \
     golang-go gparted grep gucharmap httpie ifupdown inotify-tools \
-    less luckybackup make neofetch neovim net-tools nodejs okular openvpn \
+    less luckybackup make neofetch neovim net-tools okular openvpn \
     python3-neovim qtqr rsync shfmt tlp trash-cli tree util-linux xclip httpie \
     xdg-utils zeal zip zoxide gnome-software gnome-software-plugin-flatpak
   # Maintain sudo after long install
   sudo -v
+  log 'installing nodejs. After getting node setup using `n`, run `sudo apt remove nodejs`'
+  install_if_available_apt nodejs
   remove_if_installed_apt gnome-characters
 
   # Require custom ppas
