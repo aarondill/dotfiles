@@ -29,8 +29,8 @@ function update-config() (
 function cproot() {
   declare -i exitCode=0
   files=()
-  for file; do
-    if [[ -r "$file" ]]; then
+  for file in; do
+    if [[ -e "$file" ]]; then
       local old_path
       old_path="$(realpath -s -- "$file")"
       local new_path="$HOME/.root$old_path"
@@ -38,6 +38,7 @@ function cproot() {
       mkdir -p "$(dirname -- "$new_path")"
       # cp to home, so files are relative to home
       /usr/bin/sudo cp -r "$file" "$new_path"
+      /usr/bin/sudo chown -hR "$(whoami)" "$file"
       # add to the array so i can update all at once
       files+=("$new_path")
     else
