@@ -38,7 +38,7 @@ function cproot() {
       mkdir -p "$(dirname -- "$new_path")"
       # cp to home, so files are relative to home
       /usr/bin/sudo cp -r "$file" "$new_path"
-      /usr/bin/sudo chown -hR "$(whoami)" "$file"
+      /usr/bin/sudo chown -hR "$(whoami)" "$new_path"
       # add to the array so i can update all at once
       files+=("$new_path")
     else
