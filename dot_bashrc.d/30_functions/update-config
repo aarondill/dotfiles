@@ -29,7 +29,7 @@ function update-config() (
 function cproot() {
   declare -i exitCode=0
   files=()
-  for file in; do
+  for file; do
     if [[ -e "$file" ]]; then
       local old_path
       old_path="$(realpath -s -- "$file")"
