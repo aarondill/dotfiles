@@ -28,8 +28,18 @@ function update-config() (
 # Copies the files to $HOME/.root/FILEPATH. `.root` should be backed up
 function cproot() {
   declare -i exitCode=0
+  declare -a opts args
+  opts=()
+  args=()
+  for arg; do
+    if [[ "$arg" == --?* ]]; then
+      opts+=("$arg")
+    else
+      args+=("$arg")
+    fi
+  done
   files=()
-  for file; do
+  for file in "${args[@]}"; do
     if [[ -e "$file" ]]; then
       local old_path
       old_path="$(realpath -s -- "$file")"
@@ -48,7 +58,7 @@ function cproot() {
     fi
   done
   # Add all files to chezmoi repo
-  chezmoi add "${files[@]}"
+  chezmoi add "${opts[@]}" -- "${files[@]}"
 
   # Exit with the saved code
   return $exitCode
