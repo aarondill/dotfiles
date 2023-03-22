@@ -8,7 +8,7 @@
 # and calls chezmoi add on it.
 #
 
-function update-config() ( 
+function update-config() (
   declare -a files
   declare target
   # Finds files line-by-line, ignoring the first 3 lines
