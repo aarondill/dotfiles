@@ -17,8 +17,8 @@ function update-config() (
     # cd to home, so files are relative to home
     builtin cd "$target" || return
     printf '%s\n' "Press 'n' if asked about encrypted files. They will still be updated!"
-    chezmoi add --include=noencrypted -- "${files[@]}"
-    chezmoi add --include=encrypted --encrypt -- "${files[@]}"
+    # TODO, this!
+    chezmoi add -- "${files[@]}"
     # Ensure everything is updated
     chezmoi re-add
   else
