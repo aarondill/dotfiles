@@ -73,6 +73,10 @@ function update-root-config() {
   while IFS= read -r -d $'\0' file; do
     rootpath="/$file"
     homepath="$dotroot/$file"
+    if sudo cmp -q "$rootpath" "$homepath"; then
+      # if same, move on
+      continue
+    fi
     # Doesn't need to be recursive bc is only files, not dirs.
     sudo cp -f -- "$rootpath" "$homepath"
     sudo chown --preserve-root -h -- "$(whoami)" "$homepath"
