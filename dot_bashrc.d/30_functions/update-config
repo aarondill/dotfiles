@@ -66,8 +66,10 @@ function cproot() {
 }
 
 function update-root-config() {
-  local files rootpath homepath dotroot
+  local files rootpath homepath dotroot encrypted_files add_files
   dotroot="$HOME/.root"
+  encrypted_files=()
+  add_files=()
   while IFS= read -r -d $'\0' file; do
     rootpath="/$file"
     homepath="$dotroot/$file"
@@ -76,13 +78,15 @@ function update-root-config() {
     sudo chown --preserve-root -h "$(whoami)" "$homepath"
 
     #  Fails if not encrypted
-    if chezmoi list --include=encrypted "$homepath" &>/dev/null; then
-      chezmoi add --encrypt "$homepath"
+    if [[ -n "$(chezmoi list --include=encrypted "$homepath")" ]]; then
+      encrypted_files+=("$homepath")
     else
-      chezmoi add "$homepath"
+      add_files+=("$homepath")
     fi
-
   done < <(find "$dotroot" -type f -printf '%P\0')
+
+  test ${#add_files[@]} -gt 0 && chezmoi add -- "${add_files[@]}"
+  test ${#encrypted_files[@]} -gt 0 && chezmoi add --encrypt -- "${encrypted_files[@]}"
 }
 
 # Adds to chezmoi and adds to ~/.bashrc.d/30_functions/_update-config
