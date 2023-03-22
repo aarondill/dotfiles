@@ -73,7 +73,7 @@ function update-root-config() {
   while IFS= read -r -d $'\0' file; do
     rootpath="/$file"
     homepath="$dotroot/$file"
-    if sudo cmp -q "$rootpath" "$homepath"; then
+    if sudo cmp --quiet "$rootpath" "$homepath"; then
       # if same, move on
       continue
     fi
@@ -91,6 +91,10 @@ function update-root-config() {
 
   test ${#add_files[@]} -gt 0 && echo chezmoi add -- "${add_files[@]}"
   test ${#encrypted_files[@]} -gt 0 && echo chezmoi add --encrypt -- "${encrypted_files[@]}"
+  if test ${#add_files[@]} -eq 0 && test ${#encrypted_files[@]} -eq 0; then
+    echo "No files have changed (dirs not recursive)"
+  fi
+  return 0
 }
 
 # Adds to chezmoi and adds to ~/.bashrc.d/30_functions/_update-config
