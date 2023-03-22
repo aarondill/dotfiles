@@ -55,7 +55,7 @@ Plug 'lambdalisue/suda.vim', Cond(executable('sudo'))
 let g:suda_smart_edit = 1
 
 " Install YouCompleteMe for inline-completions - only core, TS/JS, and Java.
-Plug 'ycm-core/YouCompleteMe', { 'do': './install.py --ts-completer --java-completer' }
+Plug 'ycm-core/YouCompleteMe', { 'do': './install.py --ts-completer --java-completer --go-completer' }
 " Handle completion keys
 let g:ycm_key_list_select_completion = ['<C-j>', '<DOWN>']
 let g:ycm_key_list_previous_completion = ['<C-k>', '<UP>']
