@@ -41,15 +41,15 @@ function cproot() {
   files=()
   for file in "${args[@]}"; do
     if [[ -e "$file" ]]; then
-      local old_path
+      local old_path new_dir new_path
       old_path="$(realpath -s -- "$file")"
-      local new_path="$HOME/.root$old_path"
-      local new_dir="$(dirname -- "$new_path")"
+      new_path="$HOME/.root$old_path"
+      new_dir="$(dirname -- "$new_path")"
       # ensure destination exists
       mkdir -p "$new_dir"
-      # cp to home, so files are relative to home
-      /usr/bin/sudo cp -r "$file" "$new_dir"
-      /usr/bin/sudo chown -hR "$(whoami)" "$new_path"
+      # cp to home, so files are relative to home.
+      sudo cp -r "$file" "$new_dir"
+      sudo chown --preserve-root -hR "$(whoami)" "$new_path"
       # add to the array so i can update all at once
       files+=("$new_path")
     else
@@ -63,6 +63,26 @@ function cproot() {
 
   # Exit with the saved code
   return $exitCode
+}
+
+function update-root-config() {
+  local files rootpath homepath dotroot
+  dotroot="$HOME/.root"
+  while IFS= read -r -d $'\0' file; do
+    rootpath="/$file"
+    homepath="$dotroot/$file"
+    # Doesn't need to be recursive bc is only files, not dirs.
+    sudo cp -f "$rootpath" "$homepath"
+    sudo chown --preserve-root -h "$(whoami)" "$homepath"
+
+    #  Fails if not encrypted
+    if chezmoi list --include=encrypted "$homepath" &>/dev/null; then
+      chezmoi add --encrypt "$homepath"
+    else
+      chezmoi add "$homepath"
+    fi
+
+  done < <(find "$dotroot" -type f -printf '%P\0')
 }
 
 # Adds to chezmoi and adds to ~/.bashrc.d/30_functions/_update-config
