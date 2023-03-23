@@ -16,9 +16,12 @@ function update-config() (
   if target=$(chezmoi target-path); then
     (
       # add from target so files are relative to target
-      cd "$target" &&
-        # don't force a tty prompt, instead just take my no.
-        yes no | chezmoi add --no-tty -- "${files[@]}" >/dev/null
+      cd "$target" || return
+      # Output a detail of which files are changing
+      printf 'Changed files: '
+      config status -- "${files[@]}" | awk '{ print $2 }'
+      # don't force a tty prompt, instead just take my no.
+      yes no | chezmoi add --no-tty -- "${files[@]}" >/dev/null
     )
     # Ensure everything is updated
     chezmoi re-add
