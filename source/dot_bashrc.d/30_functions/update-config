@@ -19,7 +19,7 @@ function update-config() (
       cd "$target" || return
       # Output a detail of which files are changing
       printf 'Changed files: '
-      config status -- "${files[@]}" | awk '{ print $2 }'
+      chezmoi status -- "${files[@]}" | awk '{ print $2 }'
       # don't force a tty prompt, instead just take my no.
       yes no | chezmoi add --no-tty -- "${files[@]}" >/dev/null
     )
