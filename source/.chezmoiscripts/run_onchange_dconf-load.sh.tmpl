@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# dconf.ini hash: {{ include "dconf-backup.ini | sha256sum }}
+# dconf.ini hash: {{ include "dconf-backup.ini" | sha256sum }}
 
 read -rep "load dconf settings from source? (yes) " confirmation
 if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
