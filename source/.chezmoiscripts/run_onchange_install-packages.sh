@@ -15,17 +15,17 @@ function quiet_apt() {
   sudo apt-get -qq "$@" >/dev/null
 }
 function install_if_available_apt() {
-  declare -i exit=0
+  declare -a available_packages
+  available_packages=()
   local package
   for package; do
     if is_available_apt "$package"; then
-      # If failed, set exit to failure code
-      quiet_apt install -- "$package" || exit=$?
+      available_packages+=("$package")
     else
-      echo "It appears that $package is not available from the apt repositories."
+      echo "Could not find '$package' in apt repos"
     fi
   done
-  return $exit
+  quiet_apt install -- "${available_packages[@]}"
 }
 function is_available_apt() {
   test -n "$(apt-cache show -- "$1" 2>/dev/null)"
@@ -116,7 +116,6 @@ if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
   # Install flatpaks, if flatpak is installed
   if is_accessible_cmd flatpak &>/dev/null; then
     # remove cheese if present
-    log 'Setting up flatpak'
     flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
     (
       set -e
