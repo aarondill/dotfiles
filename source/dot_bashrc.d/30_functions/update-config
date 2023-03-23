@@ -34,9 +34,9 @@ function update-config() (
   dconf dump / >|"$dconf_path"
   if [[ -n "$(chezmoi git -- status --porcelain "$dconf_path")" ]]; then
     printf 'Updating dconf backup\n'
-    chezmoi git add source/dconf-backup.ini &&
-      chezmoi git -- commit -m 'update dconf-backup.ini' &&
-      chezmoi git -- push >/dev/null
+    chezmoi git -- add source/dconf-backup.ini --quiet &&
+      chezmoi git -- commit -m 'update dconf-backup.ini' --quiet &&
+      chezmoi git -- push --quiet >/dev/null
   fi
 )
 
