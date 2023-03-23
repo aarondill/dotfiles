@@ -1,6 +1,5 @@
 #! /usr/bin/env bash
 
-echo "$PATH"
 # ~/.bashrc.d/01_overrides
 #
 # Overrides to certain system defaults,
