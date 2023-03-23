@@ -2,7 +2,7 @@
 # Installs frequently used packages. Must be manually editted!
 function remove_if_installed_apt() {
   local package
-  for package in; do
+  for package; do
     if dpkg -s "$package" &>/dev/null; then
       sudo apt remove -y -- "$package"
     fi
@@ -16,7 +16,7 @@ function quiet_apt() {
 }
 function install_if_available_apt() {
   local package
-  for package in; do
+  for package; do
     if is_available_apt "$package"; then
       quiet_apt install -- "$package"
     else
