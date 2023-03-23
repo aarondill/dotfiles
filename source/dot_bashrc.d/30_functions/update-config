@@ -16,17 +16,17 @@ function update-config() (
   if target=$(chezmoi target-path); then
     printf '%s\n' "Press 'n' if asked about encrypted files. They will still be updated!"
     # add from target so files are relative to target
-    ( cd "$target" && chezmoi add -- "${files[@]}" )
+    (cd "$target" && chezmoi add -- "${files[@]}")
     # Ensure everything is updated
     chezmoi re-add
   else
     return 2
   fi
   # Update dconf
-  dconf dump / >| $(chezmoi source-path)/dconf-backup.ini
-  chezmoi git add $(chezmoi source-path)/dconf-backup.ini \
-  && chezmoi git -- commit -m 'update dconf-backup.ini' \
-   && chezmoi git -- push
+  dconf dump / >|$(chezmoi source-path)/dconf-backup.ini
+  chezmoi git add $(chezmoi source-path)/dconf-backup.ini &&
+    chezmoi git -- commit -m 'update dconf-backup.ini' &&
+    chezmoi git -- push
 )
 
 # Copies the files to $HOME/.root/FILEPATH. `.root` should be backed up
