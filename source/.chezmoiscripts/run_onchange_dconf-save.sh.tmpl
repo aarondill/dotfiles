@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-
-# dconf.ini hash: {{ include "".root/etc/dconf"" | sha256sum }}
-# dconf.ini hash: {{ include "".config/dconf/user"" | sha256sum }}
-mkdir -p ~/.config/dconf/
-dconf dump / > ~/.config/dconf/dconf-backup.ini
