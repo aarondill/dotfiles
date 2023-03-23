@@ -19,7 +19,7 @@ function install_if_available_apt() {
   done
 }
 function is_available_apt() {
-  test -n "$(apt info "$1")"
+  test -n "$(apt-cache show -- "$1" 2>/dev/null)"
 }
 function is_accessible_cmd() {
   command -v "$1" &>/dev/null
