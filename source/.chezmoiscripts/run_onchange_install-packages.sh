@@ -40,8 +40,10 @@ if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
     xdg-utils zeal zip zoxide gnome-software gnome-software-plugin-flatpak
   # Maintain sudo after long install
   sudo -v
-  log 'installing nodejs. After getting node setup using `n`, run `sudo apt remove nodejs`'
-  install_if_available_apt nodejs
+  if ! is_accessible_cmd n; then
+    log 'installing nodejs. After getting node setup using `n`, run `sudo apt remove nodejs`'
+    install_if_available_apt nodejs
+  fi
   remove_if_installed_apt gnome-characters
 
   # Require custom ppas
