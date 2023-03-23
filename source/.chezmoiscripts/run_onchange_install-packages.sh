@@ -8,7 +8,7 @@ function remove_if_installed_apt() {
     fi
   done
 }
-function quiet_apt(){
+function quiet_apt() {
   # usage: quiet_apt install package
   # Errors are still displayed!
   # -qq implies -y, output to /dev/null to hide info
@@ -49,15 +49,24 @@ if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
   if ! is_accessible_cmd pnpm; then
     log 'installing nodejs. After getting node setup using `n`, run `sudo apt remove nodejs`'
     install_if_available_apt npm
-    npm install -g n
-    sudo mkdir -p /usr/local/n
-    sudo chown -- "$(whoami)" /usr/local/n
-    n lts # installs node and npm
-    corepack enable
-    corepack prepare --activate pnpm@latest
-    pnpm i -g n
-    npm remove -g n
-    quiet_apt autoremove npm
+    if which npm -q; then
+      # Setup n
+      "$(which npm)" install -g n
+      sudo mkdir -p /usr/local/n
+      sudo chown -- "$(whoami)" /usr/local/n
+      n lts # installs node and npm
+
+      # Remove npm from apt
+      "$(which npm)" remove -g n
+      quiet_apt autoremove npm
+      
+      # Setup pnpm
+      corepack enable
+      corepack prepare --activate pnpm@latest
+      pnpm i -g n
+    else
+      echo 'could not install npm from apt'
+    fi
   fi
   remove_if_installed_apt gnome-characters
 
