@@ -24,7 +24,7 @@ function update-config() {
         printf '%s\n' "$changed_files"
       fi
       # don't force a tty prompt, instead just take my no.
-      yes no | chezmoi add --no-tty -- "${files[@]}" >/dev/null
+      yes no | chezmoi add --exact --no-tty -- "${files[@]}" >/dev/null
     )
     # Ensure everything is updated
     chezmoi re-add
@@ -77,7 +77,7 @@ function cproot() {
     fi
   done
   # Add all files to chezmoi repo
-  chezmoi add "${opts[@]}" -- "${files[@]}"
+  chezmoi add --exact "${opts[@]}" -- "${files[@]}"
 
   # Exit with the saved code
   return $exitCode
