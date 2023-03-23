@@ -23,10 +23,14 @@ function update-config() (
     return 2
   fi
   # Update dconf
-  dconf dump / >|$(chezmoi source-path)/dconf-backup.ini
-  chezmoi git add $(chezmoi source-path)/dconf-backup.ini &&
+  local dconf_path
+  dconf_path=$(chezmoi source-path)/dconf-backup.ini
+  dconf dump / >| "$dconf_path"
+  if [[ -n "$(chezmoi git -- status --porcelain "$dconf_path")" ]]; then
+  chezmoi git add source/dconf-backup.ini &&
     chezmoi git -- commit -m 'update dconf-backup.ini' &&
     chezmoi git -- push
+  fi
 )
 
 # Copies the files to $HOME/.root/FILEPATH. `.root` should be backed up
