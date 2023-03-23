@@ -1,5 +1,6 @@
 [Desktop Entry]
 Name=Bitwarden
+TryExec=bitwarden
 Exec=bitwarden
 Terminal=false
 Type=Application
