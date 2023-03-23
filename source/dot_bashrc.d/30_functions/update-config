@@ -24,8 +24,8 @@ function update-config() (
   fi
   # Update dconf
   dconf dump / >| $(chezmoi source-path)/dconf-backup.ini
-  chezmoi git add $(chezmoi source-path)/dconf-backup.ini
-  && chezmoi git -- commit -m 'update dconf-backup.ini'
+  chezmoi git add $(chezmoi source-path)/dconf-backup.ini \
+  && chezmoi git -- commit -m 'update dconf-backup.ini' \
    && chezmoi git -- push
 )
 
