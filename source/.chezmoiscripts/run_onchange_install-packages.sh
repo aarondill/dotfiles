@@ -8,11 +8,16 @@ function remove_if_installed_apt() {
     fi
   done
 }
+function quiet_install_apt(){
+  # Errors are still displayed!
+  # -qq implies -y, output to /dev/null to hide info
+  sudo apt-get -qq install -- "$@" >/dev/null
+}
 function install_if_available_apt() {
   local package
   for package in; do
     if is_available_apt "$package"; then
-      sudo apt install -y -- "$package"
+      quiet_install_apt "$package"
     else
       echo "It appears that $package is not available from the apt repositories."
     fi
