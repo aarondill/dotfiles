@@ -1,10 +1,10 @@
 #! /usr/bin/env bash
-# Installs frequently used packages. Must be manually editted!
+# Installs frequently used packages.
 function remove_if_installed_apt() {
   local package
   for package; do
     if dpkg -s "$package" &>/dev/null; then
-      sudo apt remove -y -- "$package"
+      quiet_apt remove -- "$package"
     fi
   done
 }
@@ -30,6 +30,22 @@ function install_if_available_apt() {
 function is_available_apt() {
   test -n "$(apt-cache show -- "$1" 2>/dev/null)"
 }
+function flatpak_install() {
+  # usage: flatpak_install install [flathub] package
+  # Errors are still displayed!
+  flatpak install -y --noninteractive -- "$@" >/dev/null
+}
+function flatpak_is_installed() {
+  # usage: flatpak_is_installed package
+  flatpak info -- "$@" >/dev/null
+}
+
+# shellcheck disable=SC2120 # I know it doesn't recieve arguments. It's intentional.
+function flatpak_update() {
+  # usage: flatpak_update package
+  # Errors are still displayed!
+  flatpak update -y --noninteractive -- "$@" >/dev/null
+}
 function is_accessible_cmd() {
   command -v "$1" &>/dev/null
 }
@@ -39,11 +55,10 @@ function log() {
 function err() {
   printf '%s\n' "$@" >&2
 }
-read -rep "Would you like to install some things? (yes) " confirmation
+read -rep "Would you like to install some things? (Y/n) " confirmation
 if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
   # Get user password
   sudo -v
-  # TODO, make this count which are available and install at once
   (
     set -e
     log 'Installing apt packages...'
@@ -53,7 +68,6 @@ if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
       less luckybackup make neofetch neovim net-tools okular openvpn \
       python3-neovim qtqr rsync shfmt tlp trash-cli tree util-linux xclip httpie \
       xdg-utils zeal zip zoxide gnome-software gnome-software-plugin-flatpak
-    log 'success!'
   ) || err 'something went wrong installing apt packages!'
   # Maintain sudo after long install
   sudo -v
@@ -67,17 +81,16 @@ if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
       "$(which npm)" install --silent -g n
       sudo mkdir -p /usr/local/n
       sudo chown -- "$(whoami)" /usr/local/n
-      n --quiet lts # installs node and npm
+      n lts >/dev/null # installs node and npm
 
       # Remove npm from apt
       "$(which npm)" remove --silent -g n
-      quiet_apt autoremove npm
+      quiet_apt autoremove -y npm
 
       # Setup pnpm
       corepack enable
       corepack prepare pnpm@latest --activate >/dev/null
       pnpm i --silent -g n
-      log 'Success!'
     ) || err 'Something went wrong installing nodejs and pnpm!'
   fi
   remove_if_installed_apt gnome-characters
@@ -121,49 +134,101 @@ if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
       set -e
       log 'Installing flatpak packages...'
       remove_if_installed_apt cheese
-      flatpak install -y --noninteractive flathub com.github.johnfactotum.Foliate >/dev/null
-      flatpak install -y --noninteractive flathub com.github.tchx84.Flatseal >/dev/null
-      flatpak install -y --noninteractive flathub com.valvesoftware.Steam >/dev/null
-      flatpak install -y --noninteractive flathub io.mrarm.mcpelauncher >/dev/null
-      flatpak install -y --noninteractive flathub org.gnome.Boxes >/dev/null
-      flatpak install -y --noninteractive flathub org.gnome.Cheese >/dev/null
-      flatpak install -y --noninteractive flathub org.libretro.RetroArch >/dev/null
-      flatpak install -y --noninteractive flathub com.github.alainm23.planner >/dev/null
-      log 'Success!'
+      flatpak_apps=(
+        com.github.johnfactotum.Foliate com.github.tchx84.Flatseal
+        com.valvesoftware.Steam io.mrarm.mcpelauncher org.gnome.Boxes
+        org.gnome.Cheese org.libretro.RetroArch com.github.alainm23.planner
+      )
+      for flatpak_app in "${flatpak_apps[@]}"; do
+        if ! flatpak_is_installed "$flatpak_app"; then
+          flatpak_install "$flatpak_app"
+        fi
+      done
     ) || err 'Something went wrong installing flatpak packages'
+    (
+      set -e
+      log 'Updating flatpak packages...'
+      flatpak_update # Update all the packages
+    ) || err 'Something went wrong updating flatpak packages'
   else
     log "Flatpak is not installed, skipping flatpak installations."
   fi
-  if ! is_accessible_cmd bitwarden &>/dev/null; then
+
+  # Don't run if already installed because the appimage updates itself
+  if ! is_accessible_cmd bitwarden; then
     (
       set -e
       log 'Installing bitwarden desktop...'
-      # Is an appimage
-      sudo curl -sSL 'https://vault.bitwarden.com/download/?app=desktop&platform=linux&variant=appimage' -o /usr/local/bin/bitwarden
-      sudo chmod +x /usr/local/bin/bitwarden
-      log 'Success!'
+      declare DESTINATION=/usr/local/bin/bitwarden
+      sudo curl -sSL 'https://vault.bitwarden.com/download/?app=desktop&platform=linux&variant=appimage' -o "$DESTINATION"
+      sudo chown root "$DESTINATION"
+      sudo chmod +x "$DESTINATION"
     ) || err 'Something went wrong installing bitwarden desktop'
   fi
-  if ! bw --version &>/dev/null; then
-    (
-      set -e
-      log 'Installing bitwarden CLI...'
-      # Is a zip file
-      temp_dir=$(mktemp --tmpdir -d 'config-install-XXXXXX')
-      sudo curl -sSL 'https://vault.bitwarden.com/download/?app=cli&platform=linux' -o "$temp_dir/bw.zip"
-      unzip "$temp_dir/bw.zip"
-      mv "$temp_dir/bw" /usr/local/bin/bw
-      rm -rf "$temp_dir"
-      sudo chmod +x /usr/local/bin/bw
-      log 'Success!'
-    ) || err 'Something went wrong installing bitwarden CLI'
-  fi
+
+  (
+    set -e
+    log 'Installing bitwarden CLI...'
+    # // Download and unzip the CLI
+    # // temp_dir=$(mktemp -d)
+    # // sudo curl -sSL 'https://vault.bitwarden.com/download/?app=cli&platform=linux' -o "$temp_dir/bw.zip"
+    # // unzip "$temp_dir/bw.zip"
+    # // mv -f "$temp_dir/bw" /usr/local/bin/bw
+    # // rm -rf "$temp_dir"
+    # zcat can only unzip a single file archive, but this allows me to skip the temporary directory
+    curl -sSL 'https://vault.bitwarden.com/download/?app=cli&platform=linux' | zcat | sudo tee "/usr/local/bin/bw" >/dev/null
+    sudo chmod +x /usr/local/bin/bw
+  ) || err 'Something went wrong installing bitwarden CLI'
 
   # TODO, make this automatic!
   if ! is_accessible_cmd fzf &>/dev/null; then
-    log "fzf should be downloaded from the git repo and placed in /usr/bin/fzf"
+    (
+      set -e
+      log 'installing fzf...'
+      declare OWNER=junegunn REPO=fzf BINLOCATION="/usr/bin"
+      version=$(curl -sI https://github.com/$OWNER/$REPO/releases/latest | grep -i "location:" | awk -F"/" '{ printf "%s", $NF }' | tr -d '\r')
+      if [ -z "$version" ]; then
+        err "Failed while attempting to install $REPO. Please manually install at https://github.com/$OWNER/$REPO/releases"
+        exit 2
+      fi
+      if [[ "$(uname)" != "Linux" ]]; then
+        err "This script only supports Linux distributions"
+        exit 2
+      fi
+      arch=$(uname -m)
+      if [[ "$arch" == "aarch64" ]]; then
+        suffix="-linux_arm64.tar.gz"
+      elif [[ "$arch" == "x86_64" ]]; then
+        # ASSUMES AMD
+        suffix="-linux_amd64.tar.gz"
+      else
+        err "Could not determine architecture to install $REPO"
+        exit 2
+      fi
+      url=https://github.com/$OWNER/$REPO/releases/download/$version/$REPO-$version$suffix
+      targetFile="$BINLOCATION/fzf"
+      # Download and extract the tar.gz archive
+      curl -sSL "$url" | tar xzf - -O | sudo tee "$targetFile" >/dev/null
+      sudo chmod +x "$targetFile"
+    ) || err "something went wrong installing fzf"
   fi
+
   if ! is_available_apt grub-editor; then
-    log 'grub-editor can be downloaded from the git repo at https://github.com/Thenujan-0/grub-editor/releases/latest'
+    log "Installing grub-editor..."
+    (
+      set -e
+      declare OWNER=Thenujan-0 REPO=grub-editor suffix="1_amd64.deb" TEMP
+      version=$(curl -sI https://github.com/$OWNER/$REPO/releases/latest | grep -i "location:" | awk -F"/" '{ printf "%s", $NF }' | tr -d '\r')
+      if [ -z "$version" ]; then
+        err "Failed while attempting to install $REPO. Please manually install at https://github.com/$OWNER/$REPO/releases"
+        exit 2
+      fi
+      url=https://github.com/$OWNER/$REPO/releases/download/$version/${REPO}_${version#v}-${suffix}
+      # Download the .deb
+      TEMP=$(mktemp 'grub-editor.XXXXXXX.deb' --tmpdir)
+      curl -sSL "$url" -o "$TEMP"
+      quiet_apt install "$TEMP"
+      rm "$TEMP"
+    ) || err "something went wrong installing grub-editor"
   fi
 fi
