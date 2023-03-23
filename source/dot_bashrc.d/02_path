@@ -19,6 +19,8 @@ fi
 export JAVA_HOME=/usr/lib/jvm/jdk-19.0.2
 export PATH=$JAVA_HOME/bin${PATH:+:$PATH}
 
+# allow npm bin
+export PATH="/home/aaron/.local/share/npm/bin${PATH:+:$PATH}"
 # allow pnpm bin
 export PNPM_HOME="/home/aaron/.local/share/pnpm"
 export PATH="$PNPM_HOME${PATH:+:$PATH}"
