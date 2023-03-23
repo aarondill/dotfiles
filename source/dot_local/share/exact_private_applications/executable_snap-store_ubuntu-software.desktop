@@ -3,6 +3,7 @@ X-SnapInstanceName=snap-store
 Name=Snap Store
 Comment=Add, remove or update software on this computer
 Icon=io.snapcraft.Store.png
+tryExec=/snap/bin/snap-store.ubuntu-software
 Exec=env BAMF_DESKTOP_FILE_HINT=/var/lib/snapd/desktop/applications/snap-store_ubuntu-software.desktop /snap/bin/snap-store.ubuntu-software %U
 Terminal=false
 Type=Application
