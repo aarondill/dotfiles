@@ -37,6 +37,7 @@ read -rep "Would you like to install some things? (yes) " confirmation
 if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
   # Get user password
   sudo -v
+  log 'Installing apt packages...'
   # TODO, make this count which are available and install at once
   install_if_available_apt age anacron apt apt-clone autopoint bat command-not-found \
     curl dconf-editor duf flatpak fwts gh gimp git gnome-shell-extension-manager \
@@ -47,9 +48,9 @@ if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
   # Maintain sudo after long install
   sudo -v
   if ! is_accessible_cmd pnpm; then
-    log 'installing nodejs. After getting node setup using `n`, run `sudo apt remove nodejs`'
+    log 'installing nodejs and pnpm...'
     install_if_available_apt npm
-    if which npm -q; then
+    if which npm >/dev/null; then
       # Setup n
       "$(which npm)" install -g n
       sudo mkdir -p /usr/local/n
@@ -59,7 +60,7 @@ if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
       # Remove npm from apt
       "$(which npm)" remove -g n
       quiet_apt autoremove npm
-      
+
       # Setup pnpm
       corepack enable
       corepack prepare --activate pnpm@latest
