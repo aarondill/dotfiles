@@ -14,9 +14,12 @@ function update-config() (
   # Finds files line-by-line, ignoring the first 3 lines
   readarray -t files <<<"$(tail -n+4 -- ~/.bashrc.d/30_functions/_update-config)"
   if target=$(chezmoi target-path); then
-    printf '%s\n' "Press 'n' if asked about encrypted files. They will still be updated!"
-    # add from target so files are relative to target
-    (cd "$target" && yes no | chezmoi add --no-tty -- "${files[@]}" >/dev/null)
+    (
+      # add from target so files are relative to target
+      cd "$target" &&
+        # don't force a tty prompt, instead just take my no.
+        yes no | chezmoi add --no-tty -- "${files[@]}" >/dev/null
+    )
     # Ensure everything is updated
     chezmoi re-add
   else
@@ -25,11 +28,11 @@ function update-config() (
   # Update dconf
   local dconf_path
   dconf_path=$(chezmoi source-path)/dconf-backup.ini
-  dconf dump / >| "$dconf_path"
+  dconf dump / >|"$dconf_path"
   if [[ -n "$(chezmoi git -- status --porcelain "$dconf_path")" ]]; then
-  chezmoi git add source/dconf-backup.ini &&
-    chezmoi git -- commit -m 'update dconf-backup.ini' &&
-    chezmoi git -- push
+    chezmoi git add source/dconf-backup.ini &&
+      chezmoi git -- commit -m 'update dconf-backup.ini' &&
+      chezmoi git -- push
   fi
 )
 
