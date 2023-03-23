@@ -16,7 +16,7 @@ function update-config() (
   if target=$(chezmoi target-path); then
     printf '%s\n' "Press 'n' if asked about encrypted files. They will still be updated!"
     # add from target so files are relative to target
-    (cd "$target" && yes n | chezmoi add --no-tty -- "${files[@]}")
+    (cd "$target" && yes no | chezmoi add --no-tty -- "${files[@]}")
     # Ensure everything is updated
     chezmoi re-add
   else
