@@ -2,8 +2,7 @@
 
 # dconf.ini hash: {{ include "dconf-backup.ini" | sha256sum }}
 
-read -rep "load dconf settings from source? (yes) " confirmation
+read -rep "load dconf settings from source? (yes) " confirmation </dev/tty
 if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
-    dconf load / < {{ joinPath .chezmoi.sourceDir "dconf-backup.ini" | quote }}
+    dconf load / <{{ joinPath .chezmoi.sourceDir "dconf-backup.ini" | quote }}
 fi
-
