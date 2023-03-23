@@ -46,17 +46,18 @@ if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
     xdg-utils zeal zip zoxide gnome-software gnome-software-plugin-flatpak
   # Maintain sudo after long install
   sudo -v
-  if ! is_accessible_cmd n; then
+  if ! is_accessible_cmd pnpm; then
     log 'installing nodejs. After getting node setup using `n`, run `sudo apt remove nodejs`'
     install_if_available_apt npm
     npm install -g n
     sudo mkdir -p /usr/local/n
     sudo chown -- "$(whoami)" /usr/local/n
     n lts # installs node and npm
+    corepack enable
     corepack prepare --activate pnpm@latest
     pnpm i -g n
     npm remove -g n
-    quiet_apt remove npm
+    quiet_apt autoremove npm
   fi
   remove_if_installed_apt gnome-characters
 
