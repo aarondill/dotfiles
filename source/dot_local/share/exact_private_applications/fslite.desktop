@@ -3,7 +3,7 @@
 [Desktop Entry]
 Name=Fslite
 Comment=Open fslite in chrome
-Exec=google-chrome --enable-features=WebUIDarkMode --force-dark-mode fslite.vercel.app
+Exec=google-chrome --password-store=basic --enable-features=WebUIDarkMode --force-dark-mode fslite.vercel.app
 Icon=/home/aaron/.local/share/icons/fslite.ico
 Terminal=false
 Type=Application
