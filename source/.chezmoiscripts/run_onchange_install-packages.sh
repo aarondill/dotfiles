@@ -51,6 +51,8 @@ if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
     install_if_available_apt npm
     corepack prepare --activate pnpm@latest
     pnpm i -g n
+    sudo mkdir /usr/local/n
+    sudo chown -- "$(whoami)" /usr/local/n
     n lts # installs node and npm
     quiet_apt remove npm
   fi
