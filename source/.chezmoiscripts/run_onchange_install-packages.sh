@@ -105,7 +105,7 @@ if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
     # remove cheese if present
     flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
     remove_if_installed_apt cheese
-    sudo flatpak install com.github.johnfactotum.Foliate \
+    flatpak install com.github.johnfactotum.Foliate \
       com.github.tchx84.Flatseal \
       com.valvesoftware.Steam \
       io.mrarm.mcpelauncher \
