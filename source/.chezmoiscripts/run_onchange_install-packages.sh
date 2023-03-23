@@ -8,16 +8,17 @@ function remove_if_installed_apt() {
     fi
   done
 }
-function quiet_install_apt(){
+function quiet_apt(){
+  # usage: quiet_apt install package
   # Errors are still displayed!
   # -qq implies -y, output to /dev/null to hide info
-  sudo apt-get -qq install -- "$@" >/dev/null
+  sudo apt-get -qq "$@" >/dev/null
 }
 function install_if_available_apt() {
   local package
   for package in; do
     if is_available_apt "$package"; then
-      quiet_install_apt "$package"
+      quiet_apt install -- "$package"
     else
       echo "It appears that $package is not available from the apt repositories."
     fi
@@ -47,9 +48,16 @@ if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
   sudo -v
   if ! is_accessible_cmd n; then
     log 'installing nodejs. After getting node setup using `n`, run `sudo apt remove nodejs`'
-    install_if_available_apt nodejs
+    install_if_available_apt npm
+    corepack prepare --activate pnpm@latest
+    pnpm i -g n
+    n lts # installs node and npm
+    quiet_apt remove npm
   fi
   remove_if_installed_apt gnome-characters
+
+  # setup for custom ppas
+  quiet_apt install wget gpg curl
 
   # Require custom ppas
   log 'installing spotify ppa'
@@ -57,7 +65,6 @@ if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
   echo "deb http://repository.spotify.com stable non-free" | sudo tee /etc/apt/sources.list.d/spotify.list >/dev/null
 
   log 'installing vscode ppa'
-  sudo apt-get install wget gpg
   wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor --yes -o /etc/apt/keyrings/packages.microsoft.gpg
   echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | sudo tee /etc/apt/sources.list.d/vscode.list >/dev/null
 
@@ -65,15 +72,15 @@ if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
   wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/google-chrome.gpg
   echo "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google.list >/dev/null
 
-  sudo apt update
+  quiet_apt update
   install_if_available_apt spotify-client code google-chrome-stable
-  sudo apt-get install -f
+  quiet_apt install -f
 
   # Maintain sudo
   sudo -v
   # Install some snaps, if snap is installed
   if is_accessible_cmd snap &>/dev/null; then
-    log "No snaps to install, skipping"
+    true # install snaps here if desired
     # sudo snap install bitwarden
   else
     log "Snap is not installed, skipping snap installations."
