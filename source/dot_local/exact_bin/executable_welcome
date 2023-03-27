@@ -5,10 +5,10 @@ function append_to_output() {
 output=""
 append_to_output "$(neofetch --stdout)" # Neofetch output
 append_to_output
-append_to_output 'The last 5 logins:'
+append_to_output "The last 5 logins ($(whoami)):"
 append_to_output "$(last -n5 | head -n-2)" # Last 5 logins
-append_to_output 'The last 5 failed logins:'
-append_to_output "$(grep "pam_unix(gdm-password:auth): authentication failure" /var/log/auth.log | tail -n 5 | cut -d ' ' -f -3)"
+append_to_output "The last 5 failed logins ($(whoami)):"
+append_to_output "$(grep "user=$(whoami)" /var/log/auth.log | grep "pam_unix(gdm-password:auth): authentication failure" | tail -n 5 | cut -d ' ' -f -3)"
 ## append_to_output
 ## append_to_output 'The most recent duplicity backup was at:'
 ## append_to_output "$(find /media/aaron/Backup/UbuntuLaptop -printf "%Tb %Td %TY %Tr\n" | sort -nr | head -n 1)" # Most recent backup date
