@@ -53,7 +53,7 @@ function log() {
   printf '%s\n' "$@"
 }
 function success(){
-  printf "$(tput setaf 2)%s$(tput sgr0)" "${@:-Success!}"
+  printf "$(tput setaf 2)%s$(tput sgr0)\n" "${@:-Success!}"
 }
 function err() {
   printf '%s\n' "$@" >&2
