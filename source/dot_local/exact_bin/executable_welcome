@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# TODO:
+# replace neofetch with date, uptime, packages?, cpu temp, memory usage(free cmd), cpu usage, last backup, last login
+#
 function append_to_output() {
     output+="$*"$'\n'
 }
