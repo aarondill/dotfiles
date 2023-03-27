@@ -52,6 +52,9 @@ function is_accessible_cmd() {
 function log() {
   printf '%s\n' "$@"
 }
+function success(){
+  printf "$(tput setaf 2)%s$(tput sgr0)" "${@:-Success!}"
+}
 function err() {
   printf '%s\n' "$@" >&2
 }
@@ -68,6 +71,7 @@ if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
       less luckybackup make neofetch neovim net-tools okular openvpn \
       python3-neovim qtqr rsync shfmt tlp trash-cli tree util-linux xclip httpie \
       xdg-utils zeal zip zoxide gnome-software gnome-software-plugin-flatpak
+    success
   ) || err 'something went wrong installing apt packages!'
   # Maintain sudo after long install
   sudo -v
@@ -75,28 +79,37 @@ if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
     log 'installing nodejs and pnpm...'
     (
       set -e # stop immediately on error!
+      log 'installing npm'
       install_if_available_apt npm
       which npm >/dev/null # exits if fails
       # Setup n
+      log 'installing n through npm'
       "$(which npm)" install --silent -g n
       sudo mkdir -p /usr/local/n
       sudo chown -- "$(whoami)" /usr/local/n
+      log 'installing node lts and updating npm'
       n lts >/dev/null # installs node and npm
 
       # Remove npm from apt
+      log 'removing n from npm and npm from apt'
       "$(which npm)" remove --silent -g n
-      quiet_apt autoremove -y npm
+      quiet_apt autoremove --purge -y npm
 
       # Setup pnpm
+      log 'installing pnpm'
       corepack enable pnpm
       corepack prepare pnpm@latest --activate >/dev/null
+      log 'installing n through pnpm'
       pnpm i --silent -g n
+      success
     ) || err 'Something went wrong installing nodejs and pnpm!'
   fi
   remove_if_installed_apt gnome-characters
 
   # setup for custom ppas
   quiet_apt install gpg curl # should already be installed, but sanity check
+
+  log 'installing proprietary applications'
 
   # Require custom ppas
   log 'installing spotify ppa'
@@ -115,6 +128,7 @@ if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
   quiet_apt update
   install_if_available_apt spotify-client code google-chrome-stable
   quiet_apt install -f
+  success # Not really guarenteed, but whatever
 
   # Maintain sudo
   sudo -v
@@ -144,11 +158,13 @@ if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
           flatpak_install "$flatpak_app"
         fi
       done
+      success
     ) || err 'Something went wrong installing flatpak packages'
     (
       set -e
       log 'Updating flatpak packages...'
       flatpak_update # Update all the packages
+      success
     ) || err 'Something went wrong updating flatpak packages'
   else
     log "Flatpak is not installed, skipping flatpak installations."
@@ -163,6 +179,7 @@ if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
       sudo curl -sSL 'https://vault.bitwarden.com/download/?app=desktop&platform=linux&variant=appimage' -o "$DESTINATION"
       sudo chown root "$DESTINATION"
       sudo chmod +x "$DESTINATION"
+      success
     ) || err 'Something went wrong installing bitwarden desktop'
   fi
 
@@ -178,6 +195,7 @@ if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
     # zcat can only unzip a single file archive, but this allows me to skip the temporary directory
     curl -sSL 'https://vault.bitwarden.com/download/?app=cli&platform=linux' | zcat | sudo tee "/usr/local/bin/bw" >/dev/null
     sudo chmod +x /usr/local/bin/bw
+    success
   ) || err 'Something went wrong installing bitwarden CLI'
 
   # TODO, make this automatic!
@@ -210,6 +228,7 @@ if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
       # Download and extract the tar.gz archive
       curl -sSL "$url" | tar xzf - -O | sudo tee "$targetFile" >/dev/null
       sudo chmod +x "$targetFile"
+      success
     ) || err "something went wrong installing fzf"
   fi
 
@@ -229,6 +248,7 @@ if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
       curl -sSL "$url" -o "$TEMP"
       quiet_apt install "$TEMP"
       rm "$TEMP"
+      success
     ) || err "something went wrong installing grub-editor"
   fi
 fi
