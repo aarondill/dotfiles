@@ -116,7 +116,8 @@ function update-root-config() {
 }
 
 # Adds to chezmoi and adds to ~/.bashrc.d/30_functions/_update-config
-function add-config() {
+# Imitates config add (without dash) 
+function config-add() {
   declare -i exitCode=0
   local file
   files=()
