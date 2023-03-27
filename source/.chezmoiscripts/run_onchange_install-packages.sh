@@ -88,7 +88,7 @@ if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
       quiet_apt autoremove -y npm
 
       # Setup pnpm
-      corepack enable
+      corepack enable pnpm
       corepack prepare pnpm@latest --activate >/dev/null
       pnpm i --silent -g n
     ) || err 'Something went wrong installing nodejs and pnpm!'
