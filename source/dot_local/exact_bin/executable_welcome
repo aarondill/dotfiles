@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+function append_to_output() {
+    output+="$*"$'\n'
+}
+output=""
+append_to_output "$(neofetch --stdout)" # Neofetch output
+append_to_output
+append_to_output 'The last 5 logins:'
+append_to_output "$(last -n5 | head -n-2)" # Last 5 logins
+## append_to_output
+## append_to_output 'The most recent duplicity backup was at:'
+## append_to_output "$(find /media/aaron/Backup/UbuntuLaptop -printf "%Tb %Td %TY %Tr\n" | sort -nr | head -n 1)" # Most recent backup date
+
+# Find the longest line in `output`
+screen_width=$(xrandr --current | grep '\*' | uniq | awk '{print $1}' | cut -d 'x' -f1)
+length=$(printf '%s' "$output" | awk '{print length}' | sort -nr | head -1)
+zenity --info --no-markup \
+    --icon-name=go-home \
+    --width="$(($((length < screen_width ? length : screen_width))))" \
+    --title="Welcome ($(date +'%b %d %I:%M %p'))" \
+    --text="$output"
