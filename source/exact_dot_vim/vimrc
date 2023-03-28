@@ -151,6 +151,7 @@ Plug 'ConradIrwin/vim-bracketed-paste'
 " Enable fff :F file picker
 Plug 'dylanaraps/fff.vim'
 nnoremap <C-f> :F<CR>
+let g:fff#split_direction = "nosplitbelow nosplitright"
 
 call plug#end()
 " Config vim-submode
