@@ -63,7 +63,7 @@ function getFailedAttempts() {
     grep "user=${1:-(whoami)}" /var/log/auth.log |
         grep "pam_unix(gdm-password:auth): authentication failure" |
         tail -n "${2:-5}" |
-        cut -d ' ' -f -3
+        cut -d ' ' -f -3 | tac
 }
 function getPackageCount() {
     local result
@@ -100,7 +100,7 @@ println "$(getCPUTemp)"
 println "$(getCPUUsage)"
 println "$(getLastLogin)"
 println
-println "The last $login_count successful logins:"
+println "The last $login_count successful logins ($(whoami)):"
 println "$(getSuccessfulLogins "$(whoami)" $login_count)"
 println
 println "The last $login_count failed logins ($(whoami)):"
