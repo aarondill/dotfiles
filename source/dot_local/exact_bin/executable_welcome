@@ -49,9 +49,14 @@ function getLastLogin() {
     printf 'Last login at: %s' "$lastlogin"
 }
 function getSuccessfulLogins() {
-    # Usage: getSuccessfulLogins count
-    # Remove the "wtmp begins..." message
-    last "${1:-$(whoami)}" -n "${2:-5}" | head -n-2
+    # Usage: getSuccessfulLogins user count
+    local user
+    user=${1:-(whoami)}
+    last "$user" -n "${2:-5}" |
+        # Remove the "wtmp begins..." message
+        head -n -2 |
+        # Cut to just the date (hard coded length + username length)
+        cut -c $((35 + ${#user}))-
 }
 function getFailedAttempts() {
     # Usage: getFailedAttempts user count
