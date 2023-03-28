@@ -148,6 +148,10 @@ Plug 'junegunn/fzf.vim'
 " Enable better pasting
 Plug 'ConradIrwin/vim-bracketed-paste'
 
+" Enable fff :F file picker
+Plug 'dylanaraps/fff.vim'
+nnoremap <C-f> :F
+
 call plug#end()
 " Config vim-submode
 let g:submode_keep_leaving_key = 0
