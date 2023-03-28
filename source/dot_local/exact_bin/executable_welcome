@@ -51,12 +51,13 @@ function getLastLogin() {
 function getSuccessfulLogins() {
     # Usage: getSuccessfulLogins user count
     local user
-    user=${1:-(whoami)}
+    user=${1:-$(whoami)}
     last "$user" -n "${2:-5}" |
         # Remove the "wtmp begins..." message
         head -n -2 |
         # Cut to just the date (hard coded length + username length)
-        cut -c $((35 + ${#user}))-
+        cut -c $((18 + ${#user}))- | 
+        tr -s " " | xargs -I{} echo "tty={}"
 }
 function getFailedAttempts() {
     # Usage: getFailedAttempts user count
