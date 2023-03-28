@@ -63,7 +63,8 @@ function getFailedAttempts() {
     grep "user=${1:-(whoami)}" /var/log/auth.log |
         grep "pam_unix(gdm-password:auth): authentication failure" |
         tail -n "${2:-5}" |
-        cut -d ' ' -f -3 | tac
+        awk '{print $1,$2,$3,$12}' |
+        tac
 }
 function getPackageCount() {
     local result
