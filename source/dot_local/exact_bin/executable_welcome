@@ -51,7 +51,7 @@ function getLastLogin() {
 function getSuccessfulLogins() {
     # Usage: getSuccessfulLogins count
     # Remove the "wtmp begins..." message
-    last -n "${1:-5}" | head -n-2
+    last "${1:-$(whoami)}" -n "${2:-5}" | head -n-2
 }
 function getFailedAttempts() {
     # Usage: getFailedAttempts user count
@@ -96,7 +96,7 @@ println "$(getCPUUsage)"
 println "$(getLastLogin)"
 println
 println "The last $login_count successful logins:"
-println "$(getSuccessfulLogins $login_count)"
+println "$(getSuccessfulLogins "$(whoami)" $login_count)"
 println
 println "The last $login_count failed logins ($(whoami)):"
 println "$(getFailedAttempts "$(whoami)" $login_count)"
