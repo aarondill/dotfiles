@@ -50,21 +50,18 @@ function getLastLogin() {
 }
 function getSuccessfulLogins() {
     # Usage: getSuccessfulLogins user count
-    local user
-    user=${1:-$(whoami)}
-    last "$user" -n "${2:-5}" |
+    last "${1:-$(whoami)}" -n "${2:-5}" |
         # Remove the "wtmp begins..." message
         head -n -2 |
         # Cut to just the date (hard coded length + username length)
-        cut -c $((18 + ${#user}))- | 
-        tr -s " " | xargs -I{} echo "tty={}"
+        perl -pe 's|^.+? +(.+?) +.+? +(.+)|\1 - \2|'
 }
 function getFailedAttempts() {
     # Usage: getFailedAttempts user count
-    grep "user=${1:-(whoami)}" /var/log/auth.log |
-        grep "pam_unix(gdm-password:auth): authentication failure" |
+    grep "pam_unix(gdm-password:auth): authentication failure;.* user=${1:-$(whoami)}" /var/log/auth.log |
         tail -n "${2:-5}" |
-        awk '{print $1,$2,$3,$12}' |
+        awk '{print $12" - ",$1,$2,$3}' |
+        perl -pe 's|^tty=/dev/(.+?)|\1|' |
         tac
 }
 function getPackageCount() {
