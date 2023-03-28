@@ -80,3 +80,8 @@ C-b:unix-filename-rubout
 "\e\C- ": edit-and-execute-command
 # Safer pasting
 set enable-bracketed-paste on
+# Immediately add a trailing slash when autocompleting symlinks to directories
+set mark-symlinked-directories on
+# Display matches for ambiguous patterns at first tab press
+set show-all-if-ambiguous on
+
