@@ -52,7 +52,7 @@ function is_accessible_cmd() {
 function log() {
   printf '%s\n' "$@"
 }
-function success(){
+function success() {
   printf "$(tput setaf 2)%s$(tput sgr0)\n" "${@:-Success!}"
 }
 function err() {
@@ -79,26 +79,19 @@ if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
     log 'installing nodejs and pnpm...'
     (
       set -e # stop immediately on error!
-      log 'installing npm'
-      install_if_available_apt npm
-      which npm >/dev/null # exits if fails
       # Setup n
-      log 'installing n through npm'
-      "$(which npm)" install --silent -g n
-      sudo mkdir -p /usr/local/n
-      sudo chown -- "$(whoami)" /usr/local/n
-      log 'installing node lts and updating npm'
-      n lts >/dev/null # installs node and npm
+      log 'Setting up /usr/local files for n'
+      sudo mkdir -p /usr/local/bin /usr/local/lib/node_modules /usr/local/include /usr/local/share /usr/local/n
+      sudo chown -R "$(whoami)" /usr/local/bin /usr/local/lib/node_modules /usr/local/include /usr/local/share /usr/local/n
 
-      # Remove npm from apt
-      log 'removing n from npm and npm from apt'
-      "$(which npm)" remove --silent -g n
-      quiet_apt autoremove --purge -y npm
+      log 'installing node lts through n...'
+      curl -fsSL https://raw.githubusercontent.com/tj/n/master/bin/n | bash /dev/stdin lts
 
       # Setup pnpm
       log 'installing pnpm'
       corepack enable pnpm
       corepack prepare pnpm@latest --activate >/dev/null
+
       log 'installing n through pnpm'
       pnpm i --silent -g n
       success
