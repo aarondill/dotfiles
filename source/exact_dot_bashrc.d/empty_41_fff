@@ -1,5 +1,7 @@
+#!/usr/bin/env bash
+if ! command -v fff; then return; fi
 fff() {
-    fff "$@"
+    $(which fff) "$@"
     cd "$(cat "${XDG_CACHE_HOME:=${HOME}/.cache}/fff/.fff_d")"
 }
 
