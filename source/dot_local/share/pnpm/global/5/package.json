@@ -20,5 +20,6 @@
 		"uglify-js": "^3.17.4",
 		"vercel": "^28.18.1",
 		"wipe-modules": "^1.2.0"
+                ,"nativefier": "^1.2.0"
 	}
 }
