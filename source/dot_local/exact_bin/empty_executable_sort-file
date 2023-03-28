@@ -1,4 +1,0 @@
-sudo du -h --max-depth=1 -a --one-file-system | \
-sort -hs | \
-awk '{printf($1 " ")} system("sudo ls --color=always -d -- " $2)'
-
