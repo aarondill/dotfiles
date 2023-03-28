@@ -1,20 +1,108 @@
 #!/usr/bin/env bash
-# TODO replace neofetch with date, uptime, packages?, cpu temp, memory
-# usage(free cmd), cpu usage, last backup, last login
+# Ouput a welcome message on startup using zenity
+declare -i login_count=5
+declare date screen_width length
+date="$(date +'%b %d %I:%M %p')" # store nice date for later use
 
-function append_to_output() {
+output=""
+function println() {
     output+="$*"$'\n'
 }
-output=""
-append_to_output "$(neofetch --stdout)" # Neofetch output
-append_to_output
-append_to_output "The last 5 logins ($(whoami)):"
-append_to_output "$(last -n5 | head -n-2)" # Last 5 logins
-append_to_output "The last 5 failed logins ($(whoami)):"
-append_to_output "$(grep "user=$(whoami)" /var/log/auth.log | grep "pam_unix(gdm-password:auth): authentication failure" | tail -n 5 | cut -d ' ' -f -3)"
-## append_to_output
-## append_to_output 'The most recent duplicity backup was at:'
-## append_to_output "$(find /media/aaron/Backup/UbuntuLaptop -printf "%Tb %Td %TY %Tr\n" | sort -nr | head -n 1)" # Most recent backup date
+function getUptime() { printf 'Uptime: %s' "$(uptime -p | cut -d' ' -f 2-)"; }
+function getCPUTemp() {
+    local temp_dir deg temp_dirs
+    # Taken from neofetch at https://github.com/dylanaraps/neofetch/blob/master/neofetch#LL2490-L2499
+    # Select the right temperature file.
+    for temp_dir in /sys/class/hwmon/*; do
+        [[ "$(<"${temp_dir}/name")" =~ (cpu_thermal|coretemp|fam15h_power|k10temp) ]] && {
+            temp_dirs=("$temp_dir"/temp*_input)
+            temp_dir=${temp_dirs[0]}
+            break
+        }
+    done
+    [[ -f "$temp_dir" ]] && deg="$(($(<"$temp_dir") * 100 / 10000))"
+    if [[ -n "$deg" ]]; then
+        deg="${deg//./}"
+
+        # Convert to Fahrenheit
+        deg="$((deg * 90 / 50 + 320))"
+
+        # Format the output
+        deg="${deg/${deg: -1}/}.${deg: -1}°F"
+    fi
+    printf 'CPU Temperature: %s' "$deg"
+}
+function getCPUUsage() {
+    local cpuUsage
+    cpuUsage=$(top -bn1 | awk '/Cpu/ { print $2}')
+    # Print the usage
+    printf "CPU Usage: %s%%" "$cpuUsage"
+}
+function getRAMUsage() {
+    local ramUsage
+    ramUsage=$(free -h | awk '/^Mem/{ printf("%.1f%% \n", $3/$2 * 100.0) }')
+    printf "Used Memory: %s" "$ramUsage"
+}
+function getLastLogin() {
+    local lastlogin
+    lastlogin=$(lastlog -u "$(whoami)" | tail -n 1 | cut -c44- | cut -d' ' -f1-4) # hardcoded parsing of lastlog
+    printf 'Last login at: %s' "$lastlogin"
+}
+function getSuccessfulLogins() {
+    # Usage: getSuccessfulLogins count
+    # Remove the "wtmp begins..." message
+    last -n "${1:-5}" | head -n-2
+}
+function getFailedAttempts() {
+    # Usage: getFailedAttempts user count
+    grep "user=${1:-(whoami)}" /var/log/auth.log |
+        grep "pam_unix(gdm-password:auth): authentication failure" |
+        tail -n "${2:-5}" |
+        cut -d ' ' -f -3
+}
+function getPackageCount() {
+    local result
+    has() { type -p "$1" >/dev/null; }
+    out() { printf '%s ' "$@"; }
+    append() {
+        if [[ -z "$result" ]]; then
+            result="Packages: $(out "$@")"
+        else
+            result+=", $(out "$@")"
+        fi
+    }
+    if has neofetch; then
+        # This is complicated to replace fully. Use it if installed
+        result="$(neofetch --stdout packages)"
+    else
+        # Adapted from neofetch at https://github.com/dylanaraps/neofetch/blob/master/neofetch#L1509
+        has dpkg && append "$(dpkg-query -f '.\n' -W | wc -l) (dpkg)"
+        has flatpak && append "$(flatpak list | wc -l) (flatpak)"
+        # Snap hangs if the command is run without the daemon running.
+        # Only run snap if the daemon is also running.
+        if has snap && ps -e | grep -qFm 1 snapd >/dev/null; then
+            append "$(snap list | wc -l)"
+        fi
+
+    fi
+    printf '%s' "${result^}"
+}
+println "Date: $date"
+println "$(getUptime)"
+println "$(getPackageCount)"
+println "$(getRAMUsage)"
+println "$(getCPUTemp)"
+println "$(getCPUUsage)"
+println "$(getLastLogin)"
+println
+println "The last $login_count successful logins:"
+println "$(getSuccessfulLogins $login_count)"
+println
+println "The last $login_count failed logins ($(whoami)):"
+println "$(getFailedAttempts "$(whoami)" $login_count)"
+## println
+## println 'The most recent duplicity backup was at:'
+## println "$(find /media/aaron/Backup/UbuntuLaptop -printf "%Tb %Td %TY %Tr\n" | sort -nr | head -n 1)" # Most recent backup date
 
 # Find the longest line in `output`
 screen_width=$(xrandr --current | grep '\*' | uniq | awk '{print $1}' | cut -d 'x' -f1)
@@ -22,5 +110,7 @@ length=$(printf '%s' "$output" | awk '{print length}' | sort -nr | head -1)
 zenity --info --no-markup \
     --icon-name=go-home \
     --width="$(($((length < screen_width ? length : screen_width))))" \
-    --title="Welcome ($(date +'%b %d %I:%M %p'))" \
-    --text="$output"
+    --title="Welcome ($date)" \
+    --text="$output" &
+# Allow this script to end while waiting for user to close the popup
+exit 0
