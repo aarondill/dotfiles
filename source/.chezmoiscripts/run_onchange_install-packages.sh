@@ -52,6 +52,7 @@ function is_accessible_cmd() {
 function log() {
   printf '%s\n' "$@"
 }
+# shellcheck disable=SC2120 # I know it doesn't recieve arguments.
 function success() {
   printf "$(tput setaf 2)%s$(tput sgr0)\n" "${@:-Success!}"
 }
@@ -89,7 +90,7 @@ if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
 
       # Setup pnpm
       log 'installing pnpm'
-      corepack enable pnpm
+      corepack enable
       corepack prepare pnpm@latest --activate >/dev/null
 
       log 'installing n through pnpm'
