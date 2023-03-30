@@ -17,7 +17,7 @@ fi
 
 # fix java path to allow running
 export JAVA_HOME=/usr/lib/jvm/jdk-20
-export PATH=$JAVA_HOME/bin${PATH:+:$PATH}
+# export PATH=$JAVA_HOME/bin${PATH:+:$PATH}
 
 # allow npm bin
 export PATH="/home/aaron/.local/share/npm/bin${PATH:+:$PATH}"
