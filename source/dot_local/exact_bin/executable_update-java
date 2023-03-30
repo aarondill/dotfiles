@@ -10,7 +10,7 @@ if [ "$1" = --help ] || [ $# -eq 0 ]; then
   [ $# -eq 0 ] && exit 2 || exit 0
 fi
 JAVADIR=$1
-PRIORITY=${2:-100}
+PRIORITY=${2:-1112}
 BINDIR=/usr/bin
 if ! [[ -d "$JAVADIR" ]]; then
   printf '"%s" is not a directory\n' "$JAVADIR"
