@@ -68,4 +68,4 @@ find "$JAVADIR" -perm /u=x,g=x,o=x -type f | while read -sr FP; do
 done
 
 # Link the default-java file to this folder
-sudo ln -sf "$JAVADIR" "$JVM_VERS_DIR/default-java"
+sudo ln -sf "$JVM_VERS_DIR/default-java" "$JAVADIR"
