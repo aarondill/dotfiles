@@ -9,8 +9,8 @@ if [ "$1" = --help ] || [ $# -eq 0 ]; then
   cat <<-EOF
   update-java <JAVADIR> [priority = 1112] [JVM_VERS_DIR]
   Updates java symlinks to the path specified using update-alternatives.
-  Do not include /bin on JAVADIR. JVM_VERS_DIR will be determined by JAVA_HOME \
-  if set, or else default to /usr/lib/jvm
+  Do not include /bin on JAVADIR.
+  JVM_VERS_DIR will be determined by JAVA_HOME if set, or else default to /usr/lib/jvm
 EOF
   [ $# -eq 0 ] && exit 2 || exit 0
 fi
@@ -25,31 +25,47 @@ else
   JVM_VERS_DIR=/usr/lib/jvm
 fi
 
+if ! [[ -d "$JVM_VERS_DIR" ]]; then
+  printf 'warning: "%s" is not a directory. It will be created on confirmation\n' "$JVM_VERS_DIR" >&2
+fi
+
 if ! [[ -d "$JAVADIR" ]]; then
-  printf '"%s" is not a directory\n' "$JAVADIR"
+  printf '"%s" is not a directory\n' "$JAVADIR" >&2
   exit 2
 else
   JAVADIR=$(realpath -- "$JAVADIR")
 fi
 
 if [[ "$JAVADIR" =~ ?(.*)/bin$ ]]; then
-  read -rep "$JAVADIR ends in /bin, would you like to use it's parent? (yes) " confirmation
+  read -rep "$JAVADIR ends in /bin, would you like to use it's parent? (yes) " confirmation >&2
   if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
     JAVADIR=$(dirname -- "$(realpath -- "$JAVADIR")")
   fi
 fi
 
+read -rep "Are you sure you would like to link all binaries in $JAVADIR? (yes) " confirmation
+if [[ -n "$confirmation" && ! "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
+  printf '%s\n' "Aborting" >&2
+  exit 1
+fi
+
 # Update sudo timestamp
 sudo --validate || exit
 
-read -rep "Are you sure you would like to link all binaries in $JAVADIR? (yes) " confirmation
-if [[ -n "$confirmation" && ! "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
-  printf '%s\n' "Aborting"
-  exit 1
+sudo mkdir -p "$JVM_VERS_DIR"
+JVM_VERS_DIR=$(realpath -- "$JVM_VERS_DIR")
+
+if [[ $(basename -- "$JAVADIR") != "$JVM_VERS_DIR" ]]; then
+  printf 'Copying files to "%s"\n' "$JVM_VERS_DIR" >&2
+  sudo -E -H cp --archive --interactive "$JAVADIR" "$JVM_VERS_DIR"
+  JAVADIR="$JVM_VERS_DIR/$(basename -- $JAVADIR)"
 fi
+
 find "$JAVADIR" -perm /u=x,g=x,o=x -type f | while read -sr FP; do
   FN=$(basename -- "$FP")
   printf '%s\n' "update-alternatives --install \"$BINDIR/$FN\" \"$FN\" \"$FP\" \"$PRIORITY\""
   sudo -E -H update-alternatives --install "$BINDIR/$FN" "$FN" "$FP" "$PRIORITY"
 done
-sudo ln -sf jdk-20/ ./default-java
+
+# Link the default-java file to this folder
+sudo ln -sf "$JAVADIR" "$JVM_VERS_DIR/default-java"
