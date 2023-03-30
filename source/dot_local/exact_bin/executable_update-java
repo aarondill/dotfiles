@@ -6,12 +6,23 @@
 #
 
 if [ "$1" = --help ] || [ $# -eq 0 ]; then
-  printf '%s\n%s\n' 'update-java <JAVADIR> [priority = 100]' 'Updates java symlinks to the path specified using update-alternatives. Do not include /bin on JAVADIR'
+  printf '%s\n%s\n' 'update-java <JAVADIR> [priority = 1112] [JVM_VERS_DIR]' \
+    'Updates java symlinks to the path specified using update-alternatives. '\
+    'Do not include /bin on JAVADIR. JVM_VERS_DIR will be determined by JAVA_HOME'\
+    ' if set, or else default to /usr/lib/jvm'
   [ $# -eq 0 ] && exit 2 || exit 0
 fi
 JAVADIR=$1
 PRIORITY=${2:-1112}
 BINDIR=/usr/bin
+if [[ -n "$3" ]]; then
+  JVM_VERS_DIR=$3
+elif [[ -n "$JAVA_HOME" ]]; then
+  JVM_VERS_DIR=$(dirname -- "$JAVA_HOME") # /usr/lib/jvm/jdk-version --> /usr/lib/jvm
+else 
+  JVM_VERS_DIR=/usr/lib/jvm
+fi
+
 if ! [[ -d "$JAVADIR" ]]; then
   printf '"%s" is not a directory\n' "$JAVADIR"
   exit 2
@@ -39,3 +50,4 @@ find "$JAVADIR" -perm /u=x,g=x,o=x -type f | while read -sr FP; do
   printf '%s\n' "update-alternatives --install \"$BINDIR/$FN\" \"$FN\" \"$FP\" \"$PRIORITY\""
   sudo -E -H update-alternatives --install "$BINDIR/$FN" "$FN" "$FP" "$PRIORITY"
 done
+sudo ln -sf jdk-20/ ./default-java
