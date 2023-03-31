@@ -5,6 +5,7 @@
 .bash_logout
 .bashrc
 .bashrc.d
+.config/autostart/welcome.desktop
 .config/gh
 .config/git
 .config/neofetch
@@ -18,7 +19,9 @@
 .local/share/applications
 .local/share/bash-completion
 .local/share/fonts
+.local/share/icons/bitwarden.png
 .local/share/icons/fslite.ico
+.local/share/icons/io.snapcraft.Store.png
 .local/share/pnpm/global/5/package.json
 .pam_environment
 .profile
@@ -32,6 +35,3 @@ vscode/.release-it.json
 vscode/.shellcheckrc
 vscode/js/.gitignore
 vscode/js/EslintTests.js
-.local/share/icons/io.snapcraft.Store.png
-.local/share/icons/bitwarden.png
-.config/autostart/welcome.desktop
