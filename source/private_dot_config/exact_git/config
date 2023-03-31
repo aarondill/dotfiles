@@ -95,5 +95,5 @@ u%(upstream:trackshort)%(end)\
         fixup = commit --fixup
         merge-remote = "!git fetch --all && git merge"
 	pf = push --force-with-lease
-	shallowify = "!function f(){ git pull --depth \"${1:-1}\" \"${@:2}\" && git gc --prune=all ; }"
+	shallowify = "!bash -c 'git pull --depth \"${1:-1}\" \"${@:2}\" && git gc --prune=all' -- "
 
