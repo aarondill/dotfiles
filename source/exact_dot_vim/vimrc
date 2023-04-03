@@ -156,8 +156,8 @@ Plug 'codota/tabnine-nvim', { 'do': './dl_binaries.sh' }
 
 " Commenting easily
 Plug 'preservim/nerdcommenter'
-nmap <C-_> <plug>NERDCommenterInvert
-"let g:NERDCreateDefaultMappings = 0
+nnoremap <C-_> <plug>NERDCommenterInvert
+vnoremap <C-_> <plug>NERDCommenterInvert
 call plug#end()
 
 " if has("nvim")
@@ -215,7 +215,7 @@ call submode#map('WindowsMode', 'n', '', '-', '3<C-w>-')
 call submode#map('WindowsMode', 'n', '', '<', '10<C-w><')
 call submode#map('WindowsMode', 'n', '', '>', '10<C-w>>')
 
-" Add fzf to vim
-" if(filereadable('/usr/share/doc/fzf/examples/fzf.vim'))
-"   source /usr/share/doc/fzf/examples/fzf.vim
-" endif
+Add fzf to vim
+if(filereadable('/usr/share/doc/fzf/examples/fzf.vim'))
+ source /usr/share/doc/fzf/examples/fzf.vim
+endif
