@@ -6,6 +6,7 @@ if filereadable(expand('~/.vimrc'))
 elseif filereadable(expand('~/.vim/vimrc'))
     source ~/.vim/vimrc
 endif
+lua <<EOF
 require('tabnine').setup({
   disable_auto_comment=true,
   accept_keymap="<Tab>",
@@ -14,4 +15,4 @@ require('tabnine').setup({
   suggestion_color = {gui = "#808080", cterm = 244},
   exclude_filetypes = {"TelescopePrompt"}
 })
-
+EOF
