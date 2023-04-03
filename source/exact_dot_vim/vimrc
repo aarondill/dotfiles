@@ -164,7 +164,7 @@ if has("nvim")
       suggestion_color = {gui = "#808080", cterm = 244},
       exclude_filetypes = {"TelescopePrompt"}
     })
-  EOF
+EOF
 endif
 
 " Config vim-submode
