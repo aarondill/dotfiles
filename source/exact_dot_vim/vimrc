@@ -152,7 +152,7 @@ Plug 'junegunn/fzf.vim'
 Plug 'ConradIrwin/vim-bracketed-paste'
 
 " Tabnine autocomplete
-Plug 'codota/tabnine-nvim', { 'do': './dl_binaries.sh' }
+Plug 'aarondill/tabnine-nvim', { 'do': './dl_binaries.sh' }
 
 " Commenting easily
 Plug 'preservim/nerdcommenter'
