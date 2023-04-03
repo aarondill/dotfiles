@@ -156,7 +156,7 @@ Plug 'codota/tabnine-nvim', { 'do': './dl_binaries.sh' }
 
 " Commenting easily
 Plug 'preservim/nerdcommenter'
-nmap <C-/> <plug>NERDCommenterInvert
+nmap <C-_> <plug>NERDCommenterInvert
 let g:NERDCreateDefaultMappings = 0
 call plug#end()
 
