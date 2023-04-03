@@ -148,7 +148,12 @@ Plug 'junegunn/fzf.vim'
 " Enable better pasting
 Plug 'ConradIrwin/vim-bracketed-paste'
 
+" Tabnine autocomplete
+Plug 'codota/tabnine-nvim', { 'do': './dl_binaries.sh' }
+
 call plug#end()
+
+
 " Config vim-submode
 let g:submode_keep_leaving_key = 0
 let g:submode_always_show_submode = 1
