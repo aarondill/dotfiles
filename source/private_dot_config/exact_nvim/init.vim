@@ -16,3 +16,4 @@ require('tabnine').setup({
   exclude_filetypes = {"TelescopePrompt"}
 })
 EOF
+
