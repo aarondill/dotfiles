@@ -151,6 +151,9 @@ Plug 'ConradIrwin/vim-bracketed-paste'
 " Tabnine autocomplete
 Plug 'codota/tabnine-nvim', { 'do': './dl_binaries.sh' }
 
+" Commenting easily
+Plug 'preservim/nerdcommenter'
+
 call plug#end()
 
 " if has("nvim")
