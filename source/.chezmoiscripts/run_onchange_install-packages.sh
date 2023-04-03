@@ -71,7 +71,8 @@ if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
       golang-go gparted grep gucharmap httpie ifupdown inotify-tools \
       less luckybackup make neofetch neovim net-tools okular openvpn \
       python3-neovim qtqr rsync shfmt tlp trash-cli tree util-linux xclip httpie \
-      xdg-utils zeal zip zoxide gnome-software gnome-software-plugin-flatpak
+      xdg-utils zeal zip zoxide gnome-software gnome-software-plugin-flatpak  \
+      p7zip-full
     success
   ) || err 'something went wrong installing apt packages!'
   # Maintain sudo after long install
