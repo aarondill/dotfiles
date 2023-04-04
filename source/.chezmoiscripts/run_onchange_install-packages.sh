@@ -21,6 +21,7 @@ function install_if_available_apt() {
   for package; do
     if is_available_apt "$package"; then
       available_packages+=("$package")
+      log "Installing $package"
     else
       echo "Could not find '$package' in apt repos"
     fi
@@ -72,7 +73,7 @@ if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
       less luckybackup make neofetch neovim net-tools okular openvpn \
       python3-neovim qtqr rsync shfmt tlp trash-cli tree util-linux xclip httpie \
       xdg-utils zeal zip zoxide gnome-software gnome-software-plugin-flatpak  \
-      p7zip-full
+      p7zip-full cmake
     success
   ) || err 'something went wrong installing apt packages!'
   # Maintain sudo after long install

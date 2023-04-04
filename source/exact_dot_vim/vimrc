@@ -190,7 +190,7 @@ call plug#end()
 
 
 " Configure tabnine-nvim
-if has("nvim")
+if has("nvim-0.7")
   lua <<EOF
     require('tabnine').setup({
       disable_auto_comment=true,
