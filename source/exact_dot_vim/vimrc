@@ -156,8 +156,7 @@ Plug 'ConradIrwin/vim-bracketed-paste'
 
 if has("nvim")
   " Tabnine autocomplete - only works in neovim
-  Plug '~/vscode/vim/tabnine-nvim', { 'do': './dl_binaries.sh' }
-  " Plug 'aarondill/tabnine-nvim', { 'do': './dl_binaries.sh' }
+  Plug 'aarondill/tabnine-nvim', { 'do': './dl_binaries.sh' }
 endif
 
 " Commenting easily
