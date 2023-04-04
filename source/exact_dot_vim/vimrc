@@ -167,13 +167,13 @@ let NERDSpaceDelims=1
 
 " Only install, if node is installed
 if executable('node')
-    Plugin 'pangloss/vim-javascript'    " JavaScript support
-    Plugin 'leafgarland/typescript-vim' " TypeScript syntax
-    Plugin 'maxmellon/vim-jsx-pretty'   " JS and JSX syntax
+    Plug 'pangloss/vim-javascript'    " JavaScript support
+    Plug 'leafgarland/typescript-vim' " TypeScript syntax
+    Plug 'maxmellon/vim-jsx-pretty'   " JS and JSX syntax
     if executable('yarn')
-      Plugin 'prettier/vim-prettier', {'do': 'yarn install'}
+      Plug 'prettier/vim-prettier', {'do': 'yarn install'}
     elseif executable('npm')
-      Plugin 'prettier/vim-prettier', {'do': 'npm install'}
+      Plug 'prettier/vim-prettier', {'do': 'npm install'}
     fi
     let g:prettier#autoformat = 0
     let g:prettier#autoformat_require_pragma = 0
