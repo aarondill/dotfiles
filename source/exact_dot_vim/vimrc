@@ -165,6 +165,24 @@ nmap <C-_> <plug>NERDCommenterInvert
 xmap <C-_> <plug>NERDCommenterInvert
 let NERDSpaceDelims=1
 
+" Only install, if node is installed
+if executable('node')
+    Plugin 'pangloss/vim-javascript'    " JavaScript support
+    Plugin 'leafgarland/typescript-vim' " TypeScript syntax
+    Plugin 'maxmellon/vim-jsx-pretty'   " JS and JSX syntax
+    if executable('yarn')
+      Plugin 'prettier/vim-prettier', {'do': 'yarn install'}
+    elseif executable('npm')
+      Plugin 'prettier/vim-prettier', {'do': 'npm install'}
+    fi
+    let g:prettier#autoformat = 0
+    let g:prettier#autoformat_require_pragma = 0
+    let g:prettier#autoformat_config_present = 1
+
+    au FileType typescript setlocal expandtab
+    au FileType javascript setlocal expandtab
+endif
+
 call plug#end()
 
 
