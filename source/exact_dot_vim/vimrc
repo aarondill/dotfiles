@@ -176,7 +176,7 @@ if executable('node')
       Plug 'prettier/vim-prettier', {'do': 'npm install'}
     else
       echom 'Can not install vim-prettier bc neither'
-            \ .'yarn nor npm are instalstalled'
+            \ .' yarn nor npm are installed'
     endif
     let g:prettier#autoformat = 0
     let g:prettier#autoformat_require_pragma = 0
