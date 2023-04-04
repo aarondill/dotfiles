@@ -156,7 +156,7 @@ Plug 'ConradIrwin/vim-bracketed-paste'
 
 if has("nvim")
   " Tabnine autocomplete - only works in neovim
-  Plug 'aarondill/tabnine-nvim', { 'branch': 'disable_cmd', 'do': './dl_binaries.sh' }
+  Plug 'aarondill/tabnine-nvim', { 'branch': 'master', 'do': './dl_binaries.sh' }
 endif
 
 " Commenting easily
@@ -190,7 +190,7 @@ call plug#end()
 
 
 " Configure tabnine-nvim
-if has("nvim-0.7")
+if has("nvim")
   lua <<EOF
     require('tabnine').setup({
       disable_auto_comment=true,
