@@ -165,8 +165,8 @@ let NERDSpaceDelims=1
 call plug#end()
 
 
+" Configure tabnine-nvim
 if has("nvim")
-  " Configure tabnine-nvim
   lua <<EOF
     require('tabnine').setup({
       disable_auto_comment=true,
@@ -175,7 +175,7 @@ if has("nvim")
       debounce_ms = 800,
       suggestion_color = {gui = "#808080", cterm = 244},
       exclude_filetypes = {"TelescopePrompt"}
-    })
+    });
 EOF
 endif
 
