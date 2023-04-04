@@ -151,18 +151,9 @@ Plug 'junegunn/fzf.vim'
 " Enable better pasting
 Plug 'ConradIrwin/vim-bracketed-paste'
 
-" Tabnine autocomplete
-Plug 'codota/tabnine-nvim', { 'do': './dl_binaries.sh' }
-
-" Commenting easily
-Plug 'preservim/nerdcommenter'
-nmap <C-_> <plug>NERDCommenterInvert
-xmap <C-_> <plug>NERDCommenterInvert
-let NERDSpaceDelims=1
-
-call plug#end()
-
 if has("nvim")
+  " Tabnine autocomplete - only works in neovim
+  Plug 'codota/tabnine-nvim', { 'do': './dl_binaries.sh' }
   " Configure tabnine-nvim
   lua <<EOF
     require('tabnine').setup({
@@ -174,7 +165,17 @@ if has("nvim")
       exclude_filetypes = {"TelescopePrompt"}
     })
 EOF
+
 endif
+" Commenting easily
+Plug 'preservim/nerdcommenter'
+nmap <C-_> <plug>NERDCommenterInvert
+xmap <C-_> <plug>NERDCommenterInvert
+
+let NERDSpaceDelims=1
+
+call plug#end()
+
 
 " Config vim-submode
 let g:submode_keep_leaving_key = 0
