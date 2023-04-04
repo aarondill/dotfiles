@@ -154,8 +154,20 @@ Plug 'ConradIrwin/vim-bracketed-paste'
 if has("nvim")
   " Tabnine autocomplete - only works in neovim
   Plug 'codota/tabnine-nvim', { 'do': './dl_binaries.sh' }
+endif
+
+" Commenting easily
+Plug 'preservim/nerdcommenter'
+nmap <C-_> <plug>NERDCommenterInvert
+xmap <C-_> <plug>NERDCommenterInvert
+let NERDSpaceDelims=1
+
+call plug#end()
+
+
+if has("nvim")
   " Configure tabnine-nvim
-  lua <<EOF
+  lua <<-EOF
     require('tabnine').setup({
       disable_auto_comment=true,
       accept_keymap="<Tab>",
@@ -164,17 +176,8 @@ if has("nvim")
       suggestion_color = {gui = "#808080", cterm = 244},
       exclude_filetypes = {"TelescopePrompt"}
     })
-EOF
-
+  EOF
 endif
-" Commenting easily
-Plug 'preservim/nerdcommenter'
-nmap <C-_> <plug>NERDCommenterInvert
-xmap <C-_> <plug>NERDCommenterInvert
-
-let NERDSpaceDelims=1
-
-call plug#end()
 
 
 " Config vim-submode
