@@ -87,7 +87,7 @@ if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
       sudo chown -R "$(whoami)" /usr/local/bin /usr/local/lib/node_modules /usr/local/include /usr/local/share /usr/local/n
 
       log 'installing node lts through n...'
-      curl -fsSL https://raw.githubusercontent.com/tj/n/master/bin/n | bash /dev/stdin lts
+      curl -fsSL https://raw.githubusercontent.com/tj/n/master/bin/n | /usr/bin/env bash -s -- lts
 
       # Setup pnpm
       log 'installing pnpm'
