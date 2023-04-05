@@ -101,10 +101,10 @@ function confirm() {
 ## Actual Code {{{1
 function install_apt_packages() {
   sudo -v
-  install_if_available_apt age anacron apt apt-clone autopoint bat cmake command-not-found curl \
+  install_if_available_apt age anacron apt apt-clone aptitude autopoint bat cmake command-not-found curl \
     dconf-editor duf fwts gh git golang-go grep ifupdown inotify-tools less make \
     neofetch neovim net-tools openvpn p7zip-full python3-neovim rsync shfmt tlp \
-    trash-cli tree util-linux xclip xdg-utils zip zoxide
+    trash-cli tree util-linux xclip xdg-utils zip zoxide htop
 }
 
 function install_graphical_apt_packages() {
@@ -116,7 +116,7 @@ function install_graphical_apt_packages() {
 
   install_if_available_apt dconf-editor flatpak gimp \
     gnome-shell-extension-manager gparted gucharmap luckybackup okular qtqr \
-    zeal gnome-software gnome-software-plugin-flatpak
+    zeal gnome-software gnome-software-plugin-flatpak gnome-tweakss
 }
 
 function install_pnpm_and_node() {
