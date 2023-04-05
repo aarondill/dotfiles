@@ -151,11 +151,6 @@ Plug 'junegunn/fzf.vim'
 " Enable better pasting
 Plug 'ConradIrwin/vim-bracketed-paste'
 
-if has("nvim")
-  " Tabnine autocomplete - only works in neovim
-  Plug 'aarondill/tabnine-nvim', { 'branch': 'master', 'do': './dl_binaries.sh' }
-endif
-
 " Commenting easily
 Plug 'preservim/nerdcommenter'
 nmap <C-_> <plug>NERDCommenterInvert
@@ -181,6 +176,16 @@ if executable('node')
 
     au FileType typescript setlocal expandtab
     au FileType javascript setlocal expandtab
+endif
+
+if has("nvim-0.6")
+  " Way fast filetypes
+  Plug 'nathom/filetype.nvim'
+endif
+
+if has("nvim-0.7")
+  " Tabnine autocomplete - only works in neovim
+  Plug 'aarondill/tabnine-nvim', { 'branch': 'master', 'do': './dl_binaries.sh' }
 endif
 
 call plug#end()
