@@ -28,6 +28,9 @@ function install_if_available_apt() {
   done
   quiet_apt install -- "${available_packages[@]}"
 }
+function is_installed_apt() {
+  dpkg -s "$@" &>/dev/null
+}
 function is_available_apt() {
   test -n "$(apt-cache show -- "$1" 2>/dev/null)"
 }
@@ -64,18 +67,41 @@ read -rep "Would you like to install some things? (Y/n) " confirmation
 if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
   # Get user password
   sudo -v
-  (
-    set -e
-    log 'Installing apt packages...'
-    install_if_available_apt age anacron apt apt-clone autopoint bat command-not-found \
-      curl dconf-editor duf flatpak fwts gh gimp git gnome-shell-extension-manager \
-      golang-go gparted grep gucharmap httpie ifupdown inotify-tools \
-      less luckybackup make neofetch neovim net-tools okular openvpn \
-      python3-neovim qtqr rsync shfmt tlp trash-cli tree util-linux xclip httpie \
-      xdg-utils zeal zip zoxide gnome-software gnome-software-plugin-flatpak  \
-      p7zip-full cmake
-    success
-  ) || err 'something went wrong installing apt packages!'
+  # Only run if apt is available
+  if is_accessible_cmd apt; then
+    (
+      set -e
+      log 'Installing apt packages...'
+      install_if_available_apt age anacron apt apt-clone autopoint bat cmake command-not-found curl \
+        dconf-editor duf fwts gh git golang-go grep ifupdown inotify-tools less make \
+        neofetch neovim net-tools openvpn p7zip-full python3-neovim rsync shfmt tlp \
+        trash-cli tree util-linux xclip xdg-utils zip zoxide
+      success
+    ) || err 'something went wrong installing apt packages!'
+
+    continue=0
+    # If gnome is not installed, ask confirmation, else just install
+    if is_installed_apt gnome-shell; then
+      continue=1
+    else
+      read -rep "Are you sure? (yes) " confirmation
+      if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
+        continue=1
+      fi
+    fi
+
+    if [ "$continue" = "1" ]; then
+      sudo -v
+      (
+        set -e
+        log 'Installing graphical (gnome) apt packages...'
+        install_if_available_apt dconf-editor flatpak gimp \
+          gnome-shell-extension-manager gparted gucharmap luckybackup okular qtqr \
+          zeal gnome-software gnome-software-plugin-flatpak
+        success
+      ) || err 'something went wrong installing graphical (gnome) apt packages!'
+    fi
+  fi
   # Maintain sudo after long install
   sudo -v
   if ! is_accessible_cmd pnpm; then
