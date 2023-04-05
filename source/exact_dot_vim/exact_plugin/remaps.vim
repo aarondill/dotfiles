@@ -46,3 +46,9 @@ endfunction
 nnoremap <silent> 0 :call <SID>ToggleMovement('^', '0')<CR>
 nnoremap <silent> H :call <SID>ToggleMovement('H', 'L')<CR>
 nnoremap <silent> L :call <SID>ToggleMovement('L', 'H')<CR>
+
+" Remap f9 to fold control
+inoremap <F9> <C-O>za
+nnoremap <F9> za
+onoremap <F9> <C-C>za
+vnoremap <F9> zf
