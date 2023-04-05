@@ -141,9 +141,6 @@ let g:NERDTreePatternMatchHighlightFullName = 1
 " Add better node support
 Plug 'moll/vim-node'
 
-" Allow multiple cursers!
-Plug 'mg979/vim-visual-multi', {'branch': 'master'}
-
 " Install vim-submode. This is used to create window mode
 Plug 'kana/vim-submode'
 
