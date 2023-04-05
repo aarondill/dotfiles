@@ -51,3 +51,10 @@ if command -v bc &>/dev/null; then
   alias bc='bc -l'
   alias calc='bc -l'
 fi
+
+# if `pnpm` is installed set alias for pnpx
+if command -v pnpm &>/dev/null; then
+  alias pnpx='pnpm dlx'
+fi
+
+
