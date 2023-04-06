@@ -244,7 +244,7 @@ function install_grub_editor() {
 
 if ! confirm "Would you like to install some things?"; then
   err 'Aborting.'
-  return 2
+  exit 2
 fi
 
 # Only run if apt is available
