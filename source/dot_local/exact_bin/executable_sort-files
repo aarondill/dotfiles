@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+sudo du -h --max-depth=1 -a --one-file-system |
+  sort -hs |
+  awk '{
+    printf("%4s ", $1);
+    s="";
+    for (i = 2; i <= NF; i++) s = s $i " ";
+    s = substr(s, 1, length(s)-1);
+    sub( /^.\//, "", s)
+    system("sudo ls --color=always -d -- \"" s "\"")
+    }'
