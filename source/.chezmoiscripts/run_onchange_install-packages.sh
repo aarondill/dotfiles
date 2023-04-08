@@ -189,6 +189,7 @@ function install_bitwarden_desktop() {
 }
 
 function install_bitwarden_cli() {
+  declare temp_dir
   temp_dir=$(mktemp -d) && (
     # Executed in a subshell, so this will run on end of block
     trap 'rm -rf $temp_dir' EXIT
@@ -240,6 +241,18 @@ function install_grub_editor() {
     )
 }
 
+function install_fx() {
+  declare temp_dir
+  # Do this to ensure that files in cwd aren't deleted when moving final binary
+  temp_dir=$(mktemp -d) && (
+    trap 'rm -rf "$temp_dir"' EXIT
+    # In subshell - doesn't affect outside
+    cd "$temp_dir"
+    # Installs to /usr/local/bin/fx - needs sudo to write to
+    curl https://fx.wtf | sudo sh
+  )
+}
+
 ### Non-Funcion Code {{{1
 
 if ! confirm "Would you like to install some things?"; then
@@ -284,5 +297,8 @@ log_and_run "Installing bitwarden CLI" install_bitwarden_cli
 is_accessible_cmd fzf ||
   log_and_run 'Installing fzf' install_fzf
 
-is_available_apt grub-editor ||
+if is_accessible_cmd apt && ! is_available_apt grub-editor; then
   log_and_run "Installing grub-editor" install_grub_editor
+fi
+
+log_and_run 'installing proprietary packages' install_proprietary_software spotify-client code google-chrome-stable
