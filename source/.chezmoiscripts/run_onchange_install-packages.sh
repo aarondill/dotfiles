@@ -118,7 +118,7 @@ function install_graphical_apt_packages() {
 
   install_if_available_apt dconf-editor flatpak gimp \
     gnome-shell-extension-manager gparted gucharmap luckybackup okular qtqr \
-    zeal gnome-software gnome-software-plugin-flatpak gnome-tweakss
+    zeal gnome-software gnome-software-plugin-flatpak gnome-tweaks
 }
 
 function install_pnpm_and_node() {
@@ -249,7 +249,7 @@ function install_fx() {
     # In subshell - doesn't affect outside
     cd "$temp_dir"
     # Installs to /usr/local/bin/fx - needs sudo to write to
-    curl https://fx.wtf | sudo sh
+    curl -sSfL https://fx.wtf | sudo sh
   )
 }
 
