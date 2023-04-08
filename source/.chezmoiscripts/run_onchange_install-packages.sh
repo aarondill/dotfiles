@@ -302,3 +302,5 @@ if is_accessible_cmd apt && ! is_available_apt grub-editor; then
 fi
 
 log_and_run 'installing proprietary packages' install_proprietary_software spotify-client code google-chrome-stable
+
+log_and_run 'installing fx' install_fx
