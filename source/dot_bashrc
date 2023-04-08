@@ -143,7 +143,8 @@ while IFS= read -r -d '' file; do
     time . "$file"
     unset TIMEFORMAT
   else
-    . "$file"
+    echo "$PATH" | tr ':' '\n'
+    read && . "$file"
   fi
 done < <(find ~/.bashrc.d/ -type f -not -name "_*" -print0 | LC_ALL=C sort -z)
 # Above: Find all files not starting with _, and sort, ensuring base lang
