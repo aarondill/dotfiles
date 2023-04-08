@@ -195,7 +195,7 @@ function install_bitwarden_cli() {
     trap 'rm -rf $temp_dir' EXIT
 
     curl -sSL 'https://vault.bitwarden.com/download/?app=cli&platform=linux' -o "$temp_dir/bw.zip" &&
-      unzip "$temp_dir/bw.zip" -d "$temp_dir" &&
+      unzip -qq "$temp_dir/bw.zip" -d "$temp_dir" &&
       sudo mv -f "$temp_dir/bw" /usr/local/bin/bw &&
       sudo chmod +x /usr/local/bin/bw
   )
