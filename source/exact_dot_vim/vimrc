@@ -193,7 +193,7 @@ endif
 
 if has("nvim-0.7")
   " Tabnine autocomplete - only works in neovim
-  Plug 'codota/tabnine-nvim', { 'branch': 'disable_cmd_cr', 'do': './dl_binaries.sh' }
+  Plug 'aarondill/tabnine-nvim', { 'branch': 'all_together_now', 'do': './dl_binaries.sh' }
 endif
 
 call plug#end()
