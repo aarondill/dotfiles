@@ -28,7 +28,6 @@ function post-temp() {
   # {"message": "server error"}
   # {"status":"success","data":{"url":"https://tmpfiles.org/######/file"}}
   (
-    set -e # break subshell if anything errors
     if ! command -v 'fx' &>/dev/null; then return 1; fi
 
     local status url message
@@ -39,7 +38,7 @@ function post-temp() {
         printf '%s\n' "$status" "$url"
         return 0 # returns from subshell
     }
-    # On error: (if failed, just continue and print it all)
+    # On error: (should've returned already on success)
     RED="\e[1;41m"
     BLANK="\e[0m"
     message="$(fx '.message.toString()' <<<"$result" 2>/dev/null)" && {
