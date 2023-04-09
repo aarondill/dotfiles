@@ -27,6 +27,7 @@ function post-temp() {
   # Example outputs:
   # {"message": "server error"}
   # {"status":"success","data":{"url":"https://tmpfiles.org/######/file"}}
+  declare -i subshell_exit
   (
     if ! command -v 'fx' &>/dev/null; then return 1; fi
 
@@ -46,8 +47,11 @@ function post-temp() {
       return 1 # returns from subshell
     }
   )
+  subshell_exit=$?
   # If verbose, or subshell failed (fx not installed or error returned), print entire json
-  if is_verbose || [ $? -ne 0 ]; then
+  if is_verbose || [ $subshell_exit -ne 0 ]; then
     printf '%s\n' "$result"
   fi
+  is_verbose && echo verbose
+  echo $subshell_exit
 }
