@@ -6,24 +6,28 @@
 #
 #
 function post-temp() {
-  if [ "$1" = "--help" ]; then
-    printf '%s\n' "post-temp FILE [-v|--verbose]" "" "Hosts a temporary file on the internet for 60 mins and returns the url."
-    return 0
-  fi
-  if ! [[ -f "$1" ]]; then
+  local verbose result status url message
+
+  for arg; do #if any arg is --help
+    if [ "$arg" = "--help" ]; then
+      printf '%s\n' "post-temp [-v|--verbose] FILE"
+      printf '\n'
+      printf '%s\n' "Hosts a temporary file on the internet for 60 mins and returns the url."
+      return 0
+    fi
+  done
+
+  if [ "$1" = -v ] || [ "$1" = --verbose ]; then verbose=true; fi
+  function is_verbose() { test -n "$verbose"; }
+  if is_verbose; then shift; fi # remove first arg if is --verbose
+
+  file=$1
+  if ! [[ -f "$file" ]]; then
     printf "The path given is not a file\n"
     return 2
   fi
 
-  local verbose
-  if [ "$2" = -v ] || [ "$2" = --verbose ]; then
-    verbose=true
-  fi
-  function is_verbose(){
-    test -n "$verbose"
-  }
-
-  local result="$(curl -F "file=@$1" https://tmpfiles.org/api/v1/upload)"
+  result="$(curl -F "file=@$file" https://tmpfiles.org/api/v1/upload)"
   # Example outputs:
   # {"message": "server error"}
   # {"status":"success","data":{"url":"https://tmpfiles.org/######/file"}}
@@ -31,13 +35,12 @@ function post-temp() {
   (
     if ! command -v 'fx' &>/dev/null; then return 1; fi
 
-    local status url message
     # Print the result thru fx to get the data
     # Already strings, if present, but trying to error
     status="$(fx '.status.toString()' <<<"$result" 2>/dev/null)" &&
       url="$(fx '.data.url.toString()' <<<"$result" 2>/dev/null)" && {
-        printf '%s\n' "$status" "$url"
-        return 0 # returns from subshell
+      printf '%s\n' "$status" "$url"
+      return 0 # returns from subshell
     }
     # On error: (should've returned already on success)
     RED="\e[1;41m"
