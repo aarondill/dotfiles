@@ -7,34 +7,48 @@
 #
 function post-temp() {
   if [ "$1" = "--help" ]; then
-    printf '%s\n' "post-temp FILE" "" "Hosts a temporary file on the internet for 60 mins and returns the url."
+    printf '%s\n' "post-temp FILE [-v|--verbose]" "" "Hosts a temporary file on the internet for 60 mins and returns the url."
     return 0
   fi
   if ! [[ -f "$1" ]]; then
     printf "The path given is not a file\n"
     return 2
   fi
+
+  local verbose
+  if [ "$2" = -v ] || [ "$2" = --verbose ]; then
+    verbose=true
+  fi
+  function is_verbose(){
+    test -n "$verbose"
+  }
+
   local result="$(curl -F "file=@$1" https://tmpfiles.org/api/v1/upload)"
   # Example outputs:
   # {"message": "server error"}
   # {"status":"success","data":{"url":"https://tmpfiles.org/######/file"}}
-  if command -v 'fx' &>/dev/null; then
+  (
+    set -e # break subshell if anything errors
+    if ! command -v 'fx' &>/dev/null; then return 1; fi
+
     local status url message
-    if [ "$2" = -v ] || [ "$2" = --verbose ]; then
-      printf '%s\n' "$result"
-    fi
     # Print the result thru fx to get the data
     # Already strings, if present, but trying to error
     status="$(fx '.status.toString()' <<<"$result" 2>/dev/null)" &&
-      url="$(fx '.data.url.toString()' <<<"$result" 2>/dev/null)" &&
-      printf '%s\n' "$status" "$url" &&
-      return 0
+      url="$(fx '.data.url.toString()' <<<"$result" 2>/dev/null)" && {
+        printf '%s\n' "$status" "$url"
+        return 0 # returns from subshell
+    }
     # On error: (if failed, just continue and print it all)
     RED="\e[1;41m"
     BLANK="\e[0m"
-    message="$(fx '.message.toString()' <<<"$result" 2>/dev/null)" &&
+    message="$(fx '.message.toString()' <<<"$result" 2>/dev/null)" && {
       printf "$RED%s$BLANK\n" "$message" >&2
+      return 1 # returns from subshell
+    }
+  )
+  # If verbose, or subshell failed (fx not installed or error returned), print entire json
+  if is_verbose || [ $? -ne 0 ]; then
+    printf '%s\n' "$result"
   fi
-  # If fx isn't installed, print the pure json
-  printf '%s\n' "$result"
 }
