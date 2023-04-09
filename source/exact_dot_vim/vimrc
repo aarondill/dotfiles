@@ -170,9 +170,22 @@ if executable('node')
       echom 'Can not install vim-prettier bc neither'
             \ .' yarn nor npm are installed'
     endif
-    let g:prettier#autoformat = 0
-    let g:prettier#autoformat_require_pragma = 0
-    let g:prettier#autoformat_config_present = 1
+    let g:prettier#autoformat_config_present = 1 " autoformat if .prettierrc
+    let g:prettier#autoformat_require_pragma = 0 " don't require @format
+    " Support all available config files : https://prettier.io/docs/en/configuration.html
+    let g:prettier#autoformat_config_files = [
+            \'.prettierrc',
+          \'.prettierrc.yml',
+          \'.prettierrc.yaml',
+          \'.prettierrc.js',
+          \'.prettierrc.cjs',
+          \'.prettierrc.config.js',
+          \'.prettierrc.config.cjs',
+          \'.prettierrc.json',
+          \'.prettierrc.json5',
+          \'.prettierrc.toml'
+          \]
+
 
     au FileType typescript setlocal expandtab
     au FileType javascript setlocal expandtab
