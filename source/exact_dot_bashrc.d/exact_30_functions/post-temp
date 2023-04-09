@@ -52,6 +52,4 @@ function post-temp() {
   if is_verbose || [ $subshell_exit -ne 0 ]; then
     printf '%s\n' "$result"
   fi
-  is_verbose && echo verbose
-  echo $subshell_exit
 }
