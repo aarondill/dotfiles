@@ -249,7 +249,7 @@ function install_fx() {
     # In subshell - doesn't affect outside
     cd "$temp_dir"
     # Installs to /usr/local/bin/fx - needs sudo to write to
-    curl -sSfL https://fx.wtf | sudo sh
+    curl -sSfL https://fx.wtf/install.sh | sudo sh
   )
 }
 
