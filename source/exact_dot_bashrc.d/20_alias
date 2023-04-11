@@ -57,4 +57,7 @@ if command -v pnpm &>/dev/null; then
   alias pnpx='pnpm dlx'
 fi
 
+# Temporary aliases!! TODO
+alias nvchad='NVIM_APPNAME=NvChad nvim'
+alias lazyvim='NVIM_APPNAME=LazyVim nvim'
 
