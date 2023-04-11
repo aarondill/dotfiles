@@ -60,4 +60,5 @@ fi
 # Temporary aliases!! TODO
 alias nvchad='NVIM_APPNAME=NvChad nvim'
 alias lazyvim='NVIM_APPNAME=LazyVim nvim'
-
+# https://nvchad.com/
+# https://www.lazyvim.org/
