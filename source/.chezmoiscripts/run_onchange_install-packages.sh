@@ -368,7 +368,7 @@ function install_fx() {
 
 if ! confirm "Would you like to install some things?"; then
   err 'Aborting.'
-  exit 2
+  exit 0
 fi
 
 # Only run if apt is available
