@@ -77,7 +77,7 @@ C-b:unix-filename-rubout
 #C-M-o: auto complete from history 
 "\e\C-o": dabbrev-expand
 # edit in $editor with S-M-e
-"\e\C- ": edit-and-execute-command
+"\e\C-e": edit-and-execute-command
 # Safer pasting
 set enable-bracketed-paste on
 # Display matches for ambiguous patterns at first tab press
