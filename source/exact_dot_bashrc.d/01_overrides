@@ -14,7 +14,7 @@ case " ${!PROMPT_COMMAND*} " in
 # PROMPT_COMMAND is not defined
 *)
 	# Define it *as an array*
-	declare -ae PROMPT_COMMAND
+	declare -ax PROMPT_COMMAND
 	;;
 esac
 
