@@ -11,9 +11,8 @@ if wezterm.config_builder then
 end
 
 -- This is where you actually apply your config choices
-
--- For example, changing the color scheme:
 config.color_scheme = "Tango (terminal.sexy)"
 
--- and finally, return the configuration to wezterm
+config.hide_tab_bar_if_only_one_tab = true
+
 return config
