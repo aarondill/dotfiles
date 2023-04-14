@@ -52,24 +52,6 @@ config.scrollback_lines = 5000
 -- *THIS* is a word. (default)
 config.selection_word_boundary = " \t\n{}[]()\"'`"
 
-local root_terminfo = "/lib/terminfo/w/wezterm"
-local local_terminfo = os.getenv("HOME") .. "/.terminfo/w/wezterm"
-if not util.file_exists(root_terminfo) and not util.file_exists(local_terminfo) then
-	-- Install term info if not present
-	os.execute([[
-  echo 'Installing term info'
-  tempfile=$(mktemp) && (
-    set -e
-    trap 'rm -rf $tempfile' EXIT
-    curl -sSLf "https://raw.githubusercontent.com/wez/wezterm/main/termwiz/data/wezterm.terminfo" -o "$tempfile"
-    # Can't use sudo - installs into ~/.terminfo
-    # sudo can't get a terminal in this script, so can't elevate permissions
-    tic -x "$tempfile"
-  )
-  ]])
-end
-config.term = "wezterm"
-
 -- nopety nope (default "SystemBeep")
 config.audible_bell = "Disabled"
 -- Lmk if i'm missing some stuff (default)
