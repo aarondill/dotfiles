@@ -8,6 +8,15 @@
 # May also be a good place for init scripts
 # If required by other files
 #
+case " ${!PROMPT_COMMAND*} " in
+# PROMPT_COMMAND is defined
+*" PROMPT_COMMAND "*) : ;;
+# PROMPT_COMMAND is not defined
+*)
+	# Define it *as an array*
+	declare -ae PROMPT_COMMAND
+	;;
+esac
 
 # Rm the stupid files in HOME from chrome
 rm -r ~/.pki ~/.dotnet/ 2>/dev/null
