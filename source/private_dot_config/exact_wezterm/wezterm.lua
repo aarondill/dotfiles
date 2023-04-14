@@ -11,8 +11,11 @@ if wezterm.config_builder then
 end
 
 -- This is where you actually apply your config choices
-config.color_scheme = "Tango (terminal.sexy)"
+config.color_scheme = "LiquidCarbonTransparentInverse"
+-- Don't like the curser? can change
+config.color_scheme = "Ef-Dark"
 
 config.hide_tab_bar_if_only_one_tab = true
+config.window_background_opacity = 0.85
 
 return config
