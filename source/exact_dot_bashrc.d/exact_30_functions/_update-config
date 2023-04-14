@@ -34,3 +34,4 @@ vscode/.release-it.json
 vscode/.shellcheckrc
 vscode/js/.gitignore
 vscode/js/EslintTests.js
+.config/wezterm
