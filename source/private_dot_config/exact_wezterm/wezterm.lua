@@ -1,7 +1,6 @@
 -- Pull in the wezterm API
 local wezterm = require("wezterm")
-
--- This table will hold the configuration.
+local util = require("util")
 local config = {}
 
 -- In newer versions of wezterm, use the config_builder which will
@@ -53,21 +52,45 @@ config.scrollback_lines = 5000
 -- *THIS* is a word. (default)
 config.selection_word_boundary = " \t\n{}[]()\"'`"
 
-function file_exists(name)
-	local f = io.open(name, "r")
-	if f ~= nil then
-		io.close(f)
-		return true
-	else
-		return false
-	end
-end
-
 local root_terminfo = "/lib/terminfo/w/wezterm"
 local local_terminfo = os.getenv("HOME") .. "/.terminfo/w/wezterm"
-if file_exists(root_terminfo) or file_exists(local_terminfo) then
+if util.file_exists(root_terminfo) or util.file_exists(local_terminfo) then
 	-- TODO: Should I install it?
 	config.term = "wezterm"
 end
 
+-- nopety nope (default "SystemBeep")
+config.audible_bell = "Disabled"
+-- Lmk if i'm missing some stuff (default)
+config.warn_about_missing_glyphs = true
+-- don't close some important stuff (default)
+config.window_close_confirmation = "AlwaysPrompt"
+-- go ahead and close *these* (default below)
+-- bash, sh, zsh, fish, tmux, nu, cmd.exe, pwsh.exe, powershell.exe
+config.skip_close_confirmation_for_processes_named = {
+	"dash",
+	"bash",
+	"sh",
+	"zsh",
+	"fish",
+	"tmux",
+	"nu",
+	"cmd.exe",
+	"pwsh.exe",
+	"powershell.exe",
+}
+-- No padding pls
+-- default: left = '1cell', right = '1cell', top = '0.5cell', bottom = '0.5cell'
+config.window_padding = {
+	left = 0,
+	right = 0,
+	top = 0,
+	bottom = 0,
+}
+-- Consistency! Persistence! (default false)
+config.switch_to_last_active_tab_when_closing_tab = true
+-- I see you! Show me more of it pls (default 12.0)
+config.font_size = 9.5
+-- You too! (default 14.0)
+config.command_palette_font_size = 9.5
 return config
