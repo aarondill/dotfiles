@@ -62,6 +62,8 @@ if not util.file_exists(root_terminfo) and not util.file_exists(local_terminfo) 
     set -e
     trap 'rm -rf $tempfile' EXIT
     curl -sSLf "https://raw.githubusercontent.com/wez/wezterm/main/termwiz/data/wezterm.terminfo" -o "$tempfile"
+    # Can't use sudo - installs into ~/.terminfo
+    # sudo can't get a terminal in this script, so can't elevate permissions
     tic -x "$tempfile"
   )
   ]])
