@@ -12,5 +12,10 @@
 # Ensure prompt command ends with a ;
 old_prompt="${PROMPT_COMMAND:+${PROMPT_COMMAND/%;/};}"
 
-# Capture exit code before prompt and reinstantiate after
-PROMPT_COMMAND='__EXIT="$?";'"$old_prompt"'(exit $__EXIT)'
+pre='__EXIT=$?;'
+# shellcheck disable=SC2016 # IK expressions do not expand. that is the point.
+post='(exit $__EXIT)'
+if ! [[ "${PROMPT_COMMAND:-}" == "$pre"*"$post" ]]; then
+	# Capture exit code before prompt and reinstantiate after
+	PROMPT_COMMAND="$pre$old_prompt$post"
+fi
