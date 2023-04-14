@@ -17,7 +17,7 @@ augroup VimRCAutoCmds
 augroup END
 
 " Set leader key. Any references must be after!
-let mapleader = ','
+let mapleader = ' '
 
 " Stop recording of dir history
 let g:netrw_dirhistmax=0
