@@ -86,5 +86,4 @@ config.switch_to_last_active_tab_when_closing_tab = true
 config.font_size = 9.5
 -- You too! (default 14.0)
 config.command_palette_font_size = 9.5
-
 return config
