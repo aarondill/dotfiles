@@ -54,10 +54,18 @@ config.selection_word_boundary = " \t\n{}[]()\"'`"
 
 local root_terminfo = "/lib/terminfo/w/wezterm"
 local local_terminfo = os.getenv("HOME") .. "/.terminfo/w/wezterm"
-if util.file_exists(root_terminfo) or util.file_exists(local_terminfo) then
+if not util.file_exists(root_terminfo) and not util.file_exists(local_terminfo) then
 	-- TODO: Should I install it?
-	config.term = "wezterm"
+	os.execute([[
+  tempfile=$(mktemp) && (
+    set -e
+    trap 'rm -rf $tempfile' EXIT
+    curl -sSLf "https://raw.githubusercontent.com/wez/wezterm/main/termwiz/data/wezterm.terminfo" -o "$tempfile"
+    tic -x "$tempfile"
+  )
+  ]])
 end
+config.term = "wezterm"
 
 -- nopety nope (default "SystemBeep")
 config.audible_bell = "Disabled"
@@ -93,4 +101,5 @@ config.switch_to_last_active_tab_when_closing_tab = true
 config.font_size = 9.5
 -- You too! (default 14.0)
 config.command_palette_font_size = 9.5
+
 return config
