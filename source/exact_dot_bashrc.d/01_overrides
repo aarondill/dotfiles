@@ -10,7 +10,7 @@
 #
 
 # Ensure blank prompt command for later commands
-PROMPT_COMMAND=''
+# PROMPT_COMMAND=''
 
 # Rm the stupid files in HOME from chrome
 rm -r ~/.pki ~/.dotnet/ 2>/dev/null
