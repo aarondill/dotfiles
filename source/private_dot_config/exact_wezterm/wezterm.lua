@@ -55,8 +55,9 @@ config.selection_word_boundary = " \t\n{}[]()\"'`"
 local root_terminfo = "/lib/terminfo/w/wezterm"
 local local_terminfo = os.getenv("HOME") .. "/.terminfo/w/wezterm"
 if not util.file_exists(root_terminfo) and not util.file_exists(local_terminfo) then
-	-- TODO: Should I install it?
+	-- Install term info if not present
 	os.execute([[
+  echo 'Installing term info'
   tempfile=$(mktemp) && (
     set -e
     trap 'rm -rf $tempfile' EXIT
