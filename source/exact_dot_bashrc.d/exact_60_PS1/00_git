@@ -176,6 +176,6 @@ __set_bash_prompt() {
 # need because __git_ps1 will return different text and colors
 
 # Don't do if contains already
-if ! printf '%s\0' "${PROMPT_COMMAND[@]}" | grep -F -x -z -- '__set_bash_prompt'; then
+if ! printf '%s\0' "${PROMPT_COMMAND[@]}" | grep -F -x -z -q -- '__set_bash_prompt'; then
 	PROMPT_COMMAND+=('__set_bash_prompt')
 fi
