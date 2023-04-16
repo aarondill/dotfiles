@@ -18,6 +18,7 @@ GRUB_TIMEOUT="5"
 GRUB_DISTRIBUTOR="`lsb_release -i -s 2> /dev/null || echo Debian`"
 # Prevent keyboard freeze on unsuspend
 GRUB_CMDLINE_LINUX_DEFAULT='quiet splash loglevel=3 i8042.reset \
+plymouth:debug \
      atkbd.reset=1 i8042.dumbkbd i8042.direct \
      resume=UUID=251a8ad6-5c96-4fbe-b2b0-52ca549f45a8'
 GRUB_CMDLINE_LINUX=""
