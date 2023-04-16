@@ -57,11 +57,6 @@ if command -v pnpm &>/dev/null; then
 	alias pnpx='pnpm dlx'
 fi
 
-# if `trash` is installed set alias for pnpx
-if command -v trash &>/dev/null; then
-	alias rm='trash'
-fi
-
 # Temporary aliases!! TODO
 alias nvchad='NVIM_APPNAME=NvChad nvim'
 # https://nvchad.com/
