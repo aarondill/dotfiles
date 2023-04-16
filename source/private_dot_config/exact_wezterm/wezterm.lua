@@ -3,6 +3,7 @@ local wezterm = require("wezterm")
 local theme = require("theme")
 local usage_settings = require("functional_settings")
 local term = require("term")
+local util = require("util")
 local function create_conf_obj()
 	-- In newer versions of wezterm, use the config_builder which will
 	-- help provide clearer error messages
@@ -17,5 +18,6 @@ local config = create_conf_obj()
 theme.apply(config)
 usage_settings.apply(config)
 term.apply(config)
+config = util.tbl_merge(config, require("toggle-transparency"))
 
 return config
