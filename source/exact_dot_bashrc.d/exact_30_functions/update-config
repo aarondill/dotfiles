@@ -68,7 +68,7 @@ function cproot() {
 			# ensure destination exists
 			mkdir -p -- "$new_dir"
 			# cp to home, so files are relative to home.
-			sudo cp -rf -T -- "$file" "$new_dir"
+			sudo cp -rf -T -- "$file" "$new_path"
 			sudo chown --preserve-root -hR -- "$(whoami)" "$new_path"
 			# add to the array so i can update all at once
 			files+=("$new_path")
