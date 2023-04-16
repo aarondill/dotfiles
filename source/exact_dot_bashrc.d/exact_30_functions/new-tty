@@ -5,19 +5,19 @@
 # Creates a new disowned gnome-terminal instance then exits this one
 #
 function new-tty() {
-  if [ "$1" = "--help" ]; then
-    printf '%s\n' "new-tty" "" "Creates a new disowned gnome-terminal instance then exits this one"
-    return 0
-  fi
+	if [ "$1" = "--help" ]; then
+		printf '%s\n' "new-tty" "" "Creates a new disowned gnome-terminal instance then exits this one"
+		return 0
+	fi
 
-  local terminal=gnome-terminal
-  if command -v "$terminal" &>/dev/null; then
-    "$terminal" "$@" &
-    disown
-    exit
-  else
-    printf "%s\n" "could not find $terminal"
-  fi
+	local terminal=x-terminal-emulator
+	if command -v "$terminal" &>/dev/null; then
+		"$terminal" "$@" &
+		disown
+		exit
+	else
+		printf "%s\n" "could not find $terminal"
+	fi
 }
 
 export -f new-tty
