@@ -12,10 +12,11 @@ tempdir=$(mktemp -d) && (
 
 	# Create conf.d to show the splash on boot
 	if [[ -f /etc/initramfs-tools/conf.d/splash ]]; then
-		printf 'Overriding /etc/initramfs-tools/conf.d/splash'
+		printf '%s\n' 'Overriding /etc/initramfs-tools/conf.d/splash'
 		sleep 3 # Allow user to halt
 	fi
-	printf 'FRAMEBUFFER=y' | sudo tee /etc/initramfs-tools/conf.d/splash
+	printf 'FRAMEBUFFER=y' | sudo tee /etc/initramfs-tools/conf.d/splash >/dev/null
+	# Runing update is not necessary because the install script will do it
 
 	# Run install script
 	sudo chmod +x "$tempdir/install"
