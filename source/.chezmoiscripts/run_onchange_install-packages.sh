@@ -150,7 +150,7 @@ function install_apt_packages() {
   install_if_available_apt age anacron autopoint bat cmake command-not-found curl \
     dconf-editor duf fwts gh git golang-go grep ifupdown inotify-tools less make \
     neofetch neovim net-tools openvpn p7zip-full python3-neovim rsync shfmt tlp \
-    trash-cli tree util-linux xclip xdg-utils zip zoxide htop
+    trash-cli tree util-linux xclip xdg-utils zip zoxide htop wezterm
   is_accessible_cmd apt &&
     install_if_available_apt apt-clone aptitude
 }
