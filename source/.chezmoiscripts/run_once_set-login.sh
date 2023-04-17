@@ -11,7 +11,7 @@ OWNER="aarondill"
 FILE="ubuntu-gdm-set-background"
 DESTINATION="/usr/local/bin/$FILE"
 curl -SsfL "https://raw.githubusercontent.com/$OWNER/ubuntu-gdm-set-background/main/$FILE" |
-	tee "$DESTINATION" >/dev/null
+  tee "$DESTINATION" >/dev/null
 chmod +x "$DESTINATION"
 success
 
