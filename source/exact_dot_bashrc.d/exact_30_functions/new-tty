@@ -6,13 +6,13 @@
 #
 function new-tty() {
 	if [ "$1" = "--help" ]; then
-		printf '%s\n' "new-tty" "" "Creates a new disowned gnome-terminal instance then exits this one"
+		printf '%s\n' "new-tty" "" "Creates a new disowned terminal instance then exits this one"
 		return 0
 	fi
 
-	local terminal=x-terminal-emulator
+	local terminal="wezterm start --cwd ."
 	if command -v "$terminal" &>/dev/null; then
-		"$terminal" "$@" &
+		"$terminal" &
 		disown
 		exit
 	else
