@@ -1,6 +1,8 @@
 #!/bin/bash
 # Install ubuntu-gdm-set-background
 set -e
+IMAGE="https://images.wallpaperscraft.com/image/single/sky_stars_moon_144720_1600x900.jpg"
+
 function log() { printf '%s\n' "$@"; }
 function success() { printf "$(tput setaf 2)%s$(tput sgr0)\n" "Success!"; }
 
@@ -13,14 +15,14 @@ curl -SsfL "https://raw.githubusercontent.com/$OWNER/ubuntu-gdm-set-background/m
 chmod +x "$DESTINATION"
 success
 
-log "Downloading sky_stars_moon_144720_1600x900.jpg"
+log "Downloading background image"
 # Download image file
 TEMP_FILE="$(mktemp)"
 trap 'rm -f "$TEMP_FILE"' EXIT
-curl -SsfL "https://images.wallpaperscraft.com/image/single/sky_stars_moon_144720_1600x900.jpg" -o "$TEMP_FILE"
+curl -SsfL "$IMAGE" -o "$TEMP_FILE"
 success
 
-log 'Setting sky_stars_moon_144720_1600x900.jpg as current lock screen image'
+log 'Setting image as current lock screen image'
 sudo "$DESTINATION" --image "$TEMP_FILE"
 success
 
