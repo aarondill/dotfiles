@@ -28,9 +28,4 @@ return {
 		top = 0,
 		bottom = 0,
 	},
-
-	-- I see you! Show me more of it pls (default 12.0)
-	font_size = 9.5,
-	-- You too! (default 14.0)
-	command_palette_font_size = 9.5,
 }
