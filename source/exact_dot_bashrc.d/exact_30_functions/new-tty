@@ -12,7 +12,7 @@ function new-tty() {
 
 	local terminal="wezterm start --cwd ."
 	if command -v "$terminal" &>/dev/null; then
-		"$terminal" &
+		eval "$terminal" &
 		disown
 		exit
 	else
