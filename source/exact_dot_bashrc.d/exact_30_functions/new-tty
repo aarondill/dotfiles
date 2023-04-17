@@ -10,9 +10,11 @@ function new-tty() {
 		return 0
 	fi
 
-	local terminal="wezterm start --cwd ."
+	local terminal="wezterm"
+	local args=(start --cwd .)
+
 	if command -v "$terminal" &>/dev/null; then
-		eval "$terminal" &
+		"$terminal" "${args[@]}" &
 		disown
 		exit
 	else
