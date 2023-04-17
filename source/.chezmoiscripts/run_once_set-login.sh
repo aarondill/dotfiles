@@ -21,7 +21,7 @@ curl -SsfL "https://images.wallpaperscraft.com/image/single/sky_stars_moon_14472
 success
 
 log 'Setting sky_stars_moon_144720_1600x900.jpg as current lock screen image'
-sudo "$DESTINATION" --image "$TEMP_FILE"
+sudo "$DESTINATION" --image "$TEMP_FILE" || true # Always returns 1...
 success
 
 log 'Cleaning up temporary file'
