@@ -18,9 +18,11 @@ log "Downloading sky_stars_moon_144720_1600x900.jpg"
 TEMP_FILE="$(mktemp)"
 trap 'rm -f "$TEMP_FILE"' EXIT
 curl -SsfL "https://images.wallpaperscraft.com/image/single/sky_stars_moon_144720_1600x900.jpg" -o "$TEMP_FILE"
-rm -f "$TEMP_FILE" && trap '' EXIT # Clean up and remove trap
 success
 
 log 'Setting sky_stars_moon_144720_1600x900.jpg as current lock screen image'
 sudo "$DESTINATION" --image "$TEMP_FILE"
 success
+
+log 'Cleaning up temporary file'
+rm -f "$TEMP_FILE" && trap '' EXIT # Clean up and remove trap
