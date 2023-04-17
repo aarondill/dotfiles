@@ -1,8 +1,8 @@
 return {
 
-	color_scheme = "LiquidCarbonTransparentInverse", -- overridden
-	-- Don't like the curser? can change
-	-- config.color_scheme = "Ef-Dark"
+	-- color_scheme = "LiquidCarbonTransparentInverse", -- overridden
+	-- Don't like the curser? can change?
+	color_scheme = "Ef-Dark",
 
 	-- ✨transparency✨ (default - 1)
 	window_background_opacity = 0.85,
