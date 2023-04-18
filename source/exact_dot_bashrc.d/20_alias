@@ -21,6 +21,8 @@ alias la="ls -A"
 alias ll="ls -hl"
 alias lla="ls -Ahl"
 alias cl='clear'
+# Show battery information
+alias battery='upower -i $(upower -e | grep BAT)'
 
 # alias for 7z zipping files that should be hidden
 alias secret-zip='7z a -r -P -mhe=on'
@@ -35,26 +37,26 @@ alias has='HAS_ALLOW_UNSAFE=y has'
 
 # Replace `cat` with `bat`, if installed
 if bat -V &>/dev/null; then
-	alias cat='bat'
+  alias cat='bat'
 elif batcat -V &>/dev/null; then
-	alias cat='batcat'
+  alias cat='batcat'
 fi
 
 # if `z` is installed, initiate it and set `cd` to `z`
 if zoxide -V &>/dev/null; then
-	eval "$(zoxide init bash)"
-	alias cd='z'
+  eval "$(zoxide init bash)"
+  alias cd='z'
 fi
 
 # if `bc` is installed set aliases for it
 if command -v bc &>/dev/null; then
-	alias bc='bc -l'
-	alias calc='bc -l'
+  alias bc='bc -l'
+  alias calc='bc -l'
 fi
 
 # if `pnpm` is installed set alias for pnpx
 if command -v pnpm &>/dev/null; then
-	alias pnpx='pnpm dlx'
+  alias pnpx='pnpm dlx'
 fi
 
 # Temporary aliases!! TODO
