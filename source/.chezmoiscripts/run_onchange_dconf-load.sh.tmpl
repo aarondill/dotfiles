@@ -5,5 +5,5 @@
 read -rep "load dconf settings from source? (yes) " confirmation </dev/tty
 if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
   printf 'Updating dconf\n'
-- dconf load / <{{ joinPath .chezmoi.sourceDir "dconf-backup.ini" | quote }}
+  dconf load / <{{ joinPath .chezmoi.sourceDir "dconf-backup.ini" | quote }}
 fi
