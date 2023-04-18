@@ -7,4 +7,5 @@ return require("plugin")({
 	"text",
 	"history",
 	"toggle-transparency",
+	"ctrl_click",
 })
