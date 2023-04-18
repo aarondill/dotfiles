@@ -138,6 +138,23 @@ function log_github_install() {
   log "Installing $github_repo version $version ($asset) to $destination"
 }
 #endregion
+#region ### General utility functions {{{2
+# download_file [sudo] <file> <destination> [mode]
+function download_file() {
+  local cmd=() file_url=$1 dest=$2 mode=$3
+
+  if [ "$1" = "sudo" ]; then
+    cmd+=("sudo")
+    file_url=$2 dest=$3 mode=$4
+  fi
+
+  cmd+=(curl -sSfL "$file_url" -o "$dest" --create-dirs)
+  [ -n "$mode" ] &&
+    cmd+=(--create-file-mode "$mode")
+
+  "${cmd[@]}" # Run the constructed command
+}
+#endregion
 #region ## Actual Code {{{1
 #region ### APT {{{2
 function install_apt_packages() {
@@ -261,23 +278,23 @@ function install_fzf() {
   version=$(get_latest_version_github "$REPO") || return
 
   case "$KERNEL $ARCH" in
-  Darwin\ arm64) asset="fzf-$version-darwin_arm64.zip" ;;
-  Darwin\ x86_64) asset="fzf-$version-darwin_amd64.zip" ;;
-  Linux\ armv5*) asset="fzf-$version-linux_armv5.tar.gz" ;;
-  Linux\ armv6*) asset="fzf-$version-linux_armv6.tar.gz" ;;
-  Linux\ armv7*) asset="fzf-$version-linux_armv7.tar.gz" ;;
-  Linux\ armv8*) asset="fzf-$version-linux_arm64.tar.gz" ;;
-  Linux\ aarch64*) asset="fzf-$version-linux_arm64.tar.gz" ;;
-  Linux\ loongarch64) asset="fzf-$version-linux_loong64.tar.gz" ;;
-  Linux\ ppc64le) asset="fzf-$version-linux_ppc64le.tar.gz" ;;
-  Linux\ *64) asset="fzf-$version-linux_amd64.tar.gz" ;;
-  Linux\ s390x) asset="fzf-$version-linux_s390x.tar.gz" ;;
-  FreeBSD\ *64) asset="fzf-$version-freebsd_amd64.tar.gz" ;;
-  OpenBSD\ *64) asset="fzf-$version-openbsd_amd64.tar.gz" ;;
-  CYGWIN*\ *64) asset="fzf-$version-windows_amd64.zip" ;;
-  MINGW*\ *64) asset="fzf-$version-windows_amd64.zip" ;;
-  MSYS*\ *64) asset="fzf-$version-windows_amd64.zip" ;;
-  Windows*\ *64) asset="fzf-$version-windows_amd64.zip" ;;
+  "Darwin arm64") asset="fzf-$version-darwin_arm64.zip" ;;
+  "Darwin x86_64") asset="fzf-$version-darwin_amd64.zip" ;;
+  "Linux armv5"*) asset="fzf-$version-linux_armv5.tar.gz" ;;
+  "Linux armv6"*) asset="fzf-$version-linux_armv6.tar.gz" ;;
+  "Linux armv7"*) asset="fzf-$version-linux_armv7.tar.gz" ;;
+  "Linux armv8"*) asset="fzf-$version-linux_arm64.tar.gz" ;;
+  "Linux aarch64"*) asset="fzf-$version-linux_arm64.tar.gz" ;;
+  "Linux loongarch64") asset="fzf-$version-linux_loong64.tar.gz" ;;
+  "Linux ppc64le") asset="fzf-$version-linux_ppc64le.tar.gz" ;;
+  "Linux "*64) asset="fzf-$version-linux_amd64.tar.gz" ;;
+  "Linux s390x") asset="fzf-$version-linux_s390x.tar.gz" ;;
+  "FreeBSD "*64) asset="fzf-$version-freebsd_amd64.tar.gz" ;;
+  "OpenBSD "*64) asset="fzf-$version-openbsd_amd64.tar.gz" ;;
+  "CYGWIN"*" "*64) asset="fzf-$version-windows_amd64.zip" ;;
+  "MINGW"*" "*64) asset="fzf-$version-windows_amd64.zip" ;;
+  "MSYS"*" "*64) asset="fzf-$version-windows_amd64.zip" ;;
+  "Windows"*" "*64) asset="fzf-$version-windows_amd64.zip" ;;
   esac
 
   if [ -z "$asset" ]; then
@@ -361,9 +378,9 @@ function install_fx() {
 #endregion
 #region ### Fff {{{2
 function install_fff() {
-  local BINDIR=${BINDIR:-'/usr/local/bin'}
+  local DEST=${BINDIR:-'/usr/local/bin'}/fff
   local url='https://raw.githubusercontent.com/dylanaraps/fff/master/fff'
-  sudo curl -sSfL "$url" -o "$BINDIR/fff" --create-dirs --create-file-mode 755 # Download file to bindir with rwxr-xr-x perms
+  download_file sudo "$url" "$DEST" 755 # Download file to bindir with rwxr-xr-x perms
 }
 
 #endregion
