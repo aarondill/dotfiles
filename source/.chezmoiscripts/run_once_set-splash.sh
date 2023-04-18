@@ -13,6 +13,18 @@ if [ "$os" != "Ubuntu" ]; then
   exit 0
 fi
 
+for p in plymouth libplymouth5 plymouth-label; do
+  if ! command -v apt &>/dev/null; then
+    log "Can not install dependency $p using apt"
+    break # Don't check other dependencies
+  fi
+  dpkg -l $p &>/dev/null || {
+    log "installing $p package from apt"
+    sudo apt-get install -qq $p >/dev/null
+    success
+  }
+done
+
 tempdir=$(mktemp -d)
 # Stop on error and remove temporary dir
 trap 'rm -rf "$tempdir"' EXIT
