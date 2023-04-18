@@ -1,4 +1,18 @@
-#!/bin/sh
+#!/usr/bin/env bash
+
+function log() { printf '%s\n' "$@"; }
+function err() { printf '%s\n' "$@" >&2; }
+function success() { printf "$(tput setaf 2)%s$(tput sgr0)\n" "Success!"; }
+
+log "Decrypting age key for encrypted files"
+if ! command -v age &>/dev/null; then
+  if command -v apt &>/dev/null; then
+    err "Age is not present, attempting to install using apt"
+    sudo apt install age
+  else
+    err "Age is not present. Please install it before running this script."
+  fi
+fi
 
 if [ ! -f "$HOME/.config/chezmoi/key.txt" ]; then
   age --decrypt --output "$HOME/.config/chezmoi/key.txt" "{{ .chezmoi.sourceDir }}/key.txt.age"
