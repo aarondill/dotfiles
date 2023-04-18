@@ -39,7 +39,7 @@ function post-temp() {
     # Already strings, if present, but trying to error
     status="$(fx '.status.toString()' <<<"$result" 2>/dev/null)" &&
       url="$(fx '.data.url.toString()' <<<"$result" 2>/dev/null)" && {
-      printf '%s\n' "$status" "$url" "${url/tmpfiles.org\//tmpfiles.org\/dl\/}"
+      printf '%s\n' "$status" "${url/tmpfiles.org\//tmpfiles.org\/dl\/}"
       return 0 # returns from subshell
     }
     # On error: (should've returned already on success)
