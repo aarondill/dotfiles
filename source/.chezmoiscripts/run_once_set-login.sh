@@ -14,7 +14,7 @@ if [ "$os" != "Ubuntu" ]; then
   exit 0
 fi
 
-OWNER="aarondill"
+OWNER="PRATAP-KUMAR"
 FILE="ubuntu-gdm-set-background"
 DESTINATION="/usr/local/bin/$FILE"
 curl -SsfL "https://raw.githubusercontent.com/$OWNER/ubuntu-gdm-set-background/main/$FILE" |
