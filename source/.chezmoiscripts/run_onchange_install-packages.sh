@@ -364,6 +364,14 @@ function install_fx() {
 
 #endregion
 #endregion
+#region ### Fff {{{2
+function install_fff() {
+  local BINDIR=${BINDIR:-'/usr/local/bin'}
+  local url='https://raw.githubusercontent.com/dylanaraps/fff/master/fff'
+  sudo curl -sSfL "$url" -o "$BINDIR/fff" --create-dirs --create-file-mode 755 # Download file to bindir with rwxr-xr-x perms
+}
+
+#endregion
 #region ### Non-Funcion Code {{{1
 
 if ! confirm "Would you like to install some things?"; then
@@ -414,4 +422,6 @@ fi
 log_and_run 'installing proprietary packages' install_proprietary_software spotify-client code google-chrome-stable
 
 log_and_run 'installing fx' install_fx
+
+log_and_run 'installing fff' install_fff
 #endregion
