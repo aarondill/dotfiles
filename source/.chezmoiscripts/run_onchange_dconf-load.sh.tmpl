@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
 # dconf.ini hash: {{ include "dconf-backup.ini" | sha256sum }}
+if ! command -v dconf &>/dev/null; then
+   printf 'dconf is not installed. Please install dconf to use this backup\n' >&2
+fi
 
 read -rep "load dconf settings from source? (yes) " confirmation </dev/tty
 if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
