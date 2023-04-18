@@ -6,38 +6,26 @@ KERNEL=$(uname -s) # eg: Linux
 ARCH=$(uname -m)   # eg: x86_64
 export ARCH KERNEL
 
-#region ### APT utility functions {{{2
-function quiet_apt() { sudo apt-get -qq "$@" >/dev/null; }
+#region ### Output Utility Functions {{{2
 
-function remove_if_installed_apt() {
-  local package
-  for package; do
-    if dpkg -s "$package" &>/dev/null; then
-      quiet_apt remove -- "$package"
-    fi
-  done
+function log() { printf '%s\n' "$@"; }
+function success() { printf "$(tput setaf 2)%s$(tput sgr0)\n" "Success!"; }
+function err() { printf '%s\n' "$@" >&2; }
+function confirm() {
+  read -rep "$* (Y/n) " confirmation
+  if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
+    return 0
+  fi
+  return 1
 }
-function install_if_available_apt() {
-  declare -a available_packages
-  available_packages=()
-  local package
-  for package; do
-    if is_available_apt "$package"; then
-      available_packages+=("$package")
-      log "Installing $package"
-    else
-      echo "Could not find '$package' in apt repos"
-    fi
-  done
-  quiet_apt install -- "${available_packages[@]}"
-}
+
 #endregion
-#region ### Flatpak utility functions {{{2
-
-# usage: flatpak_install [source] package
-function flatpak_install() { flatpak install -y --noninteractive -- "$@" >/dev/null; }
-# shellcheck disable=SC2120 # I know it doesn't recieve arguments. it updates all without arguments.
-function flatpak_update() { flatpak update -y --noninteractive -- "$@" >/dev/null; }
+#endregion
+#region ### Text utility functions {{{2
+function lower() { local t && t="$(cat -)" && printf '%s' "${t,,}"; }
+function first_lower() { local t && t="$(cat -)" && printf '%s' "${t,}"; }
+function upper() { local t && t="$(cat -)" && printf '%s' "${t^^}"; }
+function first_upper() { local t && t="$(cat -)" && printf '%s' "${t^}"; }
 
 #endregion
 #region ### Boolean utility functions {{{2
@@ -54,11 +42,61 @@ function is_installed_apt() { dpkg -s "$@" &>/dev/null; }
 
 function is_available_apt() { test -n "$(apt-cache show -- "$1" 2>/dev/null)"; }
 #endregion
-#region ### Text utility functions {{{2
-function lower() { local t && t="$(cat -)" && printf '%s' "${t,,}"; }
-function first_lower() { local t && t="$(cat -)" && printf '%s' "${t,}"; }
-function upper() { local t && t="$(cat -)" && printf '%s' "${t^^}"; }
-function first_upper() { local t && t="$(cat -)" && printf '%s' "${t^}"; }
+#region ### Control flow utility functions {{{2
+
+function log_and_run() {
+  # Usage: log_and_run "Installing something" apt install -y something
+  local task command args
+  task="$1"
+  command="$2"
+  args=("${@:3}")
+  (
+    set -e
+    log "${task^}..." # Uppercase
+    "$command" "${args[@]}"
+    success
+  ) || err "Something went wrong while ${task,}!" # Lowercase
+}
+
+function installed_or_log() {
+  if ! is_accessible_cmd "$1"; then
+    err "${1^} is not installed, skipping ${1^} installation"
+    return 1
+  fi
+  return 0
+}
+
+#endregion
+#region ### APT utility functions {{{2
+function remove_if_installed_apt() {
+  local package
+  for package; do
+    if dpkg -s "$package" &>/dev/null; then
+      sudo apt remove -- "$package"
+    fi
+  done
+}
+function install_if_available_apt() {
+  declare -a available_packages
+  available_packages=()
+  local package
+  for package; do
+    if is_available_apt "$package"; then
+      available_packages+=("$package")
+      log "Installing $package"
+    else
+      err "Could not find '$package' in apt repos"
+    fi
+  done
+  sudo apt install -- "${available_packages[@]}"
+}
+#endregion
+#region ### Flatpak utility functions {{{2
+
+# usage: flatpak_install [source] package
+function flatpak_install() { flatpak install -y --noninteractive -- "$@"; }
+# shellcheck disable=SC2120 # I know it doesn't recieve arguments. it updates all without arguments.
+function flatpak_update() { flatpak update -y --noninteractive -- "$@"; }
 
 #endregion
 #region ### Github utility functions {{{2
@@ -99,49 +137,6 @@ function log_github_install() {
   local github_repo=$1 version=$2 asset=$3 destination=$4
   log "Installing $github_repo version $version ($asset) to $destination"
 }
-#endregion
-#region ### Control flow utility functions {{{2
-
-function log_and_run() {
-  # Usage: log_and_run "Installing something" apt install -y something
-  local task command args
-  task="$1"
-  command="$2"
-  args=("${@:3}")
-  (
-    set -e
-    log "${task^}..." # Uppercase
-    "$command" "${args[@]}"
-    success
-  ) || err "Something went wrong while ${task,}!" # Lowercase
-}
-
-function installed_or_log() {
-  if ! is_accessible_cmd "$1"; then
-    err "${1^} is not installed, skipping ${1^} installation"
-    return 1
-  fi
-  return 0
-}
-
-#endregion
-#region ### Output Utility Functions {{{2
-
-function log() { printf '%s\n' "$@"; }
-# shellcheck disable=SC2120 # I know it never recieve arguments, it has defaults.
-function success() { printf "$(tput setaf 2)%s$(tput sgr0)\n" "${@:-Success!}"; }
-
-function err() { printf '%s\n' "$@" >&2; }
-
-function confirm() {
-  read -rep "$* (Y/n) " confirmation
-  if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
-    return 0
-  fi
-  return 1
-}
-
-#endregion
 #endregion
 #region ## Actual Code {{{1
 #region ### APT {{{2
@@ -207,9 +202,9 @@ function setup_ppa_google-chrome() {
 
 # Run setup_ppa_* first!
 function install_proprietary_software() {
-  quiet_apt update
+  sudo apt update
   install_if_available_apt "$@"
-  quiet_apt install -f
+  sudo apt install -f
 }
 
 #endregion
@@ -330,7 +325,7 @@ function install_grub_editor() (
       local destination=$temp_dir/grub-editor.deb
       log_github_install "$REPO" "$version" "$asset" "$destination"
       curl -sSL "https://github.com/$REPO/releases/download/$version/$asset" -o "$destination"
-      quiet_apt install "$destination"
+      sudo apt install "$destination"
     )
 )
 #endregion
