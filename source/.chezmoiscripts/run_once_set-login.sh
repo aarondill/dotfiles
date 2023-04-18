@@ -7,6 +7,13 @@ function log() { printf '%s\n' "$@"; }
 function success() { printf "$(tput setaf 2)%s$(tput sgr0)\n" "Success!"; }
 
 log "Installing ubuntu-gdm-set-background"
+
+os="$(lsb_release -is)"
+if [ "$os" != "Ubuntu" ]; then
+  log "This script is only available for Ubuntu" >&2
+  exit 0
+fi
+
 OWNER="aarondill"
 FILE="ubuntu-gdm-set-background"
 DESTINATION="/usr/local/bin/$FILE"
