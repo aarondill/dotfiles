@@ -35,3 +35,4 @@ vscode/.shellcheckrc
 vscode/js/.gitignore
 vscode/js/EslintTests.js
 .config/wezterm
+.config/tealdeer
