@@ -1,8 +1,5 @@
 return {
 
-	-- color_scheme = "LiquidCarbonTransparentInverse", -- overridden
-	-- Don't like the curser? can change?
-	-- color_scheme = "Ef-Dark",
 	-- Color overrides:
 	colors = {
 		-- The default text color
