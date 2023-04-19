@@ -6,15 +6,15 @@ return {
 	-- Color overrides:
 	colors = {
 		-- The default text color
-		foreground = "silver",
+		foreground = "rgb(170,170,170)",
 		-- The default background color
-		background = "black",
+		background = "black", -- rgb(0,0,0)
 
 		-- Overrides the cell background color when the current cell is occupied by the
 		-- cursor and the cursor style is set to Block
-		cursor_bg = "#52ad70",
+		cursor_bg = "black", --#000000
 		-- Overrides the text color when the current cell is occupied by the cursor
-		cursor_fg = "black",
+		cursor_fg = "white", --#ffffff
 		-- Specifies the border color of the cursor when the cursor style is set to Block,
 		-- or the color of the vertical or horizontal bar when the cursor style is set to
 		-- Bar or Underline.
@@ -80,6 +80,7 @@ return {
 		quick_select_match_bg = { AnsiColor = "Navy" },
 		quick_select_match_fg = { Color = "#ffffff" },
 	},
+	default_cursor_style = "BlinkingBar", -- Harder on graphics, change to SteadyBar?
 
 	-- ✨transparency✨ (default - 1)
 	window_background_opacity = 0.85,
