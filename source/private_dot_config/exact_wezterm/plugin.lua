@@ -46,7 +46,6 @@ function M.plugin(mod)
 		return config
 	end
 
-	--TODO: Call safe!
 	local suc, export = pcall(require, "plugins." .. mod)
 	if not suc then
 		util.printf("require of plugins.%s failed: %s", mod, export)
