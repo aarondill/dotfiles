@@ -12,9 +12,9 @@ return {
 
 		-- Overrides the cell background color when the current cell is occupied by the
 		-- cursor and the cursor style is set to Block
-		cursor_bg = "black", --#000000
+		cursor_bg = "#52ad70",
 		-- Overrides the text color when the current cell is occupied by the cursor
-		cursor_fg = "white", --#ffffff
+		cursor_fg = "black",
 		-- Specifies the border color of the cursor when the cursor style is set to Block,
 		-- or the color of the vertical or horizontal bar when the cursor style is set to
 		-- Bar or Underline.
@@ -32,28 +32,28 @@ return {
 		split = "#444444",
 
 		ansi = {
-			"black",
-			"maroon",
-			"green",
-			"olive",
-			"navy",
-			"purple",
-			"teal",
-			"silver",
+			"rgb(0,0,0)",
+			"rgb(170,0,0)",
+			"rgb(0,170,0)",
+			"rgb(170,85,0)",
+			"rgb(0,0,170)",
+			"rgb(170,0,170)",
+			"rgb(0,170,170)",
+			"rgb(170,170,170)",
 		},
 		brights = {
-			"grey",
-			"red",
-			"lime",
-			"yellow",
-			"blue",
-			"fuchsia",
-			"aqua",
-			"white",
+			"rgb(85,85,85)",
+			"rgb(255,85,85)",
+			"rgb(85,255,85)",
+			"rgb(255,255,85)",
+			"rgb(85,85,255)",
+			"rgb(255,85,255)",
+			"rgb(85,255,255)",
+			"rgb(255,255,255)",
 		},
 
 		-- Arbitrary colors of the palette in the range from 16 to 255
-		indexed = { [136] = "#af8700" },
+		indexed = {},
 
 		-- Since: 20220319-142410-0fcdea07
 		-- When the IME, a dead key or a leader key are being processed and are effectively
@@ -84,8 +84,8 @@ return {
 
 	-- ✨transparency✨ (default - 1)
 	window_background_opacity = 0.85,
-	-- yes pls (default - true, equivalent to BrightAndBold)
-	bold_brightens_ansi_colors = "BrightAndBold",
+	-- Don't change my colors pls (default - true, equivalent to BrightAndBold)
+	bold_brightens_ansi_colors = "No",
 
 	-- I don´t wanna see no tabs if I aint usin' them. (default - false)
 	hide_tab_bar_if_only_one_tab = true,
