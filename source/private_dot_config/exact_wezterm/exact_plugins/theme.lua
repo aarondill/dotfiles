@@ -79,7 +79,7 @@ return {
 	},
 	default_cursor_style = "BlinkingBar", -- Harder on graphics, change to SteadyBar?
 	-- Milliseconds
-	cursor_blink_rate = 1000,
+	cursor_blink_rate = 3000,
 
 	-- ✨transparency✨ (default - 1)
 	window_background_opacity = 0.85,
