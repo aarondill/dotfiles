@@ -59,7 +59,11 @@ if command -v pnpm &>/dev/null; then
   alias pnpx='pnpm dlx'
 fi
 
+# If tealdeer is installed set alias for tldr
+if command -v tldr &>/dev/null; then
+  alias tldrf='tldr --list | fzf --preview "tldr {1} --color=always" --preview-window=right,70% | xargs tldr --pager'
+fi
+
 # Temporary aliases!! TODO
 alias nvchad='NVIM_APPNAME=NvChad nvim'
 # https://nvchad.com/
-# https://www.lazyvim.org/
