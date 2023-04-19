@@ -4,7 +4,7 @@ return {
 	-- Don't like the curser? can change?
 	-- color_scheme = "Ef-Dark",
 	-- Color overrides:
-	color = {
+	colors = {
 		-- The default text color
 		foreground = "silver",
 		-- The default background color
