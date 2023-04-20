@@ -64,6 +64,11 @@ if command -v tldr &>/dev/null; then
   alias tldrf='tldr --list | fzf --preview "tldr {1} --color=always" --preview-window=right,70% | xargs tldr --pager'
 fi
 
+# Shorter lazygit
+if command -v lazygit &>/dev/null; then
+  alias lg='lazygit'
+fi
+
 # Temporary aliases!! TODO
 alias nvchad='NVIM_APPNAME=NvChad nvim'
 # https://nvchad.com/
