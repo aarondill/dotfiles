@@ -105,4 +105,5 @@ return {
 		top = 0,
 		bottom = 0,
 	},
+	hide_mouse_cursor_when_typing = false,
 }
