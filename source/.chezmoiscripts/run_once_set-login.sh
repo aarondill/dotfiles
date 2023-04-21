@@ -19,7 +19,7 @@ FILE="ubuntu-gdm-set-background"
 DESTINATION="/usr/local/bin/$FILE"
 curl -SsfL "https://raw.githubusercontent.com/$OWNER/ubuntu-gdm-set-background/main/$FILE" |
   sudo tee "$DESTINATION" >/dev/null
-chmod +x "$DESTINATION"
+sudo chmod +x "$DESTINATION"
 success
 
 log "Downloading background image"
