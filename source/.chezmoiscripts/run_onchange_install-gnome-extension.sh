@@ -25,7 +25,10 @@ git clone https://github.com/oae/gnome-shell-extensions-sync.git "$TEMP"
 cd "$TEMP"
 "$NPM" install
 "$NPM" run build
-mv -- "$PWD/dist" "$HOME/.local/share/gnome-shell/extensions/extensions-sync@elhan.io" # keep the dist directory as the final result
+mv -- "$TEMP/dist" "$HOME/.local/share/gnome-shell/extensions/extensions-sync@elhan.io" # keep the dist directory as the final result
+
+# Clean up and remove trap
+rm -rf "$TEMP" && trap '' EXIT && cd -
 
 ## Sync if present
 
