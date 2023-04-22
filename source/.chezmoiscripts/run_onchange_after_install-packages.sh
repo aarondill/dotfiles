@@ -418,6 +418,8 @@ function install_wezterm() (
       curl -sSL "https://github.com/$REPO/releases/download/$version/$asset" -o "$destination"
       sudo apt install "$destination"
     )
+  # set wezterm as default term
+  sudo update-alternatives --set x-terminal-emulator /usr/bin/open-wezterm-here
 )
 #endregion
 #region ### Non-Funcion Code {{{1
