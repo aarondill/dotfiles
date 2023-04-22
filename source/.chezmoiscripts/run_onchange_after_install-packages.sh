@@ -406,7 +406,7 @@ function install_wezterm() (
 
   version=$(get_latest_version_github "$REPO") # v1.0.0
 
-  asset=wezterm-${version}.Ubuntu20.04.deb # hard coding to Ubuntu20.04.deb for now
+  asset=wezterm-${version}.Ubuntu22.04.deb # hard coding to Ubuntu22.04.deb for now
   # Download the .deb
   temp_dir=$(mktemp -d) &&
     (
