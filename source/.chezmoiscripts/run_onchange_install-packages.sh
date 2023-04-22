@@ -72,7 +72,7 @@ function remove_if_installed_apt() {
   local package
   for package; do
     if dpkg -s "$package" &>/dev/null; then
-      sudo apt remove -- "$package"
+      sudo apt remove -y -- "$package"
     fi
   done
 }
@@ -88,7 +88,7 @@ function install_if_available_apt() {
       err "Could not find '$package' in apt repos"
     fi
   done
-  sudo apt install -- "${available_packages[@]}"
+  sudo apt install -y -- "${available_packages[@]}"
 }
 #endregion
 #region ### Flatpak utility functions {{{2
