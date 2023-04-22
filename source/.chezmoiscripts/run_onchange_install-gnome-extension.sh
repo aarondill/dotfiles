@@ -13,5 +13,11 @@ curl -sSfL 'https://github.com/brunelli/gnome-shell-extension-installer/raw/mast
 
 # If sync file exists, read from it
 if [ -f "$HOME/.config/extensions-sync.json" ]; then
+  # Set local mode
+  dconf write '/org/gnome/shell/extensions/extensions-sync/provider' '"Local"'
+  # Set local file mode
+  dconf write '/org/gnome/shell/extensions/extensions-sync/provider' '"Local"'
+  # Set backup location
+  dconf write '/org/gnome/shell/extensions/extensions-sync/backup-file-location' "\"file://$HOME/.config/extensions-sync.json\""
   busctl --user call org.gnome.Shell /io/elhan/ExtensionsSync io.elhan.ExtensionsSync read # load from the file
 fi
