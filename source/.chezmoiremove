@@ -1,0 +1,7 @@
+.bash_history
+.gitconfig
+.lesshst
+bin/chezmoi
+.npm
+.yarnrc
+.sudo_as_admin_successful
