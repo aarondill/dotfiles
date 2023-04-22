@@ -24,7 +24,12 @@ git clone https://github.com/oae/gnome-shell-extensions-sync.git "$TEMP"
 
 cd "$TEMP"
 "$NPM" install
-"$NPM" run build
+# "$NPM" run build # This doesn't work because clean:schema exits 1 if not present
+# HACK: run build doesn't work. Here's the steps it took when I wrote this.
+"$NPM" run build:ts                                                  ## Build the extension
+"$NPM" run clean:schema || true                                      # This may fail, but it's fine!
+glib-compile-schemas ./resources/schemas --targetdir=./dist/schemas/ # from build:schema
+
 mv -- "$TEMP/dist" "$HOME/.local/share/gnome-shell/extensions/extensions-sync@elhan.io" # keep the dist directory as the final result
 
 # Clean up and remove trap
