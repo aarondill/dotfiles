@@ -7,9 +7,27 @@ if ! [ -f /usr/bin/gnome-session ]; then
   return 0
 fi
 
-# Install using gnome-shell-extension-installer
-curl -sSfL 'https://github.com/brunelli/gnome-shell-extension-installer/raw/master/gnome-shell-extension-installer' |
-  bash /dev/stdin 1486
+# Pick a package manager!
+NPM=$(which pnpm 2>/dev/null || which yarn 2>/dev/null || which npm 2>/dev/null)
+if ! [ -x "${NPM}" ]; then
+  echo "npm, pnpm, or yarn are required to install extensions sync" >&2
+  exit 1
+fi
+
+## Install extensions sync
+
+# Exits on fail because set -e
+TEMP=$(mktemp -d)
+trap 'rm -rf ${TEMP}' EXIT
+
+git clone https://github.com/oae/gnome-shell-extensions-sync.git "$TEMP"
+
+cd "$TEMP"
+"$NPM" install # Any of the three can do these two commands
+"$NPM" run build
+mv -- "$PWD/dist" "$HOME/.local/share/gnome-shell/extensions/extensions-sync@elhan.io" # keep the dist directory as the final result
+
+## Sync if present
 
 # If sync file exists, read from it
 if [ -f "$HOME/.config/extensions-sync.json" ]; then
