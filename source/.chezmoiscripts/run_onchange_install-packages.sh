@@ -4,6 +4,7 @@
 
 KERNEL=$(uname -s) # eg: Linux
 ARCH=$(uname -m)   # eg: x86_64
+OS=$(lsb_release -si)
 export ARCH KERNEL
 
 #region ### Output Utility Functions {{{2
@@ -394,6 +395,31 @@ function install_fff() {
 }
 
 #endregion
+#region ### Wezterm {{{2
+function install_wezterm() (
+  set -e # run in subshell
+  if [ "$OS" != "Ubuntu" ]; then
+    log 'This script currently only supports ubuntu. More support comming soon. (Hopefully)'
+    return 0
+  fi
+  declare temp_dir version REPO=wez/wezterm
+
+  version=$(get_latest_version_github "$REPO") # v1.0.0
+
+  asset=wezterm-${version}.Ubuntu20.04.deb # hard coding to Ubuntu20.04.deb for now
+  # Download the .deb
+  temp_dir=$(mktemp -d) &&
+    (
+      # In a subshell, so runs at end of block
+      trap 'rm -rf $temp_dir' EXIT
+      set -e
+      local destination=$temp_dir/wezterm.deb
+      log_github_install "$REPO" "$version" "$asset" "$destination"
+      curl -sSL "https://github.com/$REPO/releases/download/$version/$asset" -o "$destination"
+      sudo apt install "$destination"
+    )
+)
+#endregion
 #region ### Non-Funcion Code {{{1
 
 if ! confirm "Would you like to install some things?"; then
@@ -446,6 +472,11 @@ log_and_run 'installing proprietary packages' install_proprietary_software spoti
 log_and_run 'installing fx' install_fx
 
 log_and_run 'installing fff' install_fff
+
+# Wezterm will inform of updates itself, only run if not already installed (and apt is available to install with)
+if is_accessible_cmd apt && ! is_available_apt wezterm; then
+  log_and_run 'installing wezterm' install_wezterm
+fi
 
 log_and_run 'disconnecting firefox:hunspell' snap disconnect firefox:host-hunspell
 #endregion
