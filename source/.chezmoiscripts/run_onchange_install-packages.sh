@@ -446,4 +446,6 @@ log_and_run 'installing proprietary packages' install_proprietary_software spoti
 log_and_run 'installing fx' install_fx
 
 log_and_run 'installing fff' install_fff
+
+log_and_run 'disconnecting firefox:hunspell' snap disconnect firefox:host-hunspell
 #endregion
