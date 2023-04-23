@@ -428,6 +428,28 @@ function install_wezterm() (
   sudo update-alternatives --set x-terminal-emulator /usr/bin/open-wezterm-here
 )
 #endregion
+#region ### Lazygit {{{2
+function install_lazygit() (
+  set -e
+  local LAZYGIT_VERSION REPO FILE DESTINATION
+  LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
+  FILE="lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
+  BINDIR=/usr/local/bin
+  REPO='jesseduffield/lazygit'
+
+  log_github_install "$REPO" "$LAZYGIT_VERSION" "$FILE" "$BINDIR"
+
+  TMP=$(mktemp)
+  trap 'rm -f "$TMP"' EXIT
+
+  curl -SsLf "https://github.com/$REPO/releases/download/v$LAZYGIT_VERSION/$FILE" -o "$TMP"
+  # output to destination
+  tar -xvz -C "$BINDIR" -f "$TMP" lazygit
+  sudo chmod +x "$BINDIR/lazygit"
+
+  rm -f "$TMP" && trap '' EXIT # Cleanup
+)
+#endregion
 #region ### Non-Funcion Code {{{1
 
 if ! confirm "Would you like to install some things?"; then
@@ -485,6 +507,8 @@ log_and_run 'installing fff' install_fff
 if is_accessible_cmd apt && ! is_available_apt wezterm; then
   log_and_run 'installing wezterm' install_wezterm
 fi
+
+log_and_run 'installing lazygit' install_lazygit
 
 log_and_run 'disconnecting firefox:hunspell' snap disconnect firefox:host-hunspell
 #endregion
