@@ -512,12 +512,14 @@ fi
 
 log_and_run 'installing lazygit' install_lazygit
 
-installed_or_log snap && {
+installed_or_log snap && (
+  set -e
   log 'disconnecting firefox:hunspell'
   CONNECTONS=$(snap connections firefox | awk '/firefox:host-hunspell/{print $3}')
   # If still connected, disconnect
   if [ "$CONNECTONS" != '-' ]; then
     snap disconnect firefox:host-hunspell
   fi
-}
+  success
+)
 #endregion
