@@ -101,7 +101,8 @@ function flatpak_update() { flatpak update -y --noninteractive -- "$@"; }
 
 #endregion
 #region ### Github utility functions {{{2
-function get_latest_version_github() {
+function get_latest_version_github() (
+  set -e            # in subshell
   declare REPO="$1" # combined $OWNER/$REPO
   version=$(curl -sI "https://github.com/$REPO/releases/latest" | grep -i "location:" | awk -F"/" '{ printf "%s", $NF }' | tr -d '\r')
   if [ -z "$version" ]; then
@@ -109,11 +110,11 @@ function get_latest_version_github() {
     return 2
   fi
   echo "$version"
-}
+)
 # usage: `install_from_github aaron/example latest example.sh /usr/local/bin/example`
 function install_from_github() (
   set -e # runs in subshell, so doesn't affect outside
-  local github_repo=$1 version=$2 asset=$3 destination=$4
+  local github_repo=$1 version=$2 asset=$3 destination=$4 TMP
   if [[ -z "$github_repo" ]]; then
     err "GitHub repo can not be an empty string"
     return 2
@@ -129,9 +130,14 @@ function install_from_github() (
 
   log_github_install "$github_repo" "$version" "$asset" "$destination"
 
-  curl -SsLf "https://github.com/$github_repo/releases/download/$version/$asset" |
-    sudo tee "$destination" >/dev/null
+  TMP=$(mktemp)
+  trap 'rm -f "$TMP"' EXIT
+
+  curl -SsLf "https://github.com/$github_repo/releases/download/$version/$asset" -o "$TMP"
+  sudo mv "$TMP" "$destination" >/dev/null
   sudo chmod +x "$destination"
+
+  rm -f "$TMP" && trap '' EXIT # Cleanup
 )
 # usage: log_github_install aaron/example latest example.sh /usr/local/bin/
 function log_github_install() {
