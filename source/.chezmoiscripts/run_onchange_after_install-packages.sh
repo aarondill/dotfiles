@@ -468,7 +468,7 @@ function install_java() (
 
   curl -SsLf "$URL" -o "$TMP"
   # output to destination
-  sudo tar -xvz -C "$DESTINATION" -f "$TMP"
+  sudo tar -xz -C "$DESTINATION" -f "$TMP"
 
   rm -f "$TMP" && trap '' EXIT # Cleanup
 )
