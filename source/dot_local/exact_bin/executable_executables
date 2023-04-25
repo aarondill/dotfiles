@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+sed 'y/:\n/\x00\x00/' <<< "$PATH" |\
+  xargs -0 -I% \
+  find % -maxdepth 1 -type f -executable |\
+  cat <(find . -maxdepth 1 -type f -executable)
+
