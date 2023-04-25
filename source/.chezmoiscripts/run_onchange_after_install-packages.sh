@@ -212,8 +212,12 @@ function install_pnpm_and_node() {
   corepack enable
   corepack prepare pnpm@latest --activate >/dev/null
 
+  log 'Installing pnpm global packages'
+  pnpm i --silent -g
+
   log 'installing n through pnpm'
   pnpm i --silent -g n
+
 }
 
 #endregion
