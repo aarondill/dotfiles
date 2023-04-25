@@ -35,14 +35,6 @@ function install_fx() {
 
 #endregion
 #endregion
-#region ### Fff {{{2
-function install_fff() {
-  local DEST=${BINDIR:-'/usr/local/bin'}/fff
-  local url='https://raw.githubusercontent.com/dylanaraps/fff/master/fff'
-  download_file sudo "$url" "$DEST" 755 # Download file to bindir with rwxr-xr-x perms
-}
-
-#endregion
 #region ### Wezterm {{{2
 function install_wezterm() (
   set -e # run in subshell
@@ -123,8 +115,6 @@ fi
 log_and_run 'installing proprietary packages' install_proprietary_software spotify-client code google-chrome-stable
 
 log_and_run 'installing fx' install_fx
-
-log_and_run 'installing fff' install_fff
 
 # Wezterm will inform of updates itself, only run if not already installed (and apt is available to install with)
 if is_accessible_cmd apt && ! is_available_apt wezterm; then
