@@ -13,31 +13,6 @@ function installed_or_log() {
   return 0
 }
 #region ## Actual Code {{{1
-#region ### PNPM/Node {{{2
-function install_pnpm_and_node() {
-  sudo -v
-  # Setup n
-  log 'Setting up /usr/local files for n'
-  sudo mkdir -p /usr/local/bin /usr/local/lib/node_modules /usr/local/include /usr/local/share /usr/local/n
-  sudo chown -R "$(whoami)" /usr/local/bin /usr/local/lib/node_modules /usr/local/include /usr/local/share /usr/local/n
-
-  log 'installing node lts through n...'
-  curl -fsSL https://raw.githubusercontent.com/tj/n/master/bin/n | /usr/bin/env bash -s -- lts
-
-  # Setup pnpm
-  log 'installing pnpm'
-  corepack enable
-  corepack prepare pnpm@latest --activate >/dev/null
-
-  log 'Installing pnpm global packages'
-  pnpm i --silent -g
-
-  log 'installing n through pnpm'
-  pnpm i --silent -g n
-
-}
-
-#endregion
 #region ### PPAs {{{2
 function setup_ppa_spotify() {
   sudo -v
@@ -282,8 +257,6 @@ if ! confirm "Would you like to install some things?"; then
   err 'Aborting.'
   exit 0
 fi
-
-is_accessible_cmd pnpm || log_and_run 'Installing NodeJS and pnpm' install_pnpm_and_node
 
 # Gnome comes with it, but I don't want it.
 remove_if_installed_apt gnome-characters
