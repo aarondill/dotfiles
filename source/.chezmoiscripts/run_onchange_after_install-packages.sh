@@ -455,7 +455,25 @@ function install_lazygit() (
   rm -f "$TMP" && trap '' EXIT # Cleanup
 )
 #endregion
-#region ### Non-Funcion Code {{{1
+
+#region ### Java {{{2
+function install_java() (
+  set -e
+  local URL=https://download.java.net/java/GA/jdk20.0.1/b4887098932d415489976708ad6d1a4b/9/GPL/openjdk-20.0.1_linux-x64_bin.tar.gz
+  local DESTINATION="/usr/lib/jvm" # Fixed location
+  log "downloading java 20.0.1 (fixed version)"
+
+  TMP=$(mktemp)
+  trap 'rm -f "$TMP"' EXIT
+
+  curl -SsLf "$URL" -o "$TMP"
+  # output to destination
+  tar -xvz -C "$DESTINATION" -f "$TMP"
+
+  rm -f "$TMP" && trap '' EXIT # Cleanup
+)
+#endregion
+### Non-Funcion Code {{{1
 
 if ! confirm "Would you like to install some things?"; then
   err 'Aborting.'
@@ -516,6 +534,8 @@ if is_accessible_cmd apt && ! is_available_apt wezterm; then
 fi
 
 log_and_run 'installing lazygit' install_lazygit
+
+log_and_run 'installing java' install_java
 
 installed_or_log snap && (
   set -e
