@@ -65,4 +65,8 @@ installed_or_log apt && {
     log "Yeah, that didn't work. Neovim will be installed from default repos."
   log_and_run 'Installing apt packages' install_apt_packages
   log_and_run 'Installing graphical (gnome) apt packages' install_graphical_apt_packages
+  # Gnome comes with it, but I don't want it.
+  remove_if_installed_apt gnome-characters
+  # Replace the existing cheese package with the flatpak package
+  remove_if_installed_apt cheese
 }

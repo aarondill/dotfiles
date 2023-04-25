@@ -13,31 +13,6 @@ function installed_or_log() {
   return 0
 }
 #region ## Actual Code {{{1
-#region ### PPAs {{{2
-function setup_ppa_spotify() {
-  sudo -v
-  curl -sS https://download.spotify.com/debian/pubkey_7A3A762FAFD4A51F.gpg | sudo gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/spotify.gpg
-  echo "deb http://repository.spotify.com stable non-free" | sudo tee /etc/apt/sources.list.d/spotify.list >/dev/null
-}
-function setup_ppa_vscode() {
-  sudo -v
-  curl -sS https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor --yes -o /etc/apt/keyrings/packages.microsoft.gpg
-  echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | sudo tee /etc/apt/sources.list.d/vscode.list >/dev/null
-}
-function setup_ppa_google-chrome() {
-  sudo -v
-  curl -sS https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/google-chrome.gpg
-  echo "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google.list >/dev/null
-}
-
-# Run setup_ppa_* first!
-function install_proprietary_software() {
-  sudo apt update
-  install_if_available_apt "$@"
-  sudo apt install -f
-}
-
-#endregion
 #region ### Snaps {{{2
 function install_snaps() {
   true # don't do anything 🤷‍♂️ - I don't want any snaps
@@ -258,21 +233,8 @@ if ! confirm "Would you like to install some things?"; then
   exit 0
 fi
 
-# Gnome comes with it, but I don't want it.
-remove_if_installed_apt gnome-characters
-
-# Should already be installed, sanity check
-is_accessible_cmd gpg curl && {
-  log_and_run 'installing spotify ppa' setup_ppa_spotify
-  log_and_run 'installing vscode ppa' setup_ppa_vscode
-  log_and_run 'installing google chrome ppa' setup_ppa_google-chrome
-  log_and_run 'installing proprietary packages' install_proprietary_software spotify-client code google-chrome-stable
-}
-
 installed_or_log snap &&
   log_and_run "Installing snaps" install_snaps
-
-is_accessible_cmd apt && remove_if_installed_apt cheese # Replace the existing cheese package with the flatpak package
 
 # Ignore if already installed, updates itself
 is_accessible_cmd bitwarden ||
