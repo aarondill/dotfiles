@@ -4,14 +4,6 @@ SOURCE_DIR=$(chezmoi source-path)
 # shellcheck source=../.utils.sh
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
-#region ## Utility functions {{{1
-function installed_or_log() {
-  if ! is_accessible_cmd "$1"; then
-    err "${1^} is not installed, skipping ${1^} installation"
-    return 1
-  fi
-  return 0
-}
 #region ## Actual Code {{{1
 #region ### Snaps {{{2
 function install_snaps() {

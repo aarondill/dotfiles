@@ -43,6 +43,15 @@ function log_and_run() {
     success
   ) || err "Something went wrong while ${task,}!" # Lowercase
 }
+# installed_or_log snap
+function installed_or_log() {
+  if ! is_accessible_cmd "$1"; then
+    err "${1^} is not installed, skipping ${1^} installation"
+    return 1
+  fi
+  return 0
+}
+
 # returns 0 if all cmds are available, 1 otherwise
 # is_accessible_cmd apt ls git
 function is_accessible_cmd() {
