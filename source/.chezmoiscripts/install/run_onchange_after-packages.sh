@@ -80,13 +80,6 @@ function install_java() (
 #endregion
 ### Non-Funcion Code {{{1
 
-if ! confirm "Would you like to install some things?"; then
-  err 'Aborting.'
-  exit 0
-fi
-
-log_and_run 'installing proprietary packages' install_proprietary_software spotify-client code google-chrome-stable
-
 log_and_run 'installing fx' install_fx
 
 log_and_run 'installing lazygit' install_lazygit
