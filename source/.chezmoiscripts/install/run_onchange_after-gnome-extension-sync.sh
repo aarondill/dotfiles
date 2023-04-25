@@ -6,6 +6,11 @@ if ! [ -f /usr/bin/gnome-session ]; then
   echo "gnome is not installed, so skipping extension synchronization" >&2
   return 0
 fi
+DESTINATION="$HOME/.local/share/gnome-shell/extensions/extensions-sync@elhan.io"
+if [ -d "$DESTINATION" ]; then
+  echo "extensions-sync is already installed at $DESTINATION, skipping extension installation" >&2
+  return 0
+fi
 
 # Pick a package manager!
 NPM=$(which yarn 2>/dev/null)
@@ -30,7 +35,7 @@ cd "$TEMP"
 "$NPM" run clean:schema || true                                      # This may fail, but it's fine!
 glib-compile-schemas ./resources/schemas --targetdir=./dist/schemas/ # from build:schema
 
-mv -- "$TEMP/dist" "$HOME/.local/share/gnome-shell/extensions/extensions-sync@elhan.io" # keep the dist directory as the final result
+mv -- "$TEMP/dist" "$DESTINATION" # keep the dist directory as the final result
 
 # Clean up and remove trap
 rm -rf "$TEMP" && trap '' EXIT && cd -
