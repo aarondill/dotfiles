@@ -4,8 +4,6 @@ SOURCE_DIR=$(chezmoi source-path)
 # shellcheck source=../.utils.sh
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
-#region ## Actual Code {{{1
-#region ### Java {{{2
 function install_java() (
   set -e
   local URL=https://download.java.net/java/GA/jdk20.0.1/b4887098932d415489976708ad6d1a4b/9/GPL/openjdk-20.0.1_linux-x64_bin.tar.gz
@@ -24,9 +22,5 @@ function install_java() (
   # This is my own script! should be in .local/bin/update-java!
   sudo ~/.local/bin/update-java "$DESTINATION/$name"
 )
-#endregion
-### Non-Funcion Code {{{1
 
 log_and_run 'installing java' install_java
-
-#endregion
