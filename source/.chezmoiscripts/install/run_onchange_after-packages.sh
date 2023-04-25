@@ -38,15 +38,6 @@ function install_if_available_apt() {
   sudo apt install -y -- "${available_packages[@]}"
 }
 #endregion
-#region ### Flatpak utility functions {{{2
-function flatpak_is_installed() { flatpak info -- "$@" &>/dev/null; }
-# usage: flatpak_install [source] package
-function flatpak_install() { flatpak install -y --noninteractive -- "$@"; }
-# shellcheck disable=SC2120 # I know it doesn't recieve arguments. it updates all without arguments.
-function flatpak_update() { flatpak update -y --noninteractive -- "$@"; }
-#endregion
-#endregion
-
 #region ## Actual Code {{{1
 #region ### APT {{{2
 function install_apt_packages() {
@@ -125,22 +116,6 @@ function install_proprietary_software() {
 #region ### Snaps {{{2
 function install_snaps() {
   true # don't do anything 🤷‍♂️ - I don't want any snaps
-}
-
-#endregion
-#region ### Flatpak {{{2
-function install_flatpaks() {
-  flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-  flatpak_apps=(
-    com.github.johnfactotum.Foliate com.github.tchx84.Flatseal
-    com.valvesoftware.Steam io.mrarm.mcpelauncher org.gnome.Boxes
-    org.gnome.Cheese org.libretro.RetroArch com.github.alainm23.planner
-  )
-  for flatpak_app in "${flatpak_apps[@]}"; do
-    if ! flatpak_is_installed "$flatpak_app"; then
-      flatpak_install "$flatpak_app"
-    fi
-  done
 }
 
 #endregion
@@ -382,11 +357,7 @@ is_accessible_cmd gpg curl && {
 installed_or_log snap &&
   log_and_run "Installing snaps" install_snaps
 
-installed_or_log flatpak && {
-  is_accessible_cmd apt && remove_if_installed_apt cheese # Replace the existing cheese package with the flatpak package
-  log_and_run "Installing flatpak packages" install_flatpaks
-  log_and_run 'Updating flatpak packages' flatpak_update
-}
+is_accessible_cmd apt && remove_if_installed_apt cheese # Replace the existing cheese package with the flatpak package
 
 # Ignore if already installed, updates itself
 is_accessible_cmd bitwarden ||
