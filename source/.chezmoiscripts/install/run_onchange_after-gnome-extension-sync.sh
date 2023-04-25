@@ -4,12 +4,12 @@ set -e
 if ! [ -f /usr/bin/gnome-session ]; then
   # Gnome is not installed
   echo "gnome is not installed, so skipping extension synchronization" >&2
-  return 0
+  exit 0
 fi
 DESTINATION="$HOME/.local/share/gnome-shell/extensions/extensions-sync@elhan.io"
 if [ -d "$DESTINATION" ]; then
   echo "extensions-sync is already installed at $DESTINATION, skipping extension installation" >&2
-  return 0
+  exit 0
 fi
 
 # Pick a package manager!
