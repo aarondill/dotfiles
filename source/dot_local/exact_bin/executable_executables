@@ -1,3 +1,10 @@
 #!/usr/bin/env bash
-sed 's/:/\x00/g' <<<"$PATH" |
-  xargs -0 -I% find % -maxdepth 2 -type f -executable
+{
+  set -f
+  IFS=:
+  for d in $PATH; do
+    set +f
+    [ -n "$d" ] || d=.
+    for f in "$d"/.[!.]* "$d"/..?* "$d"/*; do [ -f "$f" ] && [ -x "$f" ] && printf '%s\n' "${f##*/}"; done
+  done
+} | sort
