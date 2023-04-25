@@ -1,3 +1,9 @@
+#! /usr/bin/env bash
+# Source utils
+SOURCE_DIR=$(chezmoi source-path)
+# shellcheck source=../.utils.sh
+. "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
+
 function install_bitwarden_desktop() {
   declare DESTINATION=/usr/local/bin/bitwarden
   sudo curl -sSL 'https://vault.bitwarden.com/download/?app=desktop&platform=linux&variant=appimage' -o "$DESTINATION"
