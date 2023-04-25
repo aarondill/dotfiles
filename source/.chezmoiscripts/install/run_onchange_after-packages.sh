@@ -5,12 +5,6 @@ SOURCE_DIR=$(chezmoi source-path)
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
 #region ## Actual Code {{{1
-#region ### Snaps {{{2
-function install_snaps() {
-  true # don't do anything 🤷‍♂️ - I don't want any snaps
-}
-
-#endregion
 #region ### Bitwarden {{{2
 function install_bitwarden_desktop() {
   declare DESTINATION=/usr/local/bin/bitwarden
@@ -224,10 +218,6 @@ if ! confirm "Would you like to install some things?"; then
   err 'Aborting.'
   exit 0
 fi
-
-installed_or_log snap &&
-  log_and_run "Installing snaps" install_snaps
-
 # Ignore if already installed, updates itself
 is_accessible_cmd bitwarden ||
   log_and_run "Installing bitwarden desktop" install_bitwarden_desktop
@@ -255,14 +245,4 @@ log_and_run 'installing lazygit' install_lazygit
 
 log_and_run 'installing java' install_java
 
-installed_or_log snap && (
-  set -e
-  log 'disconnecting firefox:hunspell'
-  CONNECTONS=$(snap connections firefox | awk '/firefox:host-hunspell/{print $3}')
-  # If still connected, disconnect
-  if [ "$CONNECTONS" != '-' ]; then
-    snap disconnect firefox:host-hunspell
-  fi
-  success
-)
 #endregion
