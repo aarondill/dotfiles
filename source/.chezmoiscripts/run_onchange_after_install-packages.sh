@@ -470,9 +470,8 @@ function install_java() (
   # output to destination
   sudo tar -xz -C "$DESTINATION" -f "$TMP"
 
-  rm -f "$TMP" && trap '' EXIT # Cleanup
-
   name=$(tar -ztf "$TMP" | head -n 1 | cut -d'/' -f1) # hack to get name of top folder
+  rm -f "$TMP" && trap '' EXIT                        # Cleanup
   # This is my own script! should be in .local/bin/update-java!
   sudo ~/.local/bin/update-java "$DESTINATION/$name"
 )
