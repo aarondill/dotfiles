@@ -7,4 +7,4 @@
     [ -n "$d" ] || d=.
     for f in "$d"/.[!.]* "$d"/..?* "$d"/*; do [ -f "$f" ] && [ -x "$f" ] && printf '%s\n' "${f##*/}"; done
   done
-} | sort
+} | sort | uniq
