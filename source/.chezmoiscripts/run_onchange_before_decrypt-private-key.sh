@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-function log() { printf '%s\n' "$@"; }
-function err() { printf '%s\n' "$@" >&2; }
-function success() { printf "$(tput setaf 2)%s$(tput sgr0)\n" "Success!"; }
+# Source utils
+SOURCE_DIR=$(chezmoi source-path)
+# shellcheck source=.utils.sh
+. "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
 log "Decrypting age key for encrypted files"
 if ! command -v age &>/dev/null; then
@@ -16,6 +17,6 @@ fi
 
 if [ ! -f "$HOME/.config/chezmoi/key.txt" ]; then
   mkdir -p "$HOME/.config/chezmoi"
-  age --decrypt --output "$HOME/.config/chezmoi/key.txt" "{{ .chezmoi.sourceDir }}/key.txt.age"
+  age --decrypt --output "$HOME/.config/chezmoi/key.txt" "$SOURCE_DIR/key.txt.age"
   chmod 600 "$HOME/.config/chezmoi/key.txt"
 fi

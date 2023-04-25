@@ -1,22 +1,25 @@
 #!/bin/bash
 # Installs extension sync gnome extension
 set -e
+
+# Source utils
+SOURCE_DIR=$(chezmoi source-path)
+# shellcheck source=../.utils.sh
+. "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
+
 if ! [ -f /usr/bin/gnome-session ]; then
   # Gnome is not installed
-  echo "gnome is not installed, so skipping extension synchronization" >&2
-  exit 0
+  abort0 "gnome is not installed, so skipping extension synchronization"
 fi
 DESTINATION="$HOME/.local/share/gnome-shell/extensions/extensions-sync@elhan.io"
 if [ -d "$DESTINATION" ]; then
-  echo "extensions-sync is already installed at $DESTINATION, skipping extension installation" >&2
-  exit 0
+  abort0 "extensions-sync is already installed at $DESTINATION, skipping extension installation"
 fi
 
 # Pick a package manager!
 NPM=$(which yarn 2>/dev/null)
 if ! [ -x "${NPM}" ]; then
-  echo "yarn is required to install extensions sync" >&2
-  exit 1
+  abort "yarn is required to install extensions sync"
 fi
 
 ## Install extensions sync

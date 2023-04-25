@@ -3,8 +3,10 @@
 set -e
 IMAGE="https://images.wallpaperscraft.com/image/single/sky_stars_moon_144720_1600x900.jpg"
 
-function log() { printf '%s\n' "$@"; }
-function success() { printf "$(tput setaf 2)%s$(tput sgr0)\n" "Success!"; }
+# Source utils
+SOURCE_DIR=$(chezmoi source-path)
+# shellcheck source=.utils.sh
+. "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
 log "Installing ubuntu-gdm-set-background"
 

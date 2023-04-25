@@ -1,12 +1,17 @@
 #!/usr/bin/env bash
 
+# Source utils
+SOURCE_DIR=$(chezmoi source-path)
+# shellcheck source=.utils.sh
+. "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
+
 # dconf.ini hash: {{ include "dconf-backup.ini" | sha256sum }}
 if ! command -v dconf &>/dev/null; then
-   printf 'dconf is not installed. Please install dconf to use this backup\n' >&2
+   abort 'dconf is not installed. Please install dconf to use this backup\n'
 fi
 
 read -rep "load dconf settings from source? (yes) " confirmation </dev/tty
 if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
   printf 'Updating dconf\n'
-  dconf load / <{{ joinPath .chezmoi.sourceDir "dconf-backup.ini" | quote }}
+  dconf load / < "$SOURCE_DIR/dconf-backup.ini"
 fi
