@@ -5,36 +5,6 @@ SOURCE_DIR=$(chezmoi source-path)
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
 #region ## Actual Code {{{1
-#region ### Fx {{{2
-function install_fx() {
-  local ext short_arch asset
-  local BINDIR=${BINDIR:-'/usr/local/bin'}
-  if [ "$KERNEL" == "windows" ]; then
-    ext='.exe'
-  elif ! { [ "$KERNEL" = 'Darwin' ] || [ "$KERNEL" = 'Linux' ]; }; then
-    err "Unsupported OS: $KERNEL"
-    return 1
-  fi
-
-  case "$ARCH" in
-  x86_64 | amd64)
-    short_arch=amd64
-    ;;
-  arm64 | aarch64)
-    short_arch=arm64
-    ;;
-  *)
-    err "Unsupported architecture: $ARCH"
-    return 1
-    ;;
-  esac
-
-  asset="fx_${KERNEL,,}_${short_arch}${ext}"
-  install_from_github antonmedv/fx latest "$asset" "$BINDIR/fx"
-}
-
-#endregion
-#endregion
 #region ### Java {{{2
 function install_java() (
   set -e
@@ -56,8 +26,6 @@ function install_java() (
 )
 #endregion
 ### Non-Funcion Code {{{1
-
-log_and_run 'installing fx' install_fx
 
 log_and_run 'installing java' install_java
 
