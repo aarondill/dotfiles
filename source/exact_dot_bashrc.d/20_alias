@@ -69,6 +69,11 @@ if command -v lazygit &>/dev/null; then
   alias lg='lazygit'
 fi
 
+# Shorter git
+if command -v git &>/dev/null; then
+  alias g='git'
+fi
+
 # Temporary aliases!! TODO
 alias nvchad='NVIM_APPNAME=NvChad nvim'
 # https://nvchad.com/
