@@ -16,7 +16,8 @@ if [[ -d "$HOME/.local/bin" ]] && ! [[ "$PATH" == *"$HOME/.local/bin"* ]]; then
 fi
 
 # set JAVA_HOME to latest jvm available
-JAVA_HOME="$(find /usr/lib/jvm -maxdepth 1 -type d | tail -n1)"
+# use sort -V to sort versions. only available in core-utils-7
+JAVA_HOME="$(find /usr/lib/jvm -maxdepth 1 -type d | sort -V | tail -n1)"
 export JAVA_HOME
 # export PATH=$JAVA_HOME/bin${PATH:+:$PATH}
 
