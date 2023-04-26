@@ -35,7 +35,7 @@ cd "$TEMP"
 "$NPM" run clean:schema || true                                      # This may fail, but it's fine!
 glib-compile-schemas ./resources/schemas --targetdir=./dist/schemas/ # from build:schema
 
-sudo mkdir -p "$(basename -- "$DESTINATION")"
+sudo mkdir -p -- "$(basename -- "$DESTINATION")"
 mv -T -- "$TEMP/dist" "$DESTINATION" # keep the dist directory as the final result
 
 # Clean up and remove trap
