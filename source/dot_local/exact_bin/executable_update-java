@@ -7,13 +7,18 @@
 
 if [ "$1" = --help ] || [ $# -eq 0 ]; then
   cat <<-EOF
-  update-java <JAVADIR> [priority = 1112] [JVM_VERS_DIR]
+  update-java [-y | --yes] <JAVADIR> [priority = 1112] [JVM_VERS_DIR]
   Updates java symlinks to the path specified using update-alternatives.
   Do not include /bin on JAVADIR.
   JVM_VERS_DIR will be determined by JAVA_HOME if set, or else default to /usr/lib/jvm
 EOF
   [ $# -eq 0 ] && exit 2 || exit 0
 fi
+yes=0
+if [ "$1" = --yes ] || [ "$1" = -y ]; then
+  yes=1 && shift
+fi
+
 JAVADIR=$1
 PRIORITY=${2:-1112}
 BINDIR=/usr/bin
@@ -21,7 +26,7 @@ if [[ -n "$3" ]]; then
   JVM_VERS_DIR=$3
 elif [[ -n "$JAVA_HOME" ]]; then
   JVM_VERS_DIR=$(dirname -- "$JAVA_HOME") # /usr/lib/jvm/jdk-version --> /usr/lib/jvm
-else 
+else
   JVM_VERS_DIR=/usr/lib/jvm
 fi
 
@@ -37,16 +42,22 @@ else
 fi
 
 if [[ "$JAVADIR" =~ ?(.*)/bin$ ]]; then
-  read -rep "$JAVADIR ends in /bin, would you like to use it's parent? (yes) " confirmation >&2
+  if [ $yes -ne 1 ]; then
+    read -rep "$JAVADIR ends in /bin, would you like to use it's parent? (yes) " confirmation >&2
+  else
+    confirmation=yes
+  fi
   if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
     JAVADIR=$(dirname -- "$(realpath -- "$JAVADIR")")
   fi
 fi
 
-read -rep "Are you sure you would like to link all binaries in $JAVADIR? (yes) " confirmation
-if [[ -n "$confirmation" && ! "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
-  printf '%s\n' "Aborting" >&2
-  exit 1
+if [ $yes -ne 1 ]; then
+  read -rep "Are you sure you would like to link all binaries in $JAVADIR? (yes) " confirmation
+  if [[ -n "$confirmation" && ! "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
+    printf '%s\n' "Aborting" >&2
+    exit 1
+  fi
 fi
 
 # Update sudo timestamp
@@ -69,4 +80,4 @@ done
 
 # Link the default-java file to this folder
 printf '%s\n' "sudo ln -sf -T \"$JAVADIR\" \"$JVM_VERS_DIR/default-java\""
-sudo ln -sf -T "$JAVADIR" "$JVM_VERS_DIR/default-java" 
+sudo ln -sf -T "$JAVADIR" "$JVM_VERS_DIR/default-java"
