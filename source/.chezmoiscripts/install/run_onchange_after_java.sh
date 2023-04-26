@@ -10,7 +10,7 @@ URL=https://download.java.net/java/GA/jdk20.0.1/b4887098932d415489976708ad6d1a4b
 
 set -e
 
-if [ -f "$DESTINATION/jdk-$VERSION/bin/java" ]; then
+if [ -x "$DESTINATION/jdk-$VERSION/bin/java" ]; then
   abort0 "jdk-$VERSION is already installed."
 fi
 
@@ -21,6 +21,7 @@ trap 'rm -f "$TMP"' EXIT
 
 curl -SsLf "$URL" -o "$TMP"
 # output to destination
+sudo mkdir -p "$DESTINATION"
 sudo tar -xz -C "$DESTINATION" -f "$TMP"
 
 rm -f "$TMP" && trap '' EXIT # Cleanup
