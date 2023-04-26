@@ -10,13 +10,13 @@ function sync_extensions() {
 
   # If sync file exists, read from it
   # Set local file mode
-  dconf write '/org/gnome/shell/extensions/extensions-sync/provider' '"Local"' || return
+  dconf write '/org/gnome/shell/extensions/extensions-sync/provider' '"Local"' || return 0
   # Set backup location
-  dconf write '/org/gnome/shell/extensions/extensions-sync/backup-file-location' '"file://'"$HOME"'/.config/extensions-sync.json"' || return
+  dconf write '/org/gnome/shell/extensions/extensions-sync/backup-file-location' '"file://'"$HOME"'/.config/extensions-sync.json"' || return 0
   # load from the file
   busctl --user call org.gnome.Shell /io/elhan/ExtensionsSync io.elhan.ExtensionsSync read || {
     err "failed to sync extensions, check that extensions-sync supports your current gnome version"
-    return
+    return 0
   }
 }
 
