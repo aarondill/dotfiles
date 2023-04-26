@@ -47,8 +47,6 @@ rm -rf "$TEMP" && trap '' EXIT && cd -
 
 # If sync file exists, read from it
 if [ -f "$HOME/.config/extensions-sync.json" ]; then
-  # Set local mode
-  dconf write '/org/gnome/shell/extensions/extensions-sync/provider' '"Local"'
   # Set local file mode
   dconf write '/org/gnome/shell/extensions/extensions-sync/provider' '"Local"'
   # Set backup location
