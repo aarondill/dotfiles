@@ -2,6 +2,24 @@
 # Installs extension sync gnome extension
 set -e
 
+function sync_extensions() {
+  ## Sync if present
+  if ! [ -f "$HOME/.config/extensions-sync.json" ]; then
+    return 0
+  fi
+
+  # If sync file exists, read from it
+  # Set local file mode
+  dconf write '/org/gnome/shell/extensions/extensions-sync/provider' '"Local"' || return
+  # Set backup location
+  dconf write '/org/gnome/shell/extensions/extensions-sync/backup-file-location' '"file://'"$HOME"'/.config/extensions-sync.json"' || return
+  # load from the file
+  busctl --user call org.gnome.Shell /io/elhan/ExtensionsSync io.elhan.ExtensionsSync read || {
+    err "failed to sync extensions, check that extensions-sync supports your current gnome version"
+    return
+  }
+}
+
 # Source utils
 SOURCE_DIR=$(chezmoi source-path)
 # shellcheck source=../.utils.sh
@@ -12,8 +30,12 @@ if ! [ -f /usr/bin/gnome-session ]; then
   abort0 "gnome is not installed, so skipping extension synchronization"
 fi
 DESTINATION="$HOME/.local/share/gnome-shell/extensions/extensions-sync@elhan.io"
+
 if [ -d "$DESTINATION" ]; then
-  abort0 "extensions-sync is already installed at $DESTINATION, skipping extension installation"
+  # Sync if already exists
+  log "extensions-sync is already installed at $DESTINATION, skipping extension installation"
+  sync_extensions
+  exit 0
 fi
 
 # Pick a package manager!
@@ -41,13 +63,4 @@ mv -T -- "$TEMP/dist" "$DESTINATION" # keep the dist directory as the final resu
 # Clean up and remove trap
 rm -rf "$TEMP" && trap '' EXIT && cd -
 
-## Sync if present
-
-# If sync file exists, read from it
-if [ -f "$HOME/.config/extensions-sync.json" ]; then
-  # Set local file mode
-  dconf write '/org/gnome/shell/extensions/extensions-sync/provider' '"Local"'
-  # Set backup location
-  dconf write '/org/gnome/shell/extensions/extensions-sync/backup-file-location' "\"file://$HOME/.config/extensions-sync.json\""
-  busctl --user call org.gnome.Shell /io/elhan/ExtensionsSync io.elhan.ExtensionsSync read # load from the file
-fi
+sync_extensions
