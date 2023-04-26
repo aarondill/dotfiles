@@ -16,7 +16,8 @@ if [[ -d "$HOME/.local/bin" ]] && ! [[ "$PATH" == *"$HOME/.local/bin"* ]]; then
 fi
 
 # fix java path to allow running
-export JAVA_HOME=/usr/lib/jvm/jdk-20
+JAVA_HOME="$(find/usr/lib/jvm -maxdepth 1 -type d | tail -n1)"
+export JAVA_HOME
 # export PATH=$JAVA_HOME/bin${PATH:+:$PATH}
 
 # allow npm bin
