@@ -19,6 +19,12 @@ fi
 [ -f "$RESUME_FILE" ] && WARNING="(This will overwrite $RESUME_FILE)" || WARNING=''
 
 BIG_SWAP_LABEL=$(blkid -s LABEL -o value "$BIG_SWAP_PATH")
+
+# fallback to parition label
+[ -z "$BIG_SWAP_LABEL" ] && BIG_SWAP_LABEL="$(blkid -o value -s PARTLABEL "$BIG_SWAP_PATH")"
+# don't leave it empty.
+[ -z "$BIG_SWAP_LABEL" ] && BIG_SWAP_LABEL="No Label"
+
 confirm "Would you like to use $BIG_SWAP_PATH ($BIG_SWAP_LABEL) as your swap to resume from? $WARNING" || abort0 'Aborting'
 if [ -f "$RESUME_FILE" ]; then
   log "overwriting $RESUME_FILE"
