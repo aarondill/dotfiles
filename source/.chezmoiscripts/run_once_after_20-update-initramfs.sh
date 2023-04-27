@@ -8,7 +8,13 @@ SOURCE_DIR=$(chezmoi source-path)
 
 RESUME_FILE=/etc/initramfs-tools/conf.d/resume
 
-BIG_SWAP_PATH=$(tail -n+2 </proc/swaps | LC_ALL=C sort -t$'\t' -nk3 | tail -n1 | awk '{print $1}')
+BIG_SWAP_LINE=$(tail -n+2 </proc/swaps | LC_ALL=C sort -t$'\t' -nk3 | tail -n1)
+BIG_SWAP_PATH=$(awk '{print $1}' <<<"$BIG_SWAP_LINE") # /dev/sda1
+BIG_SWAP_TYPE=$(awk '{print $2}' <<<"$BIG_SWAP_LINE") # file | partition
+
+if [ "$BIG_SWAP_TYPE" = "file" ]; then
+  abort0 "Swap files are not supported by this script. Please use a swap partition or setup youself :)"
+fi
 
 [ -f "$RESUME_FILE" ] && WARNING="(This will overwrite $RESUME_FILE)" || WARNING=''
 
