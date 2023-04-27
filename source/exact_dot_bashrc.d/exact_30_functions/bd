@@ -26,12 +26,12 @@ bd() {
     local oldpwd NEWPWD exact EXIT
     oldpwd=$1                   # store old
     shift 1                     # remove oldpwd
+    shopt -s nocasematch        # set case insensive default
     exact=''                    # default to false
-    shopt -u nocasematch        # set case sensitive default
     while getopts ':ie' opt; do # check each argument
       case $opt in
       i)
-        shopt -s nocasematch # set case insensive
+        shopt -u nocasematch # set case sensitive
         ;;
       e)
         exact=t # Set exact match
