@@ -15,11 +15,11 @@ BIG_SWAP_PATH=$(tail -n+2 </proc/swaps | LC_ALL=C sort -t$'\t' -nk3 | tail -n1 |
 confirm "Would you like to use $BIG_SWAP_PATH as your swap to resume from? $WARNING" || abort0 'Aborting'
 if [ -f "$RESUME_FILE" ]; then
   log "overwriting $RESUME_FILE"
-  rm -f -- "$RESUME_FILE"
+  sudo rm -f -- "$RESUME_FILE"
 fi
 
 BIG_SWAP_UUID="$(blkid -o value -s UUID "$BIG_SWAP_PATH")"
-printf 'RESUME=UUID=%s\n' "$BIG_SWAP_UUID" >"$RESUME_FILE"
+printf 'RESUME=UUID=%s\n' "$BIG_SWAP_UUID" | sudo tee "$RESUME_FILE" >/dev/null
 # update the initramfs-tools
 sudo update-initramfs -u
 
