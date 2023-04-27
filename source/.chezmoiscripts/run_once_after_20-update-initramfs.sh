@@ -18,7 +18,8 @@ fi
 
 [ -f "$RESUME_FILE" ] && WARNING="(This will overwrite $RESUME_FILE)" || WARNING=''
 
-confirm "Would you like to use $BIG_SWAP_PATH as your swap to resume from? $WARNING" || abort0 'Aborting'
+BIG_SWAP_LABEL=$(blkid -s LABEL -o value "$BIG_SWAP_PATH")
+confirm "Would you like to use $BIG_SWAP_PATH ($BIG_SWAP_LABEL) as your swap to resume from? $WARNING" || abort0 'Aborting'
 if [ -f "$RESUME_FILE" ]; then
   log "overwriting $RESUME_FILE"
   sudo rm -f -- "$RESUME_FILE"
