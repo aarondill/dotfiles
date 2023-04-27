@@ -73,7 +73,8 @@ bd() {
 
   # Allow `bd -` to act like `cd -`
   # And allow `bd /` --> `cd /`
-  if [ "$1" = '-' ] || [ "$1" = '/' ]; then
+  # And allow `bd /` --> `cd /`
+  if [ "$1" = '-' ] || [ "$1" = '/' ] || [ "$1" = '~' ]; then
     builtin cd "$1" || return && return
   fi
 
@@ -87,7 +88,7 @@ bd() {
   fi
 
   # Check if it wouldn't move
-  if [ "$NEWPWD" = "$oldpwd" ]; then
+  if [ -z "$NEWPWD" ] || [ "$NEWPWD" = "$oldpwd" ]; then
     echo "No such occurrence." >&2
   else
     # Output found
