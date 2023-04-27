@@ -22,9 +22,12 @@ function success() { printf "$(tput setaf 2)%s$(tput sgr0)\n" "Success!"; }
 function abort() { err "$@" && exit 2; }
 # abort0 "something went wrong!" -- exits 0
 function abort0() { err "$@" && exit 0; }
-# confirm "do you really want to do that?"
+# confirm "do you really want to do %s?" "that" --> ...do that? (Y/n)
+# Strings are evaluated using printf
 function confirm() {
-  read -rep "$* (Y/n) " confirmation
+  # shellcheck disable=SC2059 # I know this is *generally* wrong, but this is intentional.
+  PROMPT="$(printf "$1" "${@:2}")"
+  read -rep "$PROMPT (Y/n) " confirmation
   if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
     return 0
   fi
