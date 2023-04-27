@@ -17,8 +17,8 @@ if [ -f "$RESUME_FILE" ]; then
   log "overwriting $RESUME_FILE"
   sudo rm -f -- "$RESUME_FILE"
 fi
-
-BIG_SWAP_UUID="$(blkid -o value -s UUID "$BIG_SWAP_PATH")"
+# Works with swapfile (should)
+BIG_SWAP_UUID="$(sudo swaplabel "$BIG_SWAP_PATH" | awk '{print $2}')"
 printf 'RESUME=UUID=%s\n' "$BIG_SWAP_UUID" | sudo tee "$RESUME_FILE" >/dev/null
 # update the initramfs-tools
 sudo update-initramfs -u
