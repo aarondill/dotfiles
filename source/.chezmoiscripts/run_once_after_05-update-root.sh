@@ -55,4 +55,8 @@ while [ $secs -gt 0 ]; do
 done
 
 # Important! Overwrites files in ROOT!
+# --no-same-owner to ensure owned by root (sudo)
 sudo tar --no-same-owner -xf "$TARDESTFILE" -C /
+
+log "NOTE: Please consider running 'update-grub' and 'update-initramfs -u' in case these files changed."
+success
