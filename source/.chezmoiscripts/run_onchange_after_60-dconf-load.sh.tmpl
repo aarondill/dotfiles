@@ -13,5 +13,5 @@ fi
 read -rep "load dconf settings from source? (yes) " confirmation </dev/tty
 if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
   printf 'Updating dconf\n'
-  dconf load / < "$SOURCE_DIR/dconf-backup.ini"
+  dconf load -f  /< "$SOURCE_DIR/dconf-backup.ini"
 fi
