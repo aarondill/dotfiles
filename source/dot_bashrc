@@ -134,7 +134,7 @@ fi
 # Any code below is part of my personal installation
 #
 # HACK
-DISABLE_CUSTOM_PS1=1
+export DISABLE_CUSTOM_PS1=1
 # Initialize `~/.bashrc.d`
 while IFS= read -r -d '' file; do
   # For each file, if bench var is assigned,
@@ -154,4 +154,3 @@ done < <(find ~/.bashrc.d/ -type f -not -name "_*" -print0 | LC_ALL=C sort -z)
 [ -f ~/.config/tabtab/bash/__tabtab.bash ] && . ~/.config/tabtab/bash/__tabtab.bash || true
 
 # ------------------------------END OF FILE------------------------------
-eval "$(starship init bash)"
