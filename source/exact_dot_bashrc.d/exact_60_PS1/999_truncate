@@ -8,6 +8,8 @@
 # display by appending to PROMPT_COMMAND
 #
 
+if [ -n "$DISABLE_CUSTOM_PS1" ]; then return; fi
+
 # Function to get length of *displayed* ps1
 function plen() {
   local escape_removed len local_PS1 first
@@ -33,8 +35,6 @@ function __new_PWD_PS1() {
     echo -n "$curr_pwd"
   fi
 }
-
-if [ -n "$DISABLE_CUSTOM_PS1" ]; then return; fi
 
 # Replace ps1 \w with function to get new pwd
 # shellcheck disable=SC2016
