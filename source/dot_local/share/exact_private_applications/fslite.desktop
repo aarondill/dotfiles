@@ -13,3 +13,6 @@ OnlyShowIn=GNOME;Unity;
 X-GNOME-Keywords=Network;fslite;
 Name[en_US]=Fslite
 Name[es]=Fslite
+[Desktop Action new-window]
+Name=New Window
+Exec=google-chrome --password-store=basic --enable-features=WebUIDark --force-dark-mode --new-window fslite.vercel.app
