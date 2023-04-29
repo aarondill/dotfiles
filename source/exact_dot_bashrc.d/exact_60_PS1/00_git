@@ -27,7 +27,6 @@
 #   branch= : you are caught up with remote
 #   branch[+-]n : you are n commits ahead/behind remote
 #
-return
 
 export GIT_PS1_SHOWDIRTYSTATE=1          # '*'=unstaged, '+'=staged
 export GIT_PS1_SHOWSTASHSTATE=1          # '$'=stashed
