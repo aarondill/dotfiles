@@ -146,6 +146,9 @@ renamed = "r"
 deleted = "x"
 conflicted = "≠"
 
+[git_metrics]
+disabled = true
+
 [golang]
 symbol = "go "
 format = "[$symbol]($style)"
