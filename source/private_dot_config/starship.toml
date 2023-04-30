@@ -1,4 +1,5 @@
 # Wait 10 milliseconds for starship to check files under the current directory.
+
 scan_timeout = 10
 add_newline = false
 format = "$all"
@@ -11,10 +12,6 @@ symbol = "aws "
 [azure]
 symbol = "az "
 format = '[$symbol($subscription )($username )]($style)'
-
-[buf]
-format = "[$symbol]($style)"
-symbol = "buf "
 
 [battery]
 full_symbol = ' '
@@ -38,6 +35,10 @@ style = 'bold yellow'
 # between 30% and 50%
 threshold = 50
 style = 'bold green'
+
+[buf]
+format = "[$symbol]($style)"
+symbol = "buf "
 
 [bun]
 format = "[$symbol]($style)"
@@ -68,6 +69,7 @@ symbol = "cobol "
 [conda]
 symbol = "conda "
 format = "[$symbol$environment]($style) "
+
 [container]
 symbol = "cont "
 format = '[$symbol($name )]($style)'
@@ -180,6 +182,7 @@ ssh_symbol = "ssh "
 [java]
 symbol = "java "
 format = "[$symbol]($style)"
+
 [jobs]
 format = '[$symbol$number ]($style)'
 symbol = '&'
@@ -317,10 +320,6 @@ format = "[$symbol]($style)"
 symbol = "py "
 format = "[$symbol]($style)"
 
-[rlang]
-symbol = "R "
-format = "[$symbol]($style)"
-
 [raku]
 symbol = "raku "
 format = "[$symbol]($style)"
@@ -329,6 +328,9 @@ format = "[$symbol]($style)"
 symbol = "red "
 format = "[$symbol]($style)"
 
+[rlang]
+symbol = "R "
+format = "[$symbol]($style)"
 
 [ruby]
 symbol = "rb "
@@ -349,7 +351,6 @@ disabled = false
 # See https://github.com/starship/starship/issues/2407
 disabled = true
 threshold = 2
-
 
 [spack]
 symbol = "spack "
@@ -393,12 +394,13 @@ show_always = true
 symbol = "vagrant "
 format = "[$symbol]($style)"
 
-[vlang]
-symbol = "vlang "
-format = "[$symbol]($style)"
 [vcsh] # You people be crazy
 symbol = 'vcsh '
 format = '[$symbol$repo ]($style)'
+
+[vlang]
+symbol = "vlang "
+format = "[$symbol]($style)"
 
 [zig]
 symbol = "zig "
