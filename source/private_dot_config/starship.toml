@@ -2,7 +2,7 @@
 scan_timeout = 10
 add_newline = false
 format = "$all"
-continuation_prompt = "[+](bright-white) "
+continuation_prompt = "[>](bright-green) "
 
 [aws]
 format = "[$symbol($profile )(\\($region\\) )(\\[$duration\\] )]($style)"
