@@ -8,7 +8,7 @@
 # display by appending to PROMPT_COMMAND
 #
 
-if [ -n "$DISABLE_CUSTOM_PS1" ]; then return; fi
+if [ "$DISABLE_CUSTOM_PS1" = 1 ]; then return; fi
 
 # Function to get length of *displayed* ps1
 function plen() {
