@@ -8,4 +8,5 @@ return require("plugin")({
 	"history",
 	"toggle-transparency",
 	"ctrl_click",
+	"env",
 })
