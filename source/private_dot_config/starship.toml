@@ -137,6 +137,9 @@ format = "[$symbol$branch(:$remote_branch)]($style) "
 tag_disabled = false
 tag_symbol = " tag "
 
+[git_metrics]
+disabled = false
+
 [git_status]
 format = "([\\[$all_status$ahead_behind\\] ]($style))"
 ahead = ">$count"
@@ -145,9 +148,6 @@ diverged = "[$behind_count<>$ahead_count]"
 renamed = "r"
 deleted = "x"
 conflicted = "≠"
-
-[git_metrics]
-disabled = true
 
 [golang]
 symbol = "go "
