@@ -1,9 +1,0 @@
-SHELL=/bin/sh
-HOME=/home/aaron
-PATH=/sbin:/bin:/usr/sbin:/usr/bin
-
-# These replace cron's entries
-1	5	cron.daily	run-parts $HOME/.local/etc/cron.daily
-7	10	cron.weekly	run-parts $HOME/.local/etc/cron.weekly
-@monthly	15	cron.monthly	run-parts $HOME/.local/etc/cron.monthly
-

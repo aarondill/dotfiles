@@ -1,8 +1,0 @@
-#! /usr/bin/env bash
-# ~/.local/share/bash-completion/completions/config
-source ~/.local/share/bash-completion/completions/chezmoi 
-if [[ $(type -t compopt) = "builtin" ]]; then 
-    complete -o default -F __start_chezmoi config
-else
-    complete -o default -o nospace -F __start_chezmoi config
-fi
