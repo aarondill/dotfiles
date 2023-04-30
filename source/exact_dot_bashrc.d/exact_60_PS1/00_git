@@ -83,11 +83,11 @@ __set_bash_prompt() {
   # Escapes for setting titlebar
   local title='\[\e]0;' end='\a\]'
   # Titlebar
-  local TitleBar="$title\W$gitString: \u$end\${debian_chroot:+(\$debian_chroot)}"
+  local TitleBar="$title\W$gitString: \u$end"
   unset gitString end title
 
   # Variables to set depending on $COLUMNS
-  local ShortPS1="" LongPS1=""
+  local ShortPS1="\${debian_chroot:+(\$debian_chroot)}" LongPS1="\${debian_chroot:+(\$debian_chroot)}"
 
   if [[ $__colorize_prompt ]]; then
     export GIT_PS1_SHOWCOLORHINTS=1
