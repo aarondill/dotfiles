@@ -31,7 +31,7 @@ function set_win_title() {
   # Escapes for setting titlebar
   local title='\[\e]0;' end='\a\]'
   local title_bar="$title\W$git_base: \u$end\${debian_chroot:+(\$debian_chroot)}"
-  echo -ne "\033]0; $(basename "$PWD") \007"
+  printf "%b" "$title_bar"
 }
 # Please starship, do it!
 export starship_precmd_user_func="set_win_title"
