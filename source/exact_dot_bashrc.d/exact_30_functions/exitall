@@ -11,7 +11,7 @@
 
 bash() {
   # trap "echo $? $! && [[ $SHLVL -gt 1 ]] && exit $?" SIGCHLD
-  /usr/bin/bash "$@"
+  /usr/bin/env bash "$@"
   local returncode=$?
   if [[ $returncode -eq 196 && $SHLVL -gt 1 ]]; then #if not oldest parent
     exit $returncode 2>/dev/null                     #redir "exit" msg to null
