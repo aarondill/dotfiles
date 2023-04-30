@@ -132,6 +132,7 @@ symbol = "git "
 format = "[$symbol$branch(:$remote_branch)]($style) "
 
 [git_commit]
+tag_disabled = true
 tag_symbol = " tag "
 
 [git_status]
