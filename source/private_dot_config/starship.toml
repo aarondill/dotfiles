@@ -378,20 +378,26 @@ symbol = "terraform "
 format = "[$symbol$workspace]($style)"
 
 [time]
-style = 'bold green'
+style = 'dimmed green'
 format = "[$time]($style)"
-time_format = "%m/%d/%y %I:%M%P "
+time_format = "%I:%M%P "
 disabled = false
 
 [username]
-format = "[$user]($style) "
+format = "[$user ]($style)"
+show_always = true
 
 [vagrant]
-format = "[$symbol]($style) "
+symbol = "vagrant "
+format = "[$symbol]($style)"
 
 [vlang]
-format = "[$symbol]($style) "
+symbol = "vlang "
+format = "[$symbol]($style)"
+[vcsh] # You people be crazy
+symbol = 'vcsh '
+format = '[$symbol$repo ]($style)'
 
 [zig]
 symbol = "zig "
-format = "[$symbol]($style) "
+format = "[$symbol]($style)"
