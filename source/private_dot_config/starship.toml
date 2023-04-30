@@ -1,3 +1,8 @@
+# Wait 10 milliseconds for starship to check files under the current directory.
+scan_timeout = 10
+add_newline = false
+format = "$all"
+
 [aws]
 format = "[$symbol($profile )(\\($region\\) )(\\[$duration\\] )]($style)"
 symbol = "aws "
@@ -83,7 +88,7 @@ symbol = "deno "
 format = "[$symbol]($style)"
 
 [directory]
-truncation_length = 5
+truncation_length = 3
 truncation_symbol = '…/'
 truncate_to_repo = false
 read_only = " ro"
@@ -130,93 +135,113 @@ tag_symbol = " tag "
 
 [git_status]
 format = "([\\[$all_status$ahead_behind\\] ]($style))"
-ahead = ">"
-behind = "<"
+ahead = ">$count"
+behind = "<$count"
 diverged = "[$behind_count<>$ahead_count]"
 renamed = "r"
 deleted = "x"
-conflicted = "¡!"
+conflicted = "≠"
 
 [golang]
 symbol = "go "
-format = "[$symbol]($style) "
+format = "[$symbol]($style)"
 
 [gradle]
 symbol = "gradle "
-format = "[$symbol]($style) "
+format = "[$symbol]($style)"
 
 [guix_shell]
 symbol = "guix "
-format = "[$symbol]($style) "
+format = "[$symbol]($style)"
 
 [haskell]
-format = "[$symbol]($style) "
+symbol = "hs "
+format = "[$symbol]($style)"
 
 [haxe]
-format = "[$symbol]($style) "
+symbol = "haxe "
+format = "[$symbol]($style)"
 
 [helm]
-format = "[$symbol]($style) "
+symbol = "helm "
+format = "[$symbol]($style)"
 
 [hg_branch]
 symbol = "hg "
-format = "[$symbol$branch]($style) "
+format = "[$symbol$branch(:$topic)]($style) "
 
 [hostname]
-ssh_symbol = " "
+format = '[$ssh_symbol$hostname]($style) '
+ssh_only = true
+ssh_symbol = "ssh "
 
 [java]
 symbol = "java "
-format = "[$symbol]($style) "
+format = "[$symbol]($style)"
+[jobs]
+format = '[$symbol$number ]($style)'
+symbol = '&'
+number_threshold = 1
+symbol_threshold = 1
 
 [julia]
 symbol = "jl "
-format = "[$symbol]($style) "
+format = "[$symbol]($style)"
 
 [kotlin]
 symbol = "kt "
-format = "[$symbol]($style) "
+format = "[$symbol]($style)"
 
 [kubernetes]
-format = "[$symbol$context( \\($namespace\\))]($style) "
+symbol = "kube "
+format = "[$symbol$context (\\($namespace\\) )]($style)"
+
+[line_break]
+disabled = false
 
 [lua]
 symbol = "lua "
-format = "[$symbol]($style) "
+format = "[$symbol]($style)"
+detect_files = [".luarc.json", ".luarc.jsonc", ".lua-version"]
 
 [memory_usage]
-symbol = "memory "
-format = "\\[$symbol[$ram( | $swap)]($style)\\] "
+symbol = "ram: "
+format = '[$symbol$ram_pct(|$swap_pct) ]($style)'
+disabled = false
+threshold = 75
 
 [meson]
 symbol = "meson "
-format = "[$symbol$project]($style) "
+format = "[$symbol$project ]($style)"
 
 [nim]
 symbol = "nim "
-format = "[$symbol]($style) "
+format = "[$symbol]($style)"
 
 [nix_shell]
 symbol = "nix "
-format = "[$symbol$state( \\($name\\))]($style) "
+format = "[$symbol$state (\\($name\\) )]($style)"
 
 [nodejs]
-symbol = "nodejs "
-format = "[$symbol]($style) "
+symbol = "node "
+format = "[$symbol($version )]($style)"
+version_format = "${major}"
 
 [ocaml]
 symbol = "ml "
-format = "[$symbol(\\($switch_indicator$switch_name\\))]($style) "
+format = "[$symbol(\\($switch_indicator$switch_name\\) )]($style)"
 
 [opa]
 symbol = "opa "
-format = "[$symbol]($style) "
+format = "[$symbol]($style)"
 
 [openstack]
+symbol = "openstack "
 format = "[$symbol$cloud(\\($project\\))]($style) "
 
 [os]
-format = "[$symbol]($style) "
+format = "[$symbol]($style)"
+disabled = true
 
 [os.symbols]
 Alpaquita = "alq "
@@ -262,78 +287,103 @@ Unknown = "unk "
 Windows = "win "
 
 [package]
-symbol = "pkg "
-format = "[$symbol$version]($style) "
+symbol = ""
+display_private = true
+format = "[$symbol$version ]($style)"
 
 [perl]
 symbol = "pl "
-format = "[$symbol]($style) "
+format = "[$symbol]($style)"
 
 [php]
 symbol = "php "
-format = "[$symbol]($style) "
+format = "[$symbol]($style)"
 
 [pijul_channel]
 symbol = "pijul "
-format = "[$symbol$channel]($style) "
+format = "[$symbol$channel ]($style)"
 
 [pulumi]
 symbol = "pulumi "
-format = "[$symbol$stack]($style) "
+format = "[$symbol$stack ]($style)"
 
 [purescript]
 symbol = "purs "
-format = "[$symbol]($style) "
+format = "[$symbol]($style)"
 
 [python]
 symbol = "py "
-format = "\\[[${symbol}]($style)\\] "
+format = "[$symbol]($style)"
+
+[rlang]
+symbol = "R "
+format = "[$symbol]($style)"
 
 [raku]
 symbol = "raku "
-format = "[$symbol]($style) "
+format = "[$symbol]($style)"
 
 [red]
-format = "[$symbol]($style) "
+symbol = "red "
+format = "[$symbol]($style)"
 
-[rlang]
 
 [ruby]
 symbol = "rb "
-format = "[$symbol]($style) "
+format = "[$symbol]($style)"
 
 [rust]
 symbol = "rs "
-format = "[$symbol]($style) "
+format = "[$symbol]($style)"
 
 [scala]
 symbol = "scala "
-format = "[$symbol]($style) "
+format = "[$symbol]($style)"
+
+[shell]
+disabled = false
+
+[shlvl]
+# See https://github.com/starship/starship/issues/2407
+disabled = true
+threshold = 2
+
 
 [spack]
 symbol = "spack "
-format = "[$symbol$environment]($style) "
+format = "[$symbol$environment ]($style)"
 
 [status]
-symbol = "[x](bold red) "
+disabled = false
+symbol = ""
+format = '[$symbol($signal_name )$status (\($common_meaning\) )]($style)'
+map_symbol = false
+# Pipe errors!
+pipestatus = true
+pipestatus_format = '\[$pipestatus\] => [$symbol$signal_name$status ]($style)'
+pipestatus_segment_format = "[$status]($style)"
 
 [sudo]
-symbol = "sudo "
-format = "\\[[as $symbol]\\] "
+disabled = true
+style = 'bold red'
+symbol = "sudo"
+format = '[\[$symbol\]]($style)'
 
 [swift]
 symbol = "swift "
-format = "[$symbol]($style) "
+format = "[$symbol]($style)"
 
 [terraform]
 symbol = "terraform "
-format = "[$symbol$workspace]($style) "
+format = "[$symbol$workspace]($style)"
 
 [time]
-format = "\\[[$time]($style)\\] "
+format = "[$time]($style)"
+time_format = "%m/%d/%y %I:%M%P "
+disabled = false
 
 [username]
-format = "\\[[$user]($style)\\] "
+format = "[$user]($style) "
 
 [vagrant]
 format = "[$symbol]($style) "

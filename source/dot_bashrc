@@ -134,7 +134,7 @@ fi
 # Any code below is part of my personal installation
 #
 # HACK
-export DISABLE_CUSTOM_PS1=1
+export DISABLE_CUSTOM_PS1=10
 # Initialize `~/.bashrc.d`
 while IFS= read -r -d '' file; do
   # For each file, if bench var is assigned,
