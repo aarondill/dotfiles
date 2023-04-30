@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name=Bitwarden
+TryExec=bitwarden
+Exec=bitwarden
+Terminal=false
+Type=Application
+Icon=bitwarden
+StartupWMClass=Bitwarden
+X-AppImage-Version=2023.2.0
+GenericName=Password Manager
+Comment=A secure and free password manager for all of your devices.
+MimeType=x-scheme-handler/bitwarden;
+Categories=Utility;

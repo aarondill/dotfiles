@@ -1,0 +1,39 @@
+# ~/.bashrc.d/30_functions/_update-config
+# A list of files to backup. The first *three* lines are ignored. Empty lines are counted!
+# Files must be below this line!
+.backup/backup.config
+.bash_logout
+.bashrc
+.bashrc.d
+.config/autostart/welcome.desktop
+.config/gh
+.config/git
+.config/neofetch
+.config/npm
+.config/readline
+.config/tabtab
+.config/wgetrc
+.local/bin
+.local/etc
+.local/share/applications
+.local/share/bash-completion
+.local/share/fonts
+.local/share/icons/bitwarden.png
+.local/share/icons/fslite.ico
+.local/share/icons/io.snapcraft.Store.png
+.local/share/pnpm/global/5/package.json
+.pam_environment
+.profile
+.root
+.ssh
+.vim
+Templates
+vscode/.eslintrc.cjs
+vscode/.prettierrc.cjs
+vscode/.release-it.json
+vscode/.shellcheckrc
+vscode/js/.gitignore
+vscode/js/EslintTests.js
+.config/wezterm
+.config/tealdeer
+.config/extensions-sync.json

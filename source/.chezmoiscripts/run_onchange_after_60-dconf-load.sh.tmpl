@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+# Source utils
+SOURCE_DIR=$(chezmoi source-path)
+# shellcheck source=.utils.sh
+. "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
+
+# dconf.ini hash: {{ include "dconf-backup.ini" | sha256sum }}
+if ! command -v dconf &>/dev/null; then
+  abort 'dconf is not installed. Please install dconf to use this backup\n'
+fi
+
+read -rep "load dconf settings from source? (yes) " confirmation </dev/tty
+if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
+  printf 'Updating dconf\n'
+  dconf load -f / <"$SOURCE_DIR/dconf-backup.ini"
+fi
+
+# Set the filetype in vim to sh: vim:ft=sh:

@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# ~/.local/bin/steam
+#
+# Wrapper for steam, allowing calling if it is installed with flatpak, or is
+# just in the current PATH. Considers it's position in the PATH to avoid Stack
+# Overflow issues.
+#
+
+# Check if the current script is at the top of the PATH
+if [[ "$0" = "$(which steam)" ]]; then
+	# Finds all instances of 'steam' in PATH and returns the second line
+	next_in_path=$(which -a steam | tail -n+2 | head -n1)
+else
+	# Find the first instance of 'steam' in PATH
+	next_in_path=$(which steam)
+fi
+
+# Checks flatpak first to see if it is installed.
+if flatpak info com.valvesoftware.Steam &>/dev/null; then
+	printf 'Running steam using flatpak from %s\n' "$0"
+	# Run the flatpak if installed
+	exec flatpak run com.valvesoftware.Steam "$@"
+elif [[ -n "$next_in_path" ]]; then
+	# Runs the other steam
+	exec "$next_in_path" "$@"
+else
+	printf '%s\n' "Could not find steam using Flatpak or PATH!"
+	exit 2
+fi

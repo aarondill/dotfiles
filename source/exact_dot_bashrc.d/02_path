@@ -1,0 +1,34 @@
+#! /usr/bin/env bash
+
+# ~/.bashrc.d/02_path
+#
+# Includes changes to the path variable
+# May include certain paths necessary for
+# programs that install in unusual locations
+#
+
+# Add the bin files if not already added from the .profile
+if [[ -d "$HOME/bin" ]] && ! [[ "$PATH" == *"$HOME/bin"* ]]; then
+  PATH="$HOME/bin${PATH:+:$PATH}"
+fi
+if [[ -d "$HOME/.local/bin" ]] && ! [[ "$PATH" == *"$HOME/.local/bin"* ]]; then
+  PATH="$HOME/.local/bin${PATH:+:$PATH}"
+fi
+
+# set JAVA_HOME to latest jvm available
+# use sort -V to sort versions. only available in core-utils-7
+JAVA_HOME="$(find /usr/lib/jvm -maxdepth 1 -type d | sort -V | tail -n1)"
+export JAVA_HOME
+# export PATH=$JAVA_HOME/bin${PATH:+:$PATH}
+
+# allow npm bin
+export PATH="/home/aaron/.local/share/npm/bin${PATH:+:$PATH}"
+# allow pnpm bin
+export PNPM_HOME="/home/aaron/.local/share/pnpm"
+export PATH="$PNPM_HOME${PATH:+:$PATH}"
+
+# include flatpaks in path. (Have org.example.app names)
+export PATH=${PATH:+$PATH:}/var/lib/flatpak/exports/bin
+
+# include go in path
+export PATH=${PATH:+$PATH:}/usr/local/go/bin

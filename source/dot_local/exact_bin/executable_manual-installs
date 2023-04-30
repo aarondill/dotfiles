@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+release=$(lsb_release -ds | awk '{printf tolower($1) "-" $2}')
+codename=$(lsb_release -cs)
+desktop=$(dpkg -l ubuntu-desktop &>/dev/null && echo "desktop" || echo "live-server")
+manifestURL="http://releases.ubuntu.com/$codename/$release-$desktop-amd64.manifest"
+/usr/bin/comm -23 <(apt-mark showmanual | sort) <(curl -SsLf "$manifestURL" | cut -f1 | sort)

@@ -1,0 +1,33 @@
+#! /usr/bin/env bash
+
+# ~/.bashrc.d/80_chezmoi-functions
+#
+# Creates vim function to open chezmoi edit if possible
+# also creates editor function to call the vim()
+#
+# This is not perfect but allows for much easier usage of
+# chezmoi edit, without requiring extra thought about whether
+# a file is managed
+#
+
+# Only runs if chezmoi is installed
+if command -v chezmoi &>/dev/null; then
+
+  # config alias for chezmoi
+  alias config='chezmoi'
+  # Completion for config alias
+  source ~/.local/share/bash-completion/completions/config
+
+  vim() {
+    # If AN argument is passed, and is in repo
+    if [ -n "$*" ] && chezmoi source-path "$@" &>/dev/null; then
+      chezmoi edit -a -- "$@"
+      # Re-add files, incase another file was updated locally
+      chezmoi re-add
+    else
+      "$(which vim)" "$@"
+    fi
+  }
+  editor() { vim "$@"; }
+  export -f vim editor
+fi
