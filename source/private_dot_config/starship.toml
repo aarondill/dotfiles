@@ -378,6 +378,7 @@ symbol = "terraform "
 format = "[$symbol$workspace]($style)"
 
 [time]
+style = 'bold green'
 format = "[$time]($style)"
 time_format = "%m/%d/%y %I:%M%P "
 disabled = false
