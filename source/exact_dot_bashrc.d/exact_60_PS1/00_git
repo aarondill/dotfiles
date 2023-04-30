@@ -27,7 +27,7 @@
 #   branch= : you are caught up with remote
 #   branch[+-]n : you are n commits ahead/behind remote
 #
-if [ -n "$DISABLE_CUSTOM_PS1" ]; then return; fi
+if [ "$DISABLE_CUSTOM_PS1" = 1 ]; then return; fi
 
 export GIT_PS1_SHOWDIRTYSTATE=1          # '*'=unstaged, '+'=staged
 export GIT_PS1_SHOWSTASHSTATE=1          # '$'=stashed
