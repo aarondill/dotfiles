@@ -37,3 +37,4 @@ vscode/js/EslintTests.js
 .config/wezterm
 .config/tealdeer
 .config/extensions-sync.json
+.config/starship.toml
