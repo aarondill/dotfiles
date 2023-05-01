@@ -136,7 +136,8 @@ fi
 # Show starship if it's installed
 # HACK use env to disable custom ps1
 if command -v starship &>/dev/null; then
-  export DISABLE_CUSTOM_PS1=1
+  # Allow user to override by setting the environment variable to empty string
+  export DISABLE_CUSTOM_PS1=${DISABLE_CUSTOM_PS1-1}
 fi
 # Initialize `~/.bashrc.d`
 while IFS= read -r -d '' file; do
