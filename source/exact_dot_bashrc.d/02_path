@@ -15,11 +15,13 @@ if [[ -d "$HOME/.local/bin" ]] && ! [[ "$PATH" == *"$HOME/.local/bin"* ]]; then
   PATH="$HOME/.local/bin${PATH:+:$PATH}"
 fi
 
-# set JAVA_HOME to latest jvm available
-# use sort -V to sort versions. only available in core-utils-7
-JAVA_HOME="$(find /usr/lib/jvm -maxdepth 1 -type d | sort -V | tail -n1)"
-export JAVA_HOME
+if [ -d /usr/lib/jvm ]; then
+  # set JAVA_HOME to latest jvm available
+  # use sort -V to sort versions. only available in core-utils-7
+  JAVA_HOME="$(find /usr/lib/jvm -maxdepth 1 -type d | sort -V | tail -n1)"
+  export JAVA_HOME
 # export PATH=$JAVA_HOME/bin${PATH:+:$PATH}
+fi
 
 # allow npm bin
 export PATH="/home/aaron/.local/share/npm/bin${PATH:+:$PATH}"
