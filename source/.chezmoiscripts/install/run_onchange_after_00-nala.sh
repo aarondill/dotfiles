@@ -42,5 +42,7 @@ EOF
   APT=$(which nala 2>/dev/null)
 }
 
-is_accessible_cmd apt &&
-  log_and_run "Installing nala" install_nala
+is_accessible_cmd apt || exit 0
+log_and_run "Installing nala" install_nala
+
+log_and_run 'Setting up nala sources' sudo nala fetch --auto -y
