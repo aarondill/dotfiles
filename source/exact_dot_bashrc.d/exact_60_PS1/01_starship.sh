@@ -4,17 +4,6 @@ if ! [ "$DISABLE_CUSTOM_PS1" = 1 ]; then
   return
 fi
 
-# For compat. Starship will set this
-unset PS1
-
-# Init starship
-eval "$(starship init bash)"
-
-# Force first load to ensure that PS1 gets set
-true
-# or true, I don't care if this fails, starship should handle itself.
-starship_precmd || true
-
 # Set the title of the window
 function set_win_title() {
   local cwd title end who git_available git_base git_base_path
@@ -47,3 +36,14 @@ function set_win_title() {
 }
 # Please starship, do it!
 export starship_precmd_user_func="set_win_title"
+
+# For compat. Starship will set this
+unset PS1
+
+# Init starship
+eval "$(starship init bash)"
+
+# Force first load to ensure that PS1 gets set
+true
+# or true, I don't care if this fails, starship should handle itself.
+starship_precmd || true
