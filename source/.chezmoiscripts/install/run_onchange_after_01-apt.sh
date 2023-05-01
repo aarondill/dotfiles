@@ -28,12 +28,6 @@ function install_if_available_apt() {
   sudo "$APT" install -y -- "${packages[@]}"
 }
 
-function install_nala() {
-  sudo apt-get install --quiet --assume-yes nala &&
-    # only changes in this file, but should be reevaluated each file
-    APT=$(which nala 2>/dev/null)
-}
-
 function install_apt_packages() {
   sudo -v
   install_if_available_apt age anacron autopoint bat cmake command-not-found curl \
@@ -57,7 +51,6 @@ function install_graphical_apt_packages() {
 
 # Only run if apt is available
 installed_or_log apt && {
-  log_and_run "Installing nala" install_nala
   log_and_run 'installing neovim nightly ppa' sudo add-apt-repository -y ppa:neovim-ppa/unstable ||
     err "Yeah, that didn't work. Neovim will be installed from default repos."
   log_and_run 'Installing apt packages' install_apt_packages
