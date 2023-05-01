@@ -50,11 +50,13 @@ else set -- "$@" --apply; fi
 
 if [ -n "${DOTFILES_DEBUG-}" ]; then set -- "$@" --debug; fi
 
+bin_dir="$(dirname -- "$chezmoi")"
 log_task "Setting up environment"
 case :$PATH: in *:$bin_dir:*) ;; # do nothing, it's there
   # Add bin_dir to PATH so chezmoi can be found in scripts
 *) PATH="$bin_dir:$PATH" ;;
 esac
+unset bin_dir
 
 log_task "Running 'chezmoi $*'"
 # replace current process with chezmoi
