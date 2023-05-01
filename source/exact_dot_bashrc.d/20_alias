@@ -53,10 +53,6 @@ bat=$(which bat 2>/dev/null || which batcat 2>/dev/null)
   alias cat="$bat"
   export MANPAGER="sh -c 'col -bx | $bat -l man -p'"
 
-  help() {
-    "$@" --help 2>&1 | "$(which bat 2>/dev/null || which batcat 2>/dev/null)" --plain --language=help
-  }
-
   if ! command -v bat &>/dev/null; then
     alias bat="$bat"
   fi
