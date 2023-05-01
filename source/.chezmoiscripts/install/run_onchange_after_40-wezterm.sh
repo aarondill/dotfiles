@@ -26,7 +26,7 @@ DESTINATION=$TMP_DIR/wezterm.deb
 
 log_github_install "$REPO" "$VERSION" "$ASSET" "$DESTINATION"
 curl -sSL "https://github.com/$REPO/releases/download/$VERSION/$ASSET" -o "$DESTINATION"
-sudo apt install "$DESTINATION"
+sudo "$APT" install "$DESTINATION"
 
 rm -rf "$TMP_DIR" && trap '' EXIT # cleanup
 

@@ -23,7 +23,7 @@ function install_grub_editor() (
       local destination=$temp_dir/grub-editor.deb
       log_github_install "$REPO" "$version" "$asset" "$destination"
       curl -sSL "https://github.com/$REPO/releases/download/$version/$asset" -o "$destination"
-      sudo apt install "$destination"
+      sudo "$APT" install "$destination"
     )
 )
 
