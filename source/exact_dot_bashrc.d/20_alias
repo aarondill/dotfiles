@@ -48,12 +48,16 @@ fi
 
 # Replace `cat` with `bat`, if installed
 bat=$(which bat 2>/dev/null || which batcat 2>/dev/null)
-alias cat="$bat"
-export MANPAGER="sh -c 'col -bx | $bat -l man -p'"
+# shellcheck disable=SC2139 # It's intended to expand at definition
+{
+  alias cat="$bat"
+  export MANPAGER="sh -c 'col -bx | $bat -l man -p'"
 
-if ! command -v bat &>/dev/null; then
-  alias bat="$bat"
-fi
+  if ! command -v bat &>/dev/null; then
+    alias bat="$bat"
+  fi
+}
+unset bat
 
 # if `z` is installed, initiate it and set `cd` to `z`
 if zoxide -V &>/dev/null; then
