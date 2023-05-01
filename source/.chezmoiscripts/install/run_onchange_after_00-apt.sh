@@ -60,7 +60,7 @@ function install_graphical_apt_packages() {
 installed_or_log apt && {
   log_and_run "Installing nala" install_nala
   log_and_run 'installing neovim nightly ppa' sudo add-apt-repository -y ppa:neovim-ppa/unstable ||
-    log "Yeah, that didn't work. Neovim will be installed from default repos."
+    err "Yeah, that didn't work. Neovim will be installed from default repos."
   log_and_run 'Installing apt packages' install_apt_packages
   log_and_run 'Installing graphical (gnome) apt packages' install_graphical_apt_packages
   # Gnome comes with it, but I don't want it.
@@ -68,6 +68,8 @@ installed_or_log apt && {
   remove_if_installed_apt gnome-characters cheese
   # Install vim symlink to nvim
   if command -v nvim &>/dev/null; then
-    sudo update-alternatives --install /usr/bin/vim neovim "$(which nvim)" 100 || true
+    if ! [ "$(basename -- "$(update-alternatives --query vim | grep 'Value: /.\+' | cut -d' ' -f2-)")" = nvim ]; then
+      sudo update-alternatives --install /usr/bin/vim vim "$(which nvim)" 100 || true
+    fi
   fi
 }
