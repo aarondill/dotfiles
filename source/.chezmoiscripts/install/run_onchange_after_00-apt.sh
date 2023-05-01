@@ -24,7 +24,12 @@ function install_if_available_apt() {
       err "Could not find '$package' in apt repos"
     fi
   done
-  sudo apt install -y -- "${available_packages[@]}"
+  apt=$(which nala 2>/dev/null || which apt 2>/dev/null)
+  sudo "$apt" install -y -- "${available_packages[@]}"
+}
+
+function install_nala() {
+  sudo apt-get install --quiet --assume-yes nala
 }
 
 function install_apt_packages() {
@@ -52,6 +57,7 @@ function install_graphical_apt_packages() {
 
 # Only run if apt is available
 installed_or_log apt && {
+  log_and_run "Installing nala" install_nala
   log_and_run 'installing neovim nightly ppa' sudo add-apt-repository -y ppa:neovim-ppa/unstable ||
     log "Yeah, that didn't work. Neovim will be installed from default repos."
   log_and_run 'Installing apt packages' install_apt_packages
