@@ -25,6 +25,7 @@ function install_if_available_apt() {
     fi
   done
   apt=$(which nala 2>/dev/null || which apt 2>/dev/null)
+  sudo "$apt" update
   sudo "$apt" install -y -- "${available_packages[@]}"
 }
 
