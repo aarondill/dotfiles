@@ -62,4 +62,8 @@ installed_or_log apt && {
   remove_if_installed_apt gnome-characters
   # Replace the existing cheese package with the flatpak package
   remove_if_installed_apt cheese
+  # Install vim symlink to nvim
+  if command -v nvim &>/dev/null; then
+    sudo update-alternatives --install vim neovim "$(which nvim)" 100 || true
+  fi
 }
