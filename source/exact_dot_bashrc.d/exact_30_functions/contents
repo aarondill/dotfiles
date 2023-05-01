@@ -6,7 +6,7 @@
 # *Follows Symlinks*
 #
 
-parent-cd() {
+contents() {
   local filein
 
   if [ "$1" = "--help" ]; then
