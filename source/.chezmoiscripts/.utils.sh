@@ -84,13 +84,26 @@ function first_upper() { local t && t="$(cat -)" && printf '%s' "${t^}"; }
 function get_latest_version_github() (
   set -e            # in subshell
   declare REPO="$1" # combined $OWNER/$REPO
-  version=$(curl -sI "https://github.com/$REPO/releases/latest" | grep -i "location:" | awk -F"/" '{ printf "%s", $NF }' | tr -d '\r')
+  version=$(curl -sfI "https://github.com/$REPO/releases/latest" | grep -i "location:" | awk -F"/" '{ printf "%s", $NF }' | tr -d '\r')
   if [ -z "$version" ]; then
     err "Failed while attempting to install $REPO. Please manually install at https://github.com/$REPO/releases"
     return 2
   fi
   echo "$version"
 )
+
+# get_latest_version_github "someone/something" -> v1.2.3 (tagname)
+function get_latest_version_gitlab() (
+  set -e            # in subshell
+  declare REPO="$1" # combined $OWNER/$REPO
+  version=$(curl -sfI "https://gitlab.com/$REPO/-/releases/permalink/latest" | grep -i "location:" | awk -F"/" '{ printf "%s", $NF }' | tr -d '\r')
+  if [ -z "$version" ]; then
+    err "Failed while attempting to install $REPO. Please manually install at https://gitlab.com/$REPO/releases"
+    return 2
+  fi
+  echo "$version"
+)
+
 # install_from_github aaron/example latest example.sh /usr/local/bin/example
 function install_from_github() (
   set -e # runs in subshell, so doesn't affect outside
