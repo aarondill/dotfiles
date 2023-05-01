@@ -47,7 +47,7 @@ function install_graphical_apt_packages() {
 
   install_if_available_apt dconf-editor flatpak gimp \
     gnome-shell-extension-manager gparted gucharmap luckybackup okular qtqr \
-    zeal gnome-software gnome-software-plugin-flatpak gnome-tweaks
+    zeal gnome-software gnome-software-plugin-flatpak gnome-tweaks gnome-boxes
 }
 
 # Only run if apt is available
