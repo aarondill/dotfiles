@@ -19,6 +19,7 @@ function install_flatpaks() {
   )
   for flatpak_app in "${flatpak_apps[@]}"; do
     if ! flatpak_is_installed "$flatpak_app"; then
+      log "Installing ${flatpak_app}"
       flatpak_install "$flatpak_app"
     fi
   done
