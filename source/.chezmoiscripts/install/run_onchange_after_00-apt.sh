@@ -4,8 +4,6 @@ SOURCE_DIR=$(chezmoi source-path)
 # shellcheck source=../.utils.sh
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
-function is_installed_apt() { dpkg -s "$@" &>/dev/null; }
-function is_available_apt() { test -n "$(apt-cache show -- "$1" 2>/dev/null)"; }
 function remove_if_installed_apt() {
   local package
   for package; do
