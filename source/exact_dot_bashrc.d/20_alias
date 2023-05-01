@@ -41,7 +41,7 @@ if command -v 7z &>/dev/null; then
   alias secret-unzip='7z x'
 fi
 
-if command -v has; then
+if command -v has >/dev/null; then
   # Allow usage of `has` with non-defined programs
   alias has='HAS_ALLOW_UNSAFE=y has'
 fi
