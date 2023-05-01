@@ -6,7 +6,7 @@
 .bashrc
 .bashrc.d
 .config/autostart/welcome.desktop
-.config/gh
+.config/gh/config.yaml
 .config/git
 .config/neofetch
 .config/npm
