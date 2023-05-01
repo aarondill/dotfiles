@@ -20,7 +20,6 @@ function install_if_available_apt() {
   for package; do
     if is_available_apt "$package"; then
       packages+=("$package")
-      log "Installing $package"
     else
       err "Could not find '$package' in apt repos"
     fi
