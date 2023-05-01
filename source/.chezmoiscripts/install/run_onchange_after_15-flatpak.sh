@@ -6,9 +6,9 @@ SOURCE_DIR=$(chezmoi source-path)
 
 function flatpak_is_installed() { flatpak info -- "$@" &>/dev/null; }
 # usage: flatpak_install [source] package
-function flatpak_install() { flatpak install -vy --noninteractive -- "$@"; }
+function flatpak_install() { flatpak install -y --noninteractive -- "$@"; }
 # shellcheck disable=SC2120 # I know it doesn't recieve arguments. it updates all without arguments.
-function flatpak_update() { flatpak update -vy --noninteractive -- "$@"; }
+function flatpak_update() { flatpak update -y --noninteractive -- "$@"; }
 
 function install_flatpaks() {
   flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
