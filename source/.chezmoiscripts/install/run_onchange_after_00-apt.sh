@@ -5,8 +5,6 @@ SOURCE_DIR=$(chezmoi source-path)
 # shellcheck source=../.utils.sh
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
-apt=$(which nala 2>/dev/null || which apt 2>/dev/null)
-
 function remove_if_installed_apt() {
   local package packages=()
   for package; do
@@ -15,7 +13,7 @@ function remove_if_installed_apt() {
     fi
   done
   if [ ${#packages[@]} -eq 0 ]; then return 0; fi
-  sudo "$apt" remove -y -- "${packages[@]}"
+  sudo "$APT" remove -y -- "${packages[@]}"
 }
 function install_if_available_apt() {
   local packages=() package
@@ -28,11 +26,13 @@ function install_if_available_apt() {
     fi
   done
   if [ ${#packages[@]} -eq 0 ]; then return 0; fi
-  sudo "$apt" install -y -- "${packages[@]}"
+  sudo "$APT" install -y -- "${packages[@]}"
 }
 
 function install_nala() {
-  sudo apt-get install --quiet --assume-yes nala
+  sudo apt-get install --quiet --assume-yes nala &&
+    # only changes in this file, but should be reevaluated each file
+    APT=$(which nala 2>/dev/null)
 }
 
 function install_apt_packages() {

@@ -171,7 +171,10 @@ KERNEL=$(uname -s)
 ARCH=$(uname -m)
 # eg: Ubuntu
 OS=$(lsb_release -si)
-export ARCH KERNEL OS
+export ARCH KERNEL OS APT
+
+# Path to apt (or nala) for installation/removal of packages
+APT=$(which nala 2>/dev/null || which apt 2>/dev/null)
 
 # Code to source *this* file. DON'T MOVE THIS FILE!
 # SOURCE_DIR=$(chezmoi source-path)
