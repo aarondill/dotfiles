@@ -48,14 +48,11 @@ fi
 
 # Replace `cat` with `bat`, if installed
 bat=$(which bat 2>/dev/null || which batcat 2>/dev/null)
-echo $bat
-if bat -V &>/dev/null; then
-  alias cat='bat'
-  export MANPAGER="sh -c 'col -bx | bat -l man -p'"
-elif batcat -V &>/dev/null; then
-  alias cat='batcat'
-  alias bat='batcat'
-  export MANPAGER="sh -c 'col -bx | batcat -l man -p'"
+alias cat="$bat"
+export MANPAGER="sh -c 'col -bx | $bat -l man -p'"
+
+if ! command -v bat &>/dev/null; then
+  alias bat="$bat"
 fi
 
 # if `z` is installed, initiate it and set `cd` to `z`
