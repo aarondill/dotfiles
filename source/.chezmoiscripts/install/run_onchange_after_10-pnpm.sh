@@ -18,13 +18,15 @@ function install_pnpm_and_node() {
   log 'installing pnpm'
   corepack enable
   corepack prepare pnpm@latest --activate >/dev/null
+}
 
-  log 'Installing pnpm global packages'
-  pnpm i --silent -g
+pnpm i --silent -g
 
-  log 'installing n through pnpm'
+log 'installing n through pnpm'
+install_pnpm_global_packages() {
   pnpm i --silent -g n
 
 }
 
 is_accessible_cmd pnpm || log_and_run 'Installing NodeJS and pnpm' install_pnpm_and_node
+is_accessible_cmd pnpm && log_and_run 'Installing pnpm global packages' install_pnpm_global_packages
