@@ -35,13 +35,13 @@ fi
 # Show battery information
 alias battery='upower -i $(upower -e | grep BAT)'
 
-if command -v 7z; then
+if command -v 7z &>/dev/null; then
   # alias for 7z zipping files that should be hidden
   alias secret-zip='7z a -r -P -mhe=on'
   alias secret-unzip='7z x'
 fi
 
-if comamnd -v has; then
+if command -v has; then
   # Allow usage of `has` with non-defined programs
   alias has='HAS_ALLOW_UNSAFE=y has'
 fi
