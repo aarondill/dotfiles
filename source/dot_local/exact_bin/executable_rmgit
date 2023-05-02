@@ -8,7 +8,7 @@ function usage() {
   cat <<-EOF
 	Usage: rmgit [-vhyf] REPO
 
- 	Options:
+	Options:
 		-v: verbose output
 		-h, -?: show this help message
 		-y: don't confirm deletion of REPO
