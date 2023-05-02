@@ -12,12 +12,12 @@ wezterm.on("toggle-ligature", function(window, pane)
 	window:set_config_overrides(overrides)
 end)
 
+local key = {
+	key = "E",
+	mods = "CTRL",
+	action = wezterm.action.EmitEvent("toggle-ligature"),
+}
 return function(config)
-	local key = {
-		key = "E",
-		mods = "CTRL",
-		action = wezterm.action.EmitEvent("toggle-ligature"),
-	}
 	if config.keys then
 		config.keys[#config.keys + 1] = key
 	else
