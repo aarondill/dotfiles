@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+function log() { printf '%s\n' "$@"; }
+function err() { printf '%s\n' "$@" >&2; }
+REPO=$1
+
+declare -i VERBOSE=1 YES=0 FORCE=0
+
+while getopts 'hvyf' opt; do
+  case $opt in
+  v) VERBOSE=1 ;;
+  h | \?)
+    usage
+    exit
+    ;;
+  y) YES=1 ;;
+  f) YES=1 FORCE=1 ;;
+  *)
+    usage
+    exit
+    ;;
+  esac
+
+done
+
+if ! [ -d "$REPO" ] || ! [ -d "$REPO"/.git ]; then
+  err "$REPO is not a git repository"
+  exit 2
+fi
+
+if [ $YES -ne 1 ]; then
+  read -rep "Remove $REPO? (yes) " confirmation
+  if ! [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
+    err "Aborting"
+    exit 1
+  fi
+fi
+
+base_args=(--recursive)
+if [ $FORCE -eq 1 ]; then base_args+=(--force); fi
+if [ $VERBOSE -eq 1 ]; then base_args+=(--verbose); fi
+
+# Force rm .git
+args=(--force "${base_args[@]}" -- "$REPO/.git")
+if [ $VERBOSE -eq 1 ]; then log "rm ${args[*]}"; fi
+rm "${args[@]}"
+
+args=("${base_args[@]}" -- "$REPO/")
+if [ $VERBOSE -eq 1 ]; then log "rm ${args[*]}"; fi
+rm "${args[@]}"
