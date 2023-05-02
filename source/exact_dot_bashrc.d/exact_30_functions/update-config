@@ -34,12 +34,12 @@ function update-config() {
   # Update dconf
   local dconf_path local_dest=~/.config/dconf/dconf-backup.ini
   dconf dump / >|"$local_dest"
-  # keep a local copy
-  dconf_path=$(chezmoi source-path)/dconf-backup.ini
+  # Save to chezmoi
+  dconf_path=$(chezmoi source-path)/encrypted_dconf-backup.ini
   chezmoi encrypt "$local_dest" -o "$dconf_path"
   if [[ -n "$(chezmoi git -- status --porcelain "$dconf_path")" ]]; then
     printf 'Updating dconf backup\n'
-    chezmoi git -- add source/dconf-backup.ini &&
+    chezmoi git -- add "$dconf_path" &&
       chezmoi git -- commit --quiet -m 'update dconf-backup.ini' &&
       chezmoi git -- push --quiet
   fi
