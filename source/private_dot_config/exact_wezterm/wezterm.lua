@@ -8,6 +8,6 @@ return require("plugin")({
 	"history",
 	"ctrl_click",
 	"env",
-	"toggle-ligature",
 	"toggle-transparency",
+	"toggle-ligature",
 })
