@@ -5,7 +5,7 @@ SOURCE_DIR=$(chezmoi source-path)
 # shellcheck source=../.utils.sh
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
-# dconf.ini hash: {{ include "dconf-backup.ini" | sha256sum }}
+# dconf.ini hash: {{ include "encrypted_dconf-backup.ini" | sha256sum }}
 if ! command -v dconf &>/dev/null; then
   abort 'dconf is not installed. Please install dconf to use this backup\n'
 fi
