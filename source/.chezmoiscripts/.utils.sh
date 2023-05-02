@@ -8,11 +8,11 @@ if [ "$sourced" -eq 0 ]; then err "You should source this file. not run it."; fi
 ## --------------------------------------------------------------------------------------------------
 
 # log "hello world"
-function log() { printf '%s\n' "$@"; }
-# err "goodbye world"
-function err() { printf '%s\n' "$@" >&2; }
+function log() { printf "$(tput setaf 11 2>/dev/null)$(tput bold 2>/dev/null)%s\n$(tput sgr0)" "$@"; }
+# err "goodbye world" -- shows in bold red
+function err() { printf "$(tput setaf 1 2>/dev/null)$(tput bold 2>/dev/null)%s\n$(tput sgr0)" "$@" >&2; }
 # success - no arguments
-function success() { printf "$(tput setaf 2)%s$(tput sgr0)\n" "Success!"; }
+function success() { printf "$(tput setaf 2 2>/dev/null)$(tput bold 2>/dev/null)%s$(tput sgr0)\n" "Success!"; }
 
 ## --------------------------------------------------------------------------------------------------
 ## ------------------------------------------ Control Flow ------------------------------------------
