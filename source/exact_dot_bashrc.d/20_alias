@@ -91,6 +91,11 @@ if command -v git &>/dev/null; then
   alias g='git'
 fi
 
+# I don't know how to control emacs. just open dunnet pls
+if command -v emacs &>/dev/null; then
+  alias dunnet='emacs -batch -l dunnet'
+fi
+
 # Allow nvchad if it's installed
 if [ -d "${NVCHAD_CONFIG:-"${XDG_CONFIG_HOME:-$HOME/.config}/NvChad"}" ]; then
   alias nvchad='NVIM_APPNAME=NvChad nvim'
