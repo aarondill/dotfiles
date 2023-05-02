@@ -24,7 +24,6 @@
 .pam_environment
 .profile
 .root
-.ssh
 .vim
 Templates
 vscode/.eslintrc.cjs
