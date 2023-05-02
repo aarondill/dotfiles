@@ -9,5 +9,5 @@ return require("plugin")({
 	"toggle-transparency",
 	"ctrl_click",
 	"env",
-	"toggle-ligature",
+	-- "toggle-ligature",
 })
