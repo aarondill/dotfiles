@@ -9,142 +9,142 @@
 #
 
 function update-config() {
-	declare -a files
-	declare target changed_files
-	# Finds files line-by-line, ignoring the first 3 lines
-	readarray -t files <<<"$(tail -n+4 -- ~/.bashrc.d/30_functions/_update-config)"
-	if target=$(chezmoi target-path); then
-		(
-			# add from target so files are relative to target
-			cd "$target" || return
-			# Output a detail of which files are changing
-			changed_files=$(chezmoi status -- "${files[@]}" | awk '{ print $2 }')
-			if [[ -n "$changed_files" ]]; then
-				printf 'Changed files:\n'
-				printf '%s\n' "$changed_files"
-			fi
-			# don't force a tty prompt, instead just take my no.
-			yes no | chezmoi add --exact --no-tty -- "${files[@]}" >/dev/null
-		)
-		# Ensure everything is updated
-		chezmoi re-add
-	else
-		return 2
-	fi
-	# Update dconf
-	local dconf_path
-	dconf_path=$(chezmoi source-path)/dconf-backup.ini
-	dconf dump / >|"$dconf_path"
-	# keep a local copy
-	/usr/bin/cp -f -T "$dconf_path" ~/.config/dconf/dconf-backup.ini
-	if [[ -n "$(chezmoi git -- status --porcelain "$dconf_path")" ]]; then
-		printf 'Updating dconf backup\n'
-		chezmoi git -- add source/dconf-backup.ini &&
-			chezmoi git -- commit --quiet -m 'update dconf-backup.ini' &&
-			chezmoi git -- push --quiet
-	fi
+  declare -a files
+  declare target changed_files
+  # Finds files line-by-line, ignoring the first 3 lines
+  readarray -t files <<<"$(tail -n+4 -- ~/.bashrc.d/30_functions/_update-config)"
+  if target=$(chezmoi target-path); then
+    (
+      # add from target so files are relative to target
+      cd "$target" || return
+      # Output a detail of which files are changing
+      changed_files=$(chezmoi status -- "${files[@]}" | awk '{ print $2 }')
+      if [[ -n "$changed_files" ]]; then
+        printf 'Changed files:\n'
+        printf '%s\n' "$changed_files"
+      fi
+      # don't force a tty prompt, instead just take my no.
+      yes no | chezmoi add --exact --no-tty -- "${files[@]}" >/dev/null
+    )
+    # Ensure everything is updated
+    chezmoi re-add
+  else
+    return 2
+  fi
+  # Update dconf
+  local dconf_path local_dest=~/.config/dconf/dconf-backup.ini
+  dconf dump / >|"$local_dest"
+  # keep a local copy
+  dconf_path=$(chezmoi source-path)/dconf-backup.ini
+  chezmoi encrypt "$local_dest" -o "$dconf_path"
+  if [[ -n "$(chezmoi git -- status --porcelain "$dconf_path")" ]]; then
+    printf 'Updating dconf backup\n'
+    chezmoi git -- add source/dconf-backup.ini &&
+      chezmoi git -- commit --quiet -m 'update dconf-backup.ini' &&
+      chezmoi git -- push --quiet
+  fi
 }
 
 # Copies the files to $HOME/.root/FILEPATH. `.root` should be backed up
 function cproot() {
-	declare -i exitCode=0
-	declare -a opts args
-	opts=()
-	args=()
-	for arg; do
-		if [[ "$arg" == --?* ]]; then
-			opts+=("$arg")
-		else
-			args+=("$arg")
-		fi
-	done
-	files=()
-	for file in "${args[@]}"; do
-		if [[ -e "$file" ]]; then
-			local old_path new_dir new_path
-			old_path="$(realpath -s -- "$file")"
-			new_path="$HOME/.root$old_path"
-			new_dir="$(dirname -- "$new_path")"
-			# ensure destination exists
-			mkdir -p -- "$new_dir"
-			# cp to home, so files are relative to home.
-			sudo cp -rf -T -- "$file" "$new_path"
-			sudo chown --preserve-root -hR -- "$(whoami)" "$new_path"
-			# add to the array so i can update all at once
-			files+=("$new_path")
-		else
-			printf '%s is not a file\n' "$file"
-			# Exit 1 at end if any args were invalid
-			exitCode=1
-		fi
-	done
-	# Add all files to chezmoi repo
-	chezmoi add --exact "${opts[@]}" -- "${files[@]}"
+  declare -i exitCode=0
+  declare -a opts args
+  opts=()
+  args=()
+  for arg; do
+    if [[ "$arg" == --?* ]]; then
+      opts+=("$arg")
+    else
+      args+=("$arg")
+    fi
+  done
+  files=()
+  for file in "${args[@]}"; do
+    if [[ -e "$file" ]]; then
+      local old_path new_dir new_path
+      old_path="$(realpath -s -- "$file")"
+      new_path="$HOME/.root$old_path"
+      new_dir="$(dirname -- "$new_path")"
+      # ensure destination exists
+      mkdir -p -- "$new_dir"
+      # cp to home, so files are relative to home.
+      sudo cp -rf -T -- "$file" "$new_path"
+      sudo chown --preserve-root -hR -- "$(whoami)" "$new_path"
+      # add to the array so i can update all at once
+      files+=("$new_path")
+    else
+      printf '%s is not a file\n' "$file"
+      # Exit 1 at end if any args were invalid
+      exitCode=1
+    fi
+  done
+  # Add all files to chezmoi repo
+  chezmoi add --exact "${opts[@]}" -- "${files[@]}"
 
-	# Exit with the saved code
-	return $exitCode
+  # Exit with the saved code
+  return $exitCode
 }
 
 function update-root-config() {
-	local files rootpath homepath dotroot encrypted_files add_files
-	dotroot="$HOME/.root"
-	encrypted_files=()
-	add_files=()
-	while IFS= read -r -d $'\0' file; do
-		rootpath="/$file"
-		homepath="$dotroot/$file"
-		if sudo cmp --quiet "$rootpath" "$homepath"; then
-			# if same, move on
-			continue
-		fi
-		# Doesn't need to be recursive bc is only files, not dirs.
-		sudo cp -f -T -- "$rootpath" "$homepath"
-		sudo chown --preserve-root -h -- "$(whoami)" "$homepath"
+  local files rootpath homepath dotroot encrypted_files add_files
+  dotroot="$HOME/.root"
+  encrypted_files=()
+  add_files=()
+  while IFS= read -r -d $'\0' file; do
+    rootpath="/$file"
+    homepath="$dotroot/$file"
+    if sudo cmp --quiet "$rootpath" "$homepath"; then
+      # if same, move on
+      continue
+    fi
+    # Doesn't need to be recursive bc is only files, not dirs.
+    sudo cp -f -T -- "$rootpath" "$homepath"
+    sudo chown --preserve-root -h -- "$(whoami)" "$homepath"
 
-		#  Fails if not encrypted
-		if [[ -n "$(chezmoi list --include=encrypted -- "$homepath")" ]]; then
-			encrypted_files+=("$homepath")
-		else
-			add_files+=("$homepath")
-		fi
-	done < <(find "$dotroot" -type f -printf '%P\0')
+    #  Fails if not encrypted
+    if [[ -n "$(chezmoi list --include=encrypted -- "$homepath")" ]]; then
+      encrypted_files+=("$homepath")
+    else
+      add_files+=("$homepath")
+    fi
+  done < <(find "$dotroot" -type f -printf '%P\0')
 
-	test ${#add_files[@]} -gt 0 && chezmoi add -- "${add_files[@]}"
-	test ${#encrypted_files[@]} -gt 0 && chezmoi add --encrypt -- "${encrypted_files[@]}"
-	if test ${#add_files[@]} -eq 0 && test ${#encrypted_files[@]} -eq 0; then
-		echo "No files have changed (dirs not recursive)"
-	fi
-	return 0
+  test ${#add_files[@]} -gt 0 && chezmoi add -- "${add_files[@]}"
+  test ${#encrypted_files[@]} -gt 0 && chezmoi add --encrypt -- "${encrypted_files[@]}"
+  if test ${#add_files[@]} -eq 0 && test ${#encrypted_files[@]} -eq 0; then
+    echo "No files have changed (dirs not recursive)"
+  fi
+  return 0
 }
 
 # Adds to chezmoi and adds to ~/.bashrc.d/30_functions/_update-config
 # Imitates config add (without dash)
 function config-add() {
-	declare -i exitCode=0
-	local file
-	files=()
-	for file in "$@"; do
-		if [[ -r "$file" ]]; then
-			# add to the array so i can update all at once
-			files+=("$(realpath -s -- "$file")")
-		else
-			printf '%s is not a file\n' "$file"
-			# Exit 1 at end if any args were invalid
-			exitCode=1
-		fi
-	done
+  declare -i exitCode=0
+  local file
+  files=()
+  for file in "$@"; do
+    if [[ -r "$file" ]]; then
+      # add to the array so i can update all at once
+      files+=("$(realpath -s -- "$file")")
+    else
+      printf '%s is not a file\n' "$file"
+      # Exit 1 at end if any args were invalid
+      exitCode=1
+    fi
+  done
 
-	# Add all files to chezmoi repo
-	chezmoi add --exact -- "${files[@]}"
-	# Add files to the _update-config file
-	for file in "${files[@]}"; do
-		local short_file=${file#"$HOME"/} # remove /home/user/
-		# If not already in the file
-		if ! grep -F -x -q "$short_file" ~/.bashrc.d/30_functions/_update-config; then
-			printf '%s\n' "$short_file" >>~/.bashrc.d/30_functions/_update-config
-		fi
-	done
+  # Add all files to chezmoi repo
+  chezmoi add --exact -- "${files[@]}"
+  # Add files to the _update-config file
+  for file in "${files[@]}"; do
+    local short_file=${file#"$HOME"/} # remove /home/user/
+    # If not already in the file
+    if ! grep -F -x -q "$short_file" ~/.bashrc.d/30_functions/_update-config; then
+      printf '%s\n' "$short_file" >>~/.bashrc.d/30_functions/_update-config
+    fi
+  done
 
-	# Exit with the saved code
-	return $exitCode
+  # Exit with the saved code
+  return $exitCode
 }
