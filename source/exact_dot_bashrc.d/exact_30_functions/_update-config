@@ -9,7 +9,6 @@
 .config/gh/config.yml
 .config/git
 .config/neofetch
-.config/npm
 .config/readline
 .config/tabtab
 .config/wgetrc
