@@ -53,7 +53,7 @@ function install_graphical_apt_packages() {
 installed_or_log apt && {
   log_and_run 'installing neovim nightly ppa' sudo add-apt-repository -n -y -P ppa:neovim-ppa/unstable ||
     err "Yeah, that didn't work. Neovim will be installed from default repos."
-  log_and_run 'Updating apt sources' "$APT" update
+  log_and_run 'Updating apt sources' sudo "$APT" update
   log_and_run 'Installing apt packages' install_apt_packages
   log_and_run 'Installing graphical (gnome) apt packages' install_graphical_apt_packages
   # Gnome comes with it, but I don't want it.
