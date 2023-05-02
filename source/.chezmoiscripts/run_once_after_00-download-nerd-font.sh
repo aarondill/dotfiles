@@ -16,7 +16,12 @@ log "Downloading nerd fonts repository"
 TMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TMP_DIR"' EXIT
 
-git clone --filter=blob:none 'https://github.com/ryanoasis/nerd-fonts' "$TMP_DIR"
+# Only download toplevel files
+git clone --sparse --filter=blob:none 'https://github.com/ryanoasis/nerd-fonts' "$TMP_DIR"
+# Download specific files for UbuntuMono fonts
+git -C "$TMP_DIR" sparse-checkout add patched-fonts/UbuntuMono
+
+# ALl files should be downloaded already!
 "$TMP_DIR/install.sh" --use-single-width-glyphs --install-to-user-path UbuntuMono
 
 rm -rf "$TMP_DIR" && trap '' EXIT
