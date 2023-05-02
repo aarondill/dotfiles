@@ -34,4 +34,17 @@ function M.tbl_merge_modify(t1, t2)
 	return t1
 end
 
+---Return from plugin file to define a key shortcut.
+---@param key {key:string, mods?:string|string[], action?:unknown}
+---@return fun(config:table):nil
+function M.define_key(key)
+	return function(config)
+		if config.keys then
+			config.keys[#config.keys + 1] = key
+		else
+			config.keys = { key }
+		end
+	end
+end
+
 return M
