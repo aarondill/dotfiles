@@ -4,6 +4,17 @@ function err() { printf '%s\n' "$@" >&2; }
 
 declare -i VERBOSE=0 YES=0 FORCE=0
 
+function usage() {
+  cat <<-EOF
+  Usage: rmgit [-vhyf] REPO
+
+  Options:
+    -v: verbose output
+    -h, -?: show this help message
+    -y: don't confirm deletion of REPO
+    -f: force deletion of REPO. REPO/.git is always force deleted.
+EOF
+}
 while getopts 'hvyf' opt; do
   case $opt in
   v) VERBOSE=1 ;;
