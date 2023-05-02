@@ -1,4 +1,4 @@
 key.txt.age
 node_modules
 install.sh
-dconf-backup.ini
+encrypted_dconf-backup.ini
