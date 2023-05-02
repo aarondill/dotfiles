@@ -18,7 +18,7 @@ EOF
 }
 while getopts ':hvyf-:' opt; do
   case "$opt" in
-  h | \?) usage && exit 0 ;;
+  h) usage && exit 0 ;;
   v) VERBOSE=1 ;;
   y) YES=1 ;;
   f) YES=1 FORCE=1 ;;
