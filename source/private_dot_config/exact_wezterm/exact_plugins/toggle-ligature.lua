@@ -12,15 +12,8 @@ wezterm.on("toggle-ligature", function(window, pane)
 	window:set_config_overrides(overrides)
 end)
 
-local key = {
+return require("util").define_key({
 	key = "E",
 	mods = "CTRL",
 	action = wezterm.action.EmitEvent("toggle-ligature"),
-}
-return function(config)
-	if config.keys then
-		config.keys[#config.keys + 1] = key
-	else
-		config.keys = { key }
-	end
-end
+})
