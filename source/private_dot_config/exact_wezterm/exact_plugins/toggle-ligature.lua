@@ -13,6 +13,7 @@ wezterm.on("toggle-ligature", function(window, pane)
 end)
 
 return function(config)
+	print(config.keys)
 	local keys = {
 		{
 			key = "E",
