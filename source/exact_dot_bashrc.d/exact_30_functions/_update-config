@@ -16,7 +16,6 @@
 .local/etc
 .local/share/applications
 .local/share/bash-completion
-.local/share/fonts
 .local/share/icons/bitwarden.png
 .local/share/icons/fslite.ico
 .local/share/icons/io.snapcraft.Store.png
