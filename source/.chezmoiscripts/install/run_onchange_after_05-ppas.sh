@@ -22,7 +22,7 @@ function setup_ppa_google-chrome() {
 
 # Run setup_ppa_* first!
 function install_proprietary_software() {
-  sudo "$APT" update
+  sudo "$APT" update >/dev/null
   sudo "$APT" install -y -- "$@"
   sudo "$APT" install -f
 }
