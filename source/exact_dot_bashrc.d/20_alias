@@ -94,6 +94,8 @@ fi
 # I don't know how to control emacs. just open dunnet pls
 if command -v emacs &>/dev/null; then
   alias dunnet='emacs -batch -l dunnet'
+  # Don't you DARE open a window
+  alias emacs='emacs -nw'
 fi
 
 # Allow nvchad if it's installed
