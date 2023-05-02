@@ -10,16 +10,8 @@ wezterm.on("toggle-opacity", function(window)
 	window:set_config_overrides(overrides)
 end)
 
-local key = {
+return require("util").define_key({
 	key = "B",
 	mods = "CTRL",
 	action = wezterm.action.EmitEvent("toggle-opacity"),
-}
-return require("util")
-return function(config)
-	if config.keys then
-		config.keys[#config.keys + 1] = key
-	else
-		config.keys = { key }
-	end
-end
+})
