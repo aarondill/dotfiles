@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 function log() { printf '%s\n' "$@"; }
 function err() { printf '%s\n' "$@" >&2; }
-REPO=$1
 
 declare -i VERBOSE=0 YES=0 FORCE=0
 
@@ -19,8 +18,10 @@ while getopts 'hvyf' opt; do
     exit
     ;;
   esac
-
 done
+shift "$((OPTIND - 1))"
+
+REPO=$1
 
 if ! [ -d "$REPO" ] || ! [ -d "$REPO"/.git ]; then
   err "$REPO is not a git repository"
