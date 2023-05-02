@@ -44,6 +44,10 @@ done
 shift "$((OPTIND - 1))"
 
 REPO=$1
+if [ -z "$REPO" ]; then
+  err "REPO is required"
+  exit 2
+fi
 
 if ! [ -d "$REPO" ] || ! [ -d "$REPO"/.git ]; then
   err "$REPO is not a git repository"
