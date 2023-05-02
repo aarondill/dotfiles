@@ -6,7 +6,7 @@ declare -i VERBOSE=0 YES=0 FORCE=0
 
 function usage() {
   cat <<-EOF
-	Usage: rmgit [-vhyf] REPO
+	Usage: rmgit [OPTS] REPO...
 
 	Options:
 		-v, --verbose  verbose output
@@ -43,34 +43,35 @@ while getopts ':hvyf-:' opt; do
 done
 shift "$((OPTIND - 1))"
 
-REPO=$1
-if [ -z "$REPO" ]; then
-  err "REPO is required"
-  exit 2
-fi
-
-if ! [ -d "$REPO" ] || ! [ -d "$REPO"/.git ]; then
-  err "$REPO is not a git repository"
-  exit 2
-fi
-
-if [ $YES -ne 1 ]; then
-  read -rep "Remove $REPO? (yes) " confirmation
-  if ! [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
-    err "Aborting"
-    exit 1
+for REPO; do
+  if [ -z "$REPO" ]; then
+    err "Refusing to remove empty string. (REPO is required)"
+    exit 2
   fi
-fi
 
-base_args=(--recursive)
-if [ $FORCE -eq 1 ]; then base_args+=(--force); fi
-if [ $VERBOSE -eq 1 ]; then base_args+=(--verbose); fi
+  if ! [ -d "$REPO" ] || ! [ -d "$REPO"/.git ]; then
+    err "$REPO is not a git repository"
+    exit 2
+  fi
 
-# Force rm .git
-args=(--force "${base_args[@]}" -- "$REPO/.git")
-if [ $VERBOSE -eq 1 ]; then log "rm ${args[*]}"; fi
-rm "${args[@]}"
+  if [ $YES -ne 1 ]; then
+    read -rep "Remove $REPO? (yes) " confirmation
+    if ! [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
+      err "Aborting"
+      exit 1
+    fi
+  fi
 
-args=("${base_args[@]}" -- "$REPO/")
-if [ $VERBOSE -eq 1 ]; then log "rm ${args[*]}"; fi
-rm "${args[@]}"
+  base_args=(--recursive)
+  if [ $FORCE -eq 1 ]; then base_args+=(--force); fi
+  if [ $VERBOSE -eq 1 ]; then base_args+=(--verbose); fi
+
+  # Force rm .git
+  args=(--force "${base_args[@]}" -- "$REPO/.git")
+  if [ $VERBOSE -eq 1 ]; then log "rm ${args[*]}"; fi
+  rm "${args[@]}"
+
+  args=("${base_args[@]}" -- "$REPO/")
+  if [ $VERBOSE -eq 1 ]; then log "rm ${args[*]}"; fi
+  rm "${args[@]}"
+done
