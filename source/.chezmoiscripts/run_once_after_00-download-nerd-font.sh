@@ -16,7 +16,7 @@ log "Downloading nerd fonts repository"
 TMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TMP_DIR"' EXIT
 
-git clone 'https://github.com/ryanoasis/nerd-fonts' "$TMP_DIR"
+git clone --filter=blob:none 'https://github.com/ryanoasis/nerd-fonts' "$TMP_DIR"
 "$TMP_DIR/install.sh" --use-single-width-glyphs --install-to-user-path UbuntuMono
 
 rm -rf "$TMP_DIR" && trap '' EXIT
