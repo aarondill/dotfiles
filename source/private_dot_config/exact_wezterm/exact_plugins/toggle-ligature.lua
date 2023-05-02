@@ -13,18 +13,16 @@ wezterm.on("toggle-ligature", function(window, pane)
 end)
 
 return function(config)
-	print(config.keys)
 	local keys = {
-		{
-			key = "E",
-			mods = "CTRL",
-			action = wezterm.action.EmitEvent("toggle-ligature"),
-		},
+		key = "E",
+		mods = "CTRL",
+		action = wezterm.action.EmitEvent("toggle-ligature"),
 	}
+
 	if config.keys then
 		config.keys[#config.keys + 1] = keys
 	else
-		config.keys = keys
+		config.keys = { keys }
 	end
 	return {}
 end
