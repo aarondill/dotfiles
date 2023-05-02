@@ -3,7 +3,7 @@ function log() { printf '%s\n' "$@"; }
 function err() { printf '%s\n' "$@" >&2; }
 REPO=$1
 
-declare -i VERBOSE=1 YES=0 FORCE=0
+declare -i VERBOSE=0 YES=0 FORCE=0
 
 while getopts 'hvyf' opt; do
   case $opt in
