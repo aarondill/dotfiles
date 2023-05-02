@@ -5,7 +5,7 @@ set -e
 
 # Source utils
 SOURCE_DIR=$(chezmoi source-path)
-# shellcheck source=.utils.sh
+# shellcheck source=../.utils.sh
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
 log "Installing vortex-ubuntu-plymouth-theme splash screen"

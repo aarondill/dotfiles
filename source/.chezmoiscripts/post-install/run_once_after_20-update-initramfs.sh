@@ -3,7 +3,7 @@
 set -e
 # Source utils
 SOURCE_DIR=$(chezmoi source-path)
-# shellcheck source=.utils.sh
+# shellcheck source=../.utils.sh
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
 RESUME_FILE=/etc/initramfs-tools/conf.d/resume

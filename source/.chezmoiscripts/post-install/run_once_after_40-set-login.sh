@@ -5,7 +5,7 @@ IMAGE="https://images.wallpaperscraft.com/image/single/sky_stars_moon_144720_160
 
 # Source utils
 SOURCE_DIR=$(chezmoi source-path)
-# shellcheck source=.utils.sh
+# shellcheck source=../.utils.sh
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
 log "Installing ubuntu-gdm-set-background"

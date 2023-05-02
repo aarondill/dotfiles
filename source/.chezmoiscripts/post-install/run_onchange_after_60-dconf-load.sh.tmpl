@@ -2,7 +2,7 @@
 
 # Source utils
 SOURCE_DIR=$(chezmoi source-path)
-# shellcheck source=.utils.sh
+# shellcheck source=../.utils.sh
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
 # dconf.ini hash: {{ include "dconf-backup.ini" | sha256sum }}
