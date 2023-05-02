@@ -29,13 +29,13 @@ while getopts ':hvyf-:' opt; do
     yes) YES=1 ;;
     force) YES=1 FORCE=1 ;;
     *)
-      echo "Unknown option --${OPTARG}" >&2
+      err "Unknown option --${OPTARG}"
       usage >&2
       exit 1
       ;;
     esac ;;
   *)
-    echo "Unknown option -${OPTARG}" >&2
+    err "Unknown option -${OPTARG}"
     usage >&2
     exit 1
     ;;
