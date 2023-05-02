@@ -15,6 +15,7 @@ local key = {
 	mods = "CTRL",
 	action = wezterm.action.EmitEvent("toggle-opacity"),
 }
+return require("util")
 return function(config)
 	if config.keys then
 		config.keys[#config.keys + 1] = key
