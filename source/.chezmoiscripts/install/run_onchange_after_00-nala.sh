@@ -35,7 +35,7 @@ EOF
 
   rm -rf "$TMP_DIR" && trap '' EXIT # cleanup
 
-  sudo apt-get update --quiet --assume-yes
+  sudo apt-get update --quiet --assume-yes >/dev/null
   sudo apt-get install --quiet --assume-yes nala
 
   # only changes in this file, but should be reevaluated each file
