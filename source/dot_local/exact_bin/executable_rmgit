@@ -9,10 +9,10 @@ function usage() {
 	Usage: rmgit [-vhyf] REPO
 
 	Options:
-		-v: verbose output
-		-h, -?: show this help message
-		-y: don't confirm deletion of REPO
-		-f: force deletion of REPO. REPO/.git is always force deleted.
+		-v, --verbose  verbose output
+		-h, --help     show this help message
+		-y, --yes      don't confirm deletion of REPO
+		-f, --force    force deletion of REPO. REPO/.git is always force deleted.
 EOF
   return 0
 }
