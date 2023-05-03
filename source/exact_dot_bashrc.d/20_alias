@@ -97,15 +97,16 @@ if command -v emacs &>/dev/null; then
     # Constant
     local save_file="$HOME/.config/emacs/games/dunnet.save"
 
+    local skipload=
     # Allow dunnet --nosave to avoid loading save file
-    if [ "$1" = "--nosave" ]; then save_file="" && shift; fi
+    if [ "$1" = "--nosave" ]; then skipload=1 && shift; fi
 
     # Output to tty
     printf '%s\n' "Run 'restore $(basename -- "$save_file")' to (re)load" "run 'save $(basename -- "$save_file")' to overwrite save data"
     # no-site go-to-save-location no-init load-dunnet anything-else-passed
     local args=(-Q -chdir "$(dirname "$save_file")" -batch -l dunnet "$@")
 
-    if [ -f "$save_file" ]; then
+    if [ -z "$skipload" ] && [ -f "$save_file" ]; then
       # save file exists, auto restore
       cat <(echo "restore $(basename "$save_file")") - | emacs "${args[@]}"
     else
