@@ -1,6 +1,5 @@
 return {
-	-- bc cool (default)
-	-- automatically_reload_config = true,
+	-- Disabled due to error on watcher init. (too many files open)
 	automatically_reload_config = false,
 
 	-- Check for updates of wezterm (default)
