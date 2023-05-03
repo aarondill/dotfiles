@@ -1,9 +1,36 @@
 #!/bin/sh
-exec tail -n +3 $0
-# This file provides an easy way to add custom menu entries.  Simply type the
-# menu entries you want to add after this comment.  Be careful not to change
-# the 'exec tail' line above.
+# This file provides an easy way to add custom menu entries.
+
+ROOT_UUID="$(findmnt / --output UUID | tail -n1)"
+# First argument is path, then name, all others are find arguments
+
+if ! [ "$(printf '%s\n' 'v0.1.1' 'v0.10.0' | sort -V)" = "$(printf '%s\n' 'v0.1.1' 'v0.10.0')" ]; then
+  printf '%s\n' "This requires a sort that supports version sorting" >&2
+  return # exits the script
+fi
+
+find_highest_version() {
+  path="$1" && shift 1
+  sudo find "$path" -maxdepth 1 -name "$@" | sort -Vr | head -n1
+}
+
+vmlinuz=$(find_highest_version /boot 'vmlinuz-*-generic')
+initrd=$(find_highest_version /boot 'initrd.img-*-generic')
+printf '%s\n' "Creating text mode linux at the current root drive '$ROOT_UUID', with vmlinuz '$vmlinuz' and initrd '$initrd'" >&2
+cat <<-EOF
 menuentry "Shut Down" {
       halt
 }
 
+menuentry 'Ubuntu (Text mode)' --class ubuntu {
+	recordfail
+savedefault
+	insmod gzio
+	insmod part_gpt
+	insmod ext2
+	search --no-floppy --fs-uuid --set=root "$ROOT_UUID"
+	linux	"$vmlinuz"  "root=UUID=$ROOT_UUID" ro $GRUB_CMDLINE_LINUX_DEFAULT init 3
+	initrd	"$initrd"
+}
+
+EOF
