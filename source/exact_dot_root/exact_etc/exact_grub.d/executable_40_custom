@@ -18,19 +18,23 @@ vmlinuz=$(find_highest_version /boot 'vmlinuz-*-generic')
 initrd=$(find_highest_version /boot 'initrd.img-*-generic')
 printf '%s\n' "Creating text mode linux at the current root drive '$ROOT_UUID', with vmlinuz '$vmlinuz' and initrd '$initrd'" >&2
 cat <<-EOF
-menuentry "Shut Down" {
-      halt
-}
 
 menuentry 'Ubuntu (Text mode)' --class ubuntu {
-	recordfail
-savedefault
-	insmod gzio
-	insmod part_gpt
-	insmod ext2
-	search --no-floppy --fs-uuid --set=root "$ROOT_UUID"
-	linux	"$vmlinuz"  "root=UUID=$ROOT_UUID" ro $GRUB_CMDLINE_LINUX_DEFAULT init 3
-	initrd	"$initrd"
+  recordfail
+  savedefault
+  gfxmode \$linux_gfx_mode
+  insmod gzio
+  if [ x\$grub_platform = xxen ]; then insmod xzio; insmod lzopio; fi
+  insmod part_gpt
+  insmod ext2
+  search --no-floppy --fs-uuid --set=root "$ROOT_UUID"
+  linux "$vmlinuz" "root=UUID=$ROOT_UUID" ro $GRUB_CMDLINE_LINUX_DEFAULT init 3
+  initrd "$initrd"
 }
 
+EOF
+cat <<-EOF
+menuentry "Shut Down" {
+  halt
+}
 EOF
