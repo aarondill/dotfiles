@@ -14,9 +14,11 @@ find_highest_version() {
   sudo find "$path" -maxdepth 1 -name "$@" | sort -Vr | head -n1
 }
 
-vmlinuz=$(find_highest_version /boot 'vmlinuz-*-generic')
-initrd=$(find_highest_version /boot 'initrd.img-*-generic')
-printf '%s\n' "Creating text mode linux at the current root drive '$ROOT_UUID', with vmlinuz '$vmlinuz' and initrd '$initrd'" >&2
+VMLINUZ=$(find_highest_version /boot 'vmlinuz-*-generic')
+INITRD=$(find_highest_version /boot 'initrd.img-*-generic')
+# Remove splash and quiet args from GRUB_CMDLINE_LINUX_DEFAULT
+GRUB_CMDLINE_ARGS=$(printf '%s\n' "$GRUB_CMDLINE_LINUX_DEFAULT" | sed -e 's/\bsplash\b//g' -e 's/\bquiet\b//g')
+printf '%s\n' "Creating text mode linux at the current root drive '$ROOT_UUID', with vmlinuz '$VMLINUZ' and initrd '$INITRD'" >&2
 cat <<-EOF
 
 menuentry 'Ubuntu (Text mode)' --class ubuntu {
@@ -28,8 +30,8 @@ menuentry 'Ubuntu (Text mode)' --class ubuntu {
   insmod part_gpt
   insmod ext2
   search --no-floppy --fs-uuid --set=root "$ROOT_UUID"
-  linux "$vmlinuz" "root=UUID=$ROOT_UUID" ro $GRUB_CMDLINE_LINUX_DEFAULT init 3
-  initrd "$initrd"
+  linux "$VMLINUZ" "root=UUID=$ROOT_UUID" ro $GRUB_CMDLINE_ARGS init 3
+  initrd "$INITRD"
 }
 
 EOF
