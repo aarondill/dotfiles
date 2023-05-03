@@ -136,3 +136,6 @@ else
   }
 fi
 # https://nvchad.com/
+
+# Like startx, but for gnome
+alias start-gdm='sudo systemctl start gdm.service'
