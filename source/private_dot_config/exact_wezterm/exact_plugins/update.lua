@@ -1,7 +1,7 @@
 return {
 	-- bc cool (default)
-	-- automatically_reload_config = true,
-	automatically_reload_config = false,
+	automatically_reload_config = true,
+	-- automatically_reload_config = false,
 
 	-- Check for updates of wezterm (default)
 	check_for_updates = true,
