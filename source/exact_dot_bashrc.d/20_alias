@@ -96,7 +96,7 @@ if command -v emacs &>/dev/null; then
   function dunnet() (
     printf '%s\n' "Run 'restore dunnet.save' to load" "run 'save dunnet.save' to overwrite save data"
     # run dunnet (in games folder so save is accessible)
-    emacs -chdir ~/.config/emacs/games/ -batch -l dunnet "$@"
+    emacs -Q -chdir ~/.config/emacs/games/ -batch -l dunnet "$@"
   )
   # Don't you DARE open a window
   alias emacs='emacs -nw'
