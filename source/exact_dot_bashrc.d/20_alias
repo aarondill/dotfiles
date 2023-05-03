@@ -93,11 +93,26 @@ fi
 
 # I don't know how to control emacs. just open dunnet pls
 if command -v emacs &>/dev/null; then
-  function dunnet() (
-    printf '%s\n' "Run 'restore dunnet.save' to load" "run 'save dunnet.save' to overwrite save data"
-    # run dunnet (in games folder so save is accessible)
-    emacs -Q -chdir ~/.config/emacs/games/ -batch -l dunnet "$@"
-  )
+  function dunnet() {
+    # Constant
+    local save_file="$HOME/.config/emacs/games/dunnet.save"
+
+    # Allow dunnet --nosave to avoid loading save file
+    if [ "$1" = "--nosave" ]; then save_file="" && shift; fi
+
+    # Output to tty
+    printf '%s\n' "Run 'restore $(basename -- "$save_file")' to (re)load" "run 'save $(basename -- "$save_file")' to overwrite save data"
+    # no-site go-to-save-location no-init load-dunnet anything-else-passed
+    local args=(-Q -chdir "$(dirname "$save_file")" -batch -l dunnet "$@")
+
+    if [ -f "$save_file" ]; then
+      # save file exists, auto restore
+      cat <(echo "restore $(basename "$save_file")") - | emacs "${args[@]}"
+    else
+      # No save file exists, just run it
+      emacs "${args[@]}"
+    fi
+  }
   # Don't you DARE open a window
   alias emacs='emacs -nw'
 fi
