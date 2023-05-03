@@ -93,7 +93,11 @@ fi
 
 # I don't know how to control emacs. just open dunnet pls
 if command -v emacs &>/dev/null; then
-  alias dunnet='emacs -batch -l dunnet'
+  function dunnet() (
+    printf '%s\n' "Run 'restore dunnet.save' to load" "run 'save dunnet.save' to overwrite save data"
+    # run dunnet (in games folder so save is accessible)
+    emacs -chdir ~/.config/emacs/games/ -batch -l dunnet "$@"
+  )
   # Don't you DARE open a window
   alias emacs='emacs -nw'
 fi
