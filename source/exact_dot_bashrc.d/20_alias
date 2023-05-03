@@ -139,4 +139,4 @@ fi
 
 # Like startx, but for gnome
 # alias start-gdm='sudo systemctl start gdm.service'
-alias start-gdm"systemctl isolate graphical.target"
+alias start-gdm="systemctl isolate graphical.target"
