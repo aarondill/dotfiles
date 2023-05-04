@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# Aliases and functions for tty usage
+
+# alias start-gdm='sudo systemctl start gdm.service'
+# Start gdm (gnome display manager)
+alias start-gdm="systemctl isolate graphical.target"
+# Stop gdm, drop to tty
+alias stop-gdm="systemctl isolate multi-user.target"
+# usage: visual awesome :2 || visual :3 || visual || visual awesome args -- :3
+function visual() {
+  for arg; do
+    if [ "$arg" = "--help" ] || [ "$arg" = "-h" ]; then
+      command cat <<-'EOF'
+			visual [client] [client-args --] [:display] 
+
+			if run without arguments, x-window-manager will be used
+			server will be found in the $PATH. 
+			if $2 is not a valid server and a client is provided,
+			the arguments will be passed directly to the xinit script
+EOF
+      return 0
+    fi
+  done
+  local wm=$1 wmpath
+  local server=$2
+
+  disp_regex="^:[[:digit:]]+$"
+
+  # visual :3
+  if [ -z "$server" ] && [[ "$wm" =~ $disp_regex ]]; then server="$wm" wm=''; fi
+
+  # visual :3 OR visual awesome
+  if [ -z "$wm" ]; then wm="x-window-manager"; fi
+
+  if ! wmpath=$(which "$wm"); then
+    printf '%s\n' "Unable to find $wm in \$PATH" >&2
+    return 2
+  fi
+
+  args=("$wmpath")
+  # if server is defined
+  if [[ "$server" =~ $disp_regex ]]; then
+    args+=(-- "$server")
+  fi
+  args+=("$@")
+  echo "xinit ${args[*]}"
+  xinit "${args[@]}"
+}
