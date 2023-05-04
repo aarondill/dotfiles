@@ -7,7 +7,7 @@ abort() {
 }
 
 # This file provides text mode grub entries to boot without gui.
-if ! command -v findmnt 2>/dev/null; then
+if ! command -v findmnt >/dev/null 2>/dev/null; then
   abort "This requires findmnt from the 'util-linux' package."
 fi
 if ! [ "$(printf '%s\n' 'v0.1.1' 'v0.10.0' | sort -V)" = "$(printf '%s\n' 'v0.1.1' 'v0.10.0')" ]; then
