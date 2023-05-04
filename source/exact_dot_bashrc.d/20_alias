@@ -137,7 +137,7 @@ else
 fi
 # https://nvchad.com/
 function fullscreen() {
-  find=$(search --name --class --classname "$1")
-  if [ -z "$1" ]; then find=$(selectwindow); fi
+  find=(search --name --class --classname "$1")
+  if [ -z "$1" ]; then find=(selectwindow); fi
   xdotool "${find[@]}" windowsize 100% 100% windowmove 0 0 "${@:2}"
 }
