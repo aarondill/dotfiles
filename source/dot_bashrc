@@ -139,22 +139,25 @@ if command -v starship &>/dev/null; then
   # Allow user to override by setting the environment variable to empty string
   export DISABLE_CUSTOM_PS1=${DISABLE_CUSTOM_PS1-1}
 fi
-# Initialize `~/.bashrc.d`
-while IFS= read -r -d '' file; do
-  # For each file, if bench var is assigned,
-  # then call time and output benchmark
-  if [[ $__bashrc_bench ]]; then
-    TIMEFORMAT="$file: %R"
-    time . "$file"
-    unset TIMEFORMAT
-  else
-    . "$file"
-  fi
-done < <(find ~/.bashrc.d/ -type f -not -name "_*" -print0 | LC_ALL=C sort -z)
-# Above: Find all files not starting with _, and sort, ensuring base lang
+if [ -d "$HOME/.bashrc.d/" ]; then
+  # Initialize `~/.bashrc.d`
+  while IFS= read -r -d '' file; do
+    # For each file, if bench var is assigned,
+    # then call time and output benchmark
+    if [[ $__bashrc_bench ]]; then
+      TIMEFORMAT="$file: %R"
+      time . "$file"
+      unset TIMEFORMAT
+    else
+      . "$file"
+    fi
+  done < <(find "$HOME/.bashrc.d/" -type f -not -name "_*" -print0 | LC_ALL=C sort -z)
+  # Above: Find all files not starting with _, and sort, ensuring base lang
+fi
 
 # tabtab source for packages
 # uninstall by removing these lines
-[ -f ~/.config/tabtab/bash/__tabtab.bash ] && . ~/.config/tabtab/bash/__tabtab.bash || true
+# shellcheck source=/home/aaron/.config/tabtab/bash/__tabtab.bash
+if [ -f ~/.config/tabtab/bash/__tabtab.bash ]; then . ~/.config/tabtab/bash/__tabtab.bash; fi
 
 # ------------------------------END OF FILE------------------------------
