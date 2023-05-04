@@ -15,8 +15,8 @@ if ! [ "$(printf '%s\n' 'v0.1.1' 'v0.10.0' | sort -V)" = "$(printf '%s\n' 'v0.1.
 fi
 
 ROOT_UUID="$(findmnt / --output UUID | tail -n1)"
-# First argument is path, then name, all others are find arguments
 
+# First argument is path, then name, all others are find arguments
 find_highest_version() {
   path="$1" && shift 1
   find "$path" -maxdepth 1 -name "$@" | sort -Vr | head -n1
