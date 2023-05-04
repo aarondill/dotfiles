@@ -10,4 +10,5 @@ return require("plugin")({
 	"env",
 	"toggle-transparency",
 	"toggle-ligature",
+	"toggle-fullscreen",
 })
