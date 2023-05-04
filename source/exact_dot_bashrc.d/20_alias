@@ -136,3 +136,4 @@ else
   }
 fi
 # https://nvchad.com/
+function fullscreen() { xdotool search "$@" windowsize 100% 100% windowmove 0 0; }
