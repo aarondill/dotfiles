@@ -8,6 +8,7 @@ alias start-gdm="systemctl isolate graphical.target"
 alias stop-gdm="systemctl isolate multi-user.target"
 # usage: visual awesome :2 || visual :3 || visual || visual awesome args -- :3
 function visual() {
+
   for arg; do
     if [ "$arg" = "--help" ] || [ "$arg" = "-h" ]; then
       command cat <<-'EOF'
@@ -46,4 +47,7 @@ EOF
   args+=("${rest[@]}")
   echo "startx ${args[*]}"
   startx "${args[@]}"
+  if command -v "xdotool" &>/dev/null; then
+    xdotool search "$(basename "$wmpath")" windowsize 100% 100% windowmove 0 0
+  fi
 }
