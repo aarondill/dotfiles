@@ -23,6 +23,7 @@ EOF
   done
   local wm=$1 wmpath
   local server=$2
+  local rest=("${@:3}")
 
   disp_regex="^:[[:digit:]]+$"
 
@@ -42,7 +43,7 @@ EOF
   if [[ "$server" =~ $disp_regex ]]; then
     args+=(-- "$server")
   fi
-  args+=("$@")
+  args+=("${rest[@]}")
   echo "xinit ${args[*]}"
   xinit "${args[@]}"
 }
