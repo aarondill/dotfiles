@@ -35,3 +35,4 @@ vscode/js/EslintTests.js
 .config/tealdeer
 .config/starship.toml
 vscode/Java/java-format.xml
+.local/share/man/man1
