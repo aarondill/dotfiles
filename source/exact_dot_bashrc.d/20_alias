@@ -136,4 +136,6 @@ else
   }
 fi
 # https://nvchad.com/
-function fullscreen() { xdotool search "$@" windowsize 100% 100% windowmove 0 0; }
+function fullscreen() {
+  xdotool search --name --class --classname "$1" windowsize 100% 100% windowmove 0 0 "${@:2}"
+}
