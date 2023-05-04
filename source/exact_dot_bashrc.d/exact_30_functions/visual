@@ -6,8 +6,29 @@
 alias start-gdm="systemctl isolate graphical.target"
 # Stop gdm, drop to tty
 alias stop-gdm="systemctl isolate multi-user.target"
+# usage: fullscreen [Search-Term]
+function fullscreen() {
+  local arg
+  for arg; do
+    if [ "$arg" = "--help" ] || [ "$arg" = "-h" ]; then
+      command cat <<-'EOF'
+ 		fullscreen [SEARCH] 
+ 
+ 		if run without arguments, uses selectwindow to request a window,
+ 		else searches window class, name, and classname for SEARCH. When
+ 		A window is found, it is maximized and moved to the top left corner.
+EOF
+      return 0
+    fi
+  done
+  find=(search --name --class --classname "$1")
+  if [ -z "$1" ]; then find=(selectwindow); fi
+  xdotool "${find[@]}" windowsize 100% 100% windowmove 0 0 "${@:2}"
+}
+
 # usage: visual awesome :2 || visual :3 || visual || visual awesome args -- :3
 function visual() {
+  local arg
 
   for arg; do
     if [ "$arg" = "--help" ] || [ "$arg" = "-h" ]; then
