@@ -12,11 +12,11 @@ function fullscreen() {
   for arg; do
     if [ "$arg" = "--help" ] || [ "$arg" = "-h" ]; then
       command cat <<-'EOF'
- 		fullscreen [SEARCH] 
- 
- 		if run without arguments, uses selectwindow to request a window,
- 		else searches window class, name, and classname for SEARCH. When
- 		A window is found, it is maximized and moved to the top left corner.
+				fullscreen [SEARCH] 
+
+				if run without arguments, uses selectwindow to request a window,
+				else searches window class, name, and classname for SEARCH. When
+				A window is found, it is maximized and moved to the top left corner.
 EOF
       return 0
     fi
