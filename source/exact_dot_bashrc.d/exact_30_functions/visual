@@ -17,6 +17,7 @@ function fullscreen() {
 				if run without arguments, uses selectwindow to request a window,
 				else searches window class, name, and classname for SEARCH. When
 				A window is found, it is maximized and moved to the top left corner.
+        Use DISPLAY=:dsp fullscreen to controll other screens
 EOF
       return 0
     fi
