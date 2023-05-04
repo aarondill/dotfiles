@@ -47,7 +47,4 @@ EOF
   args+=("${rest[@]}")
   echo "startx ${args[*]}"
   startx "${args[@]}"
-  if command -v "xdotool" &>/dev/null; then
-    xdotool search "$(basename "$wmpath")" windowsize 100% 100% windowmove 0 0
-  fi
 }
