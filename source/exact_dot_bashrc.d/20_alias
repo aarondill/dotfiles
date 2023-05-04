@@ -141,3 +141,20 @@ fi
 # alias start-gdm='sudo systemctl start gdm.service'
 alias start-gdm="systemctl isolate graphical.target"
 alias stop-gdm="systemctl isolate multi-user.target"
+function visual() {
+  local wm=$1 wmpath
+  local server=$2
+
+  if [ -z "$wm" ]; then wm="x-window-manager"; fi
+  if ! wmpath=$(which "$wm"); then
+    printf '%s\n' "Unable to find $wm in \$PATH" >&2
+    return 2
+  fi
+  regex="^:[[:digit:]]+"
+  if [[ $server =~ $regex ]]; then
+    xinit "$wmpath" -- "$@"
+  else
+    xinit "$wmpath" "$@"
+  fi
+}
+alias visual="startx \$(which awesome) --"
