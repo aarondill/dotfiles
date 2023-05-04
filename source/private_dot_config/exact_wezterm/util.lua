@@ -47,4 +47,20 @@ function M.define_key(key)
 	end
 end
 
+---Runs cmd and returns stdout
+---Note: Stderr will be displayed
+---@param cmd string cmd to run
+---@param raw boolean? if `true`, returns stdout as raw string, else process it
+---@return string stdout processed or raw depending on `raw`
+function M.os.capture(cmd, raw)
+	local f = assert(io.popen(cmd, "r"))
+	local s = assert(f:read("*a"))
+	f:close()
+  --stylua: ignore
+	if raw then return s end
+	s = string.gsub(s, "^%s+", "")
+	s = string.gsub(s, "%s+$", "")
+	s = string.gsub(s, "[\n\r]+", " ")
+	return s
+end
 return M
