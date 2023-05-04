@@ -64,9 +64,9 @@ EOF
   args=("$wmpath")
   # if server is defined
   if [[ "$server" =~ $disp_regex ]]; then
-    args+=(-- "$server")
+    args+=(--)
   fi
-  args+=("${rest[@]}")
+  args+=("$server" "${rest[@]}")
   echo "startx ${args[*]}"
   startx "${args[@]}"
 }
