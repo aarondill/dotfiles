@@ -1,27 +1,49 @@
 #!/bin/sh
-# This file provides an easy way to add custom menu entries.
+set -e
+log() { printf '%s\n' "$@" >&2; }
+abort() {
+  log "$@"
+  exit 1
+}
+
+# This file provides text mode grub entries to boot without gui.
+if ! command -v findmnt 2>/dev/null; then
+  abort "This requires findmnt from the 'util-linux' package."
+fi
+if ! [ "$(printf '%s\n' 'v0.1.1' 'v0.10.0' | sort -V)" = "$(printf '%s\n' 'v0.1.1' 'v0.10.0')" ]; then
+  abort "This requires a sort that supports version sorting"
+fi
 
 ROOT_UUID="$(findmnt / --output UUID | tail -n1)"
 # First argument is path, then name, all others are find arguments
 
-if ! [ "$(printf '%s\n' 'v0.1.1' 'v0.10.0' | sort -V)" = "$(printf '%s\n' 'v0.1.1' 'v0.10.0')" ]; then
-  printf '%s\n' "This requires a sort that supports version sorting" >&2
-  return # exits the script
-fi
-
 find_highest_version() {
   path="$1" && shift 1
-  sudo find "$path" -maxdepth 1 -name "$@" | sort -Vr | head -n1
+  find "$path" -maxdepth 1 -name "$@" | sort -Vr | head -n1
 }
 
 VMLINUZ=$(find_highest_version /boot 'vmlinuz-*-generic')
 INITRD=$(find_highest_version /boot 'initrd.img-*-generic')
 # Remove splash and quiet args from GRUB_CMDLINE_LINUX_DEFAULT
 GRUB_CMDLINE_ARGS=$(printf '%s\n' "$GRUB_CMDLINE_LINUX_DEFAULT" | sed -e 's/\bsplash\b//g' -e 's/\bquiet\b//g')
-printf '%s\n' "Creating text mode linux at the current root drive '$ROOT_UUID', with vmlinuz '$VMLINUZ' and initrd '$INITRD'" >&2
+
+CLASS="--class gnu-linux --class gnu --class os"
+
+if [ -n "$GRUB_DISTRIBUTOR" ]; then
+  case $GRUB_DISTRIBUTOR in
+  Ubuntu | Kubuntu) OS="$GRUB_DISTRIBUTOR" ;;
+  *) OS="$GRUB_DISTRIBUTOR GNU/Linux" ;;
+  esac
+  CLASS="--class $(echo "$GRUB_DISTRIBUTOR" | tr '[:upper:]' '[:lower:]' | cut -d' ' -f1 | LC_ALL=C sed 's,[^[:alnum:]_],_,g') $CLASS"
+else
+  OS=GNU/Linux
+fi
+
+log "Creating text mode linux at the current root drive '$ROOT_UUID', with vmlinuz '$VMLINUZ' and initrd '$INITRD'"
+
 cat <<-EOF
 
-menuentry 'Ubuntu (Text mode)' --class ubuntu {
+menuentry '$OS (Text mode)' $CLASS {
   recordfail
   savedefault
   gfxmode \$linux_gfx_mode
