@@ -145,7 +145,7 @@ alias stop-gdm="systemctl isolate multi-user.target"
 function visual() {
   for arg; do
     if [ "$arg" = "--help" ] || [ "$arg" = "-h" ]; then
-      cat <<-'EOF'
+      command cat <<-'EOF'
 			visual [client] [client-args --] [:display] 
 
 			if run without arguments, x-window-manager will be used
@@ -153,6 +153,7 @@ function visual() {
 			if $2 is not a valid server and a client is provided,
 			the arguments will be passed directly to the xinit script
 EOF
+      return 0
     fi
   done
   local wm=$1 wmpath
