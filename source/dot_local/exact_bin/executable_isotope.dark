@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # sets the color of tty using setcolors
+# https://github.com/EvanPurkhiser/linux-vt-setcolors
 # Sets to isotope.dark (from terminal.sexy)
 setcolors <(
   cat <<-'EOF'
