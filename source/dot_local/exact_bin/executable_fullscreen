@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# usage: fullscreen [Search-Term]
+set -ue
+for arg; do
+  case "$arg" in
+  --help | -h)
+    command cat <<-'EOF'
+				fullscreen [SEARCH] 
+
+				if run without arguments, uses selectwindow to request a window,
+				else searches window class, name, and classname for SEARCH. When
+				A window is found, it is maximized and moved to the top left corner.
+        Use DISPLAY=:dsp fullscreen to controll other screens
+EOF
+    return 0
+    ;;
+  esac
+done
+
+if [ -z "$1" ]; then
+  find=(selectwindow)
+else
+  find=(search --name --class --classname "$1")
+fi
+xdotool "${find[@]}" windowsize 100% 100% windowmove 0 0 "${@:2}"

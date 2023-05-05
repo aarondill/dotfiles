@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+set -ue
+# usage: visual awesome :2 || visual :3 || visual || visual awesome args -- :3
+
+for arg in "$@"; do
+  if [ "$arg" = "--help" ] || [ "$arg" = "-h" ]; then
+    command cat <<-'EOF'
+			visual [client] [client-args --] [:display] 
+
+			if run without arguments, x-window-manager will be used
+			server will be found in the $PATH. 
+			if $2 is not a valid server and a client is provided,
+			the arguments will be passed directly to the startx script
+EOF
+    return 0
+  fi
+done
+
+wm=$1
+server=$2
+rest=("${@:3}")
+
+disp_regex="^:[[:digit:]]+$"
+
+# visual :3
+if [ -z "$server" ] && [[ "$wm" =~ $disp_regex ]]; then server="$wm" wm=''; fi
+
+# visual :3 OR visual awesome
+if [ -z "$wm" ]; then wm="x-window-manager"; fi
+
+if ! wmpath=$(which "$wm"); then
+  printf '%s\n' "Unable to find $wm in \$PATH" >&2
+  return 2
+fi
+
+args=("$wmpath")
+# if server is defined
+if [[ "$server" =~ $disp_regex ]]; then
+  args+=(--)
+fi
+args+=("$server" "${rest[@]}")
+echo "startx ${args[*]}"
+startx "${args[@]}"
