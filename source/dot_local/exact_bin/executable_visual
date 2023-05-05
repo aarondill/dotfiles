@@ -16,7 +16,7 @@ EOF
   fi
 done
 
-wm=${1:}
+wm=${1:-}
 server=${2-}
 rest=("${@:3}")
 
