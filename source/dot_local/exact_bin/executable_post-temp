@@ -16,9 +16,9 @@ Usage: $THIS [OPTION...] [--] FILE...
 Hosts a temporary file on the internet for 60 mins and exits the url.
 
 OPTIONS:
-    -h, --help: display this help message
-    -v, --verbose: display verbose messages
-    -q, --quiet: be quieter
+  -h, --help: display this help message
+  -v, --verbose: display verbose messages
+  -q, --quiet: be quieter
 EOF
   return 0
 }
