@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+# ~/.local/bin/assert-newlines
+#
+# searches all text files
+# and appends a newline '\n' if it doesn't already
+# end in a newline.
+#
+set -eu
+log() { printf '%s\n' "$@"; }
+err() { printf "$THIS: %s\n" "$@" >&2; }
+abort() { err "$1" && exit "${2:-1}"; }
+
+THIS=assert-newlines
+usage() {
+  cat <<-EOF
+  $THIS DIR...
+
+  searches all text files and appends a newline if it doesn't already end in a one.
+EOF
+}
+args=()
+end=false
+for arg; do
+  if [ $end = true ]; then args+=("$arg") && continue; fi
+  case "$arg" in
+  --help | -h) usage && exit 0 ;;
+  --) end=true ;;
+  *) args+=("$arg") ;;
+  esac
+done
+
+unset end
+for arg in "${args[@]}"; do
+  if [ -n "$arg" ] && ! [ -e "$arg" ]; then
+    abort "file '$arg' does not exist" 2
+  fi
+
+  IFS= readarray -d '' files < <(find "${arg:-.}" -not -path '*/.*' -type f -exec grep -Iq . {} \; -print0)
+  for file in "${files[@]}"; do
+    # Check if ends in new line
+    if ! [[ "$(tail -c1 "$file" | wc -l)" -gt 0 ]]; then
+      log "adding newline to $file"
+      printf '\n' >>"$file"
+    fi
+  done
+done
