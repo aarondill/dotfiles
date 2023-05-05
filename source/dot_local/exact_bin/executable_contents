@@ -1,0 +1,66 @@
+#! /usr/bin/env bash
+
+# ~/.local/bin/contents
+#
+# Read the contents of a file or executable
+# *Follows Symlinks*
+#
+THIS=contents
+log() { printf '%s\n' "$@"; }
+err() { printf "$THIS: %s\n" "$@" >&2; }
+abort() { err "$1" && exit "${2:-1}"; }
+
+set -eu # subshell
+args=() end=false pager=true
+for arg; do
+  if [ $end = true ]; then
+    args+=("$arg")
+    continue
+  fi
+  case "$arg" in
+  --help | -h)
+    command cat <<-EOF
+			$THIS [file|executable]
+												
+			outputs the contents of a file using \$PAGER, calls which if file is not found
+      options:
+      -P, --no-pager   Don't attempt to open the files using a pager (\$PAGER)
+EOF
+    return 0
+    ;;
+  --) end=true ;;
+  --no-pager | -P) pager=false ;;
+  -*) printf '%s\n' "Invalid option -- $arg" && return 1 ;;
+  *) args+=("$arg") ;;
+  esac
+done
+unset end
+
+files=()
+for file in "${args[@]}"; do
+  # Given a path
+  if [ -f "$file" ]; then
+    files+=("$file")
+    continue
+  fi
+
+  # given a name
+  whichfile=$(which "$file" 2>/dev/null)
+  if [ -f "$whichfile" ]; then
+    files+=("$whichfile")
+    continue
+  fi
+
+  # couldn't find
+  err "$file is not a file"
+  continue
+done
+
+# Use pager if can, else use cat
+if [ "$pager" = true ]; then
+  PAGER=${PAGER:-$(which pager 2>/dev/null || which cat 2>/dev/null || printf '/bin/cat')}
+else
+  PAGER=$(which cat 2>/dev/null || printf '/bin/cat')
+fi
+# output them all
+"$PAGER" -- "${files[@]}"
