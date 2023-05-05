@@ -28,6 +28,8 @@ abort() {
   exit "${2:-1}"
 }
 
+if [ $# -eq 0 ]; then usage && exit 0; fi
+
 verbose=false quiet=false end=false args=()
 for arg; do
   # stop processing when hit --
