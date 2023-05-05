@@ -1,26 +1,49 @@
 #!/usr/bin/env bash
 set -eu
-function verbose() {
-  local tmp
-  tmp="$(mktemp)" || return 1
-  sudo kill -s SIGRTMIN+20 1 || {
-    rm -f "$tmp"
-    return 1
-  }
-  # make plymouth hidden
-  sed /proc/cmdline -e 's/\bsplash\b//g' \
-    -e 's/\(\s\)\+/\1/g' >|"$tmp" || {
-    rm -f "$tmp"
-    return 1
-  }
 
-  sudo umount /proc/cmdline -q || true
-  sudo mount -n --bind -o ro "$tmp" /proc/cmdline || {
-    rm -f "$tmp"
-    return 1
-  }
-  rm -f "$tmp"
-  return 0
+THIS=stop-gdm
+
+usage() {
+  cat <<-EOF
+usage: $THIS 
+
+Sets systemd to show it's status, hides plymouth on shutdown, and stops gdm through systemd multi-user.target
+No options or arguments are accepted except --help
+EOF
 }
 
-systemctl isolate multi-user.target
+for arg; do
+  case "$arg" in
+  --help | -help | -h) usage && exit 0 ;;
+  esac
+done
+
+set -eu
+log() { printf '%s\n' "$@"; }
+err() { printf "$THIS: %s\n" "$@" >&2; }
+abort() { err "$1" && exit "${2:-1}"; }
+
+remove_from_file() {
+  local file=$1
+  local remove=("${@:2}")
+  local args=()
+  for word in "${remove[@]}"; do
+    args+=(-e "s/\b$word\b//g")
+  done
+  sed "$file" "${args[@]}" # output
+}
+concat() { printf '%s ' "$@"; }
+
+tmp_file="$(mktemp)" || return 1
+trap 'rm -f "$tmp_file"' EXIT
+sudo kill -s SIGRTMIN+20 1 || abort "Error setting systemd to output messages"
+# make plymouth hidden
+concat "$(remove_from_file /proc/cmdline 'splash')" 'nosplash' >|"$tmp_file"
+
+sudo umount /proc/cmdline -q || true
+sudo mount -n --bind -o ro "$tmp_file" /proc/cmdline || abort 'Error mounting /proc/cmdline'
+
+# cleanup
+rm -f "$tmp_file" && trap '' EXIT
+
+exec systemctl isolate multi-user.target
