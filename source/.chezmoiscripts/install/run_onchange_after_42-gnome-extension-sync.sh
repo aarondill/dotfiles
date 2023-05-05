@@ -1,6 +1,10 @@
 #!/bin/bash
 # Installs extension sync gnome extension
 set -e
+# Source utils
+SOURCE_DIR=$(chezmoi source-path)
+# shellcheck source=../.utils.sh
+. "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
 function sync_extensions() {
   ## Sync if present
@@ -19,11 +23,6 @@ function sync_extensions() {
     return 0
   }
 }
-
-# Source utils
-SOURCE_DIR=$(chezmoi source-path)
-# shellcheck source=../.utils.sh
-. "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
 if ! [ -f /usr/bin/gnome-session ]; then
   # Gnome is not installed
