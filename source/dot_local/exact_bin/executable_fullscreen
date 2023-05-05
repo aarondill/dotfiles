@@ -1,16 +1,23 @@
 #!/usr/bin/env bash
 # usage: fullscreen [Search-Term]
+THIS=fullscreen
+log() { printf '%s\n' "$@"; }
+err() { printf "$THIS: %s\n" "$@" >&2; }
+abort() { err "$1" && exit "${2:-1}"; }
 set -ue
 for arg; do
   case "$arg" in
   --help | -h)
     command cat <<-'EOF'
-				fullscreen [SEARCH] 
+				fullscreen [SEARCH] [xdotool-args]
 
 				if run without arguments, uses selectwindow to request a window,
 				else searches window class, name, and classname for SEARCH. When
 				A window is found, it is maximized and moved to the top left corner.
-        Use DISPLAY=:dsp fullscreen to controll other screens
+				Use DISPLAY=:dsp fullscreen to control other screens
+
+        xdotool-args are commands for xdotool that are prepended to the
+        windowsize command. Use {id} to mean the specified window id.
 EOF
     return 0
     ;;
@@ -22,4 +29,10 @@ if [ -z "$1" ]; then
 else
   find=(search --name --class --classname "$1")
 fi
-xdotool "${find[@]}" windowsize 100% 100% windowmove 0 0 "${@:2}"
+id=$(xdotool "${find[@]}") || abort "Could not find window on display: ${DISPLAY:-NONE}"
+
+userargs=()
+# Replace {id} with the id in the user string
+for arg in "${@:2}"; do userargs+=("${arg//\{id\}/$id}"); done
+
+xdotool "${userargs[@]}" windowsize "$id" 100% 100% windowmove "$id" 0 0
