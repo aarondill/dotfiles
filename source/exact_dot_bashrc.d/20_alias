@@ -145,13 +145,9 @@ function quiet() {
   }
 
   # make plymouth show
-  sed /proc/cmdline -e 's/\bnosplash\b//g' \
+  printf '%s ' "$(sed /proc/cmdline -e 's/\bnosplash\b//g' \
     -e 's/\bplymouth.enable=0\b//g' \
-    -e 's/\(\s\)\+/\1/g' >|"$tmp" || {
-    rm -f "$tmp"
-    return 1
-  }
-  printf '%s' "splash" >>"$tmp" || {
+    -e 's/\(\s\)\+/\1/g')" "splash" >|"$tmp" || {
     rm -f "$tmp"
     return 1
   }
