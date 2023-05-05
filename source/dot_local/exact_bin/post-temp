@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+
+# ~/.local/bin/post-temp
+#
+# Hosts a temporary file on the internet for 60 mins and echos the url.
+#
+#
+set -eu
+
+THIS='post-temp'
+
+usage() {
+
+  cat <<-EOF
+			$THIS [options] [--] FILE
+
+			Hosts a temporary file on the internet for 60 mins and exits the url.
+      -h, --help: display this help message
+      -v, --verbose: display verbose messages
+      -q, --quiet: be quieter
+EOF
+  return 0
+}
+log() { printf '%s\n' "$@"; }
+err() { printf "$THIS: %s\n" "$@" >&2; }
+abort() {
+  err "$1"
+  exit "${2:-1}"
+}
+
+verbose=false quiet=false end=false args=()
+for arg; do
+  # stop processing when hit --
+  if [ "$end" = true ]; then args+=("$arg") && continue; fi
+  case "$arg" in
+  -h | --help) usage && exit 0 ;;
+  -v | --verbose) verbose=true ;;               # Verbose option
+  -q | --quiet) quiet=true ;;                   # Quiet option
+  --) end=true ;;                               # End of args. this is not one.
+  -*) abort "invalid option -- '${arg#-}'" 2 ;; # Invalid -flag
+  *) args+=("$arg") ;;                          # Any other argument
+  esac
+done
+unset end arg
+
+fx=$(which fx 2>/dev/null || printf '')
+if [ -z "$fx" ] && [ "$quiet" != "true" ]; then err "This script works much better with 'fx' installed."; fi
+
+declare -i exitcode=0
+
+for file in "${args[@]}"; do
+  if ! [[ -f "$file" ]]; then
+    err "'$file' is not a file"
+    exitcode=2 && continue
+  fi
+
+  result="$(curl -sSfL -F "file=@$file" https://tmpfiles.org/api/v1/upload)" ||
+    abort 'Something went wrong during curl command. Aborting.' 1 # exits program
+  # Example outputs:
+  # {"message": "server error"}
+  # {"status":"success","data":{"url":"https://tmpfiles.org/######/file"}}
+
+  # If verbose, or fx not installed, print entire json
+  if [ "$verbose" = true ] || [ -z "$fx" ]; then
+    log "$result"
+    [ -z "$fx" ] && continue # Stops loop here because fx is not installed
+  fi
+
+  # Print the result thru fx to get the data
+  # Already strings, if present, but trying to error
+  status="$("$fx" '.status.toString()' <<<"$result" 2>/dev/null)"
+  url="$("$fx" '.data.url.toString()' <<<"$result" 2>/dev/null)"
+
+  if [ -z "$status" ] || [ -z "$url" ]; then
+    message="$("$fx" '.message.toString()' <<<"$result" 2>/dev/null)"
+    if [ -n "$message" ]; then err "$message"; else err "An unknown error occured"; fi
+    exitcode=1
+  else
+    [ "$quiet" != true ] && log "$status"
+    log "${url/tmpfiles.org\//tmpfiles.org\/dl\/}"
+  fi
+done
+
+exit $exitcode

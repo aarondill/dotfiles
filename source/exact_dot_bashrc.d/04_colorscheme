@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+if [ -z "$DISPLAY" ]; then
+isotope.dark
+fi
