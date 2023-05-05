@@ -57,7 +57,7 @@ for file in "${args[@]}"; do
 done
 
 # Use pager if can, else use cat
-if [ "$pager" = true ]; then
+if [ "$pager" = true ] && [ -t 1 ]; then
   PAGER=${PAGER:-$(which pager 2>/dev/null || which cat 2>/dev/null || printf '/bin/cat')}
 else
   PAGER=$(which cat 2>/dev/null || printf '/bin/cat')
