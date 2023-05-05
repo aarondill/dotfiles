@@ -155,6 +155,8 @@ function quiet() {
     rm -f "$tmp"
     return 1
   }
+
+  sudo umount /proc/cmdline -q || true
   sudo mount -n --bind -o ro "$tmp" /proc/cmdline || {
     rm -f "$tmp"
     return 1
@@ -176,6 +178,7 @@ function verbose() {
     return 1
   }
 
+  sudo umount /proc/cmdline -q || true
   sudo mount -n --bind -o ro "$tmp" /proc/cmdline || {
     rm -f "$tmp"
     return 1
