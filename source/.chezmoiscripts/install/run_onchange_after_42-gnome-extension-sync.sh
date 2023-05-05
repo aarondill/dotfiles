@@ -1,6 +1,6 @@
 #!/bin/bash
 # Installs extension sync gnome extension
-set -e
+set -eu
 # Source utils
 SOURCE_DIR=$(chezmoi source-path)
 # shellcheck source=../.utils.sh
@@ -14,9 +14,11 @@ function sync_extensions() {
 
   # If sync file exists, read from it
   # Set local file mode
-  dconf write '/org/gnome/shell/extensions/extensions-sync/provider' '"Local"' || return 0
+  dconf write '/org/gnome/shell/extensions/extensions-sync/provider' '"Local"' || abort0
   # Set backup location
-  dconf write '/org/gnome/shell/extensions/extensions-sync/backup-file-location' '"file://'"$HOME"'/.config/extensions-sync.json"' || return 0
+  dconf write '/org/gnome/shell/extensions/extensions-sync/backup-file-location' '"file://'"$HOME"'/.config/extensions-sync.json"' || abort0
+  # Allow no matter what version - not safe, but idc
+  dconf write '/org/gnome/shell/disable-extension-version-validation' "true" || abort0
   # load from the file
   busctl --user call org.gnome.Shell /io/elhan/ExtensionsSync io.elhan.ExtensionsSync read || {
     err "failed to sync extensions, check that extensions-sync supports your current gnome version"
