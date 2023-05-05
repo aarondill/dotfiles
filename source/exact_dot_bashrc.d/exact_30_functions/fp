@@ -125,30 +125,36 @@ EOF
 
 # For finding directories
 fpd() (
-  local output
-  if [ "$1" = '--help' ]; then
-    printf '%s\n' \
-      'fpd [--disable-color|-C] [PATH]' \
-      '' \
-      'find directories in PATH to output the user'"'"'s choice' \
-      'calls cd if stdout is connected to a tty'
-    return 0
-  fi
-  if [ "$1" = '--disable-color' ] || [ "$1" = '-C' ]; then
-    unset FZF_USE_COLOR
-    FZF_DEFAULT_OPTS=''
-    shift 1
-  fi
-  # set the command to call with
-  FZF_DEFAULT_COMMAND="FZF_FIND_DIR ${1:-.}"
+  set -eu # subshell
+  args=() done=false
+  for arg; do
+    if [ $done = true ]; then
+      args+=("$arg")
+      continue
+    fi
+    case "$arg" in
+    --help | -h)
+      command cat <<-EOF
+			fpd [--disable-color|-C] [PATH...]
+												
+      find directories in PATH to output the user's choice
+EOF
+      return 0
+      ;;
+    --disable-color | -C) unset FZF_USE_COLOR FZF_DEFAULT_OPTS ;;
+    --) done=true ;;
+    -*) printf '%s\n' "Invalid option -- $arg" && return 1 ;;
+    *) args+=("$arg") ;;
+    esac
+  done
 
-  # Call with the path given, if applicable, and find all directories
-  output=$(
-    fzf --preview "FZF_DIR_PREVIEW {} | head -n200" "${@:2}"
-  ) || return
-  if [[ -t 1 ]] && [[ -n "$output" ]]; then
-    cd "$output" || return
+  if [ ${#args[@]} -eq 0 ]; then
+    FZF_DEFAULT_COMMAND="FZF_FIND_DIR ."
   else
-    printf '%s' "$output"
+    FZF_DEFAULT_COMMAND="FZF_FIND_DIR $(printf '"%s" ' "$@")"
   fi
+
+  # Call with the path given, if applicable, and find all files
+  output=$(fzf --preview "FZF_DIR_PREVIEW {} | head -n500")
+  printf '%s' "$output"
 )
