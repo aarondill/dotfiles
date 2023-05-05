@@ -1,0 +1,26 @@
+#!/bin/sh
+BrPath=$(find /sys/class/backlight -maxdepth 1 -mindepth 1 | head -n1)
+BrMax=$(cat "$BrPath/max_brightness")
+# 100th max-brightness, rounded up to nearest integer
+BrMin=$((0 + (BrMax + 100 - 1) / 100))
+BrCur=$(cat "$BrPath/brightness")
+
+BrCurRel=$(printf '%s ' "$BrCur" "$BrMax" | awk '{ print int( $1 / $2 * 100 ) }')
+
+if command -v yad 2>/dev/null >/dev/null; then
+  BrNewRel=$(yad --scale --min-value 0 --max-value 100 --value "$BrCurRel" --print-partial --title 'Set brightness' --width 300 --fixed --sticky --mouse --on-top --escape-ok --button OK --hide-value)
+elif command -v dialog 2>/dev/null >/dev/null; then
+  BrNewRel=$(dialog --rangebox Brightness -1 -1 0 100 "$BrCurRel" 3>&1 1>&2 2>&3)
+else
+  exit 1
+fi
+if [ -z "$BrNewRel" ]; then exit 1; fi
+
+BrNew=$(printf '%s ' "$BrNewRel" "$BrMax" | awk '{ print int( ( ($1/100) * $2) ) }')
+BrNew=$((BrNew < BrMin ? BrMin : BrNew))
+BrNew=$((BrNew > BrMax ? BrMax : BrNew))
+
+sudo=""
+if ! [ -w "$BrPath"/brightness ]; then sudo="sudo"; fi
+
+printf '%s' "$BrNew" | $sudo tee "$BrPath/brightness" >/dev/null
