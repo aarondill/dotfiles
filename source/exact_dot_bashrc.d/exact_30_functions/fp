@@ -25,15 +25,15 @@ if command -v fd &>/dev/null; then
   # Echo if FZF_USE_COLOR is set
   FZF_BASE_COMMAND() { fd --follow --hidden --exclude .git "$@"; }
   FZF_FIND_DIR() {
-    FZF_BASE_COMMAND "$(test "$FZF_USE_COLOR" && printf -- "--color=always")" --type d . "$1"
+    FZF_BASE_COMMAND "$(test "$FZF_USE_COLOR" && printf -- "--color=always")" --type d . "$@"
   }
   FZF_FIND_FILE() {
-    FZF_BASE_COMMAND "$(test "$FZF_USE_COLOR" && printf -- "--color=always")" --type f . "$1"
+    FZF_BASE_COMMAND "$(test "$FZF_USE_COLOR" && printf -- "--color=always")" --type f . "$@"
   }
 else
   FZF_BASE_COMMAND() { find "$@"; }
-  FZF_FIND_DIR() { FZF_BASE_COMMAND "$1" --type d; }
-  FZF_FIND_FILE() { FZF_BASE_COMMAND "$1" --type f; }
+  FZF_FIND_DIR() { FZF_BASE_COMMAND "$@" --type d; }
+  FZF_FIND_FILE() { FZF_BASE_COMMAND "$@" --type f; }
 fi
 
 # Use better cat if installed
