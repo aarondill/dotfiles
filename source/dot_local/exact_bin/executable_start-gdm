@@ -7,7 +7,7 @@ usage() {
   cat <<-EOF
 usage: $THIS 
 
-Sets systemd to hide it's status, shows plymouth on shutdown, and starts gdm through systemd graphical.target
+Sets systemd to hide its status, shows plymouth on shutdown, and starts gdm through systemd graphical.target
 No options or arguments are accepted except --help
 EOF
 }
