@@ -85,7 +85,7 @@ export FZF_DEFAULT_COMMAND="FZF_FIND_FILE ."
 
 fp() (
   local output arg
-  for arg in; do
+  for arg; do
     case "$arg" in
     --help | -h)
       cat <<-EOF
