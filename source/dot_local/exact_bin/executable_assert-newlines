@@ -31,6 +31,7 @@ for arg; do
 done
 
 unset end
+found=false
 for arg in "${args[@]}"; do
   if [ -n "$arg" ] && ! [ -e "$arg" ]; then
     abort "file '$arg' does not exist" 2
@@ -41,7 +42,9 @@ for arg in "${args[@]}"; do
     # Check if ends in new line
     if ! [[ "$(tail -c1 "$file" | wc -l)" -gt 0 ]]; then
       log "adding newline to $file"
+      found=true
       printf '\n' >>"$file"
     fi
   done
 done
+if [ $found = false ]; then log "No files without a ending newline were found"; fi
