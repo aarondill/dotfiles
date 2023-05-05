@@ -45,6 +45,7 @@ for arg; do
   esac
 done
 unset end arg
+if [ "${#args[@]}" -eq 0 ]; then abort "FILE is required!" 2; fi
 
 fx=$(which fx 2>/dev/null || printf '')
 if [ -z "$fx" ] && [ "$quiet" != "true" ]; then err "This script works much better with 'fx' installed."; fi
