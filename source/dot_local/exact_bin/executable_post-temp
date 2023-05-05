@@ -12,12 +12,13 @@ THIS='post-temp'
 usage() {
 
   cat <<-EOF
-			$THIS [options] [--] FILE
-
+			Usage: $THIS [OPTION...] [--] FILE...
 			Hosts a temporary file on the internet for 60 mins and exits the url.
-      -h, --help: display this help message
-      -v, --verbose: display verbose messages
-      -q, --quiet: be quieter
+
+			OPTIONS:
+				-h, --help: display this help message
+				-v, --verbose: display verbose messages
+				-q, --quiet: be quieter
 EOF
   return 0
 }
