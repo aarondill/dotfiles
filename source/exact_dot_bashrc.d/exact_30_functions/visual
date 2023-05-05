@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-# Aliases and functions for tty usage
-
-# alias start-gdm='sudo systemctl start gdm.service'
-# Start gdm (gnome display manager)
-alias start-gdm="systemctl isolate graphical.target"
-# Stop gdm, drop to tty
-alias stop-gdm="systemctl isolate multi-user.target"
