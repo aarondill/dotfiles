@@ -136,4 +136,4 @@ else
   }
 fi
 # https://nvchad.com/
-alias quiet='kill -s SIGRTMIN+21 $(pidof systemd) && sudo plymouth reactivate'
+alias quiet='kill -s SIGRTMIN+21 $(pidof systemd)'
