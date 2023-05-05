@@ -16,8 +16,8 @@ EOF
   fi
 done
 
-wm=$1
-server=$2
+wm=${1:}
+server=${2-}
 rest=("${@:3}")
 
 disp_regex="^:[[:digit:]]+$"
