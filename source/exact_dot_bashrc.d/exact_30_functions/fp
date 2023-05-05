@@ -90,8 +90,8 @@ fp() (
       'fp [--disable-color|-C] [PATH]' \
       '' \
       'find files in PATH to output the user'"'"'s choice' \
-      'Opens editor if stdout is connected to a tty' \
-      return 0
+      'Opens editor if stdout is connected to a tty'
+    return 0
   fi
   if [ "$1" = '--disable-color' ] || [ "$1" = '-C' ]; then
     unset FZF_USE_COLOR
