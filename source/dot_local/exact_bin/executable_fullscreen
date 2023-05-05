@@ -24,7 +24,7 @@ EOF
   esac
 done
 
-if [ -z "$1" ]; then
+if [ -z "${1:-}" ]; then
   find=(selectwindow)
 else
   find=(search --name --class --classname "$1")
