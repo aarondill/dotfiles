@@ -84,32 +84,38 @@ export -f FZF_FIND_DIR FZF_FIND_FILE FZF_CAT_CMD FZF_CAT_CMD_JSON FZF_DIR_PREVIE
 export FZF_DEFAULT_COMMAND="FZF_FIND_FILE ."
 
 fp() (
-  local output arg
+  set -eu # subshell
+  args=() done=false
   for arg; do
+    if [ $done = true ]; then
+      args+=("$arg")
+      continue
+    fi
     case "$arg" in
     --help | -h)
-      cat <<-EOF
-			fp [--disable-color|-C] [PATH]
+      command cat <<-EOF
+			fp [--disable-color|-C] [PATH...]
 												
 			find files in PATH to output the user's choice
 			Opens editor if stdout is connected to a tty
 EOF
       return 0
       ;;
-    --disable-color | -C)
-      unset FZF_USE_COLOR
-      FZF_DEFAULT_OPTS=''
-      ;;
+    --disable-color | -C) unset FZF_USE_COLOR FZF_DEFAULT_OPTS ;;
+    --) done=true ;;
+    -*) printf '%s\n' "Invalid option -- $arg" && return 1 ;;
+    *) args+=("$arg") ;;
     esac
   done
 
-  # set the command to call with
-  FZF_DEFAULT_COMMAND="FZF_FIND_FILE ${1:-.}"
+  if [ ${#args[@]} -eq 0 ]; then
+    FZF_DEFAULT_COMMAND="FZF_FIND_FILE ."
+  else
+    FZF_DEFAULT_COMMAND="FZF_FIND_FILE $(printf '"%s "' "$@")"
+  fi
 
   # Call with the path given, if applicable, and find all files
-  output=$(
-    fzf --preview "FZF_FILE_PREVIEW {} | head -n500" "${@:2}"
-  ) || return
+  output=$(fzf --preview "FZF_FILE_PREVIEW {} | head -n500")
   if [[ -t 1 ]] && [[ -n "$output" ]]; then
     editor "$output"
   else
