@@ -9,8 +9,8 @@ usage() {
 usage: $THIS [percent]
        $THIS show
 
-sets the brightness to the specified integer percentage
-What is done depends on the arguments passed:
+sets the brightness to the specified integer percentage.
+what is done depends on the arguments passed:
   'show':              outputs current brightness percentage.
   integer percentage:  the brightness will be set to the specified percentage
   no argument:         a percentage will be retrieved graphically from the user
