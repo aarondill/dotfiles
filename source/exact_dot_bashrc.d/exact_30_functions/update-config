@@ -112,7 +112,7 @@ function update-root-config() {
   test ${#add_files[@]} -gt 0 && chezmoi add -- "${add_files[@]}"
   test ${#encrypted_files[@]} -gt 0 && chezmoi add --encrypt -- "${encrypted_files[@]}"
   if test ${#add_files[@]} -eq 0 && test ${#encrypted_files[@]} -eq 0; then
-    echo "No files have changed (dirs not recursive)"
+    printf '%s\n' "No files have changed (dirs not recursive)"
   fi
   return 0
 }
