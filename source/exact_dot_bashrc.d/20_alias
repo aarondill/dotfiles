@@ -92,6 +92,10 @@ fi
 
 # Shorter git
 if command -v git &>/dev/null; then
+  # Reuse cd completion if present (overwritten already), else default to directories
+  complete=$(complete -p git 2>/dev/null || printf '%s ' complete -d git)
+  # remove ' cd' and replace with ' z'. Lack of quotes is intentional!
+  ${complete% git} g
   alias g='git'
 fi
 
