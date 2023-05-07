@@ -92,12 +92,12 @@ fi
 
 # Shorter git
 if command -v git &>/dev/null; then
-  # Reuse git completion if present (overwritten already), else default to directories
-  complete=$(complete -p git || printf '%s ' complete -d git)
-  # remove ' git' and replace with ' g'. Lack of quotes is intentional!
-  complete="complete -o bashdefault -o default -o nospace -F __git_wrap__git_main git"
-  ${complete% git} g
   alias g='git'
+  # Reuse git completion if present (overwritten already), else default to directories
+  complete=$(complete -p git || printf '%s ' complete -o bashdefault -o default -o nospace -F __git_wrap__git_main git)
+  # remove ' git' and replace with ' g'. Lack of quotes is intentional!
+  ${complete% git} g
+  __load_completion git
 fi
 
 IBus="org.freedesktop.IBus.session.GNOME.service"
