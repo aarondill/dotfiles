@@ -64,8 +64,8 @@ if zoxide -V &>/dev/null; then
   eval "$(zoxide init bash)"
   # Reuse cd completion if present (overwritten already), else default to directories
   complete=$(complete -p cd 2>/dev/null || printf '%s ' complete -d cd)
-  # remove ' cd' and replace with ' z'
-  "${complete% cd}" z
+  # remove ' cd' and replace with ' z'. Lack of quotes is intentional!
+  ${complete% cd} z
   alias cd='z'
 fi
 
