@@ -5,8 +5,8 @@
 # Sets up aliases for user usage
 #
 
-# Alias sudo to call sudo with *my* $HOME/ENV
-alias sudo="sudo -E"
+# Alias sudo to call sudo with *my* $HOME/ENV/PATH
+alias sudo="sudo -E env PATH=\"\$PATH\""
 # Unrestrict fd by default
 alias fd="fd -u"
 # Ask before overwriting
