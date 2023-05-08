@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# ~/.local/bin/internet
+#
+# tests internet connection by pinging google.com
+
+ping -q -c 3 google.com
+exit=$?
+if test $exit -eq 0; then
+  printf '\n%s\n' "You have internet!"
+else
+  printf '\n%s\n' "Your internet connection is not functional"
+fi
+return $exit
