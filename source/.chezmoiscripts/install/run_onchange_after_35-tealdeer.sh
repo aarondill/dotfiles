@@ -10,3 +10,4 @@ DESTINATION=/usr/local/bin/tldr
 REPO='dbrgn/tealdeer'
 
 install_from_github $REPO latest "$FILE" "$DESTINATION"
+success
