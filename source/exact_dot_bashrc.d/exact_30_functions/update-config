@@ -49,7 +49,7 @@ function update-config() (
   dconf dump / >|"$local_dest"
   # Save to chezmoi
   dconf_path=$(chezmoi source-path)/encrypted_dconf-backup.ini
-  if cmp --silent "$local_dest" <(chezmoi decrypt -- "$dconf_path"); then
+  if ! cmp --silent "$local_dest" <(chezmoi decrypt -- "$dconf_path"); then
     printf 'Updating dconf backup\n'
     chezmoi encrypt "$local_dest" -o "$dconf_path"
     chezmoi git -- add "$dconf_path" &&
