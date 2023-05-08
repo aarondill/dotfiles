@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-return
 # Only if custom is not in use
 if ! [ "$DISABLE_CUSTOM_PS1" = 1 ]; then
   return
