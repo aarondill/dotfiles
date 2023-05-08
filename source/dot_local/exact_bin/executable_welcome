@@ -111,11 +111,15 @@ output="$(get_output)"
 
 # Find the longest line in `output`
 screen_width=$(xrandr --current | grep '\*' | uniq | awk '{print $1}' | cut -d 'x' -f1)
-length=$(printf '%s' "$output" | awk '{print length}' | sort -nr | head -1)
-zenity --info --no-markup \
-  --icon-name=go-home \
-  --width="$((length < screen_width ? length : screen_width))" \
-  --title="Welcome ($date)" \
-  --text="$output" &
+length=$(awk '{print length}' <<<"$output" | sort -nr | head -1)
+if command -v zenity &>/dev/null; then
+  zenity --info --no-markup \
+    --icon-name=go-home \
+    --width="$((length < screen_width ? length : screen_width))" \
+    --title="Welcome ($date)" \
+    --text="$output" &
+else
+  printf '%s\n' "$output"
+fi
 # Allow this script to end while waiting for user to close the popup
 exit 0
