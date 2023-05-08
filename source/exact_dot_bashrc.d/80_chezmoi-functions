@@ -31,14 +31,3 @@ if command -v chezmoi &>/dev/null; then
   editor() { vim "$@"; }
   export -f vim editor
 fi
-
-vim() {
-  # If AN argument is passed, and is in repo
-  if [ -n "$*" ] && chezmoi source-path "$@" &>/dev/null; then
-    chezmoi edit -a -- "$@"
-    # Re-add files, incase another file was updated locally
-    chezmoi re-add
-  else
-    "$(which vim)" "$@"
-  fi
-}
