@@ -9,22 +9,35 @@
 #
 
 function update-config() {
-  declare -a files
+  declare -a files lines dirs
   declare target changed_files
   # Finds files line-by-line, ignoring the first 3 lines
-  readarray -t files <<<"$(tail -n+4 -- ~/.bashrc.d/30_functions/_update-config)"
+  readarray -t lines <<<"$(tail -n+4 -- ~/.bashrc.d/30_functions/_update-config)"
+  files=()
+  dirs=()
+  for file in "${lines[@]}"; do
+    if [ -f "$file" ]; then
+      files+=("$file")
+    elif [ -d "$file" ]; then
+      dirs+=("$file")
+    else
+      printf '%s\n' "$file is not a file!!" >&2
+    fi
+  done
   if target=$(chezmoi target-path); then
     (
       # add from target so files are relative to target
       cd "$target" || return
       # Output a detail of which files are changing
       changed_files=$(chezmoi status -- "${files[@]}" | awk '{ print $2 }')
-      if [[ -n "$changed_files" ]]; then
+      changed_dirs=$(chezmoi status -- "${dirs[@]}" | awk '{ print $2 }')
+      if [ -n "$changed_files" ] || [ -n "$changed_dirs" ]; then
         printf 'Changed files:\n'
-        printf '%s\n' "$changed_files"
+        printf '%s\n' "$changed_files" "$changed_dirs"
       fi
       # don't force a tty prompt, instead just take my no.
-      yes no | chezmoi add --exact --no-tty -- "${files[@]}" >/dev/null
+      yes no | chezmoi add --exact --no-tty -- "${dirs[@]}" >/dev/null
+      yes no | chezmoi add --no-tty -- "${files[@]}" >/dev/null
     )
     # Ensure everything is updated
     chezmoi re-add
