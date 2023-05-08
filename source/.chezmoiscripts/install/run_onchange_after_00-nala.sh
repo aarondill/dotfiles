@@ -9,7 +9,6 @@ function install_nala() {
   local TMP_DIR
 
   TMP_DIR=$(mktemp -d)
-  echo "$TMP_DIR"
   trap 'rm -rf "$TMP_DIR"' EXIT
 
   read -r -d '' PYTHON_CODE <<-'EOF'
