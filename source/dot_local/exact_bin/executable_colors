@@ -10,8 +10,8 @@
 
 T='T' # The test text
 
-printf '\n%8s' "" # indent
-printf "%s  " "00m" "40m" "41m" "42m" "43m" "44m" "45m" "46m" "47m"
+printf '\n%7s' "" # indent
+printf " %s " "00m" "40m" "41m" "42m" "43m" "44m" "45m" "46m" "47m"
 printf '\n' # newline
 
 fg_arr=('m' '1m' '30m' '1;30m' '31m' '1;31m' '32m' '1;32m' '33m'
