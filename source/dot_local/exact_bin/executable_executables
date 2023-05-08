@@ -1,10 +1,54 @@
 #!/usr/bin/env bash
-{
+set -eu
+
+THIS='executables'
+
+usage() {
+  cat <<EOF
+Usage: $THIS
+Lists executables present in \$PATH
+
+OPTIONS:
+  -h, --help      display this help message
+  -p, --path      <path> use <path> instead of \$PATH
+EOF
+  return 0
+}
+log() { printf '%s\n' "$@"; }
+err() { printf "$THIS: %s\n" "$@" >&2; }
+abort() {
+  err "$1"
+  exit "${2:-1}"
+}
+
+path=$PATH
+end=false next_path=false
+for arg; do
+  # stop processing when hit --
+  if [ "$end" = true ]; then args+=("$arg") && continue; fi
+  if [ "$next_path" = true ]; then
+    path="$arg"
+    next_path=false
+    continue
+  fi
+
+  case "$arg" in
+  -h | --help) usage && exit 0 ;;
+  --path | -p) next_path=true ;;                # Verbose option
+  --) end=true ;;                               # End of args. this is not one.
+  -*) abort "invalid option -- '${arg#-}'" 2 ;; # Invalid -flag
+  esac
+done
+unset end next_path
+
+get_execs() {
   set -f
   IFS=:
-  for d in $PATH; do
+  # INTENTIONALLY SPLITS
+  for d in $1; do
     set +f
     [ -n "$d" ] || d=.
     for f in "$d"/.[!.]* "$d"/..?* "$d"/*; do [ -f "$f" ] && [ -x "$f" ] && printf '%s\n' "${f##*/}"; done
   done
-} | sort | uniq
+}
+get_execs "$path" | sort | uniq
