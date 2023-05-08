@@ -8,12 +8,6 @@
 #   colors (default + 8 escapes).
 #
 
-for arg; do
-  case "$arg" in
-    --help|-h) usage; exit 0;
-    -*) err "Unknown argument"
-done
-
 T='T'              # The test text
 declare -i W_COL=5 # The width of the widest column (color code)
 
