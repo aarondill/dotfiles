@@ -112,6 +112,7 @@ output="$(get_output)"
 # Find the longest line in `output`
 screen_width=$(xrandr --current | grep '\*' | uniq | awk '{print $1}' | cut -d 'x' -f1)
 length=$(awk '{print length}' <<<"$output" | sort -nr | head -1)
+
 if command -v zenity &>/dev/null; then
   zenity --info --no-markup \
     --icon-name=go-home \
