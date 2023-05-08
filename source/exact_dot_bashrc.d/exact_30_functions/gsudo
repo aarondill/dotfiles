@@ -5,5 +5,5 @@
 # Creates a `gsudo` function that runs a GUI application as root
 #
 function gsudo() {
-  pkexec env DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY "$@"
+  pkexec env DISPLAY="$DISPLAY" XAUTHORITY="$XAUTHORITY" "$@"
 }
