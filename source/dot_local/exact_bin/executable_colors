@@ -7,14 +7,46 @@
 #   test use of that color on all nine background
 #   colors (default + 8 escapes).
 #
+set -eu
+
+THIS='colors'
+
+usage() {
+
+  cat <<EOF
+$THIS [options]
+Echoes all the color codes to the terminal to demonstrate what's
+available. Each line is the color code of one forground color,
+out of 17 (default + 16 escapes), followed by a test use of that
+color on all nine background colors (default + 8 escapes).
+
+OPTIONS:
+  -h, --help      display this help message
+EOF
+  return 0
+}
+log() { printf '%s\n' "$@"; }
+err() { printf "$THIS: %s\n" "$@" >&2; }
+abort() {
+  err "$1"
+  exit "${2:-1}"
+}
+
+for arg; do
+  case "$arg" in
+  --help | -h) usage && exit 0 ;;
+  # Invalid -flag
+  -*) abort "invalid option -- '${arg#-}'" 2 ;;
+  esac
+done
 
 T='T'              # The test text
 declare -i W_COL=5 # The width of the widest column (color code)
 
-printf '\n'
+log ''
 printf "%${W_COL}s " "" # indent
 printf " %s " "00m" "40m" "41m" "42m" "43m" "44m" "45m" "46m" "47m"
-printf '\n' # newline
+log '' # newline
 
 fg_arr=('m' '1m' '30m' '1;30m' '31m' '1;31m' '32m' '1;32m' '33m'
   '1;33m' '34m' '1;34m' '35m' '1;35m' '36m' '1;36m' '37m' '1;37m')
