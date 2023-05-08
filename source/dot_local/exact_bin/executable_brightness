@@ -56,7 +56,7 @@ if [ -z "$BrNewRel" ]; then
   if command -v yad 2>/dev/null >/dev/null; then
     BrNewRel=$(yad --scale --min-value 0 --max-value 100 --value "$BrCurRel" --print-partial --title 'Set brightness' --width 300 --fixed --sticky --mouse --on-top --escape-ok --button OK --hide-value)
   elif command -v dialog 2>/dev/null >/dev/null; then
-    BrNewRel=$(dialog --rangebox Brightness -1 -1 0 100 "$BrCurRel" 3>&1 1>&2 2>&3)
+    BrNewRel=$(dialog --erase-on-exit --rangebox Brightness -1 -1 0 100 "$BrCurRel" 3>&1 1>&2 2>&3)
   else
     abort "Could not find a program to request brightness from user. Please pass a positional argument." 1
   fi
