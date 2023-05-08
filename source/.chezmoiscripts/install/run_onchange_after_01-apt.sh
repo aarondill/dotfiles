@@ -34,7 +34,7 @@ function install_apt_packages() {
     dconf-editor duf fwts gh git golang-go grep ifupdown inotify-tools less make \
     neofetch neovim net-tools openvpn p7zip-full python3-neovim rsync shfmt tlp \
     trash-cli tree util-linux xclip xdg-utils zip zoxide htop apt-file speedtest-cli \
-    ripgrep apt-clone aptitude libfuse2 hexedit luajit python3-pip
+    ripgrep apt-clone aptitude libfuse2 hexedit luajit python3-pip ppa-purge
 }
 
 function install_graphical_apt_packages() {
