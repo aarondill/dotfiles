@@ -6,6 +6,16 @@
 # *Follows Symlinks*
 #
 THIS=contents
+usage() {
+  cat <<EOF
+$THIS [file|executable...]
+                  
+outputs the contents of a file using \$PAGER, calls which if file is not found
+options:
+-P, --no-pager   Don't attempt to open the files using a pager (\$PAGER)
+EOF
+  return 0
+}
 log() { printf '%s\n' "$@"; }
 err() { printf "$THIS: %s\n" "$@" >&2; }
 abort() { err "$1" && exit "${2:-1}"; }
@@ -18,16 +28,7 @@ for arg; do
     continue
   fi
   case "$arg" in
-  --help | -h)
-    command cat <<-EOF
-			$THIS [file|executable]
-												
-			outputs the contents of a file using \$PAGER, calls which if file is not found
-      options:
-      -P, --no-pager   Don't attempt to open the files using a pager (\$PAGER)
-EOF
-    return 0
-    ;;
+  --help | -h) usage && exit 0 ;;
   --) end=true ;;
   --no-pager | -P) pager=false ;;
   -*) printf '%s\n' "Invalid option -- $arg" && return 1 ;;
@@ -37,8 +38,7 @@ done
 unset end
 
 if [ $# -eq 0 ]; then
-  err 'FILE is required'
-  exit 1
+  abort 'FILE is required' 2
 fi
 
 files=()
