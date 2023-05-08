@@ -36,6 +36,11 @@ EOF
 done
 unset end
 
+if [ $# -eq 0 ]; then
+  err 'FILE is required'
+  exit 1
+fi
+
 files=()
 for file in "${args[@]}"; do
   # Given a path
