@@ -3,7 +3,6 @@
 # This script *MUST* ask confirmation! These are breaking changes!
 # This script should aslo suggest running 'sudo update-grub' and 'sudo update-initramfs -u'
 set -e
-set -x # DEBUG
 # Source utils
 SOURCE_DIR=$(chezmoi source-path)
 # shellcheck source=../.utils.sh
