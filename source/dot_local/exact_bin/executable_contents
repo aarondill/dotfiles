@@ -31,7 +31,7 @@ for arg; do
   --help | -h) usage && exit 0 ;;
   --) end=true ;;
   --no-pager | -P) pager=false ;;
-  -*) printf '%s\n' "Invalid option -- $arg" && return 1 ;;
+  -*) abort "Invalid option -- $arg" 2 ;;
   *) args+=("$arg") ;;
   esac
 done
