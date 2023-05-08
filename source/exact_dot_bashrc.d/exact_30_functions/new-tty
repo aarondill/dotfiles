@@ -5,21 +5,21 @@
 # Creates a new disowned gnome-terminal instance then exits this one
 #
 function new-tty() {
-	if [ "$1" = "--help" ]; then
-		printf '%s\n' "new-tty" "" "Creates a new disowned terminal instance then exits this one"
-		return 0
-	fi
+  if [ "${1:-}" = "--help" ]; then
+    printf '%s\n' "new-tty" "" "Creates a new disowned terminal instance then exits this one"
+    return 0
+  fi
 
-	local terminal="wezterm"
-	local args=(start --cwd .)
+  local terminal="wezterm"
+  local args=(start --cwd .)
 
-	if command -v "$terminal" &>/dev/null; then
-		"$terminal" "${args[@]}" &
-		disown
-		exit
-	else
-		printf "%s\n" "could not find $terminal"
-	fi
+  if command -v "$terminal" &>/dev/null; then
+    "$terminal" "${args[@]}" &
+    disown
+    exit
+  else
+    printf "%s\n" "could not find $terminal"
+  fi
 }
 
 export -f new-tty
