@@ -16,7 +16,7 @@ installed_or_log snap && (
   CONNECTON=$(snap connections firefox | awk '/firefox:host-hunspell/{print $3}')
   # If still connected, disconnect
   if [ -n "$CONNECTON" ] && [ "$CONNECTON" != '-' ]; then
-    snap disconnect firefox:host-hunspell
+    sudo snap disconnect firefox:host-hunspell
   fi
   success
 )
