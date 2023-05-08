@@ -8,9 +8,13 @@
 # and calls chezmoi add on it.
 #
 
-function update-config() {
-  declare -a files lines dirs
-  declare target changed_files
+function update-config() (
+  set -eu
+  target=$(chezmoi target-path)
+
+  # add from target so files are relative to target
+  cd "$target"
+
   # Finds files line-by-line, ignoring the first 3 lines
   readarray -t lines <<<"$(tail -n+4 -- ~/.bashrc.d/30_functions/_update-config)"
   files=()
@@ -24,26 +28,22 @@ function update-config() {
       printf '%s\n' "$file is not a file!!" >&2
     fi
   done
-  if target=$(chezmoi target-path); then
-    (
-      # add from target so files are relative to target
-      cd "$target" || return
-      # Output a detail of which files are changing
-      changed_files=$(chezmoi status -- "${files[@]}" | awk '{ print $2 }')
-      changed_dirs=$(chezmoi status -- "${dirs[@]}" | awk '{ print $2 }')
-      if [ -n "$changed_files" ] || [ -n "$changed_dirs" ]; then
-        printf 'Changed files:\n'
-        printf '%s\n' "$changed_files" "$changed_dirs"
-      fi
-      # don't force a tty prompt, instead just take my no.
-      yes no | chezmoi add --exact --no-tty -- "${dirs[@]}" >/dev/null
-      yes no | chezmoi add --no-tty -- "${files[@]}" >/dev/null
-    )
-    # Ensure everything is updated
-    chezmoi re-add
-  else
-    return 2
+
+  # Output a detail of which files are changing
+  changed_files=$(chezmoi status -- "${files[@]}" | awk '{ print $2 }')
+  changed_dirs=$(chezmoi status -- "${dirs[@]}" | awk '{ print $2 }')
+  if [ -n "$changed_files" ] || [ -n "$changed_dirs" ]; then
+    printf 'Changed files:\n'
+    printf '%s\n' "$changed_files" "$changed_dirs"
   fi
+
+  # don't force a tty prompt, instead just take my no.
+  yes no | chezmoi add --exact --no-tty -- "${dirs[@]}" >/dev/null
+  yes no | chezmoi add --no-tty -- "${files[@]}" >/dev/null
+
+  # Ensure everything is updated
+  chezmoi re-add
+
   # Update dconf
   local dconf_path local_dest=~/.config/dconf/dconf-backup.ini
   dconf dump / >|"$local_dest"
@@ -56,7 +56,7 @@ function update-config() {
       chezmoi git -- commit --quiet -m 'update dconf-backup.ini' &&
       chezmoi git -- push --quiet
   fi
-}
+)
 
 # Copies the files to $HOME/.root/FILEPATH. `.root` should be backed up
 function cproot() {
