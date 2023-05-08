@@ -54,7 +54,7 @@ function getSuccessfulLogins() {
 }
 function getFailedAttempts() {
   # Usage: getFailedAttempts user count
-  grep "pam_unix(gdm-password:auth): authentication failure;.* user=${1:-$(whoami)}" /var/log/auth.log |
+  grep -a "pam_unix(gdm-password:auth): authentication failure;.* user=${1:-$(whoami)}" /var/log/auth.log |
     tail -n "${2:-5}" |
     awk '{print $12" - ",$1,$2,$3}' |
     perl -pe 's|^tty=/dev/(.+?)|\1|' |
