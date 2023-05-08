@@ -80,7 +80,7 @@ function getPackageCount() {
     has flatpak && append "$(flatpak list | wc -l) (flatpak)"
     # Snap hangs if the command is run without the daemon running.
     # Only run snap if the daemon is also running.
-    if has snap && ps -e | grep -qFm 1 snapd >/dev/null; then
+    if has snap && pgrep -x 'snapd' &>/dev/null; then
       append "$(snap list | wc -l)"
     fi
 
