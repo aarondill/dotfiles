@@ -65,12 +65,12 @@ fi
 # Output to tty
 printf '%s\n' "Run 'restore $(basename -- "$save_file")' to (re)load" "run 'save $(basename -- "$save_file")' to overwrite save data"
 # no-site go-to-save-location no-init load-dunnet anything-else-passed
-args=(-Q -chdir "$(dirname "$save_file")" -batch -l dunnet "$@")
+emamcs_args=(-Q -chdir "$(dirname "$save_file")" -batch -l dunnet "${args[@]}")
 
 if [ -n "$save_file" ] && [ -f "$save_file" ]; then
   # save file exists, auto restore
-  cat <(echo "restore $(basename "$save_file")") - | exec emacs "${args[@]}"
+  cat <(echo "restore $(basename "$save_file")") - | exec emacs "${emamcs_args[@]}"
 else
   # No save file exists, just run it
-  exec emacs "${args[@]}"
+  exec emacs "${emamcs_args[@]}"
 fi
