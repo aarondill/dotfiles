@@ -73,6 +73,8 @@ if zoxide -V &>/dev/null; then
   # remove ' cd' and replace with ' z'. Lack of quotes is intentional!
   ${complete% cd} z
   alias cd='z'
+  # Fixes warning if set -u
+  export _ZO_ECHO=0
 fi
 
 # if `bc` is installed set aliases for it
