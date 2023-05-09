@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-sudo du -h --max-depth=2 -a --one-file-system -- "$@" |
+sudo du -h --max-depth=1 -a --one-file-system -- "$@" |
   sort -hs |
+  # coloring
   awk '{
     printf("%4s ", $1);
     s="";
