@@ -55,7 +55,10 @@ if [ -n "$bat" ]; then
 
   if ! command -v bat &>/dev/null; then
     alias bat="$bat"
+  elif ! command -v batcat &>/dev/null; then
+    alias batcat="bat"
   fi
+
 fi
 unset bat
 
