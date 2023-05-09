@@ -5,14 +5,14 @@
 # Updates java symlinks to the path specified using update-alternatives
 #
 
-if [ "$1" = --help ] || [ $# -eq 0 ]; then
+if [ "$1" = --help ] || [ "$#" -eq 0 ]; then
   cat <<-EOF
   update-java [-y | --yes] <JAVADIR> [priority = 1112] [JVM_VERS_DIR]
   Updates java symlinks to the path specified using update-alternatives.
   Do not include /bin on JAVADIR.
   JVM_VERS_DIR will be determined by JAVA_HOME if set, or else default to /usr/lib/jvm
 EOF
-  [ $# -eq 0 ] && exit 2 || exit 0
+  [ "$#" -eq 0 ] && exit 2 || exit 0
 fi
 yes=0
 if [ "$1" = --yes ] || [ "$1" = -y ]; then
