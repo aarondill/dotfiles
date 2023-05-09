@@ -17,10 +17,16 @@ if [ "$os" != "Ubuntu" ]; then
 fi
 
 OWNER="PRATAP-KUMAR"
-FILE="ubuntu-gdm-set-background"
+
+codename="$(grep UBUNTU_CODENAME /etc/os-release | cut -d = -f 2)"
+if [ "$codename" = "lunar" ]; then
+  FILE="ubuntu-gdm-set-background-23.04"
+else
+  FILE="ubuntu-gdm-set-background"
+fi
+
 DESTINATION="/usr/local/bin/$FILE"
-curl -SsfL "https://raw.githubusercontent.com/$OWNER/ubuntu-gdm-set-background/main/$FILE" |
-  sudo tee "$DESTINATION" >/dev/null
+sudo curl -SsfL "https://raw.githubusercontent.com/$OWNER/ubuntu-gdm-set-background/main/$FILE" -o "$DESTINATION"
 sudo chmod +x "$DESTINATION"
 success
 
