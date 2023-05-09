@@ -18,7 +18,8 @@ fi
 if [ -d /usr/lib/jvm ]; then
   # set JAVA_HOME to latest jvm available
   # use sort -V to sort versions. only available in core-utils-7
-  JAVA_HOME="$(find /usr/lib/jvm -maxdepth 1 -type d -print0 | sort -zV | tail -zn1)"
+  # Remove trailing NULL byte with tr -d to avoid bash warning
+  JAVA_HOME="$(find /usr/lib/jvm -maxdepth 1 -type d -print0 | sort -zV | tail -zn1 | tr -d '\0')"
   export JAVA_HOME
 # export PATH=$JAVA_HOME/bin${PATH:+:$PATH}
 fi
