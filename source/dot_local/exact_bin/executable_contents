@@ -37,7 +37,7 @@ for arg; do
 done
 unset end
 
-if [ $# -eq 0 ]; then
+if [ "$#" -eq 0 ]; then
   abort 'FILE is required' 2
 fi
 
