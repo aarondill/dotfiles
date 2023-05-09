@@ -36,7 +36,7 @@ for arg; do
 done
 unset end arg
 
-BrPath=$(find /sys/class/backlight -maxdepth 1 -mindepth 1 | head -n1)
+BrPath=$(find /sys/class/backlight -maxdepth 1 -mindepth 1 -print0 | head -zn1)
 BrMax=$(cat "$BrPath/max_brightness")
 # 100th max-brightness, rounded up to nearest integer
 BrMin=$((0 + (BrMax + 100 - 1) / 100))
