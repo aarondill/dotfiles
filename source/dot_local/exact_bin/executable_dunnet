@@ -62,16 +62,23 @@ if [ -z "$emacs" ] || ! [ -x "$emacs" ]; then
   abort 'Emacs is required to run dunnet' 2
 fi
 
-# Output to tty
-printf '%s\n' "Run 'restore $(basename -- "$save_file")' to (re)load" "run 'save $(basename -- "$save_file")' to overwrite save data"
 dunnet="$(printf '%s\0' /usr/share/emacs/*/lisp/play/dunnet.elc | head -n1 -z | tr -d '\0')"
 # no-site go-to-save-location no-init load-dunnet anything-else-passed
-emamcs_args=(-Q -chdir "$(dirname "$save_file")" -batch -l "$dunnet" "${args[@]}")
+emacs_args=(-Q -batch -l "$dunnet")
+
+# Output to tty and setup chdir
+if [ -n "$save_file" ]; then
+  printf '%s\n' "Run 'restore $(basename -- "$save_file")' to (re)load" "run 'save $(basename -- "$save_file")' to overwrite save data"
+  emacs_args+=(-chdir "$(dirname "$save_file")")
+else
+  printf '%s\n' "run 'save /path/to/dunnet.save' to overwrite save data (relative to CWD)"
+fi
+emacs_args+=("${args[@]}")
 
 if [ -n "$save_file" ] && [ -f "$save_file" ]; then
   # save file exists, auto restore
-  cat <(echo "restore $(basename "$save_file")") - | exec emacs "${emamcs_args[@]}"
+  cat <(echo "restore $(basename "$save_file")") - | exec emacs "${emacs_args[@]}"
 else
   # No save file exists, just run it
-  exec emacs "${emamcs_args[@]}"
+  exec emacs "${emacs_args[@]}"
 fi
