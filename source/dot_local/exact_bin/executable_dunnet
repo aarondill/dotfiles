@@ -64,6 +64,7 @@ fi
 
 # Output to tty
 printf '%s\n' "Run 'restore $(basename -- "$save_file")' to (re)load" "run 'save $(basename -- "$save_file")' to overwrite save data"
+dunnet="$A()/usr/share/emacs/*/lisp/play/dunnet.elc"
 # no-site go-to-save-location no-init load-dunnet anything-else-passed
 emamcs_args=(-Q -chdir "$(dirname "$save_file")" -batch -l dunnet "${args[@]}")
 
