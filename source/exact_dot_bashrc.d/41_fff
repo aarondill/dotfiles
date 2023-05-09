@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 if ! command -v fff &>/dev/null; then return; fi
 fff() {
-    $(which fff) "$@"
-    cd "$(cat "${XDG_CACHE_HOME:=${HOME}/.cache}/fff/.fff_d")"
+  command fff "$@"
+  cd "$(cat "${XDG_CACHE_HOME:=${HOME}/.cache}/fff/.fff_d")" || return
 }
 # Show/Hide hidden files on open.
 export FFF_HIDDEN=1
@@ -17,4 +17,3 @@ if command -v trash &>/dev/null; then
 fi
 export FFF_FAV1=~/vscode
 export FFF_FAV2=~/.bashrc.d
-
