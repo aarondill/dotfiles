@@ -3,12 +3,71 @@
 # ~/.local/bin/internet
 #
 # tests internet connection by pinging google.com
+set -eu
 
-ping -q -c 3 google.com
-exit=$?
-if test $exit -eq 0; then
-  printf '\n%s\n' "You have internet!"
+test_url=google.com
+
+THIS=internet
+usage() {
+  cat <<EOF
+$THIS [options] [--] [arguments]
+                  
+Returns 0 if internet connection is present, else 1
+
+Options:
+-h, --help       show this message
+-t, --test=url   use url instead of $test_url to test internet connection
+-q, --quiet      don't print a message at end of test
+EOF
+  return 0
+}
+
+log() { printf '%s\n' "$@"; }
+err() { printf "$THIS: %s\n" "$@" >&2; }
+abort() { err "$1" && exit "${2:-1}"; }
+
+# Sets the variable $args to an array of positional arguments
+# Usage: parse_args "$@"
+function parse_args() {
+  # If awaiting an argument
+  next='' next_arg='' end=false args=()
+  for arg in "$@"; do
+    if [ $end = true ]; then
+      args+=("$arg") && continue
+    elif [ -n "$next" ]; then
+      declare "$next"="$arg" next=''
+    else
+      case "$arg" in
+      --help | -h) usage && exit 0 ;;
+      --) end=true ;;
+      -q | --quiet) quiet=true ;;
+      -t | --test) next=test_url next_arg="$arg" ;;
+      --test=*) test_url="${arg#--test=}" ;;
+      --*) abort "Invalid option -- ${arg#--}" 2 ;;
+      -*) abort "Invalid option -- ${arg#-}" 2 ;;
+      *) args+=("$arg") ;;
+      esac
+    fi
+  done
+  # If awaiting an argument, but end of args
+  if [ -n "$next" ]; then abort "$next_arg requires an argument" 2; fi
+  unset end next next_arg
+}
+
+quiet=false
+parse_args "$@"
+
+exit=0
+if [ $quiet = true ]; then
+  ping -q -c 3 "$test_url" &>/dev/null || exit="$?"
 else
-  printf '\n%s\n' "Your internet connection is not functional"
+  ping -c 3 "$test_url" || exit="$?"
 fi
-return $exit
+
+log ''
+if [ "$exit" -eq 0 ]; then
+  log "You have internet!"
+else
+  log "Your internet connection is not functional"
+fi
+exit "$exit"

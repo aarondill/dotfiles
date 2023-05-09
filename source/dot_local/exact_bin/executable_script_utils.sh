@@ -40,7 +40,7 @@ function parse_args() {
       --help | -h) usage && exit 0 ;;
       --) end=true ;;
       -s | --long) next=long_setting next_arg="$arg" ;;
-      --long=*) long_setting="${arg#--save=}" ;;
+      --long=*) long_setting="${arg#--long=}" ;;
       --*) abort "Invalid option -- ${arg#--}" 2 ;;
       -*) abort "Invalid option -- ${arg#-}" 2 ;;
       *) args+=("$arg") ;;

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # usage: fullscreen [Search-Term]
+set -ue
 THIS=fullscreen
 log() { printf '%s\n' "$@"; }
 err() { printf "$THIS: %s\n" "$@" >&2; }
@@ -22,25 +23,36 @@ Options:
 EOF
   return 0
 }
-set -ue
-nextdisplay=false end=false
-args=() display=${DISPLAY:-}
-for arg; do
-  if [ "$end" = true ]; then
-    args+=("$arg")
-  elif [ "$nextdisplay" = true ]; then
-    display="$arg"
-    nextdisplay=false
-  else
-    case "$arg" in
-    --help | -h) usage && return 0 ;;
-    -d | --display) nextdisplay=true ;;
-    --display=*) display="${arg#--display=}" ;;
-    --) end=true ;;
-    *) args+=("$arg") ;;
-    esac
-  fi
-done
+
+# Sets the variable $args to an array of positional arguments
+# Usage: parse_args "$@"
+function parse_args() {
+  # If awaiting an argument
+  next='' next_arg='' end=false args=()
+  for arg in "$@"; do
+    if [ $end = true ]; then
+      args+=("$arg") && continue
+    elif [ -n "$next" ]; then
+      declare "$next"="$arg" next=''
+    else
+      case "$arg" in
+      --help | -h) usage && exit 0 ;;
+      --) end=true ;;
+      -d | --display) next=display next_arg="$arg" ;;
+      --display=*) display="${arg#--display=}" ;;
+      --*) abort "Invalid option -- ${arg#--}" 2 ;;
+      -*) abort "Invalid option -- ${arg#-}" 2 ;;
+      *) args+=("$arg") ;;
+      esac
+    fi
+  done
+  # If awaiting an argument, but end of args
+  if [ -n "$next" ]; then abort "$next_arg requires an argument" 2; fi
+  unset end next next_arg
+}
+
+display="${DISPLAY:-}"
+parse_args "$@"
 
 classname="${args[0]:-}"
 if [ -z "$classname" ]; then

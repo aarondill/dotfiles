@@ -20,26 +20,35 @@ abort() {
   err "$1"
   exit "${2:-1}"
 }
+# Sets the variable $args to an array of positional arguments
+# Usage: parse_args "$@"
+function parse_args() {
+  # If awaiting an argument
+  next='' next_arg='' end=false args=()
+  for arg in "$@"; do
+    if [ $end = true ]; then
+      args+=("$arg") && continue
+    elif [ -n "$next" ]; then
+      declare "$next"="$arg" next=''
+    else
+      case "$arg" in
+      --help | -h) usage && exit 0 ;;
+      --) end=true ;;
+      -p | --path) next=path next_arg="$arg" ;;
+      --path=*) path="${arg#--path=}" ;;
+      --*) abort "Invalid option -- ${arg#--}" 2 ;;
+      -*) abort "Invalid option -- ${arg#-}" 2 ;;
+      *) args+=("$arg") ;;
+      esac
+    fi
+  done
+  # If awaiting an argument, but end of args
+  if [ -n "$next" ]; then abort "$next_arg requires an argument" 2; fi
+  unset end next next_arg
+}
 
 path=$PATH
-end=false next_path=false
-for arg; do
-  # stop processing when hit --
-  if [ "$end" = true ]; then args+=("$arg") && continue; fi
-  if [ "$next_path" = true ]; then
-    path="$arg"
-    next_path=false
-    continue
-  fi
-
-  case "$arg" in
-  -h | --help) usage && exit 0 ;;
-  --path | -p) next_path=true ;;                # Verbose option
-  --) end=true ;;                               # End of args. this is not one.
-  -*) abort "invalid option -- '${arg#-}'" 2 ;; # Invalid -flag
-  esac
-done
-unset end next_path
+parse_args "$@"
 
 get_execs() {
   local d f path dirs=()

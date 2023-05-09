@@ -38,15 +38,14 @@ for arg; do
     --no-pager | -P) pager=false ;;
     -p | --pager) next=pager next_arg="$arg" ;;
     --pager=*) pager="${arg#--pager=}" ;;
-    -*) abort "Invalid option -- $arg" 2 ;;
+    --*) abort "Invalid option -- ${arg#--}" 2 ;;
+    -*) abort "Invalid option -- ${arg#-}" 2 ;;
     *) args+=("$arg") ;;
     esac
   fi
 done
-if [ -n "$next" ]; then
-  # If awaiting an argument, but end of args
-  abort "$next_arg requires an argument" 2
-fi
+# If awaiting an argument, but end of args
+if [ -n "$next" ]; then abort "$next_arg requires an argument" 2; fi
 unset end next next_arg
 
 if [ "${#args[@]}" -eq 0 ]; then
