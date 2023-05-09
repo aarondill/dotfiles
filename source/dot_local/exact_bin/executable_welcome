@@ -105,7 +105,7 @@ function get_output() {
 }
 ## println
 ## println 'The most recent duplicity backup was at:'
-## println "$(find /media/aaron/Backup/UbuntuLaptop -printf "%Tb %Td %TY %Tr\n" | sort -nr | head -n 1)" # Most recent backup date
+## println "$(find /media/aaron/Backup/UbuntuLaptop -printf "%Tb %Td %TY %Tr\0" | sort -znr | head -zn 1)" # Most recent backup date
 
 output="$(get_output)"
 
