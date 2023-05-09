@@ -4,7 +4,7 @@
 #
 # Unsets histfile and opens a shell
 function private() {
-  if [ $# -eq 0 ]; then
+  if [ "$#" -eq 0 ]; then
     HISTFILE='' bash -i
   else
     # run the input
@@ -12,6 +12,6 @@ function private() {
   fi
   # If is in history - could false positive, but better than false negative
   if history 1 | grep -q 'private'; then
-    history -d $HISTCMD
+    history -d "$HISTCMD"
   fi
 }
