@@ -42,8 +42,7 @@ done
 unset end next_path
 
 get_execs() {
-  declare -a dirs=()
-  local d f
+  local d f dirs=()
   readarray -d ':' -t dirs <<<"$1"
   for d in "${dirs[@]}"; do
     [ -z "$d" ] && d=.
