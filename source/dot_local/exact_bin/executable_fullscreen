@@ -40,15 +40,16 @@ for arg; do
   fi
 done
 
-if [ -z "${args[1]:-}" ]; then
+classname="${args[0]:-}"
+if [ -z "$classname" ]; then
   find=(selectwindow)
 else
-  find=(search --name --class --classname "${args[1]:-}")
+  find=(search --name --class --classname "$classname")
 fi
 id=$(DISPLAY="$display" xdotool "${find[@]}") || abort "Could not find window on display: '${display:-NONE}'"
 
 userargs=()
 # Replace {id} with the id in the user string
-for arg in "${@:2}"; do userargs+=("${arg//\{id\}/$id}"); done
+for arg in "${args[@]:2}"; do userargs+=("${arg//\{id\}/$id}"); done
 
 DISPLAY="$display" xdotool "${userargs[@]}" windowsize "$id" 100% 100% windowmove "$id" 0 0
