@@ -5,9 +5,9 @@ SOURCE_DIR=$(chezmoi source-path)
 # shellcheck source=../.utils.sh
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
-log 'installing wezterm'
+log 'installing bat'
 
-REPO=wez/wezterm
+REPO=sharkdp/bat
 # Wezterm will inform of updates itself, only run if not already installed (and apt is available to install with)
 if ! is_accessible_cmd apt; then
   abort0 "This script only supports debian-based distos. install manually from $REPO"
