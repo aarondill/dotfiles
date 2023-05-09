@@ -36,6 +36,7 @@ for arg; do
     --help | -h) usage && return 0 ;;
     -d | --display) nextdisplay=true ;;
     --display=*) display="${arg#--display=}" ;;
+    --) end=true ;;
     *) args+=("$arg") ;;
     esac
   fi
