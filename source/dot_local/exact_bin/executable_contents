@@ -47,8 +47,7 @@ if [ -n "$next" ]; then
   # If awaiting an argument, but end of args
   abort "$next_arg requires an argument" 2
 fi
-
-unset end
+unset end next next_arg
 
 if [ "${#args[@]}" -eq 0 ]; then
   abort 'FILE is required' 2
@@ -77,8 +76,10 @@ done
 # Use pager if can, else use cat
 if [ "$pager" = true ] && [ -t 1 ]; then
   PAGER=${PAGER:-$(which pager 2>/dev/null || which cat 2>/dev/null || printf '/bin/cat')}
-else
+elif [ "$pager" = false ]; then
   PAGER=$(which cat 2>/dev/null || printf '/bin/cat')
+elif [ "$pager" != true ]; then
+  PAGER="$pager"
 fi
 # output them all -- PAGER is expanded to allow flags
 exec ${PAGER:-cat} -- "${files[@]}"
