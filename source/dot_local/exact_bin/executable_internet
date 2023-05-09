@@ -36,6 +36,7 @@ function parse_args() {
       args+=("$arg") && continue
     elif [ -n "$next" ]; then
       declare "$next"="$arg" next=''
+      echo $test_url
     else
       case "$arg" in
       --help | -h) usage && exit 0 ;;
@@ -56,7 +57,6 @@ function parse_args() {
 
 quiet=false
 parse_args "$@"
-echo $test_url
 
 exit=0
 if [ $quiet = true ]; then
