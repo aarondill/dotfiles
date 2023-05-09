@@ -16,6 +16,7 @@ if command -v chezmoi &>/dev/null; then
   # config alias for chezmoi
   alias config='chezmoi'
   # Completion for config alias
+  # shellcheck source=/home/aaron/.local/share/bash-completion/completions/config
   source ~/.local/share/bash-completion/completions/config
 
   vim() {
@@ -25,7 +26,7 @@ if command -v chezmoi &>/dev/null; then
       # Re-add files, incase another file was updated locally
       chezmoi re-add
     else
-      "$(which vim)" "$@"
+      command vim "$@"
     fi
   }
   editor() { vim "$@"; }
