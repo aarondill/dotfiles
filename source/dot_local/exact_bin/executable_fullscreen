@@ -46,7 +46,7 @@ classname="${args[0]:-}"
 if [ -z "$classname" ]; then
   find=(selectwindow)
 else
-  find=(search --name --class --classname "$classname")
+  find=(search --name --class --classname -- "$classname")
 fi
 id=$(DISPLAY="$display" xdotool "${find[@]}") || abort "Could not find window on display: '${display:-NONE}'"
 
