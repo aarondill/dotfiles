@@ -68,4 +68,4 @@ else
   PAGER=$(which cat 2>/dev/null || printf '/bin/cat')
 fi
 # output them all
-"$PAGER" -- "${files[@]}"
+sh -c '$PAGER' -- "${files[@]}"
