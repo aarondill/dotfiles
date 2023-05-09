@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+
+# ~/.local/bin/contents
+#
+# Read the contents of a file or executable
+# *Follows Symlinks*
+#
+set -eu
+
+THIS=dunnet
+save_file="$HOME/.config/emacs/games/dunnet.save"
+
+usage() {
+  cat <<EOF
+$THIS [options] [--] [emacs-options]
+                  
+Opens dunnet automatically loading the save file
+Depends on emacs being installed.
+
+options:
+-h, --help         show this message
+-n, --nosave       Don't use a save file
+-s, --save=save    use save instead of $save_file
+-e, --emacs=path   use path instead of searching \$PATH
+EOF
+  return 0
+}
+log() { printf '%s\n' "$@"; }
+err() { printf "$THIS: %s\n" "$@" >&2; }
+abort() { err "$1" && exit "${2:-1}"; }
+
+args=() emacs="$(which emacs 2>/dev/null)"
+# If awaiting an argument
+next='' next_arg='' end=false
+for arg; do
+  if [ $end = true ]; then
+    args+=("$arg")
+    continue
+  elif [ -n "$next" ]; then
+    declare "$next"="$arg" next=''
+  else
+    case "$arg" in
+    --help | -h) usage && exit 0 ;;
+    --) end=true ;;
+    -n | --nosave) save_file='' ;;
+    -e | --emacs) next=emacs next_arg="$arg" ;;
+    --emacs=*) emacs="${arg#--emacs=}" ;;
+    -s | --save) next=save_file next_arg="$arg" ;;
+    --save=*) save_file="${arg#--save=}" ;;
+    --*) abort "Invalid option -- ${arg#-}" 2 ;;
+    -*) abort "Invalid option -- ${arg#-}" 2 ;;
+    *) args+=("$arg") ;;
+    esac
+  fi
+done
+# If awaiting an argument, but end of args
+if [ -n "$next" ]; then abort "$next_arg requires an argument" 2; fi
+unset end next next_arg
+
+# I don't know how to control emacs. just open dunnet pls
+if [ -z "$emacs" ] || ! [ -x "$emacs" ]; then
+  abort 'Emacs is required to run dunnet' 2
+fi
+
+# Output to tty
+printf '%s\n' "Run 'restore $(basename -- "$save_file")' to (re)load" "run 'save $(basename -- "$save_file")' to overwrite save data"
+# no-site go-to-save-location no-init load-dunnet anything-else-passed
+args=(-Q -chdir "$(dirname "$save_file")" -batch -l dunnet "$@")
+
+if [ -n "$save_file" ] && [ -f "$save_file" ]; then
+  # save file exists, auto restore
+  cat <(echo "restore $(basename "$save_file")") - | exec emacs "${args[@]}"
+else
+  # No save file exists, just run it
+  exec emacs "${args[@]}"
+fi
