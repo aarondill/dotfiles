@@ -50,7 +50,7 @@ fi
 
 unset end
 
-if [ "$#" -eq 0 ]; then
+if [ "${#args[@]}" -eq 0 ]; then
   abort 'FILE is required' 2
 fi
 
