@@ -45,7 +45,7 @@ get_execs() {
   local d f path dirs=()
   path="$1"
   if ! [[ $path = *: ]]; then path="$path:"; fi
-  readarray -d ':' -t dirs <<<"$1"
+  readarray -d ':' -t dirs <<<"$path"
   for d in "${dirs[@]}"; do
     [ -z "$d" ] && d=.
     for f in "$d"/.[!.]* "$d"/..?* "$d"/*; do
