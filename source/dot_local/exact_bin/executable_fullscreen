@@ -30,6 +30,7 @@ for arg; do
     args+=("$arg")
   elif [ "$nextdisplay" = true ]; then
     display="$arg"
+    nextdisplay=false
   else
     case "$arg" in
     --help | -h) usage && return 0 ;;
