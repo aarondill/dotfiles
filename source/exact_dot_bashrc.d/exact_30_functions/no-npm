@@ -23,10 +23,10 @@ function npm() {
     # Defaults to no
     read -rep "Are you sure you want to use NPM? (y/N) " confirmation
     if [[ -n "$confirmation" && "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
-      "$(which npm)" "$@"
+      command npm "$@"
     fi
   else
-    "$(which npm)" "$@"
+    command npm "$@"
   fi
 
 }
