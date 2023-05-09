@@ -144,28 +144,22 @@ function log_github_install() {
 
 # download_file [sudo] <file> <destination> [mode]
 function download_file() {
-  local cmd=() file_url=$1 dest=$2 mode=$3 need_sudo=''
+  local cmd=()
 
+  local sudo=''
   if [ "$1" = "sudo" ]; then
-    need_sudo=true
+    sudo='sudo'
+    shift
   fi
-  if [ "$need_sudo" ]; then
-    file_url=$2 dest=$3 mode=$4
-    cmd=("sudo" "${cmd[@]}")
-  fi
+  local file_url=$1 dest=$2 mode=$3
 
-  cmd=("${cmd[@]}" curl -sSfL "$file_url" -o "$dest" --create-dirs)
+  cmd=(curl -sSfL "$file_url" -o "$dest" --create-dirs)
+  printf '%s ' $sudo "${cmd[@]}" # Show the constructed command
+  $sudo "${cmd[@]}"              # Run the constructed command
 
-  echo "${cmd[@]}" # show the constructed command
-  "${cmd[@]}"      # Run the constructed command
-
-  local cmd=(chmod "$mode" "$dest")
-  if [ "$need_sudo" ]; then
-    cmd=(sudo "${cmd[@]}")
-  fi
-
-  echo "${cmd[@]}" # show the constructed command
-  "${cmd[@]}"      # Run the constructed command
+  cmd=(chmod "$mode" "$dest")
+  printf '%s ' $sudo "${cmd[@]}" # Show the constructed command
+  $sudo "${cmd[@]}"              # Run the constructed command
 }
 
 ## --------------------------------------------------------------------------------------------------
