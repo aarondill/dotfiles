@@ -4,35 +4,51 @@ THIS=fullscreen
 log() { printf '%s\n' "$@"; }
 err() { printf "$THIS: %s\n" "$@" >&2; }
 abort() { err "$1" && exit "${2:-1}"; }
-set -ue
-for arg; do
-  case "$arg" in
-  --help | -h)
-    command cat <<-'EOF'
-				fullscreen [SEARCH] [xdotool-args]
+usage() {
+  command cat <<EOF
+$THIS [SEARCH] [xdotool-args]
 
-				if run without arguments, uses selectwindow to request a window,
-				else searches window class, name, and classname for SEARCH. When
-				A window is found, it is maximized and moved to the top left corner.
-				Use DISPLAY=:dsp fullscreen to control other screens
+if run without arguments, uses selectwindow to request a window,
+else searches window class, name, and classname for SEARCH. When
+A window is found, it is maximized and moved to the top left corner.
+Use DISPLAY=:dsp fullscreen to control other screens
 
-        xdotool-args are commands for xdotool that are prepended to the
-        windowsize command. Use {id} to mean the specified window id.
+xdotool-args are commands for xdotool that are prepended to the
+windowsize command. Use {id} to mean the specified window id.
+
+Options:
+-h, --help              Show this help message
+-d, --display=display   Set the display to use (default $DISPLAY)
 EOF
-    return 0
-    ;;
-  esac
+  return 0
+}
+set -ue
+nextdisplay=false end=false
+args=() display=${DISPLAY:-}
+for arg; do
+  if [ "$end" = true ]; then
+    args+=("$arg")
+  elif [ "$nextdisplay" = true ]; then
+    display="$arg"
+  else
+    case "$arg" in
+    --help | -h) usage && return 0 ;;
+    -d | --display) nextdisplay=true ;;
+    --display=*) display="${arg#--display=}" ;;
+    *) args+=("$arg") ;;
+    esac
+  fi
 done
 
-if [ -z "${1:-}" ]; then
+if [ -z "${args[1]:-}" ]; then
   find=(selectwindow)
 else
-  find=(search --name --class --classname "$1")
+  find=(search --name --class --classname "${args[1]:-}")
 fi
-id=$(xdotool "${find[@]}") || abort "Could not find window on display: ${DISPLAY:-NONE}"
+id=$(DISPLAY="$display" xdotool "${find[@]}") || abort "Could not find window on display: '${display:-NONE}'"
 
 userargs=()
 # Replace {id} with the id in the user string
 for arg in "${@:2}"; do userargs+=("${arg//\{id\}/$id}"); done
 
-xdotool "${userargs[@]}" windowsize "$id" 100% 100% windowmove "$id" 0 0
+DISPLAY="$display" xdotool "${userargs[@]}" windowsize "$id" 100% 100% windowmove "$id" 0 0
