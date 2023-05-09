@@ -28,10 +28,11 @@ for arg; do
   if [ "$end" = true ]; then args+=("$arg") && continue; fi
   case "$arg" in
   -h | --help) usage && exit 0 ;;
-  show) show=true ;;                            # Verbose option
-  --) end=true ;;                               # End of args. this is not one.
-  -*) abort "invalid option -- '${arg#-}'" 2 ;; # Invalid -flag
-  *) args+=("$arg") ;;                          # Any other argument
+  show | --show) show=true ;;                     # Verbose option
+  --) end=true ;;                                 # End of args. this is not one.
+  --*) abort "invalid option -- '${arg#--}'" 2 ;; # Invalid -flag
+  -*) abort "invalid option -- '${arg#-}'" 2 ;;   # Invalid -flag
+  *) args+=("$arg") ;;                            # Any other argument
   esac
 done
 unset end arg
