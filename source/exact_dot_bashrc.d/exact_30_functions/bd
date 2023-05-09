@@ -61,7 +61,7 @@ bd() {
   )
 
   # Show help
-  [ $# -eq 0 ] && help_msg && return 2
+  [ "$#" -eq 0 ] && help_msg && return 2
   for arg in "$@"; do
     if [ "$arg" = '-?' ] ||
       [ "$arg" = '--help' ] ||
