@@ -30,7 +30,6 @@ for arg; do
     args+=("$arg")
     continue
   elif [ -n "$next" ]; then
-    echo declare "$next"="$arg" next=''
     declare "$next"="$arg" next=''
   else
     case "$arg" in
@@ -44,8 +43,10 @@ for arg; do
     esac
   fi
 done
-# If awaiting an argument, but end of args
-abort "$next_arg requires an argument" 2
+if [ -n "$next" ]; then
+  # If awaiting an argument, but end of args
+  abort "$next_arg requires an argument" 2
+fi
 
 unset end
 
