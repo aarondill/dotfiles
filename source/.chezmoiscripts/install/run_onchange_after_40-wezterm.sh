@@ -31,4 +31,10 @@ sudo "$APT" install -y "$DESTINATION"
 rm -rf "$TMP_DIR" && trap '' EXIT # cleanup
 
 # set wezterm as default term
-sudo update-alternatives --set x-terminal-emulator /usr/bin/open-wezterm-here
+# sudo update-alternatives --set x-terminal-emulator /usr/bin/open-wezterm-here
+x_term="$(which x-terminal-emulator || printf '/usr/bin/x-terminal-emulator')"
+wez="$(which wezterm-gui)"
+if [ -z "$wez" ]; then abort0 "Something went wrong setting wezterm as default term"; fi
+
+sudo update-alternatives --install "$x_term" x-terminal-emulator "$wez" 50
+sudo update-alternatives --set x-terminal-emulator "$wez"
