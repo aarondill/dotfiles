@@ -6,7 +6,7 @@ err() { printf "$THIS: %s\n" "$@" >&2; }
 abort() { err "$1" && exit "${2:-1}"; }
 usage() {
   command cat <<EOF
-$THIS [SEARCH] [xdotool-args]
+$THIS [opttions...] [--] [SEARCH] [xdotool-args...]
 
 if run without arguments, uses selectwindow to request a window,
 else searches window class, name, and classname for SEARCH. When
