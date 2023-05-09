@@ -52,6 +52,6 @@ id=$(DISPLAY="$display" xdotool "${find[@]}") || abort "Could not find window on
 
 userargs=()
 # Replace {id} with the id in the user string
-for arg in "${args[@]:2}"; do userargs+=("${arg//\{id\}/$id}"); done
+for arg in "${args[@]:1}"; do userargs+=("${arg//\{id\}/$id}"); done
 
 DISPLAY="$display" xdotool "${userargs[@]}" windowsize "$id" 100% 100% windowmove "$id" 0 0
