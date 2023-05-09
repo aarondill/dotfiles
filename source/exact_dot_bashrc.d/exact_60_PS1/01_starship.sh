@@ -47,3 +47,7 @@ eval "$(starship init bash)"
 true
 # or true, I don't care if this fails, starship should handle itself.
 starship_precmd || true
+
+if ! [ -v "BP_PIPESTATUS[@]" ]; then
+  declare -a BP_PIPESTATUS=()
+fi
