@@ -34,7 +34,8 @@ function parse_args() {
     if [ $end = true ]; then
       args+=("$arg") && continue
     elif [ -n "$next" ]; then
-      declare "$next"="$arg" next=''
+      # -x to expose outside function
+      declare -x "$next"="$arg" next=''
     else
       case "$arg" in
       --help | -h) usage && exit 0 ;;
