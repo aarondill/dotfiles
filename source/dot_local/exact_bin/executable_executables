@@ -41,7 +41,7 @@ for arg; do
 done
 unset end next_path
 
-get_execs() {
+get_execs() (
   set -f
   IFS=:
   # INTENTIONALLY SPLITS
@@ -50,5 +50,5 @@ get_execs() {
     [ -n "$d" ] || d=.
     for f in "$d"/.[!.]* "$d"/..?* "$d"/*; do [ -f "$f" ] && [ -x "$f" ] && printf '%s\n' "${f##*/}"; done
   done
-}
+)
 get_execs "$path" | sort | uniq
