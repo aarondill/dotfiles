@@ -12,7 +12,8 @@ $THIS [file|executable...]
                   
 outputs the contents of a file using \$PAGER, calls which if file is not found
 options:
--P, --no-pager   Don't attempt to open the files using a pager (\$PAGER)
+-P, --no-pager      Don't attempt to open the files using a pager (\$PAGER)
+-p, --pager=PAGER   Use <PAGER> instead of \$PAGER
 EOF
   return 0
 }
@@ -22,19 +23,30 @@ abort() { err "$1" && exit "${2:-1}"; }
 
 set -eu # subshell
 args=() end=false pager=true
+# If awaiting an argument
+next='' next_arg=''
 for arg; do
   if [ $end = true ]; then
     args+=("$arg")
     continue
+  elif [ -n "$next" ]; then
+    declare "$next"="$arg"
+    next=''
+  else
+    case "$arg" in
+    --help | -h) usage && exit 0 ;;
+    --) end=true ;;
+    --no-pager | -P) pager=false ;;
+    -p | --pager) next=pager next_arg="$arg" ;;
+    --pager=*) pager="${arg#--pager=}" ;;
+    -*) abort "Invalid option -- $arg" 2 ;;
+    *) args+=("$arg") ;;
+    esac
   fi
-  case "$arg" in
-  --help | -h) usage && exit 0 ;;
-  --) end=true ;;
-  --no-pager | -P) pager=false ;;
-  -*) abort "Invalid option -- $arg" 2 ;;
-  *) args+=("$arg") ;;
-  esac
 done
+# If awaiting an argument, but end of args
+abort "$next_arg requires an argument" 2
+
 unset end
 
 if [ "$#" -eq 0 ]; then
