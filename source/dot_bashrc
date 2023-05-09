@@ -144,6 +144,7 @@ if [ -d "$HOME/.bashrc.d/" ]; then
   while IFS= read -r -d '' file; do
     # For each file, if bench var is assigned,
     # then call time and output benchmark
+    # shellcheck disable=SC1090 # Don't even try to follow this loop
     if [[ $__bashrc_bench ]]; then
       TIMEFORMAT="$file: %R"
       time . "$file"
