@@ -5,18 +5,20 @@
 # A template script for writing good scripts
 # could be improved, but 🤷
 #
-set -eu
+
+set -euC -o pipefail
 
 THIS=script_utils.sh
 usage() {
   cat <<EOF
 $THIS [options] [--] [arguments]
                   
-This does <SOMETHING>
+This does SOMETHING
 
 Options:
 -h, --help        show this message
--s, --long=long   do something with \$long
+-l, --long=long   do something with \$long
+-s, --short       enable short
 EOF
   return 0
 }
@@ -25,48 +27,39 @@ log() { printf '%s\n' "$@"; }
 err() { printf "$THIS: %s\n" "$@" >&2; }
 abort() { err "$1" && exit "${2:-1}"; }
 
-# Sets the variable $args to an array of positional arguments
-# Usage: parse_args "$@"
+# Returns a string that should be 'eval'ed to set the positional arguments
+# Input: $LONGOPTS,$SHORTOPTS
+# eval "$(parse_args "$@")"
 function parse_args() {
-  # If awaiting an argument
-  local next='' next_arg='' end=false
-  declare -g args=()
-  for arg in "$@"; do
-    if [ $end = true ]; then
-      args+=("$arg") && continue
-    elif [ -n "$next" ]; then
-      # -x to expose outside function
-      declare -g "$next"="$arg"
-      next=""
-    else
-      case "$arg" in
-      --*) split_arg=("$arg") ;;
-      -*)
-        [[ "$arg" =~ ${arg//?/(.)} ]]                 # splits into array
-        declare -a split_arg=("${BASH_REMATCH[@]:1}") # copy array for later
-        split_arg=("${split_arg[@]/#/-}")
-        ;;
-      esac
+  # -allow a command to fail with !’s side effect on errexit
+  # -use return value from ${PIPESTATUS[0]}, because ! hosed $?
+  # shellcheck disable=SC2251
+  ! getopt --test >/dev/null
+  if [[ "${PIPESTATUS[0]}" -ne 4 ]]; then abort "Enhanced getopt is required for this script to work. Please install it." 1; fi
 
-      case "$arg" in
-      --help | -h) usage && exit 0 ;;
-      --) end=true ;;
-      -s | --long) next=long_setting next_arg="$arg" ;;
-      --long=*) long_setting="${arg#*=}" ;;
-      --*) abort "Invalid option -- ${arg#--}" 2 ;;
-      -*) abort "Invalid option -- ${arg#-}" 2 ;;
-      *) args+=("$arg") ;;
-      esac
-    fi
-  done
-  # If awaiting an argument, but end of args
-  if [ -n "$next" ]; then abort "$next_arg requires an argument" 2; fi
+  local parsed
+  if parsed=$(getopt --options="$SHORTOPTS" --longoptions="$LONGOPTS" --name "${THIS-$0}" -- "$@"); then
+    # output getopt’s output this way to handle the quoting right:
+    printf '%s' "set -- $parsed"
+    return 0
+  fi
+  # getopt has already complained about wrong arguments to stdout - Exit script
+  exit 2
 }
 
-long_setting=''
-parse_args "$@"
+# option --output/-o requires 1 argument
+LONGOPTS=short,long:,help
+SHORTOPTS=h,s,l:
+eval "$(parse_args "$@")"
 
-# Do something with empty positionals
-if [ "${#args[@]}" -eq 0 ]; then :; fi
-# Do something with --long
-echo "$long_setting"
+while true; do
+  case "$1" in
+  -h | --help) usage && exit 0 ;;
+  -s | --short) short=true && shift ;;
+  -l | --long) long="$2" && shift 2 ;;
+  --) shift && break ;;
+  *) abort "This is a bug" 3 ;;
+  esac
+done
+# handle non-option arguments
+if [[ "$#" -eq 0 ]]; then abort "POS_ARGUMENT is required" 2; fi
