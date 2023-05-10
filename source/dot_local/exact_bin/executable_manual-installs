@@ -57,11 +57,13 @@ if [ -z "$manifestURL" ]; then
   manifestURL="http://releases.ubuntu.com/$codename/$release-$desktop-amd64.manifest"
 fi
 showmanual=$(apt-mark showmanual | sort)
+declare -i curl_exit=0
+
 set -o pipefail
-manifest_content=$(curl -SsLf "$manifestURL" | cut -f1 | sort || err "${PIPESTATUS[0]}")
+manifest_content=$(curl -SsLf "$manifestURL" | cut -f1 | sort) || curl_exit="${PIPESTATUS[0]}"
 set +o pipefail
-exit_curl=${PIPESTATUS[0]:-failed}
-if [ "$exit_curl" -eq 0 ]; then
+
+if [ "$curl_exit" -eq 0 ]; then
   :
   # /usr/bin/comm -23 <(cat <<<"$showmanual") <(cat <<<"$manifest_content")
 else
