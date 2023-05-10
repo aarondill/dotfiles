@@ -61,7 +61,8 @@ manifest_content=$(curl -SsLf "$manifestURL" | cut -f1 | sort)
 exit_curl=${PIPESTATUS[0]:-failed}
 echo "$exit_curl"
 if [ "$exit_curl" -eq 0 ]; then
-  /usr/bin/comm -23 <(cat <<<"$showmanual") <(cat <<<"$manifest_content")
+  :
+  # /usr/bin/comm -23 <(cat <<<"$showmanual") <(cat <<<"$manifest_content")
 else
   abort "downloading the manifest from $manifestURL failed" 1
 fi
