@@ -29,7 +29,8 @@ abort() { err "$1" && exit "${2:-1}"; }
 # Usage: parse_args "$@"
 function parse_args() {
   # If awaiting an argument
-  next='' next_arg='' end=false args=()
+  local next='' next_arg='' end=false
+  declare -g args=()
   for arg in "$@"; do
     if [ $end = true ]; then
       args+=("$arg") && continue
@@ -39,10 +40,19 @@ function parse_args() {
       next=""
     else
       case "$arg" in
+      --*) split_arg=("$arg") ;;
+      -*)
+        [[ "$arg" =~ ${arg//?/(.)} ]]                 # splits into array
+        declare -a split_arg=("${BASH_REMATCH[@]:1}") # copy array for later
+        split_arg=("${split_arg[@]/#/-}")
+        ;;
+      esac
+
+      case "$arg" in
       --help | -h) usage && exit 0 ;;
       --) end=true ;;
       -s | --long) next=long_setting next_arg="$arg" ;;
-      --long=*) long_setting="${arg#--long=}" ;;
+      --long=*) long_setting="${arg#*=}" ;;
       --*) abort "Invalid option -- ${arg#--}" 2 ;;
       -*) abort "Invalid option -- ${arg#-}" 2 ;;
       *) args+=("$arg") ;;
@@ -51,7 +61,6 @@ function parse_args() {
   done
   # If awaiting an argument, but end of args
   if [ -n "$next" ]; then abort "$next_arg requires an argument" 2; fi
-  unset end next next_arg
 }
 
 long_setting=''
