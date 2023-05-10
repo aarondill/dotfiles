@@ -1,26 +1,27 @@
 {
 	"dependencies": {
 		"@aarondill/create-ts": "^3.0.1",
-		"@types/node": "^18.16.3",
+		"@types/node": "20.1.1",
 		"@vscode/vsce": "^2.19.0",
 		"auto-changelog": "^2.4.0",
 		"depcheck": "^1.4.3",
-		"eslint": "^8.39.0",
+		"eslint": "^8.40.0",
 		"fd-find": "^1.0.7",
 		"jest": "^29.5.0",
 		"live-server": "^1.2.2",
 		"n": "^9.1.0",
 		"neovim": "^4.10.1",
 		"npkill": "^0.11.3",
-		"npm-check-updates": "^16.10.9",
+		"npm-check-updates": "^16.10.12",
 		"prettier": "^2.8.8",
-		"release-it": "^15.10.2",
+		"release-it": "^15.10.3",
 		"sort-package-json": "^2.4.1",
 		"tree-sitter-cli": "^0.20.8",
 		"ts-node": "^10.9.1",
 		"typescript": "^5.0.4",
 		"uglify-js": "^3.17.4",
-		"vercel": "^29.0.3",
+		"vercel": "^29.1.1",
+		"vite": "^4.3.5",
 		"wipe-modules": "^1.2.0"
 	}
 }
