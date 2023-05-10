@@ -56,5 +56,5 @@ if [ -z "$manifestURL" ]; then
   desktop=$(dpkg -l ubuntu-desktop &>/dev/null && echo "desktop" || echo "live-server")
   manifestURL="http://releases.ubuntu.com/$codename/$release-$desktop-amd64.manifest"
 fi
-set -o pipefail
-/usr/bin/comm -23 <(apt-mark showmanual | sort) <(curl -SsLf "$manifestURL" | cut -f1 | sort)
+showmanual=$(apt-mark showmanual | sort)
+/usr/bin/comm -23 "<(<<<$showmanual)" <({ curl -SsLf "$manifestURL" || printf "%s" "$showmanual"; } | cut -f1 | sort)
