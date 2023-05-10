@@ -28,14 +28,14 @@ function parse_args() {
     if [ $end = true ]; then
       args+=("$arg") && continue
     elif [ -n "$next" ]; then
-      # Declare -x to expose outside the function
-      declare -x "$next"="$arg" next=''
+      # Declare -g to expose outside the function
+      declare -g "$next"="$arg" next=''
     else
       case "$arg" in
       --help | -h) usage && exit 0 ;;
       --) end=true ;;
       -m | --manifest) next='manifestURL' next_arg="$arg" ;;
-      --manifest=*) manifestURL=${arg#--manifest} ;;
+      --manifest=*) manifestURL=${arg#--manifest=} ;;
       --*) abort "Invalid option -- ${arg#--}" 2 ;;
       -*) abort "Invalid option -- ${arg#-}" 2 ;;
       *) args+=("$arg") ;;
