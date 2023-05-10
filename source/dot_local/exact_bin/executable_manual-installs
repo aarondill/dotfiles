@@ -1,7 +1,59 @@
 #!/usr/bin/env bash
+set -eu
 
-release=$(lsb_release -ds | awk '{printf tolower($1) "-" $2}')
-codename=$(lsb_release -cs)
-desktop=$(dpkg -l ubuntu-desktop &>/dev/null && echo "desktop" || echo "live-server")
-manifestURL="http://releases.ubuntu.com/$codename/$release-$desktop-amd64.manifest"
+THIS=manual-installs
+usage() {
+  cat <<EOF
+$THIS [options]
+                  
+returns a list of manually installed packages (attempted to parse from ubuntu package manifest)
+
+Options:
+-h, --help           show this message
+-m, --manifest=url   use the url given instead of detecting the ubuntu package manifest
+EOF
+  return 0
+}
+
+log() { printf '%s\n' "$@"; }
+err() { printf "$THIS: %s\n" "$@" >&2; }
+abort() { err "$1" && exit "${2:-1}"; }
+
+# Sets the variable $args to an array of positional arguments
+# Usage: parse_args "$@"
+function parse_args() {
+  # If awaiting an argument
+  next='' next_arg='' end=false args=()
+  for arg in "$@"; do
+    if [ $end = true ]; then
+      args+=("$arg") && continue
+    elif [ -n "$next" ]; then
+      # Declare -x to expose outside the function
+      declare -x "$next"="$arg" next=''
+    else
+      case "$arg" in
+      --help | -h) usage && exit 0 ;;
+      --) end=true ;;
+      -m | --manifest) next='manifestURL' next_arg="$arg" ;;
+      --manifest=*) manifestURL=${arg#--manifest} ;;
+      --*) abort "Invalid option -- ${arg#--}" 2 ;;
+      -*) abort "Invalid option -- ${arg#-}" 2 ;;
+      *) args+=("$arg") ;;
+      esac
+    fi
+  done
+  # If awaiting an argument, but end of args
+  if [ -n "$next" ]; then abort "$next_arg requires an argument" 2; fi
+  unset end next next_arg
+}
+
+manifestURL=''
+parse_args "$@"
+
+if [ -z "$manifestURL" ]; then
+  release=$(lsb_release -ds | awk '{printf tolower($1) "-" $2}')
+  codename=$(lsb_release -cs)
+  desktop=$(dpkg -l ubuntu-desktop &>/dev/null && echo "desktop" || echo "live-server")
+  manifestURL="http://releases.ubuntu.com/$codename/$release-$desktop-amd64.manifest"
+fi
 /usr/bin/comm -23 <(apt-mark showmanual | sort) <(curl -SsLf "$manifestURL" | cut -f1 | sort)
