@@ -24,11 +24,15 @@ if [ -d /usr/lib/jvm ]; then
 # export PATH="$JAVA_HOME/bin${PATH:+:$PATH}"
 fi
 
-# allow npm bin
-export PATH="/home/aaron/.local/share/npm/bin${PATH:+:$PATH}"
+if [ -d "${XDG_DATA_HOME:-$HOME/.local/share}/npm/bin" ]; then
+  # allow npm bin
+  export PATH="${XDG_DATA_HOME:-$HOME/.local/share}/npm/bin${PATH:+:$PATH}"
+fi
 # allow pnpm bin
-export PNPM_HOME="/home/aaron/.local/share/pnpm"
-export PATH="$PNPM_HOME${PATH:+:$PATH}"
+export PNPM_HOME="${XDG_DATA_HOME:-$HOME/.local/share}/pnpm"
+if [ -d "$PNPM_HOME" ]; then
+  export PATH="$PNPM_HOME${PATH:+:$PATH}"
+fi
 
 # include flatpaks in path. (Have org.example.app names)
 if [ -d /var/lib/flatpak/exports/bin ]; then
