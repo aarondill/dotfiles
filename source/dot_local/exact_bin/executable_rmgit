@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
+set -eu
+
 THIS=rmgit
-function log() { printf '%s\n' "$@"; }
-function err() { printf "$THIS: %s\n" "$@" >&2; }
+log() { printf '%s\n' "$@"; }
+err() { printf "$THIS: %s\n" "$@" >&2; }
+abort() { err "$1" && exit "${2:-1}"; }
 
 declare -i VERBOSE=0 YES=0 FORCE=0
 
