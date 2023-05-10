@@ -2,6 +2,34 @@
 # sets the color of tty using setcolors
 # https://github.com/EvanPurkhiser/linux-vt-setcolors
 # Sets to isotope.dark (from terminal.sexy)
+set -eu
+
+THIS=isotope.dark
+
+log() { printf '%s\n' "$@"; }
+err() { printf "$THIS: %s\n" "$@" >&2; }
+abort() { err "$1" && exit "${2:-1}"; }
+usage() {
+  cat <<EOF
+$THIS [-h|--help]
+Sets the color of tty using setcolors (EvanPurkhiser/linux-vt-setcolors)
+Sets to isotope.dark (from terminal.sexy)
+Requires setcolors to be in the \$PATH
+
+Options:
+-h, --help       show this message
+EOF
+  return 0
+}
+
+# Simple argument parsing, only help supported
+for arg in "$@"; do
+  case "$arg" in
+  --help | -h) usage && exit 0 ;;
+  esac
+done
+
+if ! command -v setcolors &>/dev/null; then abort 'setcolors is required for this script to work' 1; fi
 setcolors <(
   cat <<-'EOF'
 0#000000
