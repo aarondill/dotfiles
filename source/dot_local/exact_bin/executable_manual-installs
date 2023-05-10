@@ -57,4 +57,5 @@ if [ -z "$manifestURL" ]; then
   manifestURL="http://releases.ubuntu.com/$codename/$release-$desktop-amd64.manifest"
 fi
 showmanual=$(apt-mark showmanual | sort)
-/usr/bin/comm -23 "<(<<<$showmanual)" <({ curl -SsLf "$manifestURL" || printf "%s" "$showmanual"; } | cut -f1 | sort)
+manifest_content=$(curl -SsLf "$manifestURL" | cut -f1 | sort)
+/usr/bin/comm -23 <(cat <<<"$showmanual") <(cat <<<"$manifest_content")
