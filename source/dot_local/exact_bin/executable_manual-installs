@@ -58,4 +58,7 @@ if [ -z "$manifestURL" ]; then
 fi
 showmanual=$(apt-mark showmanual | sort)
 manifest_content=$(curl -SsLf "$manifestURL" | cut -f1 | sort)
-/usr/bin/comm -23 <(cat <<<"$showmanual") <(cat <<<"$manifest_content")
+exit_curl=${PIPESTATUS[0]:-}
+if [ "$exit_curl" -eq 0 ]; then
+  /usr/bin/comm -23 <(cat <<<"$showmanual") <(cat <<<"$manifest_content")
+fi
