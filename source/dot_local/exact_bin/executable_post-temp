@@ -8,6 +8,7 @@
 set -eu
 
 THIS='post-temp'
+temp_source=https://tmpfiles.org/api/v1/upload
 
 usage() {
 
@@ -16,35 +17,51 @@ Usage: $THIS [OPTION...] [--] FILE...
 Hosts a temporary file on the internet for 60 mins and outputs the url.
 
 OPTIONS:
-  -h, --help      display this help message
-  -v, --verbose   display verbose messages
-  -q, --quiet     be quieter
+  -h, --help       display this help message
+  -v, --verbose    display verbose messages
+  -q, --quiet      be quieter
+  -t, --temp=url   use url to upload files (POST) (default: $temp_source)
 EOF
   return 0
 }
 log() { printf '%s\n' "$@"; }
 err() { printf "$THIS: %s\n" "$@" >&2; }
-abort() {
-  err "$1"
-  exit "${2:-1}"
+abort() { err "$1" && exit "${2:-1}"; }
+
+# Sets the variable $args to an array of positional arguments
+# Usage: parse_args "$@"
+function parse_args() {
+  # If awaiting an argument
+  local next='' next_arg='' end=false
+  declare -g args=()
+  for arg in "$@"; do
+    if [ $end = true ]; then
+      args+=("$arg") && continue
+    elif [ -n "$next" ]; then
+      # -x to expose outside function
+      declare -g "$next"="$arg"
+      next=''
+    else
+      case "$arg" in
+      --help | -h) usage && exit 0 ;;
+      --) end=true ;;
+      -v | --verbose) verbose=true ;; # Verbose option
+      -q | --quiet) quiet=true ;;     # Quiet option
+      -t | --temp) next=temp_source next_arg="$arg" ;;
+      --temp=*) temp_source="${arg#--temp=}" ;;
+      --*) abort "Invalid option -- ${arg#--}" 2 ;;
+      -*) abort "Invalid option -- ${arg#-}" 2 ;;
+      *) args+=("$arg") ;;
+      esac
+    fi
+  done
+  # If awaiting an argument, but end of args
+  if [ -n "$next" ]; then abort "$next_arg requires an argument" 2; fi
 }
 
 if [ "$#" -eq 0 ]; then usage && exit 0; fi
-
-verbose=false quiet=false end=false args=()
-for arg; do
-  # stop processing when hit --
-  if [ "$end" = true ]; then args+=("$arg") && continue; fi
-  case "$arg" in
-  -h | --help) usage && exit 0 ;;
-  -v | --verbose) verbose=true ;;               # Verbose option
-  -q | --quiet) quiet=true ;;                   # Quiet option
-  --) end=true ;;                               # End of args. this is not one.
-  -*) abort "invalid option -- '${arg#-}'" 2 ;; # Invalid -flag
-  *) args+=("$arg") ;;                          # Any other argument
-  esac
-done
-unset end arg
+verbose=false quiet=false
+parse_args "$@"
 if [ "${#args[@]}" -eq 0 ]; then abort "FILE is required!" 2; fi
 
 fx=$(which fx 2>/dev/null || printf '')
@@ -58,7 +75,7 @@ for file in "${args[@]}"; do
     exitcode=2 && continue
   fi
 
-  result="$(curl -sSfL -F "file=@$file" https://tmpfiles.org/api/v1/upload)" ||
+  result="$(curl -sSfL -F "file=@$file" "$temp_source")" ||
     abort 'Something went wrong during curl command. Aborting.' 1 # exits program
   # Example outputs:
   # {"message": "server error"}
