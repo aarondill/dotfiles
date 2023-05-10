@@ -64,8 +64,7 @@ manifest_content=$(curl -SsLf "$manifestURL" | cut -f1 | sort) || curl_exit="${P
 set +o pipefail
 
 if [ "$curl_exit" -eq 0 ]; then
-  :
-  # /usr/bin/comm -23 <(cat <<<"$showmanual") <(cat <<<"$manifest_content")
+  /usr/bin/comm -23 <(cat <<<"$showmanual") <(cat <<<"$manifest_content")
 else
   abort "downloading the manifest from $manifestURL failed" 1
 fi
