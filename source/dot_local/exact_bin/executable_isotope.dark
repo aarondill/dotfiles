@@ -29,9 +29,8 @@ for arg in "$@"; do
   esac
 done
 
-if ! command -v setcolors &>/dev/null; then abort 'setcolors is required for this script to work' 1; fi
-setcolors <(
-  cat <<-'EOF'
+if ! command -v setcolors &>/dev/null; then abort 'setcolors is required for this script to work' 2; fi
+setcolors <<<'
 0#000000
 1#ff0000
 2#33ff00
@@ -48,5 +47,4 @@ setcolors <(
 13#cc00ff
 14#00ffff
 15#ffffff
-EOF
-)
+'
