@@ -59,9 +59,12 @@ function parse_args() {
   if [ -n "$next" ]; then abort "$next_arg requires an argument" 2; fi
 }
 
+# Usage if no args are passed
 if [ "$#" -eq 0 ]; then usage && exit 0; fi
+# Parse the arguments and default values
 verbose=false quiet=false
 parse_args "$@"
+# Error if args given, but no files given
 if [ "${#args[@]}" -eq 0 ]; then abort "FILE is required!" 2; fi
 
 fx=$(which fx 2>/dev/null || printf '')
