@@ -57,9 +57,7 @@ function parse_args() {
 
 parse_args "$@"
 
-if [ -z "$manifestURL" ]; then
-  abort "No manifest URL was provided" 2
-fi
+if [ -z "$manifestURL" ]; then abort "No manifest URL was provided" 2; fi
 
 showmanual=$(apt-mark showmanual | sort)
 
