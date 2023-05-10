@@ -31,7 +31,11 @@ export PNPM_HOME="/home/aaron/.local/share/pnpm"
 export PATH="$PNPM_HOME${PATH:+:$PATH}"
 
 # include flatpaks in path. (Have org.example.app names)
-export PATH=${PATH:+$PATH:}/var/lib/flatpak/exports/bin
+if [ -d /var/lib/flatpak/exports/bin ]; then
+  export PATH=${PATH:+$PATH:}/var/lib/flatpak/exports/bin
+fi
 
 # include go in path
-export PATH=${PATH:+$PATH:}/usr/local/go/bin
+if [ -d /usr/local/go/bin ]; then
+  export PATH=${PATH:+$PATH:}/usr/local/go/bin
+fi
