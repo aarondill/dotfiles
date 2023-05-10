@@ -12,7 +12,9 @@ usage() {
   cat <<EOF
 $THIS [options]
                   
-returns a list of manually installed packages (attempted to parse from ubuntu package manifest)
+uses apt-mark to fetch a list of manually installed packages and compares against the
+ubuntu manifest (or a given list of packages) to find the packages that were manually
+installed by the user.
 
 Options:
 -h, --help           show this message
