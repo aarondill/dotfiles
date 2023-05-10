@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
+THIS=rmgit
 function log() { printf '%s\n' "$@"; }
-function err() { printf '%s\n' "$@" >&2; }
+function err() { printf "$THIS: %s\n" "$@" >&2; }
 
 declare -i VERBOSE=0 YES=0 FORCE=0
 
 function usage() {
   cat <<-EOF
-	Usage: rmgit [OPTS] REPO...
+	Usage: $THIS [OPTS] REPO...
 
 	Options:
 		-v, --verbose  verbose output
@@ -16,32 +17,37 @@ function usage() {
 EOF
   return 0
 }
-while getopts ':hvyf-:' opt; do
-  case "$opt" in
-  h) usage && exit 0 ;;
-  v) VERBOSE=1 ;;
-  y) YES=1 ;;
-  f) YES=1 FORCE=1 ;;
-  -) case "${OPTARG}" in
-    # Long options
-    help) usage && exit 0 ;;
-    verbose) VERBOSE=1 ;;
-    yes) YES=1 ;;
-    force) YES=1 FORCE=1 ;;
-    *)
-      err "Unknown option --${OPTARG}"
-      usage >&2
-      exit 1
-      ;;
-    esac ;;
-  *)
-    err "Unknown option -${OPTARG}"
-    usage >&2
-    exit 1
-    ;;
-  esac
-done
-shift "$((OPTIND - 1))"
+# Sets the variable $args to an array of positional arguments
+# Usage: parse_args "$@"
+function parse_args() {
+  # If awaiting an argument
+  next='' next_arg='' end=false args=()
+  for arg in "$@"; do
+    if [ $end = true ]; then
+      args+=("$arg") && continue
+    elif [ -n "$next" ]; then
+      # -x to expose outside function
+      declare -g "$next"="$arg"
+      next=""
+    else
+      case "$arg" in
+      --help | -h) usage && exit 0 ;;
+      --) end=true ;;
+      -v | --verbose) VERBOSE=1 ;;
+      -y | --yes) YES=1 ;;
+      -f | --force) FORCE=1 YES=1 ;;
+      --*) abort "Invalid option -- ${arg#--}" 2 ;;
+      -*) abort "Invalid option -- ${arg#-}" 2 ;;
+      *) args+=("$arg") ;;
+      esac
+    fi
+  done
+  # If awaiting an argument, but end of args
+  if [ -n "$next" ]; then abort "$next_arg requires an argument" 2; fi
+  unset end next next_arg
+}
+
+parse_args "$@"
 
 for REPO; do
   if [ -z "$REPO" ]; then
