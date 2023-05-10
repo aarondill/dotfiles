@@ -2,6 +2,12 @@
 set -eu
 
 THIS=manual-installs
+
+release=$(lsb_release -ds | awk '{printf tolower($1) "-" $2}')
+codename=$(lsb_release -cs)
+desktop=$(dpkg -l ubuntu-desktop &>/dev/null && echo "desktop" || echo "live-server")
+manifestURL="http://releases.ubuntu.com/$codename/$release-$desktop-amd64.manifest"
+
 usage() {
   cat <<EOF
 $THIS [options]
@@ -10,7 +16,7 @@ returns a list of manually installed packages (attempted to parse from ubuntu pa
 
 Options:
 -h, --help           show this message
--m, --manifest=url   use the url given instead of detecting the ubuntu package manifest
+-m, --manifest=url   use the url given to download the manifest (default: $manifestURL)
 EOF
   return 0
 }
@@ -50,16 +56,10 @@ function parse_args() {
 manifestURL=''
 parse_args "$@"
 
-if [ -z "$manifestURL" ]; then
-  release=$(lsb_release -ds | awk '{printf tolower($1) "-" $2}')
-  codename=$(lsb_release -cs)
-  desktop=$(dpkg -l ubuntu-desktop &>/dev/null && echo "desktop" || echo "live-server")
-  manifestURL="http://releases.ubuntu.com/$codename/$release-$desktop-amd64.manifest"
-fi
 showmanual=$(apt-mark showmanual | sort)
-declare -i curl_exit=0
 
 set -o pipefail
+declare -i curl_exit=0
 manifest_content=$(curl -SsLf "$manifestURL" | cut -f1 | sort) || curl_exit="${PIPESTATUS[0]}"
 set +o pipefail
 
