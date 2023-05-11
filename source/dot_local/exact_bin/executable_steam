@@ -7,24 +7,33 @@
 # Overflow issues.
 #
 
+# usage 'get_nth_line 2', 1 indexed
+get_nth_line() {
+  local _ line i
+  declare -i end="$1"
+  for ((i = 1; i < end; i++)); do read -r _; done || return 0
+  read -r line || return 0
+  printf '%s' "$line"
+}
+
 # Check if the current script is at the top of the PATH
-if [[ "$0" = "$(which steam)" ]]; then
-	# Finds all instances of 'steam' in PATH and returns the second line
-	next_in_path=$(which -a steam | tail -n+2 | head -n1)
+if [[ "$(realpath -- "$0")" = "$(which steam)" ]]; then
+  # Finds all instances of 'steam' in PATH and returns the second line
+  next_in_path=$(which -a steam 2>/dev/null | get_nth_line 2) || true
 else
-	# Find the first instance of 'steam' in PATH
-	next_in_path=$(which steam)
+  # Find the first instance of 'steam' in PATH
+  next_in_path=$(which steam 2>/dev/null) || true
 fi
 
 # Checks flatpak first to see if it is installed.
 if flatpak info com.valvesoftware.Steam &>/dev/null; then
-	printf 'Running steam using flatpak from %s\n' "$0"
-	# Run the flatpak if installed
-	exec flatpak run com.valvesoftware.Steam "$@"
+  printf 'Running steam using flatpak from %s\n' "$0"
+  # Run the flatpak if installed
+  exec flatpak run com.valvesoftware.Steam "$@"
 elif [[ -n "$next_in_path" ]]; then
-	# Runs the other steam
-	exec "$next_in_path" "$@"
+  # Runs the other steam
+  exec "$next_in_path" "$@"
 else
-	printf '%s\n' "Could not find steam using Flatpak or PATH!"
-	exit 2
+  printf '%s\n' "Could not find steam using Flatpak or PATH!"
+  exit 2
 fi
