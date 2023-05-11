@@ -58,6 +58,8 @@ for arg in "$@"; do
   esac
 done
 
+if [ "$#" -eq 0 ]; then abort "missing operand" 2; fi
+
 for REPO in "$@"; do
   if [ -z "$REPO" ]; then
     err "Refusing to remove empty string. (REPO is required)"
