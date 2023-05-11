@@ -43,7 +43,8 @@ function parse_args() {
 
 path=$PATH
 LONGOPTS=help,path: SHORTOPTS=h,p:
-eval "$(parse_args "$@")"
+ARGSTRING="$(parse_args "$@")"
+eval "$ARGSTRING"
 
 while true; do
   case "$1" in
