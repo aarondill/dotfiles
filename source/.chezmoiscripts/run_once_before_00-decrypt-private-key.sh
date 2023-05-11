@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euC -o pipefail
 
 # Source utils
 SOURCE_DIR=$(chezmoi source-path)
