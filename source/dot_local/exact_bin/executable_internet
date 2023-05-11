@@ -48,17 +48,17 @@ function parse_args() {
 }
 
 # option --long/-l requires 1 argument
-LONGOPTS=short,long:,help
-SHORTOPTS=h,s,l:
+LONGOPTS=help,test:,quiet
+SHORTOPTS=h,t:,q
 ARGSTRING="$(parse_args "$@")"
 eval "$ARGSTRING"
 quiet=false
 while true; do
   case "$1" in
   --help | -h) usage && exit 0 ;;
-  --) shift && break ;;
   -q | --quiet) quiet=true && shift ;;
   -t | --test) test_url=$2 && shift 2 ;;
+  --) shift && break ;;
   *) abort "This is a bug" 3 ;;
   esac
 done
