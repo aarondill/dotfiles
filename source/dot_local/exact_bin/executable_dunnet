@@ -30,6 +30,7 @@ err() { printf "$THIS: %s\n" "$@" >&2; }
 abort() { err "$1" && exit "${2:-1}"; }
 
 # Returns a string that should be 'eval'ed to set the positional arguments
+# Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
 # Input: $LONGOPTS,$SHORTOPTS
 # eval "$(parse_args "$@")"
 function parse_args() {
@@ -51,7 +52,8 @@ function parse_args() {
 
 emacs="$(which emacs 2>/dev/null)"
 LONGOPTS=help,nosave,emacs:,save: SHORTOPTS=h,n,e:,s:
-eval "$(parse_args "$@")"
+ARGSTRING="$(parse_args "$@")"
+eval "$ARGSTRING"
 
 while true; do
   case "$1" in
