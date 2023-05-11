@@ -21,6 +21,7 @@ abort() {
   exit "${2:-1}"
 }
 # Returns a string that should be 'eval'ed to set the positional arguments
+# Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
 # Input: $LONGOPTS,$SHORTOPTS
 # eval "$(parse_args "$@")"
 function parse_args() {
