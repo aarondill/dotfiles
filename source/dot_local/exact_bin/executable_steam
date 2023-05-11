@@ -6,6 +6,7 @@
 # just in the current PATH. Considers it's position in the PATH to avoid Stack
 # Overflow issues.
 #
+# No argument parsing, as it's intended to be a transparent wrapper
 
 # usage 'get_nth_line 2', 1 indexed
 get_nth_line() {
