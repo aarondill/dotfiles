@@ -116,6 +116,10 @@ if systemctl list-unit-files --quiet --all --type=service --user --state=enabled
 fi
 unset IBus
 
+if command -v nvim; then
+  alias vim='nvim'
+fi
+
 if command -v emacs &>/dev/null; then
   # Don't you DARE open a window
   alias emacs='emacs -nw'
