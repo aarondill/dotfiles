@@ -5,6 +5,7 @@
 # Read the contents of a file or executable
 # *Follows Symlinks*
 #
+set -eu # subshell
 THIS=contents
 usage() {
   cat <<EOF
@@ -21,40 +22,44 @@ log() { printf '%s\n' "$@"; }
 err() { printf "$THIS: %s\n" "$@" >&2; }
 abort() { err "$1" && exit "${2:-1}"; }
 
-set -eu # subshell
-args=() end=false pager=true
-# If awaiting an argument
-next='' next_arg=''
-for arg; do
-  if [ $end = true ]; then
-    args+=("$arg")
-    continue
-  elif [ -n "$next" ]; then
-    declare -g "$next"="$arg"
-    next=""
-  else
-    case "$arg" in
-    --help | -h) usage && exit 0 ;;
-    --) end=true ;;
-    --no-pager | -P) pager=false ;;
-    -p | --pager) next=pager next_arg="$arg" ;;
-    --pager=*) pager="${arg#--pager=}" ;;
-    --*) abort "Invalid option -- ${arg#--}" 2 ;;
-    -*) abort "Invalid option -- ${arg#-}" 2 ;;
-    *) args+=("$arg") ;;
-    esac
-  fi
-done
-# If awaiting an argument, but end of args
-if [ -n "$next" ]; then abort "$next_arg requires an argument" 2; fi
-unset end next next_arg
+# Returns a string that should be 'eval'ed to set the positional arguments
+# Input: $LONGOPTS,$SHORTOPTS
+# eval "$(parse_args "$@")"
+function parse_args() {
+  # -allow a command to fail with !’s side effect on errexit
+  # -use return value from ${PIPESTATUS[0]}, because ! hosed $?
+  # shellcheck disable=SC2251
+  ! getopt --test >/dev/null
+  if [[ "${PIPESTATUS[0]}" -ne 4 ]]; then abort "Enhanced getopt is required for this script to work. Please install it." 1; fi
 
-if [ "${#args[@]}" -eq 0 ]; then
+  local parsed
+  if parsed=$(getopt --options="$SHORTOPTS" --longoptions="$LONGOPTS" --name "${THIS-$0}" -- "$@"); then
+    # output getopt’s output this way to handle the quoting right:
+    printf '%s' "set -- $parsed"
+    return 0
+  fi
+  # getopt has already complained about wrong arguments to stdout - Exit script
+  exit 2
+}
+
+LONGOPTS=help,no-pager,pager: SHORTOPTS=h,P,p:
+eval "$(parse_args "$@")"
+while true; do
+  case "$1" in
+  --help | -h) usage && exit 0 ;;
+  --no-pager | -P) pager=false && shift ;;
+  -p | --pager) pager=$2 && shift 2 ;;
+  --) shift && break ;;
+  *) abort "This is a bug" 3 ;;
+  esac
+done
+
+if [ "$#" -eq 0 ]; then
   abort 'FILE is required' 2
 fi
 
 files=()
-for file in "${args[@]}"; do
+for file in "$@"; do
   # Given a path
   if [ -f "$file" ]; then
     files+=("$file")
