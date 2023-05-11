@@ -8,10 +8,10 @@
 #
 
 # Add the bin files if not already added from the .profile
-if [[ -d "$HOME/bin" ]] && ! [[ "$PATH" == *"$HOME/bin"* ]]; then
+if ! [[ "$PATH" == *"$HOME/bin"* ]]; then
   PATH="$HOME/bin${PATH:+:$PATH}"
 fi
-if [[ -d "$HOME/.local/bin" ]] && ! [[ "$PATH" == *"$HOME/.local/bin"* ]]; then
+if ! [[ "$PATH" == *"$HOME/.local/bin"* ]]; then
   PATH="$HOME/.local/bin${PATH:+:$PATH}"
 fi
 
