@@ -32,7 +32,6 @@ function parse_args() {
 
   local parsed
   if parsed=$(getopt --options="$SHORTOPTS" --longoptions="$LONGOPTS" --name "${THIS-$0}" -- "$@"); then
-    err succ
     # output getopt’s output this way to handle the quoting right:
     printf '%s' "set -- $parsed"
     return 0
