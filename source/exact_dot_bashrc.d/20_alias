@@ -105,9 +105,7 @@ if command -v git &>/dev/null; then
   complete=$(complete -p git 2>/dev/null || printf '%s ' complete -o bashdefault -o default -o nospace -F __git_wrap__git_main git)
   # remove ' git' and replace with ' g'. Lack of quotes is intentional!
   ${complete% git} g
-  if command -v __load_completion &>/dev/null; then
-    __load_completion git
-  fi
+  __load_completion git
 fi
 
 IBus="org.freedesktop.IBus.session.GNOME.service"
@@ -117,10 +115,6 @@ if systemctl list-unit-files --quiet --all --type=service --user --state=enabled
   alias restart-ibus="systemctl --user restart '$IBus'"
 fi
 unset IBus
-
-if command -v nvim &>/dev/null; then
-  alias vim='nvim'
-fi
 
 if command -v emacs &>/dev/null; then
   # Don't you DARE open a window
