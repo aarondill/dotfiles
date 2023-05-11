@@ -5,7 +5,7 @@
 # Read the contents of a file or executable
 # *Follows Symlinks*
 #
-set -eu # subshell
+set -eu -o pipefail
 THIS=contents
 usage() {
   cat <<EOF

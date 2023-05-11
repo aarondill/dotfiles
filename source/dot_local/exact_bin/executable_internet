@@ -3,7 +3,7 @@
 # ~/.local/bin/internet
 #
 # tests internet connection by pinging google.com
-set -eu
+set -eu -o pipefail
 
 test_url=google.com
 

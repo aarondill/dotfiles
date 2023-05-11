@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # usage: fullscreen [Search-Term]
-set -eu
+set -eu -o pipefail
 THIS=fullscreen
 log() { printf '%s\n' "$@"; }
 err() { printf "$THIS: %s\n" "$@" >&2; }
