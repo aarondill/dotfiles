@@ -81,7 +81,6 @@ else
   printf '%s\n' "run 'save /path/to/dunnet.save' to overwrite save data (relative to CWD)"
 fi
 emacs_args+=("$@")
-printf '%s ' "${emacs_args[@]}"
 
 if [ -n "$save_file" ] && [ -f "$save_file" ]; then
   # save file exists, auto restore
