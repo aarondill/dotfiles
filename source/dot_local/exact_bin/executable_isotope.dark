@@ -2,7 +2,7 @@
 # sets the color of tty using setcolors
 # https://github.com/EvanPurkhiser/linux-vt-setcolors
 # Sets to isotope.dark (from terminal.sexy)
-set -eu -o pipefail
+set -euC -o pipefail
 
 THIS=isotope.dark
 

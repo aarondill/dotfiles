@@ -7,7 +7,7 @@
 # Overflow issues.
 #
 # No argument parsing, as it's intended to be a transparent wrapper
-set -eu -o pipefail
+set -euC -o pipefail
 
 # usage 'get_nth_line 2', 1 indexed
 get_nth_line() {

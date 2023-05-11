@@ -6,7 +6,7 @@
 # and appends a newline '\n' if it doesn't already
 # end in a newline.
 #
-set -eu -o pipefail
+set -euC -o pipefail
 log() { printf '%s\n' "$@"; }
 err() { printf "$THIS: %s\n" "$@" >&2; }
 abort() { err "$1" && exit "${2:-1}"; }

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # this is a hack to make desktop files with Terminal=true open in the right application
-set -eu -o pipefail
+set -euC -o pipefail
 
 if [ "$1" != "--" ]; then
   exec /usr/bin/gnome-terminal "$@"

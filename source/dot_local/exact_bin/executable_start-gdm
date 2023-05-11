@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # This sets systemd to hide it's status, shows plymouth on shutdown, and starts gdm through systemd graphical.target
-set -eu -o pipefail
+set -euC -o pipefail
 
 THIS=start-gdm
 

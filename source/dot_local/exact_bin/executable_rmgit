@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -eu -o pipefail
+set -euC -o pipefail
 
 THIS=rmgit
 log() { printf '%s\n' "$@"; }

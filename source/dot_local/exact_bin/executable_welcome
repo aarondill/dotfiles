@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -eu -o pipefail
+set -euC -o pipefail
 # Ouput a welcome message on startup using zenity
 declare -i login_count=5
 declare date screen_width length
