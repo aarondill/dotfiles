@@ -41,7 +41,7 @@ function parse_args() {
 }
 
 path=$PATH
-LONGOPTS=help,path: SHORTOPTS=h,p
+LONGOPTS=help,path: SHORTOPTS=h,p:
 eval "$(parse_args "$@")"
 
 while true; do
