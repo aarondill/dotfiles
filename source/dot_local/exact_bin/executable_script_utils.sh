@@ -49,7 +49,7 @@ function parse_args() {
 }
 
 # option --long/-l requires 1 argument
-LONGOPTS=short,long:,help
+LONGOPTS=help,short,long:
 SHORTOPTS=h,s,l:
 ARGSTRING="$(parse_args "$@")"
 eval "$ARGSTRING"
