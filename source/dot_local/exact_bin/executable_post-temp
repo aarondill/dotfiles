@@ -28,51 +28,56 @@ log() { printf '%s\n' "$@"; }
 err() { printf "$THIS: %s\n" "$@" >&2; }
 abort() { err "$1" && exit "${2:-1}"; }
 
-# Sets the variable $args to an array of positional arguments
-# Usage: parse_args "$@"
+# Returns a string that should be 'eval'ed to set the positional arguments
+# Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
+# Input: $LONGOPTS,$SHORTOPTS
+# eval "$(parse_args "$@")"
 function parse_args() {
-  # If awaiting an argument
-  local next='' next_arg='' end=false
-  declare -g args=()
-  for arg in "$@"; do
-    if [ $end = true ]; then
-      args+=("$arg") && continue
-    elif [ -n "$next" ]; then
-      # -x to expose outside function
-      declare -g "$next"="$arg"
-      next=''
-    else
-      case "$arg" in
-      --help | -h) usage && exit 0 ;;
-      --) end=true ;;
-      -v | --verbose) verbose=true ;; # Verbose option
-      -q | --quiet) quiet=true ;;     # Quiet option
-      -t | --temp) next=temp_source next_arg="$arg" ;;
-      --temp=*) temp_source="${arg#--temp=}" ;;
-      --*) abort "Invalid option -- ${arg#--}" 2 ;;
-      -*) abort "Invalid option -- ${arg#-}" 2 ;;
-      *) args+=("$arg") ;;
-      esac
-    fi
-  done
-  # If awaiting an argument, but end of args
-  if [ -n "$next" ]; then abort "$next_arg requires an argument" 2; fi
+  # -allow a command to fail with !’s side effect on errexit
+  # -use return value from ${PIPESTATUS[0]}, because ! hosed $?
+  # shellcheck disable=SC2251
+  ! getopt --test >/dev/null
+  if [[ "${PIPESTATUS[0]}" -ne 4 ]]; then abort "Enhanced getopt is required for this script to work. Please install it." 1; fi
+
+  local parsed
+  if parsed=$(getopt --options="$SHORTOPTS" --longoptions="$LONGOPTS" --name "${THIS-$0}" -- "$@"); then
+    # output getopt’s output this way to handle the quoting right:
+    printf '%s' "set -- $parsed"
+    return 0
+  fi
+  # getopt has already complained about wrong arguments to stdout - Exit script
+  exit 2
 }
 
 # Usage if no args are passed
 if [ "$#" -eq 0 ]; then usage && exit 0; fi
-# Parse the arguments and default values
+
 verbose=false quiet=false
-parse_args "$@"
+LONGOPTS=help,short,long:
+SHORTOPTS=h,s,l:
+ARGSTRING="$(parse_args "$@")"
+eval "$ARGSTRING"
+
+while true; do
+  case "$1" in
+  --help | -h) usage && exit 0 ;;
+  --) shift && break ;;
+  -v | --verbose) verbose=true && shift ;; # Verbose option
+  -q | --quiet) quiet=true && shift ;;     # Quiet option
+  -t | --temp) temp_source="$2" && shift 2 ;;
+  *) abort "This is a bug" 3 ;;
+  esac
+done
+
 # Error if args given, but no files given
-if [ "${#args[@]}" -eq 0 ]; then abort "FILE is required!" 2; fi
+if [ "$#" -eq 0 ]; then abort "FILE is required!" 2; fi
 
 fx=$(which fx 2>/dev/null || printf '')
 if [ -z "$fx" ] && [ "$quiet" != "true" ]; then err "This script works much better with 'fx' installed."; fi
 
 declare -i exitcode=0
 
-for file in "${args[@]}"; do
+for file in "$@"; do
   if ! [[ -f "$file" ]]; then
     err "'$file' is not a file"
     exitcode=2 && continue
