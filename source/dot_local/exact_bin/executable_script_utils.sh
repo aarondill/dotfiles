@@ -10,7 +10,7 @@ set -euC -o pipefail
 
 THIS=script_utils.sh
 usage() {
-  cat <<EOF
+  cat <<EOF || return 0
 $THIS [options] [--] [arguments]
                   
 This does SOMETHING
@@ -20,11 +20,10 @@ Options:
 -l, --long=long   do something with \$long
 -s, --short       enable short
 EOF
-  return 0
 }
 
 log() { printf '%s\n' "$@"; }
-err() { printf "${THIS:-$0}: %s\n" "$@" >&2; }
+err() { printf "${THIS:}: %s\n" "$@" >&2; }
 abort() { err "$1" && exit "${2:-1}"; }
 
 # Returns a string that should be 'eval'ed to set the positional arguments

@@ -1,19 +1,27 @@
 #!/usr/bin/env bash
-set -ue
+set -euC -o pipefail
 # usage: visual awesome :2 || visual :3 || visual || visual awesome args -- :3
 
-for arg in "$@"; do
-  if [ "$arg" = "--help" ] || [ "$arg" = "-h" ]; then
-    command cat <<-'EOF'
-			visual [client] [client-args --] [:display] 
+THIS=visual
+usage() {
+  cat <<EOF || return 0
+$THIS [client] [client-args --] [:display] 
 
-			if run without arguments, x-window-manager will be used
-			server will be found in the $PATH. 
-			if $2 is not a valid server and a client is provided,
-			the arguments will be passed directly to the startx script
+if run without arguments, x-window-manager will be used
+server will be found in the \$PATH. 
+if \$2 is not a valid server and a client is provided,
+the arguments will be passed directly to the startx script
 EOF
-    return 0
-  fi
+}
+
+log() { printf '%s\n' "$@"; }
+err() { printf "${THIS:}: %s\n" "$@" >&2; }
+abort() { err "$1" && exit "${2:-1}"; }
+
+for arg in "$@"; do
+  case "$arg" in
+  -h|--help) usage && exit 0;;
+  esac
 done
 
 wm=${1:-}
