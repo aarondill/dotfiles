@@ -110,4 +110,4 @@ for file in "$@"; do
   fi
 done
 
-exit $exitcode
+exit "$exitcode"
