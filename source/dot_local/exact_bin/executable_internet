@@ -71,9 +71,11 @@ else
 fi
 
 log ''
-if [ "$exit" -eq 0 ]; then
-  log "You have internet!"
-else
-  log "Your internet connection is not functional"
+if [ "$quiet" != true ]; then
+  if [ "$exit" -eq 0 ]; then
+    log "You have internet!"
+  else
+    log "Your internet connection is not functional"
+  fi
 fi
 exit "$exit"
