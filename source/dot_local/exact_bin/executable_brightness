@@ -56,7 +56,7 @@ while true; do
 done
 if [ "${1:-}" = show ]; then show=true; fi
 
-BrPath=$(find /sys/class/backlight -maxdepth 1 -mindepth 1 -print0 | head -zn1)
+BrPath=$(find /sys/class/backlight -maxdepth 1 -mindepth 1 -print0 | head -zn1 | tr -d '\0')
 BrMax=$(cat "$BrPath/max_brightness")
 # 100th max-brightness, rounded up to nearest integer
 BrMin=$((0 + (BrMax + 100 - 1) / 100))
