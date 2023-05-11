@@ -92,4 +92,6 @@ fi
 USED_AFTER="$(df -k / | awk 'NR>1 {print $3}')"
 
 # Summary
-log "${YELLOW_COLOR}Freed up space: $(((USED_BEFORE - USED_AFTER) / 1024)) MB${OFF_COLOR}"
+printf "%b" "${YELLOW_COLOR}"
+log "Freed up space: $(((USED_BEFORE - USED_AFTER) / 1024)) MB"
+printf "%b" "${OFF_COLOR}"
