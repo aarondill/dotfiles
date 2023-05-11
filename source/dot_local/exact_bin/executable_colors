@@ -36,6 +36,7 @@ abort() {
 for arg; do
   case "$arg" in
   --help | -h | -\?) usage && exit 0 ;;
+  --) break ;;
   # Invalid -flag
   --*) abort "invalid option -- '${arg#--}'" 2 ;;
   -*) abort "invalid option -- '${arg#-}'" 2 ;;
