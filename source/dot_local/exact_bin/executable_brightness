@@ -70,7 +70,7 @@ if [ "$show" = true ]; then
 fi
 
 # First arg, or menu
-BrNewRel=${args[0]:-}
+BrNewRel=${1:-}
 number_re='^[0-9]+$'
 if [ -z "$BrNewRel" ]; then
   if command -v yad 2>/dev/null >/dev/null; then
