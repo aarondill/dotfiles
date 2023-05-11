@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # This sets systemd to hide it's status, shows plymouth on shutdown, and starts gdm through systemd graphical.target
+set -eu
 
 THIS=start-gdm
 
@@ -12,13 +13,16 @@ No options or arguments are accepted except --help
 EOF
 }
 
+# Basic arg handling
+invalid=false
 for arg; do
   case "$arg" in
   --help | -help | -h) usage && exit 0 ;;
+  -*) abort "unrecognized option '$arg'" && invalid=true ;;
   esac
 done
+if [ "$invalid" = true ]; then exit 2; fi
 
-set -eu
 log() { printf '%s\n' "$@"; }
 err() { printf "$THIS: %s\n" "$@" >&2; }
 abort() { err "$1" && exit "${2:-1}"; }
