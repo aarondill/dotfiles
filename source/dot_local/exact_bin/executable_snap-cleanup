@@ -22,6 +22,7 @@ EOF
 }
 
 log() { printf '%s\n' "$@"; }
+color() { printf '%b' "$@"; }
 err() { printf "$RED_COLOR$THIS: %s\n$OFF_COLOR" "$@" >&2; }
 abort() { err "$1" && exit "${2:-1}"; }
 
@@ -92,6 +93,6 @@ fi
 USED_AFTER="$(df -k / | awk 'NR>1 {print $3}')"
 
 # Summary
-printf "%b" "${YELLOW_COLOR}"
+color "${YELLOW_COLOR}"
 log "Freed up space: $(((USED_BEFORE - USED_AFTER) / 1024)) MB"
-printf "%b" "${OFF_COLOR}"
+color "${OFF_COLOR}"
