@@ -12,20 +12,19 @@ Sets systemd to hide its status, shows plymouth on shutdown, and starts gdm thro
 No options or arguments are accepted except --help
 EOF
 }
+log() { printf '%s\n' "$@"; }
+err() { printf "$THIS: %s\n" "$@" >&2; }
+abort() { err "$1" && exit "${2:-1}"; }
 
 # Basic arg handling
 invalid=false
 for arg; do
   case "$arg" in
   --help | -help | -h) usage && exit 0 ;;
-  -*) abort "unrecognized option '$arg'" && invalid=true ;;
+  -*) err "unrecognized option '$arg'" && invalid=true ;;
   esac
 done
 if [ "$invalid" = true ]; then exit 2; fi
-
-log() { printf '%s\n' "$@"; }
-err() { printf "$THIS: %s\n" "$@" >&2; }
-abort() { err "$1" && exit "${2:-1}"; }
 
 remove_from_file() {
   local file=$1
