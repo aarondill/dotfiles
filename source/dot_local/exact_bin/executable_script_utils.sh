@@ -48,7 +48,7 @@ function parse_args() {
   exit 2
 }
 
-# option --long/-o requires 1 argument
+# option --long/-l requires 1 argument
 LONGOPTS=short,long:,help
 SHORTOPTS=h,s,l:
 ARGSTRING="$(parse_args "$@")"
