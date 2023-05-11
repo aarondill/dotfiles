@@ -55,7 +55,6 @@ while true; do
   esac
 done
 
-unset end
 found=false
 for arg in "$@"; do
   if [ -n "$arg" ] && ! [ -e "$arg" ]; then
