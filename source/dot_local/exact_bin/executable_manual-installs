@@ -67,10 +67,8 @@ if [ -z "$manifestURL" ]; then abort "No manifest URL was provided" 2; fi
 
 showmanual=$(apt-mark showmanual | sort)
 
-set -o pipefail
 declare -i curl_exit=0
 manifest_content=$(curl -SsLf "$manifestURL" | cut -f1 | sort) || curl_exit="${PIPESTATUS[0]}"
-set +o pipefail
 
 if [ "$curl_exit" -eq 0 ]; then
   comm -23 <(printf "%s" "$showmanual") <(printf "%s" "$manifest_content")
