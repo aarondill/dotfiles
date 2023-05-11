@@ -70,8 +70,8 @@ else
   ping -c 3 "$test_url" || exit="$?"
 fi
 
-log ''
 if [ "$quiet" != true ]; then
+  log ''
   if [ "$exit" -eq 0 ]; then
     log "You have internet!"
   else
