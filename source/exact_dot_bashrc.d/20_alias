@@ -116,7 +116,7 @@ if systemctl list-unit-files --quiet --all --type=service --user --state=enabled
 fi
 unset IBus
 
-if command -v nvim; then
+if command -v nvim &>/dev/null; then
   alias vim='nvim'
 fi
 
