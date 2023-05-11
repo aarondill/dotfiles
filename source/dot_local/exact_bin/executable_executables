@@ -36,7 +36,6 @@ function parse_args() {
     printf '%s' "set -- $parsed"
     return 0
   fi
-  err faile
   # getopt has already complained about wrong arguments to stdout - Exit script
   exit 2
 }
