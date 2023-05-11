@@ -19,22 +19,45 @@ usage() {
   searches all text files and appends a newline if it doesn't already end in a one.
 EOF
 }
-args=()
-end=false
-for arg; do
-  if [ $end = true ]; then args+=("$arg") && continue; fi
-  case "$arg" in
+
+# Returns a string that should be 'eval'ed to set the positional arguments
+# Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
+# Input: $LONGOPTS,$SHORTOPTS
+# eval "$(parse_args "$@")"
+function parse_args() {
+  # -allow a command to fail with !’s side effect on errexit
+  # -use return value from ${PIPESTATUS[0]}, because ! hosed $?
+  # shellcheck disable=SC2251
+  ! getopt --test >/dev/null
+  if [[ "${PIPESTATUS[0]}" -ne 4 ]]; then abort "Enhanced getopt is required for this script to work. Please install it." 1; fi
+
+  local parsed
+  if parsed=$(getopt --options="$SHORTOPTS" --longoptions="$LONGOPTS" --name "${THIS-$0}" -- "$@"); then
+    # output getopt’s output this way to handle the quoting right:
+    printf '%s' "set -- $parsed"
+    return 0
+  fi
+  # getopt has already complained about wrong arguments to stdout - Exit script
+  exit 2
+}
+
+# option --output/-o requires 1 argument
+LONGOPTS=help
+SHORTOPTS=h
+ARGSTRING="$(parse_args "$@")"
+eval "$ARGSTRING"
+
+while true; do
+  case "$1" in
   --help | -h) usage && exit 0 ;;
-  --) end=true ;;
-  --*) abort "invalid option -- '${arg#--}'" 2 ;; # Invalid -flag
-  -*) abort "invalid option -- '${arg#-}'" 2 ;;   # Invalid -flag
-  *) args+=("$arg") ;;
+  --) shift && break ;;
+  *) abort "This is a bug" 3 ;;
   esac
 done
 
 unset end
 found=false
-for arg in "${args[@]}"; do
+for arg in "$@"; do
   if [ -n "$arg" ] && ! [ -e "$arg" ]; then
     abort "file '$arg' does not exist" 2
   fi
