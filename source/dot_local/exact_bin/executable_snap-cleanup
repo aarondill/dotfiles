@@ -75,9 +75,8 @@ if [ -n "$(command -v snap)" ]; then
     # remove unused snapd revisions
     log "Removing unused snapd revisions..."
     snap set system refresh.retain=2
-    # shellcheck disable=SC2162
     snap list --all | awk '/disabled/ {print $1, $3}' |
-      while read SNAP_NAME SNAP_REV; do
+      while read -r SNAP_NAME SNAP_REV; do
         snap remove "${SNAP_NAME}" --revision="${SNAP_REV}"
       done
     if [ -d /var/lib/snapd/cache ] && [ -n "$(find /var/lib/snapd/cache/ -mindepth 1)" ]; then
