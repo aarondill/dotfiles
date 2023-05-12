@@ -16,7 +16,7 @@ PACKAGES=(
   grep inotify-tools less make neofetch neovim net-tools
   openvpn p7zip python-pynvim rsync shfmt tlp trash-cli tree util-linux
   xclip xdg-utils zip zoxide htop speedtest-cli ripgrep hexedit
-  luajit python-pip xdotool
+  luajit python-pip xdotool base-devel
 )
 GRAPHICAL_PACKAGES=(
   dconf-editor flatpak gimp gparted gucharmap luckybackup okular qtqr
