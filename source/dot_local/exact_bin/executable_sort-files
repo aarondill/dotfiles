@@ -43,6 +43,7 @@ eval "$ARGSTRING"
 while true; do
   case "$1" in
   -h | --help) usage && exit 0 ;;
+  --) shift && break ;;
   *) abort 'This is a bug' 3 ;;
   esac
 done
