@@ -5,12 +5,11 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 # shellcheck source=../../.utils.sh
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
+# Defined in utils.sh
 if [ -z "$APT" ]; then
   # STOP! if dependencies aren't installed, other things will fail, but can't use apt.
   abort0 "Apt is not installed, skipping apt install script"
 fi
-
-GNOME=$(which gnome-shell 2>/dev/null || printf '')
 
 PACKAGES=(
   age anacron autopoint bat cmake command-not-found curl
@@ -41,7 +40,7 @@ function install_if_available() {
     if is_available "$package"; then
       packages+=("$package")
     else
-      err "Could not find '$package' in repos"
+      err "Could not find '$package'"
     fi
   done
   if [ ${#packages[@]} -eq 0 ]; then return 0; fi
