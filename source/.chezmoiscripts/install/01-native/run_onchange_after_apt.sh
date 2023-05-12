@@ -9,6 +9,7 @@ if [ -z "$APT" ]; then
   # STOP! if dependencies aren't installed, other things will fail, but can't use apt.
   abort0 "Apt is not installed, skipping apt install script"
 fi
+GNOME='gnome-shell'
 
 PACKAGES=(age anacron autopoint bat cmake command-not-found curl
   dconf-editor duf fwts gh git golang-go grep ifupdown inotify-tools less make
@@ -46,7 +47,7 @@ function install_apt_packages() { install_if_available_apt "${PACKAGES[@]}"; }
 
 function install_graphical_apt_packages() {
   # If gnome is not installed, ask confirmation, else just install
-  if ! is_installed_apt gnome-shell; then
+  if ! is_installed_apt "$GNOME"; then
     confirm "Gnome is not installed, would you still like to install gui applications?" || return 2
   fi
   install_if_available_apt "${GRAPHICAL_PACKAGES[@]}"
