@@ -32,19 +32,27 @@ function remove_if_installed() {
     fi
   done
   if [ ${#packages[@]} -eq 0 ]; then return 0; fi
-  sudo "$PACMAN" remove -y -- "${packages[@]}"
+  # The user still has to confirm, but that's good here
+  sudo "$PACMAN" -Rsn -- "${packages[@]}"
 }
+
+is_available_pacman() {
+  # DON'T call it like this, but if a list of packages is passed, this will handle them
+  for package in "$@"; do pacman -Ss "^${package}\$" || return; done
+}
+
 function install_if_available() {
   local packages=() package
   for package; do
-    if is_available "$package"; then
+    if is_available_pacman "$package"; then
       packages+=("$package")
     else
       err "Could not find '$package'"
     fi
   done
   if [ ${#packages[@]} -eq 0 ]; then return 0; fi
-  sudo "$PACMAN" install -y -- "${packages[@]}"
+  # The user still has to confirm, but that's good here
+  sudo "$PACMAN" -S -- "${packages[@]}"
 }
 
 function install_packages() { install_if_available "${PACKAGES[@]}"; }
