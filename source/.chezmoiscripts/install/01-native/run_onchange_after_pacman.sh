@@ -12,11 +12,11 @@ if [ -z "$PACMAN" ]; then
 fi
 
 PACKAGES=(
-  age anacron autopoint bat cmake find-the-command curl
-  dconf-editor duf fwts gh git golang-go grep ifupdown inotify-tools less make
-  neofetch neovim net-tools openvpn p7zip-full python3-neovim rsync shfmt tlp
-  trash-cli tree util-linux xclip xdg-utils zip zoxide htop speedtest-cli
-  ripgrep libfuse2 hexedit luajit python3-pip xdotool
+  age cronie bat cmake find-the-command curl dconf-editor duf github-cli git
+  grep inotify-tools less make neofetch neovim net-tools
+  openvpn p7zip python-pynvim rsync shfmt tlp trash-cli tree util-linux
+  xclip xdg-utils zip zoxide htop speedtest-cli ripgrep hexedit
+  luajit python-pip xdotool
 )
 GRAPHICAL_PACKAGES=(
   dconf-editor flatpak gimp gparted gucharmap luckybackup okular qtqr

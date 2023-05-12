@@ -12,8 +12,8 @@ if [ -z "$APT" ]; then
 fi
 
 PACKAGES=(
-  age anacron autopoint bat cmake command-not-found curl
-  dconf-editor duf fwts gh git golang-go grep ifupdown inotify-tools less make
+  age anacron bat cmake command-not-found curl
+  dconf-editor duf gh git grep inotify-tools less make
   neofetch neovim net-tools openvpn p7zip-full python3-neovim rsync shfmt tlp
   trash-cli tree util-linux xclip xdg-utils zip zoxide htop speedtest-cli
   ripgrep libfuse2 hexedit luajit python3-pip ppa-purge xdotool
