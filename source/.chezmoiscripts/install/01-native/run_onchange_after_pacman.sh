@@ -10,9 +10,9 @@ if [ -z "$PACMAN" ]; then
   # STOP! deps may not be installed, hopefully handled elsewhere
   abort0 "pacman is not installed, skipping pacman installation"
 fi
-
+# find-the-command
 PACKAGES=(
-  age cronie bat cmake find-the-command curl dconf-editor duf github-cli git
+  age cronie bat cmake curl dconf-editor duf github-cli git
   grep inotify-tools less make neofetch neovim net-tools
   openvpn p7zip python-pynvim rsync shfmt tlp trash-cli tree util-linux
   xclip xdg-utils zip zoxide htop speedtest-cli ripgrep hexedit
