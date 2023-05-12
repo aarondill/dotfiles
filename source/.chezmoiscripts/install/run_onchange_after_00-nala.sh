@@ -44,4 +44,4 @@ EOF
 is_accessible_cmd apt || exit 0
 log_and_run "Installing nala" install_nala
 
-log_and_run 'Setting up nala sources' sudo nala fetch --auto -y
+# log_and_run 'Setting up nala sources' sudo nala fetch --auto -y
