@@ -188,7 +188,7 @@ APT=$(which nala 2>/dev/null || which apt 2>/dev/null)
 # (re)source this file
 source_utils() {
   SOURCE_DIR=$(chezmoi source-path)
-  # uncomment this if copying this code. It's commented to stop recursive checking:
+  ## uncomment this if copying this code. It's commented to stop recursive checking:
   ## shellcheck source=./.utils.sh
   . "$SOURCE_DIR/.chezmoiscripts/utils.sh"
 }
