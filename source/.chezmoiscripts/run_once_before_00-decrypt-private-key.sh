@@ -8,12 +8,15 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 
 log "Decrypting age key for encrypted files"
 if ! command -v age &>/dev/null; then
-  if [ -z "$APT" ]; then
-    abort "age is not present. Please install it before running this script." 1
-  fi
-  err "Age is not present, attempting to install using apt"
+  err "Age is not present, attempting to install."
   # Exits on failure
-  sudo "$APT" install age
+  if [ -n "$APT" ]; then
+    sudo "$APT" install age
+  elif [ -n "$PACMAN" ]; then
+    sudo "$PACMAN" -S age
+  else
+    abort "age is required to decrypt files. Please install it and try again." 1
+  fi
 fi
 
 if [ ! -f "$HOME/.config/chezmoi/key.txt" ]; then
