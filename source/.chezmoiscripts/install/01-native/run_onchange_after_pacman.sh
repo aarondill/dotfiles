@@ -69,6 +69,7 @@ function install_graphical_packages() {
 }
 
 # no install neovim latest, bc should already be
+log_and_run 'Updating sources/packages' sudo "$PACMAN" -Syu
 log_and_run 'Installing packages' install_packages
 log_and_run 'Installing graphical packages' install_graphical_packages
 # Gnome comes with it, but I don't want it.
