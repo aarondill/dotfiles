@@ -38,7 +38,7 @@ function remove_if_installed() {
 
 is_available_pacman() {
   # DON'T call it like this, but if a list of packages is passed, this will handle them
-  for package in "$@"; do pacman -Ss "^${package}\$" || return; done
+  for package in "$@"; do pacman -Ss "^${package}\$" &>/dev/null || return 1; done
 }
 
 function install_if_available() {
