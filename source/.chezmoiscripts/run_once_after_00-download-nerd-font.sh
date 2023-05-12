@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Source utils
-SOURCE_DIR=$(chezmoi source-path)
+SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 # shellcheck source=.utils.sh
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 

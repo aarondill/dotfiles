@@ -2,7 +2,7 @@
 # this finds the largest swap partition and *offers* to replace important instances of the backed up source with the uuid
 set -e
 # Source utils
-SOURCE_DIR=$(chezmoi source-path)
+SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 # shellcheck source=../.utils.sh
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
