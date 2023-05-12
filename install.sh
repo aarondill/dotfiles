@@ -6,9 +6,9 @@
 # -o pipefail fail a pipe if anything fails
 set -euC -o pipefail
 
-RED=$(tput setaf 2 || printf '')
-BLUE=$(tput setaf 4 || printf '')
-RESET_COLOR=$(tput sgr0 || printf '')
+RED=$(tput setaf 2 2>/dev/null || printf '')
+BLUE=$(tput setaf 4 2>/dev/null || printf '')
+RESET_COLOR=$(tput sgr0 2>/dev/null || printf '')
 
 log() { printf "$BLUE%s$RESET_COLOR\n" "$@"; }
 err() { printf "$RED%s$RESET_COLOR\n" "$@" >&2; }
@@ -37,15 +37,9 @@ script_dir="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)"
 
 args=(init --source="${script_dir}")
 
-if [ "${DOTFILES_ONE_SHOT:-}" = y ]; then
-  args+=(--one-shot)
-else
-  args+=(--apply)
-fi
+if [ -n "${DOTFILES_ONE_SHOT:-}" ]; then args+=(--one-shot); else args+=(--apply); fi
 
-if [ -n "${DOTFILES_DEBUG-}" ]; then
-  args+=(--debug)
-fi
+if [ -n "${DOTFILES_DEBUG:-}" ]; then args+=(--debug); fi
 
 log "Setting up environment"
 bin_dir="$(dirname -- "$chezmoi")"
