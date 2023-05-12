@@ -1,63 +1,59 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # -e: exit on error
 # -u: exit on unset variables
-set -eu
+# -C don't overwrite files by accident
+# -o pipefail fail a pipe if anything fails
+set -euC -o pipefail
 
-log_color() {
-  color_code="$1"
-  shift
-  printf "\033[${color_code}m%s\033[0m\n" "$*" >&2
-}
+RED=$(tput setaf 2 || printf '')
+BLUE=$(tput setaf 4 || printf '')
+RESET_COLOR=$(tput sgr0 || printf '')
 
-log_red() { log_color "0;31" "$@"; }
+log() { printf "$BLUE%s$RESET_COLOR\n" "$@"; }
+err() { printf "$RED%s$RESET_COLOR\n" "$@" >&2; }
+abort() { err "$1" && exit "${2:-1}"; }
 
-log_blue() { log_color "0;34" "$@"; }
-
-log_task() { log_blue "🔃" "$@"; }
-
-log_error() { log_red "❌" "$@"; }
-
-error() {
-  log_error "$@"
-  exit 1
-}
-
-if ! chezmoi="$(command -v chezmoi)"; then
-  bin_dir="${BINDIR:-/usr/local/bin}"
-  chezmoi="${bin_dir}/chezmoi"
-  log_task "Installing chezmoi to '${chezmoi}'"
-  if command -v curl >/dev/null; then
+install_chezmoi() {
+  local bin_dir="${BINDIR:-/usr/local/bin}"
+  local chezmoi="${bin_dir}/chezmoi"
+  local chezmoi_install_script
+  log "Installing chezmoi to '${chezmoi}'"
+  if command -v curl &>/dev/null; then
     chezmoi_install_script="$(curl -fsSL https://get.chezmoi.io)"
-  elif command -v wget >/dev/null; then
+  elif command -v wget &>/dev/null; then
     chezmoi_install_script="$(wget -qO- https://get.chezmoi.io)"
   else
-    error "To install chezmoi, you must have curl or wget."
+    abort "To install chezmoi, you must have curl or wget." 1
   fi
   sh -c "${chezmoi_install_script}" -- -b "${bin_dir}"
-  unset chezmoi_install_script bin_dir
-fi
+}
+
+# `if cmd; then true; else cmd; fi` to fix syntax highlighting
+if chezmoi="$(command -v chezmoi)"; then true; else install_chezmoi; fi
 
 # POSIX way to get script dir: https://stackoverflow.com/a/29834779/12156188
-# shellcheck disable=SC2312
-script_dir="$(cd -P -- "$(dirname -- "$(command -v -- "$0")")" && pwd -P)"
+script_dir="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)"
 
-set -- init --source="${script_dir}"
+args=(init --source="${script_dir}")
 
-if [ -n "${DOTFILES_ONE_SHOT-}" ]; then
-  set -- "$@" --one-shot
-else set -- "$@" --apply; fi
+if [ "${DOTFILES_ONE_SHOT:-}" = y ]; then
+  args+=(--one-shot)
+else
+  args+=(--apply)
+fi
 
-if [ -n "${DOTFILES_DEBUG-}" ]; then set -- "$@" --debug; fi
+if [ -n "${DOTFILES_DEBUG-}" ]; then
+  args+=(--debug)
+fi
 
+log "Setting up environment"
 bin_dir="$(dirname -- "$chezmoi")"
-log_task "Setting up environment"
-case :$PATH: in *:$bin_dir:*) ;; # do nothing, it's there
-  # Add bin_dir to PATH so chezmoi can be found in scripts
-*) PATH="$bin_dir:$PATH" ;;
-esac
-unset bin_dir
+if [[ ":$PATH:" != *":$bin_dir"* ]]; then
+  # security issue, but who tf cares
+  PATH="$bin_dir:$PATH"
+fi
 
-log_task "Running 'chezmoi $*'"
+log "Running 'chezmoi ${args[*]}'"
 # replace current process with chezmoi
-exec "$chezmoi" "$@"
+exec "$chezmoi" "${args[@]}"
