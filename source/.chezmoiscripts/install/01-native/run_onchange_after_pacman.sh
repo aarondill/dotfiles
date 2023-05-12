@@ -52,7 +52,7 @@ function install_if_available() {
   done
   if [ ${#packages[@]} -eq 0 ]; then return 0; fi
   # The user still has to confirm, but that's good here
-  sudo "$PACMAN" -S -- "${packages[@]}"
+  sudo "$PACMAN" -S --needed -- "${packages[@]}"
 }
 
 function install_packages() { install_if_available "${PACKAGES[@]}"; }
