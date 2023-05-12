@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# This is run repeatedly, should
 # Source this file to get utilities
 (return 0 2>/dev/null) && sourced=1 || sourced=0
 if [ "$sourced" -eq 0 ]; then err "You should source this file. not run it."; fi
@@ -177,13 +178,17 @@ KERNEL=$(uname -s)
 # eg: x86_64
 ARCH=$(uname -m)
 # eg: Ubuntu
-OS="$(. /etc/os-release && printf '%s' "${NAME:-${ID:-}}" | lower | first_upper)"
+OS="$(source /etc/os-release && lower <<<"${NAME:-${ID:-}}" | first_upper)"
 export ARCH KERNEL OS APT
 
 # Path to apt (or nala) for installation/removal of packages
 APT=$(which nala 2>/dev/null || which apt 2>/dev/null)
 
 # Code to source *this* file. DON'T MOVE THIS FILE!
-# SOURCE_DIR=$(chezmoi source-path)
-# # shellcheck source=.utils.sh
-# . "$SOURCE_DIR/.chezmoiscripts/utils.sh"
+# (re)source this file
+source_utils() {
+  SOURCE_DIR=$(chezmoi source-path)
+  # uncomment this if copying this code. It's commented to stop recursive checking:
+  ## shellcheck source=./.utils.sh
+  . "$SOURCE_DIR/.chezmoiscripts/utils.sh"
+}

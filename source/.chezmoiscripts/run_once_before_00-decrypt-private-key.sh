@@ -8,12 +8,12 @@ SOURCE_DIR=$(chezmoi source-path)
 
 log "Decrypting age key for encrypted files"
 if ! command -v age &>/dev/null; then
-  if command -v apt &>/dev/null; then
-    err "Age is not present, attempting to install using apt"
-    sudo apt install age
-  else
-    err "Age is not present. Please install it before running this script."
+  if [ -z "$APT" ]; then
+    abort "age is not present. Please install it before running this script." 1
   fi
+  err "Age is not present, attempting to install using apt"
+  # Exits on failure
+  sudo "$APT" install age
 fi
 
 if [ ! -f "$HOME/.config/chezmoi/key.txt" ]; then

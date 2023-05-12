@@ -13,10 +13,11 @@ REGULAR_FILE=UbuntuMonoNerdFontMono-Regular.ttf
 # Test arbitrary file to ensure that nerd fonts is installed
 if [ -f "$NERD_FONTS_DIR/$REGULAR_FILE" ]; then abort0 "NerdFonts are already installed!"; fi
 
-log "Downloading nerd fonts repository"
+log "Downloading nerd fonts repository, this may take a while"
 TMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TMP_DIR"' EXIT
 
+# This is very costly
 # Only download toplevel files
 git clone --sparse --filter=blob:none 'https://github.com/ryanoasis/nerd-fonts' "$TMP_DIR"
 log "Downloading $NERD_FONT_TO_INSTALL fonts"
