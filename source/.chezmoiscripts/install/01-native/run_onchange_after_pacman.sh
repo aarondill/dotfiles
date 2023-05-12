@@ -27,7 +27,7 @@ GNOME_PACKAGES=(gnome-shell-extension-manager gnome-tweaks)
 function remove_if_installed() {
   local package packages=()
   for package; do
-    if "$PACMAN" -Qi "$package" >/dev/null; then
+    if "$PACMAN" -Qi "$package" &>/dev/null; then
       packages+=("$package")
     fi
   done
@@ -76,4 +76,4 @@ log_and_run 'Installing graphical packages' install_graphical_packages
 # Replace the existing cheese package with the flatpak package
 remove_if_installed gnome-characters cheese
 # Install vim symlink to nvim - throws is /usr/bin/vim is defined.
-if which nvim &>/dev/null; then ln -s -T "$(which nvim)" /usr/bin/vim; fi
+if ! [ -f /usr/bin/vim ] && which nvim &>/dev/null; then ln -s -T "$(which nvim)" /usr/bin/vim; fi
