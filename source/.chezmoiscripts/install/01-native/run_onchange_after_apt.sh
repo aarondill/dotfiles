@@ -2,7 +2,7 @@
 set -euC -o pipefail
 # Source utils
 SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
-# shellcheck source=../.utils.sh
+# shellcheck source=../../.utils.sh
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 if [ -z "$APT" ]; then
   # STOP! if dependencies aren't installed, other things will fail, but can't use apt.
