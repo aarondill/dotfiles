@@ -183,7 +183,7 @@ OS="$(source /etc/os-release && lower <<<"${NAME:-${ID:-}}" | first_upper)"
 GNOME=$(which gnome-shell 2>/dev/null || printf '')
 
 # Path to apt (or nala) for installation/removal of packages
-APT=$(which nala 2>/dev/null || which apt 2>/dev/null)
+APT=$(which nala 2>/dev/null || which apt 2>/dev/null || printf '')
 # Path to pacman for installation/removal of packages
 PACMAN=$(which pacman 2>/dev/null || printf '')
 
