@@ -4,6 +4,10 @@ set -e
 SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 # shellcheck source=../.utils.sh
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
+if [ -z "$APT" ]; then
+  # STOP! if dependencies aren't installed, other things will fail, but can't use apt.
+  abort0 "Apt is not installed, skipping apt install script"
+fi
 
 PACKAGES=(age anacron autopoint bat cmake command-not-found curl
   dconf-editor duf fwts gh git golang-go grep ifupdown inotify-tools less make
