@@ -9,8 +9,7 @@ SOURCE_DIR=$(chezmoi source-path)
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
 log "Installing vortex-ubuntu-plymouth-theme splash screen"
-os="$(lsb_release -is)"
-if [ "$os" != "Ubuntu" ]; then
+if [ "$OS" != "Ubuntu" ]; then
   log "This script is only available for Ubuntu" >&2
   exit 0
 fi

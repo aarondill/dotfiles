@@ -10,10 +10,8 @@ SOURCE_DIR=$(chezmoi source-path)
 
 log "Installing ubuntu-gdm-set-background"
 
-os="$(lsb_release -is)"
 if [ "$os" != "Ubuntu" ]; then
-  log "This script is only available for Ubuntu" >&2
-  exit 0
+  abort0 "This script is only available for Ubuntu"
 fi
 
 OWNER="PRATAP-KUMAR"

@@ -177,7 +177,7 @@ KERNEL=$(uname -s)
 # eg: x86_64
 ARCH=$(uname -m)
 # eg: Ubuntu
-OS=$(lsb_release -si)
+OS="$(. /etc/os-release && printf '%s' "${NAME:-${ID:-}}" | lower | first_upper)"
 export ARCH KERNEL OS APT
 
 # Path to apt (or nala) for installation/removal of packages
