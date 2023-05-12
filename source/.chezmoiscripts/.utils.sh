@@ -41,7 +41,7 @@ function log_and_run() {
   command="$2"
   args=("${@:3}")
   (
-    set -e
+    set -euC -o pipefail
     log "${task^}..." # Uppercase
     "$command" "${args[@]}"
     success
