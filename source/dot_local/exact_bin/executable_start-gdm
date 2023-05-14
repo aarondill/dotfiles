@@ -51,4 +51,4 @@ sudo mount -n --bind -o ro "$tmp_file" /proc/cmdline || abort 'Failed to make bi
 rm -f "$tmp_file" && trap '' EXIT
 
 # start the graphical system
-exec sudo systemctl isolate graphical.target
+exec systemctl isolate graphical.target
