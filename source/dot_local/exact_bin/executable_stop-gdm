@@ -48,4 +48,4 @@ sudo mount -n --bind -o ro "$tmp_file" /proc/cmdline || abort 'Error mounting /p
 # cleanup
 rm -f "$tmp_file" && trap '' EXIT
 
-exec sudo systemctl isolate multi-user.target
+exec systemctl isolate multi-user.target
