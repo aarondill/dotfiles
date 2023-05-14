@@ -60,9 +60,10 @@ if [ -n "$bat" ]; then
     # 0.21.0 is the latest version where PAGER=bat will cause
     # recursive forks, thus require greater than this before setting PAGER
     ExpecV="0.21.0"
-    versions=$(printf '%s\n' "$(bat --version | cut -d' ' -f 2)" "$ExpecV")
+    CurrV="$(bat --version | cut -d' ' -f 2)"
+    versions=$(printf '%s\n' "$CurrV" "$ExpecV")
     # shellcheck disable=SC2319 # $? *should* refer to the condition, not the sort command
-    test "$versions" = "$(sort -V <<<"$versions")" || exit "$?"
+    test "$versions" != "$(sort -V <<<"$versions")" || exit "$?"
   ) && export PAGER="$bat"
 
   if ! command -v bat &>/dev/null; then
