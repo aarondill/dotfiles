@@ -56,12 +56,12 @@ if [ -n "$bat" ]; then
   alias cat="$bat"
   export MANPAGER="sh -c 'col -bx | $bat -l man -p'"
   # Tests bat version and exits 0 if version is high enough
+  # subshell to avoid leaving behind variables
   (
     # 0.21.0 is the latest version where PAGER=bat will cause
     # recursive forks, thus require greater than this before setting PAGER
     ExpecV="0.21.0"
-    CurrV="$(bat --version | cut -d' ' -f 2)"
-    versions=$(printf '%s\n' "$CurrV" "$ExpecV")
+    versions="$(printf '%s\n' "$(bat --version | cut -d' ' -f 2)" "$ExpecV")"
     # shellcheck disable=SC2319 # $? *should* refer to the condition, not the sort command
     test "$versions" != "$(sort -V <<<"$versions")" || exit "$?"
   ) && export PAGER="$bat"
