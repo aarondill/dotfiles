@@ -52,7 +52,7 @@ eval "$ARGSTRING"
 
 display="${DISPLAY:-}"
 while true; do
-  case "$arg" in
+  case "$1" in
   -h | --help) usage && exit 0 ;;
   -d | --display) display="$2" && shift 2 ;;
   --) shift && break ;;
