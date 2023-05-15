@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# shellcheck shell=sh
+# Purly visual shebang
 # ~/.profile: executed by the command interpreter for login shells.
 # This file is not read by bash(1), if ~/.bash_profile or ~/.bash_login
 # exists.
@@ -10,15 +10,20 @@
 # for ssh logins, install and configure the libpam-umask package.
 #umask 022
 
-export XDG_DATA_HOME=$HOME/.local/share
-export XDG_CONFIG_HOME=$HOME/.config
-export XDG_STATE_HOME=$HOME/.local/state
-export XDG_CACHE_HOME=$HOME/.cache
+path_contains() { case ":$PATH:" in *":${1:-}:"*) return 0 ;; *) return 1 ;; esac }
+# colorscheme
+append_path() { p="${1:-}" && ! path_contains "$p" && PATH="${PATH:+$PATH:}$p"; }
+prepend_path() { p="${1:-}" && ! path_contains "$p" && PATH="$p${PATH:+:$PATH}"; }
+
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_STATE_HOME="$HOME/.local/state"
+export XDG_CACHE_HOME="$HOME/.cache"
 
 # Stop less from saving it's history
 export LESSHISTFILE=-
 # Move some files from my $HOME directory
-export LESSKEY=$XDG_CONFIG_HOME/less/lesskey
+export LESSKEY="$XDG_CONFIG_HOME/less/lesskey"
 export GNUPGHOME="$XDG_CONFIG_HOME"/gnupg
 export NODE_REPL_HISTORY="$XDG_STATE_HOME"/node/node_repl_history
 export NPM_CONFIG_USERCONFIG="$XDG_CONFIG_HOME"/npm/npmrc
@@ -34,18 +39,14 @@ export WGETRC="$XDG_CONFIG_HOME/wgetrc"
 export ASPELL_CONF="per-conf $XDG_CONFIG_HOME/aspell/aspell.conf; personal $XDG_CONFIG_HOME/aspell/en.pws; repl $XDG_CONFIG_HOME/aspell/en.prepl"
 export TS_NODE_HISTORY="$XDG_STATE_HOME"/node/ts_node_repl_history
 
+# Also set in .bashrc
+# set PATH so it includes user's private bin if it exists
+prepend_path "$HOME/bin"
+# set PATH so it includes user's private bin if it exists
+prepend_path "$HOME/.local/bin"
+
 # if running bash
 if [ -n "$BASH_VERSION" ]; then
-  function path_contains() { [[ ":$PATH:" = *":${1:-}:"* ]]; }
-  function append_path() { local p="${1:-}" && ! path_contains "$p" && PATH="${PATH:+$PATH:}$p"; }
-  function prepend_path() { local p="${1:-}" && ! path_contains "$p" && PATH="$p${PATH:+:$PATH}"; }
-
-  # Also set in .bashrc
-  # set PATH so it includes user's private bin if it exists
-  prepend_path "$HOME/bin"
-  # set PATH so it includes user's private bin if it exists
-  prepend_path "$HOME/.local/bin"
-
   # include .bashrc if it exists
   if [ -f "$HOME/.bashrc" ]; then
     # shellcheck source=/home/aaron/.bashrc
