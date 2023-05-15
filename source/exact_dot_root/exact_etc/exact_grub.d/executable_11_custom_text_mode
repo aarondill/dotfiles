@@ -21,19 +21,34 @@ ROOT_UUID="$(findmnt / --output UUID | tail -n1)"
 # First argument is path, then name, all others are find arguments
 find_highest_version() {
   path="$1" && shift 1
-  find "$path" -maxdepth 1 -name "$@" | sort -Vr | head -n1
+  find "$path" -maxdepth 1 -name "$@" -print0 | sort -zVr | head -zn1 | tr -d '\0'
+}
+
+one_match_glob() {
+  file=$(printf '%s\0' "$@" | sort -z | head -zn1 | tr -d '\0')
+  # if exists, output
+  if [ -e "$file" ]; then
+    printf '%s' "$file"
+  else
+    return 1
+  fi
+
 }
 
 VMLINUZ=$(find_highest_version /boot 'vmlinuz-*-generic')
 INITRD=$(find_highest_version /boot 'initrd.img-*-generic')
 # Fallbacks - desperately try to find one.
-if [ -z "$VMLINUZ" ]; then VMLINUZ=$(printf '%s\0' /boot/vmlinuz* | head -zn1 | tr -d '\0'); fi
-if [ -z "$INITRD" ]; then INITRD=$(printf '%s\0' /boot/initrd.img* /boot/initramfs* | head -zn1 | tr -d '\0'); fi
+if [ -z "$VMLINUZ" ]; then
+  VMLINUZ="$(one_match_glob /boot/vmlinuz*)" || abort "Could not find vmlinuz"
+fi
+
+if [ -z "$INITRD" ]; then
+  INITRD=$(one_match_glob /boot/initrd.img*) || INITRD=$(one_match_glob /boot/initramfs*) || abort "Could not find initrd.img"
+fi
 
 # ABORT ABORT, missing vital files
-if [ -z "$VMLINUZ" ]; then abort "Could not find vmlinuz"; fi
 if [ -z "$INITRD" ]; then abort "Could not find initrd.img"; fi
-
+k
 # Remove splash and quiet args from GRUB_CMDLINE_LINUX_DEFAULT
 GRUB_CMDLINE_ARGS=$(printf '%s\n' "$GRUB_CMDLINE_LINUX_DEFAULT" | sed -e 's/\bsplash\b//g' -e 's/\bquiet\b//g')
 
