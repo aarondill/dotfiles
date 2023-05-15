@@ -19,5 +19,5 @@ tmpdir="$(mktemp -d)"
 trap 'rm -rf "$tmpdir"' EXIT
 git clone "$REPO" "$tmpdir"
 cd "$tmpdir"
-makepkg -sirc
+(export -n SHELLOPTS && makepkg -sirc)
 rm -rf "$tmpdir" && trap '' EXIT
