@@ -26,4 +26,4 @@ sudo tar -xz -C "$DESTINATION" -f "$TMP"
 
 rm -f "$TMP" && trap '' EXIT # Cleanup
 # This is my own script! should be in ~/.local/bin/update-java!
-sudo ~/.local/bin/update-java --yes "$DESTINATION/jdk-$VERSION"
+sudo ~/.local/bin/update-java --quiet --yes "$DESTINATION/jdk-$VERSION"
