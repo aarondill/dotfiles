@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Installs the latest version of wezterm. Only works on Ubuntu for now
+# This is handled by pacman on arch because it's more recently updated
+
 set -euC -o pipefail
 export SHELLOPTS
 # Source utils
