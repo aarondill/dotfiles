@@ -144,7 +144,7 @@ if [ -d "$HOME/.bashrc.d/" ]; then
   # Find all files not starting with _, and sort, ensuring base lang
   readarray -d '' files < <(find "$HOME/.bashrc.d/" -type f -not -name "_*" -print0 | LC_ALL=C sort -z)
   # disable keyboard echo until bashrc is done
-  stty -echo
+  stty -echo 2>/dev/null
   for file in "${files[@]}"; do
     # For each file, if bench var is assigned,
     # then call time and output benchmark
@@ -158,7 +158,7 @@ if [ -d "$HOME/.bashrc.d/" ]; then
     fi
   done
   # Enable keyboard echo for interactive use
-  stty echo
+  stty echo 2>/dev/null
 fi
 
 # tabtab source for packages
