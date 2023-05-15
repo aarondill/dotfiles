@@ -6,8 +6,8 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
 function install_fx() {
-  local ext short_arch asset
-  local BINDIR=${BINDIR:-'/usr/local/bin'}
+  local ext='' short_arch='' asset=''
+  local BINDIR='/usr/local/bin'
   if [ "$KERNEL" == "windows" ]; then
     ext='.exe'
   elif ! { [ "$KERNEL" = 'Darwin' ] || [ "$KERNEL" = 'Linux' ]; }; then
