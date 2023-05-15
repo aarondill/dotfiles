@@ -1,6 +1,7 @@
 #! /usr/bin/env bash
 # Source utils
 set -euC -o pipefail
+export SHELLOPTS
 
 SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 # shellcheck source=../.utils.sh
