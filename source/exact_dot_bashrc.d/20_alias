@@ -24,6 +24,12 @@ alias la="ls -A"
 alias ll="ls -hl"
 alias lla="ls -Ahl"
 alias cl='clear'
+
+if command -v tree &>/dev/null; then
+  # show hidden
+  alias tree='tree -a'
+fi
+
 if command -v google-chrome &>/dev/null; then
   # Alias to remove error messages on opening google-chrome
   # Also allows css detection of dark mode
