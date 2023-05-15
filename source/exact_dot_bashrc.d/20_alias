@@ -115,7 +115,10 @@ if command -v git &>/dev/null; then
   complete=$(complete -p git 2>/dev/null || printf '%s ' complete -o bashdefault -o default -o nospace -F __git_wrap__git_main git)
   # remove ' git' and replace with ' g'. Lack of quotes is intentional!
   ${complete% git} g
-  __load_completion git
+  # if not defined, just wait till git is used
+  if command -v __load_completion &>/dev/null; then
+    __load_completion git
+  fi
 fi
 
 IBus="org.freedesktop.IBus.session.GNOME.service"
