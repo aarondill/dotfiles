@@ -19,7 +19,7 @@ aur_install() {
   git clone "$REPO" "$tmpdir"
   cd "$tmpdir"
   (export -n SHELLOPTS && makepkg -sirc)
-
+  cd -
   rm -rf "$tmpdir" && trap '' EXIT
 }
 
@@ -31,7 +31,7 @@ if ! command -v zeal &>/dev/null; then
 else err "Zeal is already installed, skipping installation"; fi
 
 # Google chrome
-if ! command -v google-chrome &>/dev/null; then
+if ! command -v google-chrome-stable &>/dev/null; then
   aur_install "https://aur.archlinux.org/google-chrome.git"
 else err "google-chrome is already installed, skipping installation"; fi
 
