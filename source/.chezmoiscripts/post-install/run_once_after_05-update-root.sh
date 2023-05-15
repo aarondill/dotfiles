@@ -2,7 +2,7 @@
 # this tars the '~/.root' directory and unzips it at '/'
 # This script *MUST* ask confirmation! These are breaking changes!
 # This script should aslo suggest running 'sudo update-grub' and 'sudo update-initramfs -u'
-set -e
+set -euC -o pipefail
 # Source utils
 SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 # shellcheck source=../.utils.sh

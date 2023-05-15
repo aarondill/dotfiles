@@ -1,7 +1,6 @@
 #!/bin/bash
 # Install vortex-ubuntu-plymouth-theme splash screen
-
-set -e
+set -euC -o pipefail
 
 # Source utils
 SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"

@@ -1,6 +1,6 @@
 #!/bin/bash
 # Install ubuntu-gdm-set-background
-set -e
+set -euC -o pipefail
 IMAGE="https://images.wallpaperscraft.com/image/single/sky_stars_moon_144720_1600x900.jpg"
 
 # Source utils
