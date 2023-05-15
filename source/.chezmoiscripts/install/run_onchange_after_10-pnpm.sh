@@ -6,6 +6,14 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 # shellcheck source=../.utils.sh
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
+function add_global_dir_to_path() {
+  local global_bin_dir
+  global_bin_dir="$(pnpm config get global-bin-dir 2>/dev/null || printf '')"
+  if [ -z "$global_bin_dir" ]; then return 1; fi
+  if [[ ":$PATH:" = *:"$global_bin_dir":* ]]; then return 0; fi
+  PATH="$PATH:$global_bin_dir"
+}
+
 function install_pnpm_and_node() {
   sudo -v
   # Setup n
@@ -24,12 +32,15 @@ function install_pnpm_and_node() {
   corepack enable
   corepack prepare pnpm@latest --activate >/dev/null
 
+  add_global_dir_to_path || [ -n "$PNPM_HOME" ]
+
   log 'installing n through pnpm'
   # requires wget
   pnpm i -g n
 }
 
 install_pnpm_global_packages() {
+  add_global_dir_to_path || [ -n "$PNPM_HOME" ]
   pnpm i -g n
 }
 is_accessible_cmd wget || abort 'wget is required to install n' 2
