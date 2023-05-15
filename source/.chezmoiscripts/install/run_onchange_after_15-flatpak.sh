@@ -26,7 +26,6 @@ function install_flatpaks() {
   done
 }
 
-installed_or_log flatpak && {
-  log_and_run "Installing flatpak packages" install_flatpaks
-  log_and_run 'Updating flatpak packages' flatpak_update
-}
+installed_or_log flatpak || exit 0
+log_and_run "Installing flatpak packages" install_flatpaks
+log_and_run 'Updating flatpak packages' flatpak_update
