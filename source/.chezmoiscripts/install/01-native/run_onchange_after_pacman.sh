@@ -12,7 +12,7 @@ if [ -z "$PACMAN" ]; then
 fi
 # find-the-command
 PACKAGES=(
-  age cronie bat cmake curl dconf-editor duf github-cli git
+  age cronie cmake curl dconf-editor duf github-cli git
   grep inotify-tools less make neofetch neovim net-tools
   openvpn p7zip python-pynvim rsync shfmt tlp trash-cli tree util-linux
   xclip xdg-utils zip zoxide htop speedtest-cli ripgrep hexedit
