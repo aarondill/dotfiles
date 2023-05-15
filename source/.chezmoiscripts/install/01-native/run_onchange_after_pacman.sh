@@ -20,7 +20,7 @@ PACKAGES=(
   luajit python-pip xdotool base-devel wezterm
 )
 GRAPHICAL_PACKAGES=(
-  dconf-editor flatpak gimp gparted gucharmap luckybackup okular qtqr zeal
+  dconf-editor flatpak gparted gucharmap luckybackup okular qtqr zeal
 )
 GNOME_PACKAGES=(gnome-shell-extension-manager gnome-tweaks gnome-software gnome-software-plugin-flatpak gnome-boxes)
 
