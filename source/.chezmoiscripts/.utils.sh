@@ -1,4 +1,15 @@
 #!/usr/bin/env bash
+
+# THIS FILE IS SOURCED! preserve the old options
+# https://unix.stackexchange.com/a/383581
+OLDOPTS=$(set +o)
+case $- in
+*e*) OLDOPTS="$OLDOPTS; set -e" ;;
+*) OLDOPTS="$OLDOPTS; set +e" ;;
+esac
+# for this file's safety, won't affect the functions defined here!
+set -euC -o pipefail
+
 # This is run repeatedly, should
 # Source this file to get utilities
 (return 0 2>/dev/null) && sourced=1 || sourced=0
@@ -197,3 +208,7 @@ source_utils() {
   ## shellcheck source=./.utils.sh
   . "$SOURCE_DIR/.chezmoiscripts/utils.sh"
 }
+
+# Should be the last thing.
+# Restore the old options. VERY important because this is sourced, not run.
+eval "$OLDOPTS"
