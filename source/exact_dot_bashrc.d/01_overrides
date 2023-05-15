@@ -13,14 +13,14 @@ case " ${!PROMPT_COMMAND*} " in
 *" PROMPT_COMMAND "*) : ;;
 # PROMPT_COMMAND is not defined
 *)
-	# Define it *as an array*
-	declare -ax PROMPT_COMMAND
-	;;
+  # Define it *as an array*
+  declare -ax PROMPT_COMMAND
+  ;;
 esac
 
 # Rm the stupid files in HOME from chrome
-rm -r ~/.pki ~/.dotnet/ 2>/dev/null
+rm -rf ~/.pki ~/.dotnet/ 2>/dev/null
 # RM the firefox files
-rm -r ~/.mozilla 2>/dev/null
+rm -rf ~/.mozilla 2>/dev/null
 # RM the hplip files
-rm -r ~/.hplip 2>/dev/null
+rm -rf ~/.hplip 2>/dev/null
