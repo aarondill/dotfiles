@@ -23,6 +23,13 @@ else
   FILE="ubuntu-gdm-set-background"
 fi
 
+# dependencies
+if ! dpkg -l | grep -q libglib2.0-dev-bin; then
+  log 'Attemping to install dependencies'
+  if [ -z "$APT" ]; then abort "Can't install libglib2.0-dev-bin using apt. Please make sure it's installed"; fi
+  sudo "$APT" install -y libglib2.0-dev-bin
+fi
+
 DESTINATION="/usr/local/bin/$FILE"
 sudo curl -SsfL "https://raw.githubusercontent.com/$OWNER/ubuntu-gdm-set-background/main/$FILE" -o "$DESTINATION"
 sudo chmod +x "$DESTINATION"
