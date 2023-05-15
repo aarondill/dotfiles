@@ -46,8 +46,7 @@ function parse_args() {
   exit 2
 }
 
-LONGOPTS=help,yes
-SHORTOPTS=h,y
+LONGOPTS=help,yes,quiet SHORTOPTS=h,y,q
 ARGSTRING="$(parse_args "$@")"
 eval "$ARGSTRING"
 
