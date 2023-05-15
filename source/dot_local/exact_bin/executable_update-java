@@ -109,14 +109,14 @@ if command -v update-alternatives &>/dev/null; then
   function link() {
     dest_path=$1 name=$2 from_path=$3 priority=$4
     printf '%s\n' "update-alternatives --install \"$dest_path\" \"$name\" \"$from_path\" \"$priority\""
-    sudo -E -H update-alternatives --install "$dest_path" "$name" "$from_path" "$priority"
+    sudo -EH -- update-alternatives --install "$dest_path" "$name" "$from_path" "$priority"
   }
 else
   # use ln because update-alternatives is not available
   function link() {
     dest_path=$1 name=$2 from_path=$3 priority=$4
     printf '%s\n' "ln -s -T \"$from_path\" \"$dest_path\""
-    ln -s -T "$from_path" "$dest_path"
+    sudo -EH -- ln -s -T "$from_path" "$dest_path"
   }
 fi
 
