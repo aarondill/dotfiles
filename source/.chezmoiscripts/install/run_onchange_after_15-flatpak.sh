@@ -13,6 +13,7 @@ function flatpak_install() { flatpak install -y --noninteractive -- "$@"; }
 function flatpak_update() { flatpak update -y --noninteractive -- "$@"; }
 
 function install_flatpaks() {
+  trap 'err Aborting; exit 1' SIGINT
   flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
   flatpak_apps=(
     com.github.johnfactotum.Foliate com.github.tchx84.Flatseal
@@ -22,7 +23,7 @@ function install_flatpaks() {
   for flatpak_app in "${flatpak_apps[@]}"; do
     if ! flatpak_is_installed "$flatpak_app"; then
       log "Installing ${flatpak_app}"
-      flatpak_install "$flatpak_app"
+      flatpak_install "$flatpak_app" || return 1
     fi
   done
 }
