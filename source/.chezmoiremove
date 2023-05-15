@@ -1,4 +1,5 @@
 .bash_history
+.bash_profile
 .gitconfig
 .lesshst
 bin/chezmoi
