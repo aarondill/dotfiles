@@ -1,2 +1,2 @@
 auto-install-peers=true
-global-bin-dir=${HOME}/.local/pnpm
+global-bin-dir=${HOME}/.local/share/pnpm
