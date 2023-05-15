@@ -21,7 +21,9 @@ PACKAGES=(
 )
 
 GRAPHICAL_PACKAGES=(
-  dconf-editor flatpak gparted gucharmap code
+  dconf-editor flatpak gparted gucharmap
+  # These are setup on ubuntu through a ppa
+  code spotify-launcher
   # VM management. Technically, only virt-manager is graphical, but they are used together
   virt-manager qemu-desktop
   # virsh

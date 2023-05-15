@@ -34,8 +34,3 @@ else err "Zeal is already installed, skipping installation"; fi
 if ! command -v google-chrome-stable &>/dev/null; then
   aur_install "https://aur.archlinux.org/google-chrome.git"
 else err "google-chrome is already installed, skipping installation"; fi
-
-# spotify
-if ! command -v spotify &>/dev/null; then
-  aur_install "https://aur.archlinux.org/spotify.git"
-else err "Spotify is already installed, skipping installation"; fi
