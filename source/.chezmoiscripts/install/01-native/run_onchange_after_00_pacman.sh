@@ -22,7 +22,7 @@ PACKAGES=(
 GRAPHICAL_PACKAGES=(
   dconf-editor flatpak gparted gucharmap luckybackup zeal
 )
-GNOME_PACKAGES=(gnome-shell-extension-manager gnome-tweaks gnome-software gnome-software-plugin-flatpak gnome-boxes)
+GNOME_PACKAGES=(gnome-shell-extension-manager gnome-tweaks gnome-software gnome-software-plugin-flatpak)
 
 function remove_if_installed() {
   local package packages=()
