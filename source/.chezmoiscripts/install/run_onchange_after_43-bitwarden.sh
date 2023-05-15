@@ -28,8 +28,8 @@ if ! is_accessible_cmd bitwarden; then
   log_and_run "Installing bitwarden desktop" install_bitwarden_desktop
 fi
 
-if ! is_accessible_cmd zip; then
-  abort "zip is required to install bitwarden cli" 2
+if ! is_accessible_cmd unzip; then
+  abort "unzip is required to install bitwarden cli" 2
 fi
 
 log_and_run "Installing bitwarden CLI" install_bitwarden_cli
