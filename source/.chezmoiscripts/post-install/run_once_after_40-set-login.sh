@@ -39,6 +39,6 @@ log 'Setting image as current lock screen image'
 sudo "$DESTINATION" --image "$TEMP_FILE" || exit 0
 success
 
-log 'Cleaning up temporary file'
+log 'Cleaning up temporary files'
 rm -f "$TEMP_FILE" && trap '' EXIT # Clean up and remove trap
 success
