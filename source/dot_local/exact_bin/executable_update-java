@@ -13,6 +13,9 @@ $THIS [-y | --yes] <JAVADIR> [priority = 1112] [JVM_VERS_DIR]
 Updates java symlinks to the path specified using update-alternatives.
 Do not include /bin on JAVADIR.
 JVM_VERS_DIR will be determined by JAVA_HOME if set, or else default to /usr/lib/jvm
+Options:
+-y, --yes     don't prompt for confirmation
+-q, --quiet   don't output debug info
 EOF
   EOF
   return 0
@@ -48,11 +51,12 @@ SHORTOPTS=h,y
 ARGSTRING="$(parse_args "$@")"
 eval "$ARGSTRING"
 
-yes=0
+yes=0 quiet=0
 while true; do
   case "$1" in
   -h | --help) usage && exit 0 ;;
   -y | --yes) yes=1 && shift ;;
+  -q | --quiet) quiet=1 && shift ;;
   --) shift && break ;;
   *) abort "This is a bug" 3 ;;
   esac
@@ -108,14 +112,14 @@ fi
 if command -v update-alternatives &>/dev/null; then
   function link() {
     dest_path=$1 name=$2 from_path=$3 priority=$4
-    printf '%s\n' "update-alternatives --install \"$dest_path\" \"$name\" \"$from_path\" \"$priority\""
+    [ "$quiet" != 1 ] && printf '%s\n' "update-alternatives --install \"$dest_path\" \"$name\" \"$from_path\" \"$priority\""
     sudo -EH -- update-alternatives --install "$dest_path" "$name" "$from_path" "$priority"
   }
 else
   # use ln because update-alternatives is not available
   function link() {
     dest_path=$1 name=$2 from_path=$3 priority=$4
-    printf '%s\n' "ln -s -T \"$from_path\" \"$dest_path\""
+    [ "$quiet" != 1 ] && printf '%s\n' "ln -s -T \"$from_path\" \"$dest_path\""
     sudo -EH -- ln -s -T "$from_path" "$dest_path"
   }
 fi
