@@ -20,10 +20,9 @@ PACKAGES=(
   luajit python-pip xdotool base-devel wezterm
 )
 GRAPHICAL_PACKAGES=(
-  dconf-editor flatpak gimp gparted gucharmap luckybackup okular qtqr
-  zeal gnome-software gnome-software-plugin-flatpak gnome-boxes
+  dconf-editor flatpak gimp gparted gucharmap luckybackup okular qtqr zeal
 )
-GNOME_PACKAGES=(gnome-shell-extension-manager gnome-tweaks)
+GNOME_PACKAGES=(gnome-shell-extension-manager gnome-tweaks gnome-software gnome-software-plugin-flatpak gnome-boxes)
 
 function remove_if_installed() {
   local package packages=()
