@@ -6,3 +6,4 @@ bin/chezmoi
 .npm
 .yarnrc
 .sudo_as_admin_successful
+.wget-hsts
