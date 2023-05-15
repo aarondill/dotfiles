@@ -9,14 +9,13 @@ function install_snaps() {
   true # don't do anything 🤷‍♂️ - I don't want any snaps
 }
 
-installed_or_log snap &&
-  log_and_run "Installing snaps" install_snaps
-installed_or_log snap && (
-  log 'disconnecting firefox:hunspell'
-  CONNECTON=$(snap connections firefox | awk '/firefox:host-hunspell/{print $3}')
-  # If still connected, disconnect
-  if [ -n "$CONNECTON" ] && [ "$CONNECTON" != '-' ]; then
-    sudo snap disconnect firefox:host-hunspell
-  fi
-  success
-)
+installed_or_log snap
+log_and_run "Installing snaps" install_snaps
+
+log 'disconnecting firefox:hunspell'
+CONNECTON=$(snap connections firefox | awk '/firefox:host-hunspell/{print $3}')
+# If still connected, disconnect
+if [ -n "$CONNECTON" ] && [ "$CONNECTON" != '-' ]; then
+  sudo snap disconnect firefox:host-hunspell
+fi
+success
