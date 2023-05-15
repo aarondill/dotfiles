@@ -21,13 +21,14 @@ function install_pnpm_and_node() {
   corepack prepare pnpm@latest --activate >/dev/null
 
   log 'installing n through pnpm'
+  # requires wget
   pnpm i --silent -g n
 }
 
 install_pnpm_global_packages() {
   pnpm i --silent -g n
-
 }
+is_accessible_cmd wget || abort 'wget is required to install n' 2
 
 is_accessible_cmd pnpm || log_and_run 'Installing NodeJS and pnpm' install_pnpm_and_node
 is_accessible_cmd pnpm && log_and_run 'Installing pnpm global packages' install_pnpm_global_packages
