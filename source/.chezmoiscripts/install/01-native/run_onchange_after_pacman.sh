@@ -61,7 +61,7 @@ function install_graphical_packages() {
   local graphical_packages=("${GRAPHICAL_PACKAGES[@]}")
   # If gnome is not installed, ask confirmation, else just install
   if [ -z "$GNOME" ]; then
-    confirm "Gnome is not installed, would you still like to install gui applications?" || return
+    confirm "Gnome is not installed, would you still like to install gui applications?" || return 0
   else
     graphical_packages+=("${GNOME_PACKAGES[@]}")
   fi
