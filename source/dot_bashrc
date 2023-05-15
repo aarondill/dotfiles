@@ -143,7 +143,6 @@ if [ -d "$HOME/.bashrc.d/" ]; then
   # Initialize `~/.bashrc.d`
   stty -echo
   readarray -d '' files < <(find "$HOME/.bashrc.d/" -type f -not -name "_*" -print0 | LC_ALL=C sort -z)
-  echo "${files[@]}"
   for file in "${files[@]}"; do
     # For each file, if bench var is assigned,
     # then call time and output benchmark
