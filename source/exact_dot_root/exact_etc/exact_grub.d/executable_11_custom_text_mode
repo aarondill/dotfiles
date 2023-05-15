@@ -28,9 +28,9 @@ VMLINUZ=$(find_highest_version /boot 'vmlinuz-*-generic')
 INITRD=$(find_highest_version /boot 'initrd.img-*-generic')
 # Fallbacks - desperately try to find one.
 if [ -z "$VMLINUZ" ]; then VMLINUZ=$(printf '%s\0' /boot/vmlinuz* | head -zn1 | tr -d '\0'); fi
-if [ -z "$INITRD" ]; then INITRD=$(printf '%s\0' /boot/initrd.img* | head -zn1 | tr -d '\0'); fi
+if [ -z "$INITRD" ]; then INITRD=$(printf '%s\0' /boot/initrd.img* /boot/initramfs* | head -zn1 | tr -d '\0'); fi
 
-# ABORT ABORT
+# ABORT ABORT, missing vital files
 if [ -z "$VMLINUZ" ]; then abort "Could not find vmlinuz"; fi
 if [ -z "$INITRD" ]; then abort "Could not find initrd.img"; fi
 
