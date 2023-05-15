@@ -6,14 +6,12 @@
 # May include certain paths necessary for
 # programs that install in unusual locations
 #
-
+function path_contains() { [[ ":$PATH:" = *":${1:-}:"* ]]; }
+function append_path() { local p="${1:-}" && ! path_contains "$p" && PATH="${PATH:+$PATH:}$p"; }
+function prepend_path() { local p="${1:-}" && ! path_contains "$p" && PATH="$p${PATH:+:$PATH}"; }
 # Add the bin files if not already added from the .profile
-if ! [[ "$PATH" == *"$HOME/bin"* ]]; then
-  PATH="$HOME/bin${PATH:+:$PATH}"
-fi
-if ! [[ "$PATH" == *"$HOME/.local/bin"* ]]; then
-  PATH="$HOME/.local/bin${PATH:+:$PATH}"
-fi
+prepend_path "$HOME/bin"
+prepend_path "$HOME/.local/bin"
 
 if [ -d /usr/lib/jvm ]; then
   # set JAVA_HOME to latest jvm available
@@ -21,29 +19,23 @@ if [ -d /usr/lib/jvm ]; then
   # Remove trailing NULL byte with tr -d to avoid bash warning
   JAVA_HOME="$(find /usr/lib/jvm -maxdepth 1 -type d -print0 | sort -zV | tail -zn1 | tr -d '\0')"
   export JAVA_HOME
-# export PATH="$JAVA_HOME/bin${PATH:+:$PATH}"
+  # removed because should be linked to /usr/bin/*
+  # export PATH="$JAVA_HOME/bin${PATH:+:$PATH}"
 fi
 
-if [ -d "${XDG_DATA_HOME:-$HOME/.local/share}/npm/bin" ]; then
-  # allow npm bin
-  export PATH="${XDG_DATA_HOME:-$HOME/.local/share}/npm/bin${PATH:+:$PATH}"
-fi
+# allow npm bin
+# My own variable, for symetry with PNPM_HOME
+NPM_HOME="${XDG_DATA_HOME:-$HOME/.local/share}/npm/bin"
+prepend_path "$NPM_HOME"
+
 # allow pnpm bin
 export PNPM_HOME="${XDG_DATA_HOME:-$HOME/.local/share}/pnpm"
-if [ -d "$PNPM_HOME" ]; then
-  export PATH="$PNPM_HOME${PATH:+:$PATH}"
-fi
+prepend_path "$PNPM_HOME"
 
 # include flatpaks in path. (Have org.example.app names)
-if [ -d /var/lib/flatpak/exports/bin ]; then
-  export PATH="${PATH:+$PATH:}/var/lib/flatpak/exports/bin"
-fi
+append_path "/var/lib/flatpak/exports/bin/"
 
 # include go in path
-if [ -d /usr/local/go/bin ]; then
-  export PATH="${PATH:+$PATH:}/usr/local/go/bin"
-  export GOPATH="${XDG_DATA_HOME:-$HOME/.local/share}/go"
-  if command -v go &>/dev/null; then
-    PATH="$PATH:$(go env GOPATH)/bin"
-  fi
-fi
+append_path "/usr/local/go/bin"
+export GOPATH="${XDG_DATA_HOME:-$HOME/.local/share}/go"
+if command -v go &>/dev/null; then PATH="$PATH:$(go env GOPATH)/bin"; fi
