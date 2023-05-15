@@ -20,8 +20,7 @@ PACKAGES=(
   ripgrep libfuse2 hexedit luajit python3-pip ppa-purge xdotool
 )
 GRAPHICAL_PACKAGES=(
-  dconf-editor flatpak gparted gucharmap luckybackup okular qtqr
-  zeal
+  dconf-editor flatpak gparted gucharmap luckybackup okular zeal
 )
 GNOME_PACKAGES=(
   gnome-shell-extension-manager gnome-tweaks
