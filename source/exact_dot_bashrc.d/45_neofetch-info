@@ -7,8 +7,4 @@
 #
 if [ "$NONEOFETCH" = "1" ]; then return 0; fi
 if [ "$SHLVL" -gt "1" ]; then return 0; fi
-# disable echo user-typing
-# stty -echo
 if command -v neofetch &>/dev/null; then neofetch; fi
-# enable echo user-typing
-# stty echo
