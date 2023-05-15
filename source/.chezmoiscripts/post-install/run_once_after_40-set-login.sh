@@ -24,7 +24,7 @@ else
 fi
 
 # dependencies
-if ! dpkg -l | grep -q libglib2.0-dev-bin; then
+if ! dpkg -l libglib2.0-dev-bin &>/dev/null; then
   log 'Attemping to install dependencies'
   if [ -z "$APT" ]; then abort "Can't install libglib2.0-dev-bin using apt. Please make sure it's installed"; fi
   sudo "$APT" install -y libglib2.0-dev-bin
