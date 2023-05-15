@@ -30,7 +30,7 @@ function install_pnpm_and_node() {
 }
 
 install_pnpm_global_packages() {
-  pnpm i --silent -g n
+  pnpm i -g n
 }
 is_accessible_cmd wget || abort 'wget is required to install n' 2
 
