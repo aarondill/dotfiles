@@ -36,3 +36,4 @@ vscode/js/EslintTests.js
 .config/starship.toml
 vscode/Java/java-format.xml
 .local/share/man/man1
+.config/pnpm/rc
