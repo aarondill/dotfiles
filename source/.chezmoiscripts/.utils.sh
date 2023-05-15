@@ -10,8 +10,8 @@ if [ "$sourced" -eq 0 ]; then err "You should source this file. not run it."; fi
 
 # log "hello world"
 function log() { printf "$(tput setaf 11 2>/dev/null)$(tput bold 2>/dev/null)%s\n$(tput sgr0)" "$@"; }
-# err "goodbye world" -- shows in bold red
-function err() { printf "$(tput setaf 1 2>/dev/null)$(tput bold 2>/dev/null)%s\n$(tput sgr0)" "$@" >&2; }
+# err "goodbye world" -- shows in bold red - Use $THIS to show `script: error`
+function err() { printf "${THIS:+$THIS:}$(tput setaf 1 2>/dev/null)$(tput bold 2>/dev/null)%s\n$(tput sgr0)" "$@" >&2; }
 # success - no arguments
 function success() { printf "$(tput setaf 2 2>/dev/null)$(tput bold 2>/dev/null)%s$(tput sgr0)\n" "Success!"; }
 
@@ -19,10 +19,10 @@ function success() { printf "$(tput setaf 2 2>/dev/null)$(tput bold 2>/dev/null)
 ## ------------------------------------------ Control Flow ------------------------------------------
 ## --------------------------------------------------------------------------------------------------
 
-# abort "something went wrong!"
-function abort() { err "$@" && exit 2; }
+# abort "something went wrong!" 1
+function abort() { err "$1" && exit "${2:-2}"; }
 # abort0 "something went wrong!" -- exits 0
-function abort0() { err "$@" && exit 0; }
+function abort0() { abort "$1" 0; }
 # confirm "do you really want to do %s?" "that" --> ...do that? (Y/n)
 # Strings are evaluated using printf
 function confirm() {
