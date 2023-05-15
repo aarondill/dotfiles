@@ -24,13 +24,18 @@ aur_install() {
 }
 
 # Zeal
-if ! command -v zeal &>/dev/null; then
+if ! which zeal &>/dev/null; then
   # Dependancy that's no longer supplied by pacman
   pacman -U https://archive.archlinux.org/packages/q/qt5-webkit/qt5-webkit-5.212.0alpha4-18-x86_64.pkg.tar.zst
   aur_install "https://aur.archlinux.org/zeal.git"
 else err "Zeal is already installed, skipping installation"; fi
 
 # Google chrome
-if ! command -v google-chrome-stable &>/dev/null; then
+if ! which google-chrome-stable &>/dev/null; then
   aur_install "https://aur.archlinux.org/google-chrome.git"
 else err "google-chrome is already installed, skipping installation"; fi
+
+# grub-editor
+if ! [ -x /opt/grub-editor/grub-editor.py ]; then
+  aur_install "https://aur.archlinux.org/grub-editor.git"
+else err "grub-editor is already installed, skipping installation"; fi
