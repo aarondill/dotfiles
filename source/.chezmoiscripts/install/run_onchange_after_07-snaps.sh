@@ -9,7 +9,7 @@ function install_snaps() {
   true # don't do anything 🤷‍♂️ - I don't want any snaps
 }
 
-installed_or_log snap
+installed_or_log snap || exit 0
 log_and_run "Installing snaps" install_snaps
 
 log 'disconnecting firefox:hunspell'
