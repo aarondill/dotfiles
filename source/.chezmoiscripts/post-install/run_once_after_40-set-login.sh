@@ -36,7 +36,7 @@ curl -SsfL "$IMAGE" -o "$TEMP_FILE"
 success
 
 log 'Setting image as current lock screen image'
-sudo "$DESTINATION" --image "$TEMP_FILE" || exit 0
+sudo "$DESTINATION" --image "$TEMP_FILE"
 success
 
 log 'Cleaning up temporary files'
