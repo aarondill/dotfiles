@@ -21,7 +21,7 @@ PACKAGES=(
 )
 
 GRAPHICAL_PACKAGES=(
-  dconf-editor flatpak gparted gucharmap luckybackup zeal
+  dconf-editor flatpak gparted gucharmap
   # VM management. Technically, only virt-manager is graphical, but they are used together
   virt-manager qemu-desktop
   # virsh
