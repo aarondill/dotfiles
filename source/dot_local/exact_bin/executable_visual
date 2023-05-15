@@ -36,9 +36,9 @@ if [ -z "$server" ] && [[ "$wm" =~ $disp_regex ]]; then server="$wm" wm=''; fi
 # visual :3 OR visual awesome
 if [ -z "$wm" ]; then wm="x-window-manager"; fi
 
-if ! wmpath=$(which "$wm"); then
+if ! wmpath=$(which "$wm" 2>/dev/null); then
   printf '%s\n' "Unable to find $wm in \$PATH" >&2
-  return 2
+  exit 2
 fi
 
 args=("$wmpath")
