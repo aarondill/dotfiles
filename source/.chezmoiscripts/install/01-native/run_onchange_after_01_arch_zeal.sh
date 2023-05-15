@@ -15,6 +15,9 @@ elif command -v zeal &>/dev/null; then
   abort 'Zeal is already installed' 0
 fi
 
+# Dependancy that's no longer supplied by pacman
+pacman -U https://archive.archlinux.org/packages/q/qt5-webkit/qt5-webkit-5.212.0alpha4-18-x86_64.pkg.tar.zst
+
 tmpdir="$(mktemp -d)"
 trap 'rm -rf "$tmpdir"' EXIT
 git clone "$REPO" "$tmpdir"
