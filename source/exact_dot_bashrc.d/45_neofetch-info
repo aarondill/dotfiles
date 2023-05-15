@@ -5,6 +5,6 @@
 # Displays neofetch if shlvl = 1
 # This should be before backup information
 #
-if [[ $SHLVL -eq 1 ]] && command -v neofetch &>/dev/null; then
-  neofetch
-fi
+if [ "$NONEOFETCH" = "1" ]; then exit 0; fi
+if [ "$SHLVL" -gt "1" ]; then exit 0; fi
+if command -v neofetch &>/dev/null; then neofetch; fi
