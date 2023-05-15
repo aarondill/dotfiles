@@ -5,6 +5,10 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 # shellcheck source=../.utils.sh
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
+if ! is_accessible_cmd apt; then
+  abort0 "Apt not installed, skipping ppa setup"
+fi
+
 function setup_ppa_spotify() {
   sudo -v
   curl -sS https://download.spotify.com/debian/pubkey_7A3A762FAFD4A51F.gpg | sudo gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/spotify.gpg
@@ -29,9 +33,8 @@ function install_proprietary_software() {
 }
 
 # Should already be installed, sanity check
-is_accessible_cmd gpg curl && {
-  log_and_run 'installing spotify ppa' setup_ppa_spotify
-  log_and_run 'installing vscode ppa' setup_ppa_vscode
-  log_and_run 'installing google chrome ppa' setup_ppa_google-chrome
-  log_and_run 'installing proprietary packages' install_proprietary_software spotify-client code google-chrome-stable
-}
+is_accessible_cmd gpg curl
+log_and_run 'installing spotify ppa' setup_ppa_spotify
+log_and_run 'installing vscode ppa' setup_ppa_vscode
+log_and_run 'installing google chrome ppa' setup_ppa_google-chrome
+log_and_run 'installing proprietary packages' install_proprietary_software spotify-client code google-chrome-stable

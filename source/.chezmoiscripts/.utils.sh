@@ -40,12 +40,13 @@ function log_and_run() {
   task="$1"
   command="$2"
   args=("${@:3}")
-  (
-    set -euC -o pipefail
-    log "${task^}..." # Uppercase
-    "$command" "${args[@]}"
-    success
-  ) || err "Something went wrong while ${task,}!" # Lowercase
+  log "${task^}..." # Uppercase
+  "$command" "${args[@]}" || {
+    code=$?
+    err "Something went wrong while ${task,}!" # Lowercase
+    return "$code"
+  }
+  success
 }
 # installed_or_log snap
 function installed_or_log() {
