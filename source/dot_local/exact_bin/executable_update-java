@@ -64,7 +64,7 @@ PRIORITY=${2:-1112}
 BINDIR=/usr/bin
 if [[ -n "${3:-}" ]]; then
   JVM_VERS_DIR=$3
-elif [[ -n "$JAVA_HOME" ]]; then
+elif [[ -n "${JAVA_HOME:-}" ]]; then
   JVM_VERS_DIR=$(dirname -- "$JAVA_HOME") # /usr/lib/jvm/jdk-version --> /usr/lib/jvm
 else
   JVM_VERS_DIR=/usr/lib/jvm
