@@ -2,7 +2,7 @@
 # this is a hack to make desktop files with Terminal=true open in the right application
 set -euC -o pipefail
 
-if [ "$1" != "--" ]; then
+if [ "${1:-}" != "--" ]; then
   exec /usr/bin/gnome-terminal "$@"
 else
   exec x-terminal-emulator -e "${@:2}"
