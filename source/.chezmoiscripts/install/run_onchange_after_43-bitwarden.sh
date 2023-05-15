@@ -12,7 +12,7 @@ function install_bitwarden_desktop() {
   sudo chmod +x "$DESTINATION"
 }
 
-function install_bitwarden_cli() {
+function install_bitwarden_cli() (
   local DESTINATION=/usr/local/bin/bw temp_dir
   temp_dir=$(mktemp -d)
   trap 'rm -rf "$temp_dir"' EXIT
@@ -21,10 +21,15 @@ function install_bitwarden_cli() {
   sudo mv -f "$temp_dir/bw" "$DESTINATION"
   sudo chmod +x "$DESTINATION"
   rm -rf "$temp_dir" && trap '' EXIT # cleanup
-}
+)
 
 # Ignore if already installed, updates itself
-is_accessible_cmd bitwarden ||
+if ! is_accessible_cmd bitwarden; then
   log_and_run "Installing bitwarden desktop" install_bitwarden_desktop
+fi
+
+if ! is_accessible_cmd zip; then
+  abort "zip is required to install bitwarden cli" 2
+fi
 
 log_and_run "Installing bitwarden CLI" install_bitwarden_cli
