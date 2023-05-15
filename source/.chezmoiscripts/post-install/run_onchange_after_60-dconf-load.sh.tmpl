@@ -7,7 +7,7 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 
 # dconf.ini hash: {{ include "encrypted_dconf-backup.ini" | sha256sum }}
 if ! command -v dconf &>/dev/null; then
-  abort 'dconf is not installed. Please install dconf to use this backup\n'
+  abort 'dconf is not installed. Please install dconf to use this backup' 0
 fi
 
 read -rep "load dconf settings from source? (yes) " confirmation </dev/tty
