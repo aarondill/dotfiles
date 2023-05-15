@@ -1,4 +1,5 @@
 #! /usr/bin/env bash
+set -euC -o pipefail
 # Source utils
 SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 # shellcheck source=../.utils.sh
@@ -42,14 +43,14 @@ function install_fzf() {
   if [[ "$asset" =~ tar.gz$ ]]; then
     curl -sSfL "$url" | tar -xzf - -O | sudo tee "$targetFile" >/dev/null
   else
-    temp_dir=$(mktemp -d) && (
-      trap 'rm -rf "$temp_dir"' EXIT
-      set -e # stop on failure
-      local temp=$temp_dir/fzf.zip
-      curl -fLo "$temp" "$url"
-      unzip -o "$temp"
-      sudo mv "$temp" "$targetFile"
-    )
+    temp_dir=$(mktemp -d)
+    trap 'rm -rf "$temp_dir"' EXIT
+    local temp="$temp_dir/fzf.zip"
+    curl -sSfL "$url" -o "$temp"
+    unzip -o "$temp"
+    sudo mv "$temp" "$targetFile"
+    # cleanup
+    rm -rf "$temp_dir" && trap '' EXIT
   fi
   sudo chmod +x "$targetFile"
 }

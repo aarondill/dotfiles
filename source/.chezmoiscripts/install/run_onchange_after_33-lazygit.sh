@@ -1,11 +1,11 @@
 #! /usr/bin/env bash
+set -euC -o pipefail
 # Source utils
 SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 # shellcheck source=../.utils.sh
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
 function install_lazygit() (
-  set -e
   local LAZYGIT_VERSION REPO FILE
   LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
   FILE="lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"

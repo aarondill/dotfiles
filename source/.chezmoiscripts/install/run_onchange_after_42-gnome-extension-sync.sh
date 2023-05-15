@@ -1,6 +1,6 @@
 #!/bin/bash
 # Installs extension sync gnome extension
-set -eu
+set -euC -o pipefail
 # Source utils
 SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 # shellcheck source=../.utils.sh
@@ -44,7 +44,6 @@ NPM=$(which yarn 2>/dev/null) || abort "yarn is required to install extensions s
 
 ## Install extensions sync
 
-# Exits on fail because set -e
 TEMP=$(mktemp -d)
 trap 'rm -rf ${TEMP}' EXIT
 

@@ -1,4 +1,5 @@
 #! /usr/bin/env bash
+set -euC -o pipefail
 # Source utils
 SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 # shellcheck source=../.utils.sh
@@ -12,17 +13,14 @@ function install_bitwarden_desktop() {
 }
 
 function install_bitwarden_cli() {
-  declare temp_dir
-  temp_dir=$(mktemp -d) && (
-    # Executed in a subshell, so this will run on end of block
-    trap 'rm -rf $temp_dir' EXIT
-    set -e
-
-    curl -sSL 'https://vault.bitwarden.com/download/?app=cli&platform=linux' -o "$temp_dir/bw.zip"
-    unzip -qq "$temp_dir/bw.zip" -d "$temp_dir"
-    sudo mv -f "$temp_dir/bw" /usr/local/bin/bw
-    sudo chmod +x /usr/local/bin/bw
-  )
+  local DESTINATION=/usr/local/bin/bw temp_dir
+  temp_dir=$(mktemp -d)
+  trap 'rm -rf "$temp_dir"' EXIT
+  curl -sSL 'https://vault.bitwarden.com/download/?app=cli&platform=linux' -o "$temp_dir/bw.zip"
+  unzip -qq "$temp_dir/bw.zip" -d "$temp_dir"
+  sudo mv -f "$temp_dir/bw" "$DESTINATION"
+  sudo chmod +x "$DESTINATION"
+  rm -rf "$temp_dir" && trap '' EXIT # cleanup
 }
 
 # Ignore if already installed, updates itself

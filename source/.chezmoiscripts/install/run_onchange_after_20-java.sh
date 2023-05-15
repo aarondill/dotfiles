@@ -1,4 +1,5 @@
 #! /usr/bin/env bash
+set -euC -o pipefail
 # Source utils
 SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 # shellcheck source=../.utils.sh
@@ -7,8 +8,6 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 DESTINATION="/usr/lib/jvm" # Fixed location
 VERSION=20.0.1
 URL=https://download.java.net/java/GA/jdk20.0.1/b4887098932d415489976708ad6d1a4b/9/GPL/openjdk-20.0.1_linux-x64_bin.tar.gz
-
-set -e
 
 if [ -x "$DESTINATION/jdk-$VERSION/bin/java" ]; then
   abort0 "jdk-$VERSION is already installed."
