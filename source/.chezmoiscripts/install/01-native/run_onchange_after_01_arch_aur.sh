@@ -12,12 +12,14 @@ if [ -z "$PACMAN" ]; then
 fi
 
 aur_install() {
-  REPO=$1
+  local REPO=$1 tmpdir
   tmpdir="$(mktemp -d)"
   trap 'rm -rf "$tmpdir"' EXIT
+
   git clone "$REPO" "$tmpdir"
   cd "$tmpdir"
   (export -n SHELLOPTS && makepkg -sirc)
+
   rm -rf "$tmpdir" && trap '' EXIT
 }
 
