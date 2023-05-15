@@ -26,7 +26,7 @@ function install_pnpm_and_node() {
 
   log 'installing n through pnpm'
   # requires wget
-  pnpm i --silent -g n
+  pnpm i -g n
 }
 
 install_pnpm_global_packages() {
