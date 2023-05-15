@@ -9,6 +9,7 @@
 function path_contains() { [[ ":$PATH:" = *":${1:-}:"* ]]; }
 function append_path() { local p="${1:-}" && ! path_contains "$p" && PATH="${PATH:+$PATH:}$p"; }
 function prepend_path() { local p="${1:-}" && ! path_contains "$p" && PATH="$p${PATH:+:$PATH}"; }
+
 # Add the bin files if not already added from the .profile
 prepend_path "$HOME/bin"
 prepend_path "$HOME/.local/bin"
