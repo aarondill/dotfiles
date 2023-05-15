@@ -142,6 +142,7 @@ fi
 if [ -d "$HOME/.bashrc.d/" ]; then
   # Initialize `~/.bashrc.d`
   while IFS= read -r -d '' file; do
+    stty -echo
     # For each file, if bench var is assigned,
     # then call time and output benchmark
     # shellcheck disable=SC1090 # Don't even try to follow this loop
@@ -152,6 +153,7 @@ if [ -d "$HOME/.bashrc.d/" ]; then
     else
       . "$file"
     fi
+    stty echo
   done < <(find "$HOME/.bashrc.d/" -type f -not -name "_*" -print0 | LC_ALL=C sort -z)
   # Above: Find all files not starting with _, and sort, ensuring base lang
 fi
