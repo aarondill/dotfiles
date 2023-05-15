@@ -1,4 +1,4 @@
-# shellcheck shell=dash
+# shellcheck shell=sh
 # ~/.profile: executed by the command interpreter for login shells.
 # This file is not read by bash(1), if ~/.bash_profile or ~/.bash_login
 # exists.
@@ -8,10 +8,6 @@
 # the default umask is set in /etc/profile; for setting the umask
 # for ssh logins, install and configure the libpam-umask package.
 #umask 022
-
-function path_contains() { [[ ":$PATH:" = *":${1:-}:"* ]]; }
-function append_path() { local p="${1:-}" && ! path_contains "$p" && PATH="${PATH:+$PATH:}$p"; }
-function prepend_path() { local p="${1:-}" && ! path_contains "$p" && PATH="$p${PATH:+:$PATH}"; }
 
 export XDG_DATA_HOME=$HOME/.local/share
 export XDG_CONFIG_HOME=$HOME/.config
@@ -39,6 +35,10 @@ export TS_NODE_HISTORY="$XDG_STATE_HOME"/node/ts_node_repl_history
 
 # if running bash
 if [ -n "$BASH_VERSION" ]; then
+  function path_contains() { [[ ":$PATH:" = *":${1:-}:"* ]]; }
+  function append_path() { local p="${1:-}" && ! path_contains "$p" && PATH="${PATH:+$PATH:}$p"; }
+  function prepend_path() { local p="${1:-}" && ! path_contains "$p" && PATH="$p${PATH:+:$PATH}"; }
+
   # Also set in .bashrc
   # set PATH so it includes user's private bin if it exists
   prepend_path "$HOME/bin"
