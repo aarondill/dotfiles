@@ -1,12 +1,16 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # this finds the largest swap partition and *offers* to replace important instances of the backed up source with the uuid
-set -e
+set -euC -o pipefail
 # Source utils
 SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 # shellcheck source=../.utils.sh
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
 RESUME_FILE=/etc/initramfs-tools/conf.d/resume
+
+if ! [ -d "$(dirname -- "$RESUME_FILE")" ]; then
+  abort 'This script only supports initramfs, please manually setup resume for your initramfs system' 0
+fi
 
 BIG_SWAP_LINE=$(tail -n+2 </proc/swaps | LC_ALL=C sort -t$'\t' -nk3 | tail -n1)
 BIG_SWAP_PATH=$(awk '{print $1}' <<<"$BIG_SWAP_LINE") # /dev/sda1
