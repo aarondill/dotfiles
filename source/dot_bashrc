@@ -139,15 +139,17 @@ if command -v starship &>/dev/null; then
   # Allow user to override by setting the environment variable to empty string
   export DISABLE_CUSTOM_PS1=${DISABLE_CUSTOM_PS1-1}
 fi
+# Initialize `~/.bashrc.d`
 if [ -d "$HOME/.bashrc.d/" ]; then
-  # Initialize `~/.bashrc.d`
-  stty -echo
+  # Find all files not starting with _, and sort, ensuring base lang
   readarray -d '' files < <(find "$HOME/.bashrc.d/" -type f -not -name "_*" -print0 | LC_ALL=C sort -z)
+  # disable keyboard echo until bashrc is done
+  stty -echo
   for file in "${files[@]}"; do
     # For each file, if bench var is assigned,
     # then call time and output benchmark
     # shellcheck disable=SC1090 # Don't even try to follow this loop
-    if [[ $__bashrc_bench ]]; then
+    if [[ -n "$__bashrc_bench" ]]; then
       TIMEFORMAT="$file: %R"
       time . "$file"
       unset TIMEFORMAT
@@ -155,8 +157,8 @@ if [ -d "$HOME/.bashrc.d/" ]; then
       . "$file"
     fi
   done
+  # Enable keyboard echo for interactive use
   stty echo
-  # Above: Find all files not starting with _, and sort, ensuring base lang
 fi
 
 # tabtab source for packages
