@@ -63,7 +63,9 @@ else
   OS=GNU/Linux
 fi
 
-log "Creating text mode linux at the current root drive '$ROOT_UUID', with vmlinuz '$VMLINUZ' and initrd '$INITRD'"
+log "Creating text mode linux at the current root drive '$ROOT_UUID'"
+log "Found vmlinuz '$VMLINUZ'"
+log "Found initrd '$INITRD'"
 
 # DO NOT output anything to stdout BEFORE THIS!
 # At any point before this cat, you should assume
