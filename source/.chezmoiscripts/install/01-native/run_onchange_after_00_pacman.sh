@@ -19,8 +19,15 @@ PACKAGES=(
   xclip xdg-utils zip unzip zoxide htop speedtest-cli ripgrep hexedit
   luajit python-pip xdotool base-devel wezterm
 )
+
 GRAPHICAL_PACKAGES=(
   dconf-editor flatpak gparted gucharmap luckybackup zeal
+  # VM management. Technically, only virt-manager is graphical, but they are used together
+  virt-manager qemu-desktop
+  # virsh
+  libvirt
+  # virt-clone, etc...
+  virt-install
 )
 GNOME_PACKAGES=(gnome-shell-extension-manager gnome-tweaks gnome-software gnome-software-plugin-flatpak)
 

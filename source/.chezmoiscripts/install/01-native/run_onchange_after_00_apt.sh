@@ -21,7 +21,14 @@ PACKAGES=(
 )
 GRAPHICAL_PACKAGES=(
   dconf-editor flatpak gparted gucharmap luckybackup zeal
+  # VM management. Technically, only virt-manager is graphical, but they are used together
+  virt-manager
+  # virsh
+  libvirt-clients
+  # virt-clone, etc
+  virtinst
 )
+
 GNOME_PACKAGES=(
   gnome-shell-extension-manager gnome-tweaks
   gnome-software gnome-software-plugin-flatpak
