@@ -21,7 +21,7 @@ function install_pnpm_and_node() {
   corepack prepare pnpm@latest --activate >/dev/null
 
   log 'installing n through pnpm'
-  pnpm i --silent -g
+  pnpm i --silent -g n
 }
 
 install_pnpm_global_packages() {
