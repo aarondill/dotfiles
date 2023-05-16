@@ -57,7 +57,10 @@ end
 beautiful.init(gears.filesystem.get_themes_dir() .. "default/theme.lua")
 beautiful.useless_gap = 4
 beautiful.outer_gaps = 10
-beautiful.wallpaper = gears.filesystem.get_configuration_dir() .. "/wallpapers/1.jpg"
+beautiful.wallpaper = function(s)
+	naughty.notify({ text = tostring(s.index) })
+	return string.format("%s/wallpapers/%d.jpg", gears.filesystem.get_configuration_dir(), s.index)
+end
 -- beautiful.gap_single_client = false
 
 -- {{{ Variable definitions
