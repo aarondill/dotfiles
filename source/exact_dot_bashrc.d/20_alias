@@ -24,11 +24,9 @@ alias la="ls -A"
 alias ll="ls -hl"
 alias lla="ls -Ahl"
 alias cl='clear'
-
-if command -v tree &>/dev/null; then
-  # show hidden
-  alias tree='tree -a'
-fi
+if command -v tty-clock &>/dev/null; then alias clock='tty-clock  -sScbtrnC3'; fi
+# show hidden
+if command -v tree &>/dev/null; then alias tree='tree -a'; fi
 
 if command -v google-chrome &>/dev/null; then
   # Alias to remove error messages on opening google-chrome
@@ -50,10 +48,8 @@ if command -v 7z &>/dev/null; then
   alias secret-unzip='7z x'
 fi
 
-if command -v has >/dev/null; then
-  # Allow usage of `has` with non-defined programs
-  alias has='HAS_ALLOW_UNSAFE=y has'
-fi
+# Allow usage of `has` with non-defined programs
+if command -v has >/dev/null; then alias has='HAS_ALLOW_UNSAFE=y has'; fi
 
 # Replace `cat` with `bat`, if installed
 bat=$(which bat 2>/dev/null || which batcat 2>/dev/null)
@@ -100,9 +96,7 @@ if command -v bc &>/dev/null; then
 fi
 
 # if `pnpm` is installed set alias for pnpx
-if command -v pnpm &>/dev/null; then
-  alias pnpx='pnpm dlx'
-fi
+if command -v pnpm &>/dev/null; then alias pnpx='pnpm dlx'; fi
 
 # If tealdeer is installed set alias for tldr
 if command -v tldr &>/dev/null; then
@@ -110,9 +104,7 @@ if command -v tldr &>/dev/null; then
 fi
 
 # Shorter lazygit
-if command -v lazygit &>/dev/null; then
-  alias lg='lazygit'
-fi
+if command -v lazygit &>/dev/null; then alias lg='lazygit'; fi
 
 # Shorter git
 if command -v git &>/dev/null; then
@@ -135,10 +127,8 @@ if systemctl list-unit-files --quiet --all --type=service --user --state=enabled
 fi
 unset IBus
 
-if command -v emacs &>/dev/null; then
-  # Don't you DARE open a window
-  alias emacs='emacs -nw'
-fi
+# Don't you DARE open a window
+if command -v emacs &>/dev/null; then alias emacs='emacs -nw'; fi
 
 # Allow nvchad if it's installed
 if [ -d "${NVCHAD_CONFIG:-"${XDG_CONFIG_HOME:-$HOME/.config}/NvChad"}" ]; then
