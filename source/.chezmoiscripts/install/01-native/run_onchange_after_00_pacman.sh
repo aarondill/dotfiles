@@ -85,4 +85,4 @@ log_and_run 'Installing graphical packages' install_graphical_packages
 # Replace the existing cheese package with the flatpak package
 remove_if_installed gnome-characters cheese
 # Install vim symlink to nvim - throws is /usr/bin/vim is defined.
-if ! [ -f /usr/bin/vim ] && which nvim &>/dev/null; then ln -s -T "$(which nvim)" /usr/bin/vim; fi
+if ! [ -f /usr/bin/vim ] && which nvim &>/dev/null; then sudo ln -s -T "$(which nvim)" /usr/bin/vim; fi
