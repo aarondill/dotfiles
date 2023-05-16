@@ -62,8 +62,9 @@ while true; do
 done
 if [ "${1:-}" = show ] || [ "$#" -eq 0 ]; then show=true; fi
 
-if [ -n "$device" ]; then BrPath="$device"; else
-  BrPath=$(find /sys/class/backlight -maxdepth 1 -mindepth 1 -print0 | head -zn1 | tr -d '\0')
+BrPath="$device"
+if [ -z "$BrPath" ]; then
+  BrPath="$(find /sys/class/backlight -maxdepth 1 -mindepth 1 -print0 | head -zn1 | tr -d '\0')"
 fi
 
 if [ -z "$BrPath" ]; then
