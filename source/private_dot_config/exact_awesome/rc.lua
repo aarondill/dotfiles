@@ -60,9 +60,6 @@ beautiful.init(gears.filesystem.get_themes_dir() .. "default/theme.lua")
 beautiful.useless_gap = 2
 beautiful.outer_gaps = 8
 -- beautiful.gap_single_client = false
-beautiful.wallpaper = function(s)
-	return string.format("%s/wallpaper/%d.jpg", gears.filesystem.get_configuration_dir(), s.index)
-end
 
 -- {{{ Variable definitions
 
@@ -618,67 +615,43 @@ end)
 -- }}}
 
 -- {{{ Tag Wallpaper
--- Set according to wallpaper directory
-local path = gears.filesystem.get_configuration_dir() .. "/wallpaper/"
--- Set to number of used tags
-local num_tabs = 9
--- Other variables
-local num_files = 0
-local wp_all = {}
-local wp_selected = {}
-math.randomseed(os.time())
--- To guarantee unique random numbers on every platform, pop a few
-for _ = 1, 10 do
-	math.random()
-end
+local function setup_wallpapers()
+	-- Set according to wallpaper directory
+	local path = gears.filesystem.get_configuration_dir() .. "wallpaper"
+	-- Set to number of used tags
+	local num_tabs = 9
+	-- Other variables
+	local default = path .. "/1.jpg"
+	if not gears.filesystem.file_readable(default) then
+		default = gears.filesystem.get_themes_dir() .. "default/background.png"
+	end
 
--- LUA implementation of PHP scan dir
--- Returns all files (except . and ..) in "directory"
-local function scandir(directory)
-	num_files = 0
-	local t = {}
-	for filename in io.popen('ls -a "' .. directory .. '"'):lines() do
-		-- If case to disregard "." and ".."
-		if not (filename == "." or filename == "..") then
-			num_files = num_files + 1
-			t[num_files] = filename
+	-- For each screen
+	for s = 1, screen.count() do
+		local sc = screen[s]
+		if not sc then
+			goto continue
 		end
-	end
-	return t
-end
-
--- Basically a modern Fisher-Yates shuffle
--- Returns "tabs" elements from an table "wp" of length "files"
--- Guarantees no duplicated elements in the return while having linear runtime
-function select(wp, files, tabs)
-	local selected = {}
-	for i = 1, tabs do
-		local position = math.random(1, files)
-		selected[i] = wp[position]
-		wp[position] = wp[files]
-		files = files - 1
-	end
-	return selected
-end
-
--- Get the names of "num_tabs" files from "num_files" total files in "path"
-wp_selected = select(scandir(path), num_files, num_tabs)
-
--- For each screen
-for s = 1, screen.count() do
-	local screen = awful.screen[s]
-	-- Set wallpaper on first tab (else it would be empty at start up)
-	gears.wallpaper.fit(path .. wp_selected[1], s)
-	-- Go over each tab
-	for t = 1, num_tabs do
-		screen.tags[t]:connect_signal("property::selected", function(tag)
-			-- And if selected
-			if not tag.selected then
-				return
-			end
-			-- Set wallpaper
-			gears.wallpaper.fit(path .. wp_selected[t], s)
-		end)
+		-- Set wallpaper on first tab (else it would be empty at start up)
+		gears.wallpaper.maximized(default, s)
+		-- Go over each tab
+		for t = 1, num_tabs do
+			sc.tags[t]:connect_signal("property::selected", function(tag)
+				-- And if selected
+				if not tag.selected then
+					return
+				end
+				-- Set wallpaper
+				local wp = string.format("%s/%d.jpg", path, t)
+				if gears.filesystem.file_readable(wp) then
+					gears.wallpaper.maximized(wp, s)
+				else
+					gears.wallpaper.maximized(default, s)
+				end
+			end)
+		end
+		::continue::
 	end
 end
+setup_wallpapers()
 -- }}}
