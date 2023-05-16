@@ -57,7 +57,7 @@ end
 beautiful.init(gears.filesystem.get_themes_dir() .. "default/theme.lua")
 beautiful.useless_gap = 4
 beautiful.outer_gaps = 10
-beautiful.wallpaper = os.getenv("HOME") .. "/.config/awesome/wallpaper.jpg"
+beautiful.wallpaper = gears.filesystem.get_configuration_dir() .. "/wallpaper.jpg"
 -- beautiful.gap_single_client = false
 
 -- {{{ Variable definitions
@@ -202,7 +202,6 @@ local function set_wallpaper(s)
 	end
 end
 
-naughty.notify({ timeout = 0, text = "hello!" })
 -- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
 screen.connect_signal("property::geometry", set_wallpaper)
 
