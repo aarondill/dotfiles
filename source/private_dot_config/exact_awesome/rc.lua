@@ -55,8 +55,8 @@ end
 
 -- Themes define colours, icons, font and wallpapers.
 beautiful.init(gears.filesystem.get_themes_dir() .. "default/theme.lua")
-beautiful.useless_gap = 4
-beautiful.outer_gaps = 10
+beautiful.useless_gap = 2
+beautiful.outer_gaps = 8
 beautiful.wallpaper = function(s)
 	naughty.notify({ text = tostring(s.index) })
 	return string.format("%s/wallpaper/%d.jpg", gears.filesystem.get_configuration_dir(), s.index)
