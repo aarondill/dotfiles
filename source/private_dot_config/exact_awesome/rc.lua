@@ -56,7 +56,7 @@ end
 -- {{{ Variable definitions
 -- Themes define colours, icons, font and wallpapers.
 beautiful.init(gears.filesystem.get_themes_dir() .. "default/theme.lua")
-beautiful.useless_gap = 900
+beautiful.useless_gap = 2
 beautiful.gap_single_client = true
 -- beautiful.outer_gaps = 900
 
