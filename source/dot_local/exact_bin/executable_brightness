@@ -77,10 +77,12 @@ elif ! [ -f "$BrPath/brightness" ]; then
   abort "Backlight device must support /brightness" 1
 fi
 
+declare -i BrMax BrMin BrCur
 BrMax="$(cat "$BrPath/max_brightness")"
 # 100th max-brightness, rounded up to nearest integer
 BrMin="$((0 + (BrMax + 100 - 1) / 100))"
 BrCur="$(cat "$BrPath/brightness")"
+if [ "$BrMax" -eq 0 ]; then abort "Backlight device reported maximum brightness of 0." 1; fi
 
 BrCurRel="$(printf '%s ' "$BrCur" "$BrMax" | awk '{ print int( $1 / $2 * 100 ) }')"
 
