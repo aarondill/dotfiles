@@ -14,10 +14,9 @@ In the first form, sets the brightness to the given percentage.
 In the second form, outputs the current brightness percentage to stdout.
 
 Options:
-  -h, --help    Show this help message.
-  -s, --show    output the current brightness percentage.
-  -d, --device dev  the /sys style device to set the brightness on.
-                    \$device/brightness will be writen to!
+  -h, --help         Show this help message.
+  -s, --show         output the current brightness percentage.
+  -d, --device=dev   the /sys style device to set the brightness on. \$device/brightness will be writen to!
 EOF
 }
 
