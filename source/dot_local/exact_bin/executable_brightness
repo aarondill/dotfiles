@@ -6,15 +6,16 @@ THIS=brightness
 
 usage() {
   cat <<-EOF
-usage: $THIS [percent]
+usage: $THIS [OPTS]... [percent]
        $THIS show
-
 sets the brightness to the specified integer percentage.
 what is done depends on the arguments passed:
   'show':              outputs current brightness percentage.
   integer percentage:  the brightness will be set to the specified percentage
   no argument:         a percentage will be retrieved graphically from the user
-
+Options:
+  -d, --device         the /sys style device to set the brightness on.
+                         $device/brightness will be writen to!
 EOF
 }
 
@@ -44,21 +45,36 @@ function parse_args() {
 }
 
 show=false
-LONGOPTS=help,show SHORTOPTS=h,s
+LONGOPTS=help,show,device SHORTOPTS=h,s,d
 ARGSTRING="$(parse_args "$@")"
 eval "$ARGSTRING"
 
+device=''
 while true; do
   case "$1" in
   --help | -h) usage && exit 0 ;;
   -s | --show) show=true && shift ;;
+  -d | --device) device="$2" && shift 2 ;;
   --) shift && break ;;
   *) abort "This is a bug" 3 ;;
   esac
 done
 if [ "${1:-}" = show ]; then show=true; fi
 
-BrPath=$(find /sys/class/backlight -maxdepth 1 -mindepth 1 -print0 | head -zn1 | tr -d '\0')
+if [ -z "$device" ]; then BrPath="$device"; else
+  BrPath=$(find /sys/class/backlight -maxdepth 1 -mindepth 1 -print0 | head -zn1 | tr -d '\0')
+fi
+
+if [ -z "$BrPath" ]; then
+  abort "Unable to find backlight device" 1
+elif ! [ -d "$BrPath" ]; then
+  abort "Found backlight device is not a directory" 1
+elif ! [ -f "$BrPath/max_brightness" ]; then
+  abort "Backlight device must support /max_brightness" 1
+elif ! [ -f "$BrPath/brightness" ]; then
+  abort "Backlight device must support /brightness" 1
+fi
+
 BrMax=$(cat "$BrPath/max_brightness")
 # 100th max-brightness, rounded up to nearest integer
 BrMin=$((0 + (BrMax + 100 - 1) / 100))
