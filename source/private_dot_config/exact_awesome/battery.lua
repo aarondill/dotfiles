@@ -8,10 +8,10 @@ local wibox = require("wibox")
 -- command every 10 seconds:
 local function batterybar()
 	local batbar = wibox.widget({
-		{ id = "mytb", text = "bat: unknown", widget = wibox.widget.textbox },
+		{ id = "batbar", text = "bat: unknown", widget = wibox.widget.textbox },
 		layout = wibox.layout.stack,
 		set_battery = function(self, val)
-			self.mytb.text = string.format("bat: %s", tostring(val))
+			self.batbar.text = string.format("bat: %s", tostring(val))
 		end,
 	})
 	---@param bat string
