@@ -26,7 +26,7 @@ aur_install() {
 # Zeal
 if ! which zeal &>/dev/null; then
   # Dependancy that's no longer supplied by pacman
-  pacman -U https://archive.archlinux.org/packages/q/qt5-webkit/qt5-webkit-5.212.0alpha4-18-x86_64.pkg.tar.zst
+  sudo pacman -U https://archive.archlinux.org/packages/q/qt5-webkit/qt5-webkit-5.212.0alpha4-18-x86_64.pkg.tar.zst
   aur_install "https://aur.archlinux.org/zeal.git"
 else err "Zeal is already installed, skipping installation"; fi
 
