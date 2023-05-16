@@ -17,6 +17,9 @@ function usage() {
 		-h, --help     show this help message
 		-y, --yes      don't confirm deletion of REPO
 		-f, --force    force deletion of REPO. REPO/.git is always force deleted.
+  The following options are ignored for rm compatibility:
+    -r, --recursive
+    -i, --interactive
 EOF
   return 0
 }
@@ -42,8 +45,8 @@ function parse_args() {
   exit 2
 }
 
-LONGOPTS=help,verbose,yes,force
-SHORTOPTS=h,v,y,f
+LONGOPTS=help,verbose,yes,force,interactive,recursive
+SHORTOPTS=h,v,y,f,i,r
 ARGSTRING="$(parse_args "$@")"
 eval "$ARGSTRING"
 
@@ -53,6 +56,7 @@ for arg in "$@"; do
   -v | --verbose) VERBOSE=1 && shift ;;
   -y | --yes) YES=1 && shift ;;
   -f | --force) FORCE=1 YES=1 && shift ;;
+  -i | --interactive) ;& -r | --recursive) shift ;;
   --) shift && break ;;
   *) abort 'This is a bug' 3 ;;
   esac
