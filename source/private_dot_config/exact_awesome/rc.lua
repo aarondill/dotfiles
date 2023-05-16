@@ -478,6 +478,7 @@ local clientbuttons = gears.table.join(
 		c:emit_signal("request::activate", "mouse_click", { raise = true })
 		awful.mouse.client.resize(c)
 	end),
+	-- Ctrl+Super+drag = resize client
 	awful.button({ modkey, "Control" }, 1, function(c)
 		c:emit_signal("request::activate", "mouse_click", { raise = true })
 		awful.mouse.client.resize(c)
@@ -614,4 +615,70 @@ end)
 client.connect_signal("unfocus", function(c)
 	c.border_color = beautiful.border_normal or "#0E0E0E"
 end)
+-- }}}
+
+-- {{{ Tag Wallpaper
+-- Set according to wallpaper directory
+local path = gears.filesystem.get_configuration_dir() .. "/wallpaper/"
+-- Set to number of used tags
+local num_tabs = 9
+-- Other variables
+local num_files = 0
+local wp_all = {}
+local wp_selected = {}
+math.randomseed(os.time())
+-- To guarantee unique random numbers on every platform, pop a few
+for _ = 1, 10 do
+	math.random()
+end
+
+-- LUA implementation of PHP scan dir
+-- Returns all files (except . and ..) in "directory"
+local function scandir(directory)
+	num_files = 0
+	local t = {}
+	for filename in io.popen('ls -a "' .. directory .. '"'):lines() do
+		-- If case to disregard "." and ".."
+		if not (filename == "." or filename == "..") then
+			num_files = num_files + 1
+			t[num_files] = filename
+		end
+	end
+	return t
+end
+
+-- Basically a modern Fisher-Yates shuffle
+-- Returns "tabs" elements from an table "wp" of length "files"
+-- Guarantees no duplicated elements in the return while having linear runtime
+function select(wp, files, tabs)
+	local selected = {}
+	for i = 1, tabs do
+		local position = math.random(1, files)
+		selected[i] = wp[position]
+		wp[position] = wp[files]
+		files = files - 1
+	end
+	return selected
+end
+
+-- Get the names of "num_tabs" files from "num_files" total files in "path"
+wp_selected = select(scandir(path), num_files, num_tabs)
+
+-- For each screen
+for s = 1, screen.count() do
+	local screen = awful.screen[s]
+	-- Set wallpaper on first tab (else it would be empty at start up)
+	gears.wallpaper.fit(path .. wp_selected[1], s)
+	-- Go over each tab
+	for t = 1, num_tabs do
+		screen.tags[t]:connect_signal("property::selected", function(tag)
+			-- And if selected
+			if not tag.selected then
+				return
+			end
+			-- Set wallpaper
+			gears.wallpaper.fit(path .. wp_selected[t], s)
+		end)
+	end
+end
 -- }}}
