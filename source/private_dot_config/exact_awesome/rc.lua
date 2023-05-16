@@ -626,31 +626,28 @@ local function setup_wallpapers()
 		default = gears.filesystem.get_themes_dir() .. "default/background.png"
 	end
 
+	local function get_wp_path(num)
+		local wp = string.format("%s/%d.jpg", path, num)
+		if gears.filesystem.file_readable(wp) then
+			return wp
+		else
+			return default
+		end
+	end
 	-- For each screen
 	for s = 1, screen.count() do
-		local sc = screen[s]
-		if not sc then
-			goto continue
-		end
 		-- Set wallpaper on first tab (else it would be empty at start up)
-		gears.wallpaper.maximized(default, s)
+		gears.wallpaper.maximized(get_wp_path(1), s)
 		-- Go over each tab
 		for t = 1, num_tabs do
-			sc.tags[t]:connect_signal("property::selected", function(tag)
+			screen[s].tags[t]:connect_signal("property::selected", function(tag)
 				-- And if selected
-				if not tag.selected then
-					return
-				end
-				-- Set wallpaper
-				local wp = string.format("%s/%d.jpg", path, t)
-				if gears.filesystem.file_readable(wp) then
-					gears.wallpaper.maximized(wp, s)
-				else
-					gears.wallpaper.maximized(default, s)
+				if tag.selected then
+					-- Set wallpaper
+					gears.wallpaper.maximized(get_wp_path(t), s)
 				end
 			end)
 		end
-		::continue::
 	end
 end
 setup_wallpapers()
