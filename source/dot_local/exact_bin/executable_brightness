@@ -23,6 +23,8 @@ EOF
 log() { printf '%s\n' "$@"; }
 err() { printf "$THIS: %s\n" "$@" >&2; }
 abort() { err "$1" && exit "${2:-1}"; }
+number_re='^[0-9]+$'
+is_integer() { [[ "$1" =~ $number_re ]]; }
 
 # Returns a string that should be 'eval'ed to set the positional arguments
 # Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
@@ -77,11 +79,14 @@ elif ! [ -f "$BrPath/brightness" ]; then
   abort "Backlight device must support /brightness" 1
 fi
 
-declare -i BrMax BrMin BrCur
 BrMax="$(<"$BrPath/max_brightness")"
+if ! is_integer "$BrMax"; then abort "Invalid max brightness '$BrMax'" 2; fi
+BrCur="$(<"$BrPath/brightness")"
+if ! is_integer "$BrCur"; then abort "Invalid current brightness '$BrCur'" 2; fi
+declare -i BrMax BrMax BrCur # Cast all to integers
 # 100th max-brightness, rounded up to nearest integer
 BrMin="$((0 + (BrMax + 100 - 1) / 100))"
-BrCur="$(<"$BrPath/brightness")"
+
 if [ "$BrMax" -eq 0 ]; then abort "Backlight device reported maximum brightness of 0." 1; fi
 
 BrCurRel="$(printf '%s ' "$BrCur" "$BrMax" | awk '{ print int( $1 / $2 * 100 ) }')"
@@ -92,9 +97,8 @@ if [ "$show" = true ]; then
 fi
 
 BrNewRel="${1:-}"
-number_re='^[0-9]+$'
 if [ -z "$BrNewRel" ]; then abort "Brightness can't be empty"; fi
-if ! [[ "$BrNewRel" =~ $number_re ]]; then
+if ! is_integer "$BrNewRel"; then
   abort "Invalid brightness '$BrNewRel', brightness must be an integer between 0 and 100" 2
 fi
 
