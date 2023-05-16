@@ -43,7 +43,17 @@ install_pnpm_global_packages() {
   add_global_dir_to_path || [ -n "$PNPM_HOME" ]
   pnpm i -g n
 }
-is_accessible_cmd wget || abort 'wget is required to install n' 2
+
+if ! is_accessible_cmd wget; then
+  err "wget is not present, attempting to install."
+  if [ -n "$APT" ]; then
+    sudo "$APT" install wget
+  elif [ -n "$PACMAN" ]; then
+    sudo "$PACMAN" -S wget
+  else
+    abort "wget is required to install n. Please install it and try again." 1
+  fi
+fi
 
 is_accessible_cmd pnpm || log_and_run 'Installing NodeJS and pnpm' install_pnpm_and_node
 is_accessible_cmd pnpm && log_and_run 'Installing pnpm global packages' install_pnpm_global_packages
