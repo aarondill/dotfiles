@@ -46,7 +46,7 @@ function parse_args() {
 }
 
 show="false"
-LONGOPTS="help,show,device" SHORTOPTS="h,s,d"
+LONGOPTS="help,show,device:" SHORTOPTS="h,s,d:"
 ARGSTRING="$(parse_args "$@")"
 eval "$ARGSTRING"
 
