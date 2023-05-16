@@ -7,17 +7,15 @@ THIS=brightness
 usage() {
   cat <<-EOF
 usage: $THIS [OPTS]... [percent]
-       $THIS [OPTS]... [-s | show]
-Sets the brightness to the specified integer percentage.
-
-In the first form, sets the brightness to the given percentage.
-In the second form, outputs the current brightness percentage to stdout.
-
+       $THIS show
+sets the brightness to the specified integer percentage.
+what is done depends on the arguments passed:
+  'show':              outputs current brightness percentage.
+  integer percentage:  the brightness will be set to the specified percentage
+  no argument:         a percentage will be retrieved graphically from the user
 Options:
-  -h, --help    Show this help message.
-  -s, --show    output the current brightness percentage.
-  -d, --device  the /sys style device to set the brightness on.
-                    \$device/brightness will be writen to!
+  -d, --device         the /sys style device to set the brightness on.
+                         $device/brightness will be writen to!
 EOF
 }
 
@@ -84,7 +82,7 @@ BrCur=$(cat "$BrPath/brightness")
 
 BrCurRel=$(printf '%s ' "$BrCur" "$BrMax" | awk '{ print int( $1 / $2 * 100 ) }')
 
-if [ "$#" -eq 0 ] || [ "$show" = true ]; then
+if [ "$show" = true ]; then
   log "$BrCurRel"
   exit 0
 fi
@@ -92,6 +90,15 @@ fi
 # First arg, or menu
 BrNewRel=${1:-}
 number_re='^[0-9]+$'
+if [ "$#" -eq 0 ]; then
+  if command -v yad 2>/dev/null >/dev/null; then
+    BrNewRel=$(yad --scale --min-value 0 --max-value 100 --value "$BrCurRel" --print-partial --title 'Set brightness' --width 300 --fixed --sticky --mouse --on-top --escape-ok --button OK --hide-value)
+  elif command -v dialog 2>/dev/null >/dev/null; then
+    BrNewRel=$(dialog --erase-on-exit --rangebox Brightness -1 -1 0 100 "$BrCurRel" 3>&1 1>&2 2>&3)
+  else
+    abort "Could not find a program to request brightness from user. Please pass a positional argument." 1
+  fi
+fi
 if ! [[ "$BrNewRel" =~ $number_re ]]; then
   abort "Invalid brightness '$BrNewRel', brightness must be an integer between 0 and 100" 2
 fi
