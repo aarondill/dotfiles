@@ -18,8 +18,9 @@ function install_pnpm_and_node() {
   sudo -v
   # Setup n
   log 'Setting up /usr/local files for n'
-  sudo mkdir -p /usr/local/bin /usr/local/lib/node_modules /usr/local/include /usr/local/share /usr/local/n
-  sudo chown -R "$(whoami)" /usr/local/bin /usr/local/lib/node_modules /usr/local/include /usr/local/share /usr/local/n
+  local files=(/usr/local/{bin,lib/node_modules,include,share/{,man},n})
+  sudo mkdir -p "${files[@]}"
+  sudo chown -R "$(whoami)" "${files[@]}"
 
   log 'installing node lts through n...'
   (
