@@ -60,7 +60,7 @@ while true; do
   *) abort "This is a bug" 3 ;;
   esac
 done
-if [ "${1:-}" = show ]; then show=true; fi
+if [ "${1:-}" = show ] || [ "$#" -eq 0 ]; then show=true; fi
 
 if [ -z "$device" ]; then BrPath="$device"; else
   BrPath=$(find /sys/class/backlight -maxdepth 1 -mindepth 1 -print0 | head -zn1 | tr -d '\0')
@@ -83,18 +83,17 @@ BrCur=$(cat "$BrPath/brightness")
 
 BrCurRel=$(printf '%s ' "$BrCur" "$BrMax" | awk '{ print int( $1 / $2 * 100 ) }')
 
-if [ "$#" -eq 0 ] || [ "$show" = true ]; then
+if [ "$show" = true ]; then
   log "$BrCurRel"
   exit 0
 fi
 
-# First arg, or menu
 BrNewRel=${1:-}
 number_re='^[0-9]+$'
+if [ -z "$BrNewRel" ]; then abort "Brightness can't be empty"; fi
 if ! [[ "$BrNewRel" =~ $number_re ]]; then
   abort "Invalid brightness '$BrNewRel', brightness must be an integer between 0 and 100" 2
 fi
-if [ -z "$BrNewRel" ]; then exit 1; fi
 
 BrNew=$(printf '%s ' "$BrNewRel" "$BrMax" | awk '{ print int( ( ($1/100) * $2) ) }')
 BrNew=$((BrNew < BrMin ? BrMin : BrNew))
