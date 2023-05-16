@@ -57,7 +57,7 @@ end
 beautiful.init(gears.filesystem.get_themes_dir() .. "default/theme.lua")
 beautiful.useless_gap = 4
 beautiful.outer_gaps = 10
-beautiful.wallpaper = gears.filesystem.get_configuration_dir() .. "/wallpaper.jpg"
+beautiful.wallpaper = gears.filesystem.get_configuration_dir() .. "/wallpapers/1.jpg"
 -- beautiful.gap_single_client = false
 
 -- {{{ Variable definitions
