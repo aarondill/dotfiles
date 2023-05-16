@@ -19,12 +19,19 @@ if [ "$sourced" -eq 0 ]; then err "You should source this file. not run it."; fi
 ## --------------------------------------------- Output ---------------------------------------------
 ## --------------------------------------------------------------------------------------------------
 
+# COLOR vars to keep from branching to tput repeatedly
+RED_COLOR="$(tput setaf 1 2>/dev/null)"
+YELLOW_COLOR="$(tput setaf 11 2>/dev/null)"
+GREEN_COLOR="$(tput setaf 2 2>/dev/null)"
+BOLD_COLOR="$(tput bold 2>/dev/null)"
+RESET_COLOR="$(tput sgr0 2>/dev/null)"
+
 # log "hello world"
-function log() { printf "$(tput setaf 11 2>/dev/null)$(tput bold 2>/dev/null)%s\n$(tput sgr0)" "$@"; }
+function log() { printf "$YELLOW_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@"; }
 # err "goodbye world" -- shows in bold red - Use $THIS to show `script: error`
-function err() { printf "${THIS:+$THIS:}$(tput setaf 1 2>/dev/null)$(tput bold 2>/dev/null)%s\n$(tput sgr0)" "$@" >&2; }
+function err() { printf "${THIS:+$THIS:}$RED_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@" >&2; }
 # success - no arguments
-function success() { printf "$(tput setaf 2 2>/dev/null)$(tput bold 2>/dev/null)%s$(tput sgr0)\n" "Success!"; }
+function success() { printf "$GREEN_COLOR$BOLD_COLOR%s$RESET_COLOR\n" "Success!"; }
 
 ## --------------------------------------------------------------------------------------------------
 ## ------------------------------------------ Control Flow ------------------------------------------
