@@ -55,8 +55,8 @@ end
 
 -- Themes define colours, icons, font and wallpapers.
 beautiful.init(gears.filesystem.get_themes_dir() .. "default/theme.lua")
-beautiful.useless_gap = 4
-beautiful.outer_gaps = 10
+beautiful.useless_gap = 0
+beautiful.outer_gaps = 0
 beautiful.wallpaper = gears.filesystem.get_configuration_dir() .. "/wallpaper.jpg"
 -- beautiful.gap_single_client = false
 
