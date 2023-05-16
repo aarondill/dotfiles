@@ -54,20 +54,22 @@ end
 -- }}}
 
 -- Themes define colours, icons, font and wallpapers.
-beautiful.init(gears.filesystem.get_themes_dir() .. "default/theme.lua")
+-- beautiful.init(gears.filesystem.get_themes_dir() .. "default/theme.lua")
+local themeName = "amazing"
+beautiful.init(gears.filesystem.get_configuration_dir() .. "/themes/" .. themeName .. "/theme.lua")
 beautiful.useless_gap = 2
 beautiful.outer_gaps = 8
+-- beautiful.gap_single_client = false
 beautiful.wallpaper = function(s)
 	naughty.notify({ text = tostring(s.index) })
 	return string.format("%s/wallpaper/%d.jpg", gears.filesystem.get_configuration_dir(), s.index)
 end
--- beautiful.gap_single_client = false
 
 -- {{{ Variable definitions
 
 -- This is used later as the default terminal and editor to run.
-local terminal = "x-terminal-emulator"
-local editor = os.getenv("EDITOR") or "editor"
+local terminal = "wezterm"
+local editor = os.getenv("EDITOR") or "nvim"
 local editor_cmd = terminal .. " -e " .. editor
 
 -- Default modkey.
