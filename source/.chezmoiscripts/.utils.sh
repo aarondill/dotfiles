@@ -54,17 +54,36 @@ function confirm() {
 }
 # Usage: log_and_run "Installing something" apt install -y something
 function log_and_run() {
-  local task command args
-  task="$1"
-  command="$2"
-  args=("${@:3}")
+  local err_status=0 opts=''
+  local task="$1" command="$2" args=("${@:3}")
   log "${task^}..." # Uppercase
-  "$command" "${args[@]}" || {
-    code=$?
+
+  # store errexit option
+  case $- in
+  *e*) opts='set -e' ;;
+  *) opts='set +e' ;;
+  esac
+
+  # Sometimes I regret shell scripting things.
+  # This is because set -e doesn't work in a conditional.
+  # We *want* this to exit on failure, but not exit *this* shell
+  # I wish bash was just smarter than this, but instead, we do this.
+  # Got the snippet here: https://stackoverflow.com/a/11092989
+  set +e
+  (
+    set -e
+    "$command" "${args[@]}"
+  )
+  err_status=$?
+  set -e
+
+  if [ "$err_status" -ne 0 ]; then
     err "Something went wrong while ${task,}!" # Lowercase
-    return "$code"
-  }
+    return "$err_status"
+  fi
   success
+  # set -e back to it's previous state
+  eval "$opts"
 }
 # installed_or_log snap
 function installed_or_log() {
