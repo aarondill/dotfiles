@@ -59,7 +59,7 @@ beautiful.useless_gap = 4
 beautiful.outer_gaps = 10
 beautiful.wallpaper = function(s)
 	naughty.notify({ text = tostring(s.index) })
-	return string.format("%s/wallpapers/%d.jpg", gears.filesystem.get_configuration_dir(), s.index)
+	return string.format("%s/wallpaper/%d.jpg", gears.filesystem.get_configuration_dir(), s.index)
 end
 -- beautiful.gap_single_client = false
 
