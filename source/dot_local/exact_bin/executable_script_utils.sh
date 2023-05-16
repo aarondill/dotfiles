@@ -8,7 +8,7 @@
 
 set -euC -o pipefail
 
-THIS=script_utils.sh
+THIS="script_utils.sh"
 usage() {
   cat <<EOF || return 0
 $THIS [options] [--] [arguments]
@@ -38,7 +38,7 @@ function parse_args() {
   if [[ "${PIPESTATUS[0]}" -ne 4 ]]; then abort "Enhanced getopt is required for this script to work. Please install it." 1; fi
 
   local parsed
-  if parsed=$(getopt --options="$SHORTOPTS" --longoptions="$LONGOPTS" --name "${THIS-$0}" -- "$@"); then
+  if parsed="$(getopt --options="$SHORTOPTS" --longoptions="$LONGOPTS" --name "${THIS-$0}" -- "$@")"; then
     # output getopt’s output this way to handle the quoting right:
     printf '%s' "set -- $parsed"
     return 0
@@ -48,15 +48,15 @@ function parse_args() {
 }
 
 # option --long/-l requires 1 argument
-LONGOPTS=help,short,long:
-SHORTOPTS=h,s,l:
+LONGOPTS="help,short,long:"
+SHORTOPTS="h,s,l:"
 ARGSTRING="$(parse_args "$@")"
 eval "$ARGSTRING"
 
 while true; do
   case "$1" in
   -h | --help) usage && exit 0 ;;
-  -s | --short) short=true && shift ;;
+  -s | --short) short="true" && shift ;;
   -l | --long) long="$2" && shift 2 ;;
   --) shift && break ;;
   *) abort "This is a bug" 3 ;;
