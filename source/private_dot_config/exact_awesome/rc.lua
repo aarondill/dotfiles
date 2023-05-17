@@ -445,15 +445,13 @@ local function setup_wallpapers()
 			-- Go over each tab
 			for t = 1, num_tabs do
 				local tag = scr.tags[t]
-				if tag then
-					tag:connect_signal("property::selected", function(tag)
-						-- And if selected
-						if tag.selected then
-							-- Set wallpaper
-							gears.wallpaper.maximized(get_wp_path(t), s)
-						end
-					end)
-				end
+				tag:connect_signal("property::selected", function(tag)
+					-- And if selected
+					if tag.selected then
+						-- Set wallpaper
+						gears.wallpaper.maximized(get_wp_path(t), s)
+					end
+				end)
 			end
 		end
 	end
