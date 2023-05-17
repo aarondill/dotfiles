@@ -22,27 +22,6 @@ local hotkeys_popup = require("awful.hotkeys_popup")
 -- when client with a matching name is opened:
 require("awful.hotkeys_popup.keys")
 
--- Load brightness widget
-local has_brightness, brightness = pcall(require, "brightness")
-local brightness_ctrl = {}
-if has_brightness then
-	brightness_ctrl = brightness({
-		step = 3,
-		timeout = 10,
-		levels = { 1, 25, 50, 75, 100 },
-	})
-else
-	naughty.notify({
-		title = "Brightness module not found",
-		text = "Please clone https://github.com/deficient/brightness to ~/.config/awesome/brightness/",
-		timeout = 0,
-		run = function(n)
-			awful.spawn(browser .. " https://github.com/deficient/brightness")
-			n.die(naughty.notificationClosedReason.dismissedByUser)
-		end,
-	})
-end
-
 -- Load Debian menu entries
 local has_debian, debian = pcall(require, "debian.menu")
 local has_fdo, freedesktop = pcall(require, "freedesktop")
@@ -120,6 +99,53 @@ awful.layout.layouts = {
 	-- awful.layout.suit.corner.se,
 	awful.layout.suit.floating,
 }
+-- }}}
+
+-- {{{ Custom modules
+---Displays a notification, which when clicked runs run(). The notification will already be killed.
+---@param message string
+---@param title string
+---@param run (fun(notification: table):any?)?
+local function warning(title, message, run)
+	naughty.notify({
+		title = title,
+		message = message,
+		timeout = 0,
+		run = run and function(n)
+			n.die(naughty.notificationClosedReason.dismissedByUser)
+			run(n)
+		end,
+	})
+end
+
+-- Load brightness widget
+local has_brightness, brightness = pcall(require, "brightness")
+local brightness_ctrl = {}
+if has_brightness then
+	brightness_ctrl = brightness({
+		step = 3,
+		timeout = 10,
+		levels = { 1, 25, 50, 75, 100 },
+	})
+else
+	warning(
+		"Brightness module not found",
+		"Please clone https://github.com/deficient/brightness to ~/.config/awesome/brightness/",
+		function()
+			awful.spawn(browser .. " https://github.com/deficient/brightness")
+		end
+	)
+end
+local has_battery, battery = pcall(require, "battery")
+local battery_widget = nil
+if has_battery then
+	battery_widget = battery({})
+else
+	warning(
+		"Battery module not found",
+		"Please ensure the battery widget is available at ~/.config/awesome/{battery.lua,battery/init.lua}"
+	)
+end
 -- }}}
 
 -- {{{ Menu
@@ -290,7 +316,7 @@ awful.screen.connect_for_each_screen(function(s)
 			wibox.widget.systray(),
 			mytextclock,
 			s.mylayoutbox,
-			require("battery")(),
+			battery_widget or nil,
 			brightness_ctrl.widget or nil,
 		},
 	})
