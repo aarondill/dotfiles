@@ -31,6 +31,8 @@ if has_brightness then
 		timeout = 10,
 		levels = { 1, 25, 50, 75, 100 },
 	})
+else
+	naughty.notify({ title = "Brightness module not found" })
 end
 
 -- Load Debian menu entries
