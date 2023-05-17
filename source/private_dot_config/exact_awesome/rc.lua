@@ -287,10 +287,9 @@ root.buttons(gears.table.join(
 
 -- {{{ Key bindings
 local globalkeys = gears.table.join(
-	awful.key({ modkey }, ";", function()
-		awful.spawn("emoji-picker")
-	end, { description = "emoji-picker", group = "client" }),
-
+	awful.key({ modkey }, "j", function()
+		awful.client.focus.byidx(1)
+	end, { description = "focus next by index", group = "client" }),
 	awful.key({ modkey }, "s", hotkeys_popup.show_help, { description = "show help", group = "awesome" }),
 	awful.key({ modkey }, "Left", awful.tag.viewprev, { description = "view previous", group = "tag" }),
 	awful.key({ modkey }, "Right", awful.tag.viewnext, { description = "view next", group = "tag" }),
