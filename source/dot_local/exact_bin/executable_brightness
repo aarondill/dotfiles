@@ -7,7 +7,7 @@ THIS="brightness"
 usage() {
   cat <<-EOF
 usage: $THIS [OPTS]... [percent]
-Sets the brightness to the specified integer percentage.
+Sets the brightness to the specified integer percentage. Use n{+,-} to increment the brightness.
 
 without a percentage, outputs the current brightness percentage
 
@@ -57,6 +57,7 @@ while true; do
   *) abort "This is a bug" 3 ;;
   esac
 done
+show=false
 if [ "$#" -eq 0 ]; then show="true"; fi
 
 BrPath="$device"
@@ -88,20 +89,27 @@ BrCurRel="$(printf '%s ' "$BrCur" "$BrMax" | awk '{ print int( $1 / $2 * 100 ) }
 
 if [ "$show" = true ]; then
   log "$BrCurRel"
-  exit 0
+else
+  BrNewRel="${1:-}"
+  if [ -z "$BrNewRel" ]; then abort "Brightness can't be empty" 2; fi
+  suf='' BrNewRel=${1}
+  case "$BrNewRel" in
+  +* | *+) suf=+ ;;
+  -* | *-) suf=- ;;
+  esac
+  BrNewRel=${BrNewRel%-} BrNewRel=${BrNewRel#-} BrNewRel=${BrNewRel%+} BrNewRel=${BrNewRel#+} BrNewRel=${BrNewRel%\%}
+  if ! is_integer "$BrNewRel"; then abort "Invalid brightness '$BrNewRel'" 2; fi
+  case "$suf" in
+  +) BrNewRel=$((BrCurRel + BrNewRel)) ;;
+  -) BrNewRel=$((BrCurRel - BrNewRel)) ;;
+  esac
+
+  BrNew="$(printf '%s ' "$BrNewRel" "$BrMax" | awk '{ print int( ( ($1/100) * $2) ) }')"
+  BrNew="$((BrNew < BrMin ? BrMin : BrNew))"
+  BrNew="$((BrNew > BrMax ? BrMax : BrNew))"
+
+  sudo=""
+  if ! [ -w "$BrPath"/brightness ]; then sudo="sudo"; fi
+
+  printf '%s' "$BrNew" | $sudo tee "$BrPath/brightness" >/dev/null
 fi
-
-BrNewRel="${1:-}"
-if [ -z "$BrNewRel" ]; then abort "Brightness can't be empty"; fi
-if ! is_integer "$BrNewRel"; then
-  abort "Invalid brightness '$BrNewRel', brightness must be an integer between 0 and 100" 2
-fi
-
-BrNew="$(printf '%s ' "$BrNewRel" "$BrMax" | awk '{ print int( ( ($1/100) * $2) ) }')"
-BrNew="$((BrNew < BrMin ? BrMin : BrNew))"
-BrNew="$((BrNew > BrMax ? BrMax : BrNew))"
-
-sudo=""
-if ! [ -w "$BrPath"/brightness ]; then sudo="sudo"; fi
-
-printf '%s' "$BrNew" | $sudo tee "$BrPath/brightness" >/dev/null
