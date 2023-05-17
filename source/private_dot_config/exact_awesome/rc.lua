@@ -253,6 +253,7 @@ awful.screen.connect_for_each_screen(function(s)
 	-- Create the wibox
 	s.mywibox = awful.wibar({ position = "top", screen = s })
 
+	local has_brightness, brightness = pcall(require, "brightness")
 	-- Add widgets to the wibox
 	s.mywibox:setup({
 		layout = wibox.layout.align.horizontal,
@@ -270,6 +271,7 @@ awful.screen.connect_for_each_screen(function(s)
 			mytextclock,
 			s.mylayoutbox,
 			require("battery")(),
+			has_brightness or nil and brightness({}),
 		},
 	})
 end)
