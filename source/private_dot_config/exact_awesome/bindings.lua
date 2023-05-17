@@ -105,7 +105,7 @@ local globalkeys = gears.table.join(
 
 	-- Prompt
 	awful.key({ vars.modkey }, "r", function()
-		awful.screen.focused().mypromptbox:run()
+		awful.screen.focused().promptbox:run()
 	end, { description = "run prompt", group = "launcher" }),
 
 	awful.key({ vars.modkey }, "x", function()
