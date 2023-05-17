@@ -6,8 +6,7 @@ local wibox = require("wibox")
 
 -- Create a widget and update its content using the output of a shell
 -- command every 10 seconds:
----@param args table? ununsed
-local function batterybar(args)
+local function batterybar()
 	local batbar = wibox.widget({
 		{ id = "batbar", text = "bat: unknown", widget = wibox.widget.textbox },
 		layout = wibox.layout.stack,
