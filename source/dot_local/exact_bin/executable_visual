@@ -48,4 +48,4 @@ if [[ "$server" =~ $disp_regex ]]; then
 fi
 args+=("$server" "${rest[@]}")
 echo "startx ${args[*]}"
-startx "${args[@]}"
+exec startx "${args[@]}"
