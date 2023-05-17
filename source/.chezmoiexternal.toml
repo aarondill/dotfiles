@@ -1,5 +1,9 @@
-[".config/nvim"]
-    type = "git-repo"
-    url = "https://github.com/aarondill/LazyVim.git"
-    refreshPeriod = "12h"
+[".config/awesome"]
+type = "git-repo"
+url = "https://github.com/aarondill/awesome.git"
+refreshPeriod = "12h"
 
+[".config/nvim"]
+type = "git-repo"
+url = "https://github.com/aarondill/LazyVim.git"
+refreshPeriod = "12h"
