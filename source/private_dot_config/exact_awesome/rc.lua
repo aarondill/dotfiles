@@ -16,7 +16,7 @@ require("error_handling")
 
 require("theme")(nil)
 
-require("layout.wibar")
+require("layout")
 
 require("rules")
 
