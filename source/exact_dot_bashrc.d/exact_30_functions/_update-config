@@ -37,5 +37,4 @@ vscode/js/EslintTests.js
 vscode/Java/java-format.xml
 .local/share/man/man1
 .config/pnpm/rc
-.config/awesome
 .config/protonvpn
