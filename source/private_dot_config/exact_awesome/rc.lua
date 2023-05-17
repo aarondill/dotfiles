@@ -22,6 +22,17 @@ local hotkeys_popup = require("awful.hotkeys_popup")
 -- when client with a matching name is opened:
 require("awful.hotkeys_popup.keys")
 
+-- Load brightness widget
+local has_brightness, brightness = pcall(require, "brightness")
+local brightness_ctrl = {}
+if has_brightness then
+	brightness_ctrl = brightness({
+		step = 3,
+		timeout = 10,
+		levels = { 1, 25, 50, 75, 100 },
+	})
+end
+
 -- Load Debian menu entries
 local has_debian, debian = pcall(require, "debian.menu")
 local has_fdo, freedesktop = pcall(require, "freedesktop")
@@ -252,16 +263,6 @@ awful.screen.connect_for_each_screen(function(s)
 
 	-- Create the wibox
 	s.mywibox = awful.wibar({ position = "top", screen = s })
-
-	local has_brightness, brightness = pcall(require, "brightness")
-	local brightness_ctrl = {}
-	if has_brightness then
-		brightness_ctrl = brightness({
-			step = 3,
-			timeout = 10,
-			levels = { 1, 25, 50, 75, 100 },
-		})
-	end
 	-- Add widgets to the wibox
 	s.mywibox:setup({
 		layout = wibox.layout.align.horizontal,
@@ -279,7 +280,7 @@ awful.screen.connect_for_each_screen(function(s)
 			mytextclock,
 			s.mylayoutbox,
 			require("battery")(),
-			brightness_ctrl.widget,
+			brightness_ctrl.widget or nil,
 		},
 	})
 end)
