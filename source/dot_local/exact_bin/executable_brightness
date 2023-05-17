@@ -8,8 +8,8 @@ usage() {
   cat <<-EOF
 usage: $THIS [OPTS]... [percent]
 Sets the brightness to the specified integer percentage. Use n{+,-} to increment the brightness.
-
-without a percentage, outputs the current brightness percentage
+Without a percentage, outputs the current brightness percentage
+NOTE: 1 is the minimum brightness, while 100 is the maximum brightness
 
 Options:
   -h, --help         Show this help message.
