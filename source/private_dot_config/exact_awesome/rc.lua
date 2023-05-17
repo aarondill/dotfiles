@@ -118,7 +118,7 @@ local function warning(title, message, run)
 end
 
 -- Load brightness widget
-local has_brightness, brightness = pcall(require, "brightness")
+local has_brightness, brightness = pcall(require, "widget.brightness")
 local brightness_ctrl = {}
 if has_brightness then
 	brightness_ctrl = brightness({
@@ -135,7 +135,7 @@ else
 		end
 	)
 end
-local has_battery, battery = pcall(require, "battery")
+local has_battery, battery = pcall(require, "widget.battery")
 local battery_widget = nil
 if has_battery then
 	battery_widget = battery({})
