@@ -271,7 +271,7 @@ awful.screen.connect_for_each_screen(function(s)
 			mytextclock,
 			s.mylayoutbox,
 			require("battery")(),
-			has_brightness or nil and brightness({}),
+			(has_brightness or nil) and brightness({}),
 		},
 	})
 end)
