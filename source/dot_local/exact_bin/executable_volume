@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+
+set -euC -o pipefail
+
+THIS="volume"
+sink='@DEFAULT_SINK@'
+
+usage() {
+  cat <<-EOF
+usage: $THIS [OPTS]... [PERCENT|'mute']
+Sets the volume to the specified PERCENT. Use n{+,-} to incremenet the volume.
+Call with no positional arguments to output the current volume.
+
+Options:
+  -h, --help        Show this help message.
+  -m, --mute        Toggle mute on the device
+  -s, --sink=sink   pactl sink to set the volume on (default: $sink)
+EOF
+}
+
+log() { printf '%s\n' "$@"; }
+err() { printf "$THIS: %s\n" "$@" >&2; }
+abort() { err "$1" && exit "${2:-1}"; }
+
+# Returns a string that should be 'eval'ed to set the positional arguments
+# Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
+# Input: $LONGOPTS,$SHORTOPTS
+# eval "$(parse_args "$@")"
+function parse_args() {
+  # -allow a command to fail with !’s side effect on errexit
+  # -use return value from ${PIPESTATUS[0]}, because ! hosed $?
+  # shellcheck disable=SC2251
+  ! getopt --test >/dev/null
+  if [[ "${PIPESTATUS[0]}" -ne 4 ]]; then abort "Enhanced getopt is required for this script to work. Please install it." 1; fi
+
+  local parsed
+  if parsed="$(getopt --options="$SHORTOPTS" --longoptions="$LONGOPTS" --name "${THIS-$0}" -- "$@")"; then
+    # output getopt’s output this way to handle the quoting right:
+    printf '%s' "set -- $parsed"
+    return 0
+  fi
+  # getopt has already complained about wrong arguments to stdout - Exit script
+  exit 2
+}
+
+LONGOPTS="help,sink:,mute" SHORTOPTS="h,s:,m"
+ARGSTRING="$(parse_args "$@")"
+eval "$ARGSTRING"
+
+mute='false'
+while true; do
+  case "$1" in
+  --help | -h) usage && exit 0 ;;
+  -s | --sink) sink="$2" && shift 2 ;;
+  -m | --mute) mute="true" && shift ;;
+  --) shift && break ;;
+  *) abort "This is a bug" 3 ;;
+  esac
+done
+
+if [ "${1:-}" = "mute" ] || [ "${1:-}" = "m" ]; then mute="true"; fi
+
+if [ "$mute" = true ]; then
+  pactl set-sink-mute "$sink" toggle
+elif [ "$#" -eq 0 ]; then
+  pactl get-sink-volume "$sink"
+else
+  suf='' vol=${1}
+  case "$vol" in
+  +* | *+) suf=+ ;;
+  -* | *-) suf=- ;;
+  esac
+  # all valid: 20-, -20, 20+, +20, +20%, 20%+, 20%
+  vol=${vol%-} vol=${vol#-} vol=${vol%+} vol=${vol#+} vol=${vol%\%}
+  pactl set-sink-volume "$sink" "$suf$vol%"
+  pactl set-sink-mute "$sink" false # user experience! :)
+fi
