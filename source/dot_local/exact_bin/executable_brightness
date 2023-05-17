@@ -7,15 +7,12 @@ THIS="brightness"
 usage() {
   cat <<-EOF
 usage: $THIS [OPTS]... [percent]
-       $THIS [OPTS]... [-s | show]
 Sets the brightness to the specified integer percentage.
 
-In the first form, sets the brightness to the given percentage.
-In the second form, outputs the current brightness percentage to stdout.
+without a percentage, outputs the current brightness percentage
 
 Options:
   -h, --help         Show this help message.
-  -s, --show         output the current brightness percentage.
   -d, --device=dev   the /sys style device to set the brightness on. \$device/brightness will be writen to!
 EOF
 }
@@ -47,8 +44,7 @@ function parse_args() {
   exit 2
 }
 
-show="false"
-LONGOPTS="help,show,device:" SHORTOPTS="h,s,d:"
+LONGOPTS="help,device:" SHORTOPTS="h,d:"
 ARGSTRING="$(parse_args "$@")"
 eval "$ARGSTRING"
 
@@ -56,13 +52,12 @@ device=''
 while true; do
   case "$1" in
   --help | -h) usage && exit 0 ;;
-  -s | --show) show="true" && shift ;;
   -d | --device) device="$2" && shift 2 ;;
   --) shift && break ;;
   *) abort "This is a bug" 3 ;;
   esac
 done
-if [ "${1:-}" = "show" ] || [ "$#" -eq 0 ]; then show="true"; fi
+if [ "$#" -eq 0 ]; then show="true"; fi
 
 BrPath="$device"
 if [ -z "$BrPath" ]; then
