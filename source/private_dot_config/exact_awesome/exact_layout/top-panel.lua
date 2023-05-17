@@ -75,6 +75,7 @@ local function TopPanel(s)
 
 	-- Create a promptbox for each screen
 	local promptbox = awful.widget.prompt()
+	s.promptbox = promptbox
 	-- Create an imagebox widget which will contain an icon indicating which layout we're using.
 	-- We need one layoutbox per screen.
 	local layoutbox = awful.widget.layoutbox(s)
