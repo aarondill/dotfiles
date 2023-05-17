@@ -61,7 +61,7 @@ end
 beautiful.init(gears.filesystem.get_themes_dir() .. "default/theme.lua")
 -- local themeName = "amazing"
 -- beautiful.init(gears.filesystem.get_configuration_dir() .. "/themes/" .. themeName .. "/theme.lua")
-beautiful.useless_gap = 2
+beautiful.useless_gap = 3
 beautiful.gap_single_client = true
 
 -- {{{ Variable definitions
