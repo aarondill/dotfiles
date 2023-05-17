@@ -70,7 +70,7 @@ beautiful.outer_gaps = 8
 -- This is used later as the default terminal and editor to run.
 local terminal = "wezterm"
 local editor = os.getenv("EDITOR") or "nvim"
-local browser = os.getenv("BROWSER") or "firefox"
+local browser = os.getenv("BROWSER") or "sensible-browser"
 local editor_cmd = terminal .. " -e " .. editor
 
 -- Default modkey.
