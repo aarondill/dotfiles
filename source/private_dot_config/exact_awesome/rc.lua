@@ -123,7 +123,7 @@ local has_brightness, brightness = pcall(require, "brightness")
 local brightness_ctrl = {}
 if has_brightness then
 	brightness_ctrl = brightness({
-		step = 3,
+		step = 5,
 		timeout = 10,
 		levels = { 1, 25, 50, 75, 100 },
 	})
