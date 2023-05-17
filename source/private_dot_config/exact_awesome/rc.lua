@@ -109,7 +109,7 @@ awful.layout.layouts = {
 local function warning(title, message, run)
 	naughty.notify({
 		title = title,
-		message = message,
+		text = message,
 		timeout = 0,
 		run = run and function(n)
 			n.die(naughty.notificationClosedReason.dismissedByUser)
