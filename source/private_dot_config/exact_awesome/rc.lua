@@ -627,7 +627,7 @@ local function setup_wallpapers()
 	end
 
 	local function get_wp_path(num)
-		local wp = string.format("%s/%d.jpg", path, num)
+		local wp = string.format("%s/%s.jpg", path, tostring(num))
 		if gears.filesystem.file_readable(wp) then
 			return wp
 		else
