@@ -32,7 +32,15 @@ if has_brightness then
 		levels = { 1, 25, 50, 75, 100 },
 	})
 else
-	naughty.notify({ title = "Brightness module not found" })
+	naughty.notify({
+		title = "Brightness module not found",
+		text = "Please clone https://github.com/deficient/brightness to ~/.config/awesome/brightness/",
+		timeout = 0,
+		run = function(n)
+			awful.spawn(browser .. " https://github.com/deficient/brightness")
+			n.die(naughty.notificationClosedReason.dismissedByUser)
+		end,
+	})
 end
 
 -- Load Debian menu entries
@@ -83,6 +91,7 @@ beautiful.outer_gaps = 8
 -- This is used later as the default terminal and editor to run.
 local terminal = "wezterm"
 local editor = os.getenv("EDITOR") or "nvim"
+local browser = os.getenv("BROWSER") or "firefox"
 local editor_cmd = terminal .. " -e " .. editor
 
 -- Default modkey.
