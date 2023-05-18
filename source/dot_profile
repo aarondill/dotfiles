@@ -38,6 +38,7 @@ export HISTFILE="$HISTDIR/history"
 export WGETRC="$XDG_CONFIG_HOME/wgetrc"
 export ASPELL_CONF="per-conf $XDG_CONFIG_HOME/aspell/aspell.conf; personal $XDG_CONFIG_HOME/aspell/en.pws; repl $XDG_CONFIG_HOME/aspell/en.prepl"
 export TS_NODE_HISTORY="$XDG_STATE_HOME"/node/ts_node_repl_history
+export GTK2_RC_FILES="$XDG_CONFIG_HOME/gtk-2.0/gtkrc"
 
 #ibus
 # export GTK_IM_MODULE="xim" #Fix for Chrome
