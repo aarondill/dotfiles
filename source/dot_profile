@@ -39,6 +39,11 @@ export WGETRC="$XDG_CONFIG_HOME/wgetrc"
 export ASPELL_CONF="per-conf $XDG_CONFIG_HOME/aspell/aspell.conf; personal $XDG_CONFIG_HOME/aspell/en.pws; repl $XDG_CONFIG_HOME/aspell/en.prepl"
 export TS_NODE_HISTORY="$XDG_STATE_HOME"/node/ts_node_repl_history
 
+#ibus
+export GTK_IM_MODULE="xim" #Fix for Chrome
+export QT_IM_MODULE="xim"  #Not sure if this works or not, but whatever
+export XMODIFIERS="@im=ibus"
+
 # Also set in .bashrc
 # set PATH so it includes user's private bin if it exists
 prepend_path "$HOME/bin"
