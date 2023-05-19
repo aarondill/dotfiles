@@ -76,7 +76,7 @@ function cproot() {
     if [[ -e "$file" ]]; then
       local old_path new_dir new_path
       old_path="$(realpath -s -- "$file")"
-      new_path="$HOME/.root$old_path"
+      new_path="$HOME/.root/$old_path"
       new_dir="$(dirname -- "$new_path")"
       # ensure destination exists
       mkdir -p -- "$new_dir"
@@ -85,6 +85,7 @@ function cproot() {
       sudo chown --preserve-root -hR -- "$(whoami)" "$new_path"
       # add to the array so i can update all at once
       files+=("$new_path")
+      echo "$new_path"
     else
       printf '%s is not a file\n' "$file"
       # Exit 1 at end if any args were invalid
