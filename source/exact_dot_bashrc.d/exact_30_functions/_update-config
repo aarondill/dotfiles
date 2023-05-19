@@ -39,3 +39,4 @@ vscode/Java/java-format.xml
 .config/pnpm/rc
 .config/protonvpn
 .config/gtk-2.0/gtkrc
+.config/gtk-2.0
