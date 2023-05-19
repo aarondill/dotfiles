@@ -1,7 +1,0 @@
-#!/bin/sh
-# This file provides an easy way to add custom menu entries.
-cat <<-EOF
-menuentry "Shut Down" {
-  halt
-}
-EOF
