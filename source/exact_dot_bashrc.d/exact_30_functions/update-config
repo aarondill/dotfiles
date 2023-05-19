@@ -93,6 +93,7 @@ function cproot() {
     fi
   done
   # Add all files to chezmoi repo
+  printf '"%s" ' chezmoi add --exact "${opts[@]}" -- "${files[@]}"
   chezmoi add --exact "${opts[@]}" -- "${files[@]}"
 
   # Exit with the saved code
