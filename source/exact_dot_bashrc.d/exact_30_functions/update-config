@@ -59,7 +59,7 @@ function update-config() (
 )
 
 # Copies the files to $HOME/.root/FILEPATH. `.root` should be backed up
-function cproot() {
+function cproot() (
   declare -i exitCode=0
   declare -a opts args
   opts=()
@@ -84,7 +84,7 @@ function cproot() {
       sudo cp -rf -T -- "$file" "$new_path"
       sudo chown --preserve-root -hR -- "$(whoami)" "$new_path"
       # add to the array so i can update all at once
-      files+=("$new_path")
+      files+=("$(realpath --relative-to="$HOME" -- "$new_path")")
       echo "$new_path"
     else
       printf '%s is not a file\n' "$file"
@@ -94,11 +94,12 @@ function cproot() {
   done
   # Add all files to chezmoi repo
   printf '"%s" ' chezmoi add --exact "${opts[@]}" -- "${files[@]}"
+  cd "$HOME"
   chezmoi add --exact "${opts[@]}" -- "${files[@]}"
 
   # Exit with the saved code
   return $exitCode
-}
+)
 
 function update-root-config() {
   local files rootpath homepath dotroot encrypted_files add_files
