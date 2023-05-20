@@ -61,44 +61,26 @@ function update-config() (
 # Copies the files to $HOME/.root/FILEPATH. `.root` should be backed up
 function cproot() (
   declare -i exitCode=0
-  declare -a opts args
-  opts=()
-  args=()
-  for arg; do
-    if [[ "$arg" == --?* ]]; then
-      opts+=("$arg")
-    else
-      args+=("$arg")
-    fi
-  done
-  files=()
-  for file in "${args[@]}"; do
-    if [[ -e "$file" ]]; then
-      local old_path new_dir new_path
-      old_path="$(realpath -s -- "$file")"
-      new_path="$HOME/.root/$old_path"
-      new_dir="$(dirname -- "$new_path")"
-      # ensure destination exists
-      mkdir -p -- "$new_dir"
-      # cp to home, so files are relative to home.
-      sudo cp -rf -T -- "$file" "$new_path"
-      sudo chown --preserve-root -hR -- "$(whoami)" "$new_path"
-      # add to the array so i can update all at once
-      files+=("$(realpath --relative-to="$HOME" -- "$new_path")")
-      echo "$new_path"
-    else
-      printf '%s is not a file\n' "$file"
+  for file in "$@"; do
+    if ! [ -e "$file" ]; then
+      printf '%s is not a file\n' "$file" >&2
       # Exit 1 at end if any args were invalid
-      exitCode=1
+      exitCode=1 && continue
     fi
+    local old_path new_dir new_path
+    old_path="$(realpath -s -- "$file")"
+    new_path="$HOME/.root/${old_path#/}"
+    new_dir="$(dirname -- "$new_path")"
+    # ensure destination exists
+    mkdir -p -- "$new_dir"
+    # cp to home, so files are relative to home.
+    sudo cp -rf -T -- "$file" "$new_path"
+    sudo chown --preserve-root -hR -- "$(whoami)" "$new_path"
+    echo "$new_path"
   done
-  # Add all files to chezmoi repo
-  printf '"%s" ' chezmoi add --exact "${opts[@]}" -- "${files[@]}"
-  cd "$HOME"
-  chezmoi add --exact "${opts[@]}" -- "${files[@]}"
 
   # Exit with the saved code
-  return $exitCode
+  return "$exitCode"
 )
 
 function update-root-config() {
