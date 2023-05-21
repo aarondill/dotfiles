@@ -8,9 +8,9 @@
 GRUB_DEFAULT="saved"
 GRUB_SAVEDEFAULT="true"
 
-# Make grub hidden, but wait 5 seconds for shift key
+# Make grub hidden, but wait 2 seconds for shift key
 GRUB_TIMEOUT_STYLE="countdown"
-GRUB_TIMEOUT="5"
+GRUB_TIMEOUT="2"
 
 # Uncomment to display grub menu on startup
 # GRUB_TIMEOUT_STYLE=menu
