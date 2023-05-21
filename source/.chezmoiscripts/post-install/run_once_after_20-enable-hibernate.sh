@@ -37,7 +37,11 @@ BIG_SWAP_LABEL=$(blkid -s LABEL -o value "$BIG_SWAP_PATH" 2>/dev/null || printf 
 confirm "Would you like to use $BIG_SWAP_PATH ($BIG_SWAP_LABEL) as your swap to resume from? $WARNING" || abort0 'Aborting'
 
 BIG_SWAP_UUID="$(blkid -o value -s UUID "$BIG_SWAP_PATH")"
-printf 'RESUME=UUID=%s\n' "$BIG_SWAP_UUID" | sudo tee "$INITRAMFS_RESUME_FILE" >/dev/null
+
+# Setup initramfs resume file
+cat <<EOF | sudo tee "$INITRAMFS_RESUME_FILE" >/dev/null
+RESUME=UUID=$BIG_SWAP_UUID
+EOF
 
 # Setup grub config file
 cat <<EOF | sudo tee "$GRUB_RESUME_FILE" >/dev/null
@@ -45,6 +49,8 @@ cat <<EOF | sudo tee "$GRUB_RESUME_FILE" >/dev/null
 # MAKE SURE this matches your swap partition's UUID
 GRUB_CMDLINE_LINUX_DEFAULT="\$GRUB_CMDLINE_LINUX_DEFAULT resume=UUID='$BIG_SWAP_UUID'"
 EOF
-log "Run these commands to use the changes: " "'update-initramfs -u -k all'" "'update-grub'"
 
 success
+log "Run these commands to use the changes:" "'update-initramfs -u -k all'" "'update-grub'" "Press any key to continue."
+# Make sure the user reads this!
+read -r -s -n1 || true
