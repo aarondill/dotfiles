@@ -11,12 +11,20 @@ if run without arguments, x-window-manager will be used
 server will be found in the \$PATH. 
 if \$2 is not a valid server and a client is provided,
 the arguments will be passed directly to the startx script
+if \$1 is exactly '--supress-power' then a script will be
+run using systemd to suppress power button handling until
+the client exits
 EOF
 }
 
 log() { printf '%s\n' "$@"; }
 err() { printf "${THIS:}: %s\n" "$@" >&2; }
 abort() { err "$1" && exit "${2:-1}"; }
+
+inhibit=0
+if [ "${1:-}" = "--supress-power" ]; then
+  inhibit=1; shift;
+fi
 
 for arg in "$@"; do
   case "$arg" in
@@ -47,5 +55,15 @@ if [[ "$server" =~ $disp_regex ]]; then
   args+=(--)
 fi
 args+=("$server" "${rest[@]}")
-echo "startx ${args[*]}"
-exec startx "${args[@]}"
+
+cmd=()
+if [ "$inhibit" = 1 ];then
+  cmd=(systemd-inhibit 
+        --what="handle-power-key" 
+        --who="shutdown-button-inhibit script" 
+        --why="allows i3 to open shutdown-dialog instead" 
+        startx "${args[@]}")
+fi
+cmd=("${cmd[@]}" startx "${args[@]}")
+printf '%s ' exec "${cmd[@]}"
+exec "${cmd[@]}"
