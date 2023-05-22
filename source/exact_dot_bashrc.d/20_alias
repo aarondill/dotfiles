@@ -130,6 +130,11 @@ unset IBus
 # Don't you DARE open a window
 if command -v emacs &>/dev/null; then alias emacs='emacs -nw'; fi
 
+if command -v awesome-client &>/dev/null; then
+  # Save history to ~/.cache/awesome
+  alias awesome-client='RLWRAP_HOME="$HOME/.cache/awesome" awesome-client'
+fi
+
 # Allow nvchad if it's installed
 if [ -d "${NVCHAD_CONFIG:-"${XDG_CONFIG_HOME:-$HOME/.config}/NvChad"}" ]; then
   alias nvchad='NVIM_APPNAME=NvChad nvim'
