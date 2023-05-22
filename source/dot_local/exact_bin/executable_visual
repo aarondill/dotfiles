@@ -62,7 +62,7 @@ if [ "$inhibit" = 1 ]; then
   cmd=(systemd-inhibit
     --what="handle-power-key"
     --who="shutdown-button-inhibit script"
-    --why="allows i3 to open shutdown-dialog instead"
+    --why="allows script to manage power keys"
     startx "${args[@]}")
 fi
 cmd=("${cmd[@]}" startx "${args[@]}")
