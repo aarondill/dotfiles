@@ -1,12 +1,12 @@
 #!/bin/sh
 set -euC
 revert() {
-  xset dpms 0 0 0
+  xset dpms 0 0 0 || true
 }
 trap revert HUP INT TERM
 # every 5 seconds
-xset +dpms dpms 5 5 5
+xset +dpms dpms 5 5 5 || true
 # force off the first time
-sleep .5 && xset dpms force off &
+sleep .5 && xset dpms force off || true &
 i3lock -n -e -c 000000
 revert
