@@ -24,7 +24,7 @@ alias la="ls -A"
 alias ll="ls -hl"
 alias lla="ls -Ahl"
 alias cl='clear'
-if command -v tty-clock &>/dev/null; then alias clock='tty-clock  -sScbtrnC3'; fi
+if command -v tty-clock &>/dev/null; then alias clock='tty-clock  -sScbtr'; fi
 # show hidden
 if command -v tree &>/dev/null; then alias tree='tree -a'; fi
 
