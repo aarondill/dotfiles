@@ -19,7 +19,6 @@ alias cp="cp -ai"
 alias backup="~/.backup/dobackup"
 alias lastbackup="/usr/bin/cat ~/.backup/backup-time"
 alias browser="sensible-browser"
-export BROWSER="sensible-browser"
 alias fslite="browser fslite.vercel.app 2>/dev/null"
 alias la="ls -A"
 alias ll="ls -hl"
@@ -37,6 +36,7 @@ if command -v google-chrome &>/dev/null; then
   {
     alias google-chrome="$chrome"
     alias chrome="$chrome"
+    export BROWSER="$chrome"
   }
   unset chrome
 fi
