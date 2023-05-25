@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
-if [ -z "$DISPLAY" ] && [ -t 1 ]; then
+if [ -z "$DISPLAY" ] && [ -t 1 ] && [ "$TERM" = "Linux" ]; then
   isotope.dark 2>/dev/null || true
 fi
