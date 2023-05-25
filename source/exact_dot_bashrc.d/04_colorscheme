@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
-if [ -z "$DISPLAY" ] && [ -t 1 ] && [ "${TERM,,}" = "linux" ]; then
+if [ -t 1 ] && [ "${TERM,,}" = "linux" ]; then
   isotope.dark || true
 fi
