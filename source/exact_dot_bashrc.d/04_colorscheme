@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
-if [ -z "$DISPLAY" ]; then
-isotope.dark
+if [ -z "$DISPLAY" ] && [ -t 1 ]; then
+  isotope.dark 2>/dev/null || true
 fi
