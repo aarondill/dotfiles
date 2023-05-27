@@ -1,12 +1,9 @@
 #!/usr/bin/env bash
 set -euC
 optional() { "$@" || true; }
-old=()
-read -ar -d ' ' old < <(xset q | grep DPMS -A 1 | awk '/Standby/{print $2 " " $4 " " $6}')
 revert() {
   optional xset dpms force on
-  optional xset dpms "${old[@]}"
-  echo "${old[@]}"
+  optional xset dpms 0 0 0
 }
 trap revert HUP INT TERM EXIT
 # every 5 seconds
