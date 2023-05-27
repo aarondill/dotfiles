@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
 if [ -t 1 ] && [ "${TERM,,}" = "linux" ]; then
   isotope.dark || true
+  printf 'control keycode 105 = Meta_b\ncontrol keycode 106 = Meta_f\n' | loadkeys -
 fi
