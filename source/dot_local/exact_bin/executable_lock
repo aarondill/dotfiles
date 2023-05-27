@@ -2,7 +2,7 @@
 set -euC
 optional() { "$@" || true; }
 old=()
-read -ar old < <(xset q | grep DPMS -A 1 | awk '/Standby/{print $2 " " $4 " " $6}')
+read -ar -d ' ' old < <(xset q | grep DPMS -A 1 | awk '/Standby/{print $2 " " $4 " " $6}')
 revert() {
   optional xset dpms force on
   optional xset dpms "${old[@]}"
