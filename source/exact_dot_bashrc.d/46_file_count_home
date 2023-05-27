@@ -7,5 +7,5 @@
 #
 if [ "$SHLVL" -gt "1" ]; then return 0; fi
 if command -v file-count &>/dev/null; then
-  printf '%d files found in %s' "$(file-count "$HOME")" "$HOME"
+  printf '%s\n' "$(file-count "$HOME") files found in $HOME"
 fi
