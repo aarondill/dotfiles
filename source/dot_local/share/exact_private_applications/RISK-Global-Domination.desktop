@@ -1,8 +1,8 @@
 [Desktop Entry]
 Name=RISK: Global Domination
 Comment=Play this game on Steam
-TryExec=~/.local/bin/steam
-Exec=~/.local/bin/steam steam://rungameid/1128810
+TryExec=$HOME/.local/bin/steam
+Exec=$HOME/.local/bin/steam steam://rungameid/1128810
 Icon=steam_icon_1128810
 Terminal=false
 Type=Application
