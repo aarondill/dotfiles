@@ -10,6 +10,7 @@ GenericName[es]=Navegador web
 # Gnome and KDE 3 uses Comment.
 Comment=Access the Internet
 Comment[es]=Accede a Internet.
+TryExec=/usr/bin/google-chrome-stable
 # Override to force dark mode
 Exec=/usr/bin/google-chrome-stable --password-store=basic --enable-features=WebUIDarkMode --force-dark-mode %U
 StartupNotify=true

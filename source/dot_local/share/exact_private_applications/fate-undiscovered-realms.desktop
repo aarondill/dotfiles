@@ -1,8 +1,8 @@
 [Desktop Entry]
 Name=FATE: Undiscovered Realms
 Comment=Play this game on Steam
-TryExec=flatpak
-Exec=flatpak run com.valveSoftware.Steam steam://rungameid/276890
+TryExec=steam
+Exec=steam steam://rungameid/276890
 Icon=steam_icon_276890
 Terminal=false
 Type=Application

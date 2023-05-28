@@ -3,8 +3,8 @@
 [Desktop Entry]
 Name=Fate (Original)
 Comment=Open Fate in Steam
-TryExec=flatpak
-Exec=flatpak run com.valvesoftware.Steam steam://rungameid/246840
+TryExec=steam
+Exec=steam steam://rungameid/246840
 Icon=/home/aaron/.var/app/com.valvesoftware.Steam/.local/share/Steam/steamapps/common/FATE/fate.ico
 Terminal=false
 Type=Application

@@ -4,6 +4,7 @@
 [Desktop Entry]
 Name=Gedit Text Editor
 Comment=Edit text files
+TryExec=gedit
 Exec=gedit %U
 Terminal=false
 Type=Application
