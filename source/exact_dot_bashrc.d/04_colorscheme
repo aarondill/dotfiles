@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-if [ -t 1 ] && [ "${TERM,,}" = "linux" ]; then
-  isotope.dark || true
-fi
