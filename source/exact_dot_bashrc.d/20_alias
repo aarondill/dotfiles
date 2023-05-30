@@ -9,7 +9,7 @@
 alias quit='exit'
 alias :q='exit'
 # Alias sudo to call sudo with *my* $HOME/ENV/PATH
-alias sudo="sudo -HE env PATH=\"\$PATH\" "
+alias sudo="sudo -E env PATH=\"\$PATH\" "
 # Unrestrict fd by default
 alias fd="fd -u"
 # Ask before overwriting
