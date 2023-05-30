@@ -24,3 +24,5 @@ rm -rf ~/.pki ~/.dotnet/ 2>/dev/null
 rm -rf ~/.mozilla 2>/dev/null
 # RM the hplip files
 rm -rf ~/.hplip 2>/dev/null
+# RM the dbus files
+rm -rf ~/.dbus 2>/dev/null
