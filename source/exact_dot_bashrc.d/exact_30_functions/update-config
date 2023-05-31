@@ -74,7 +74,7 @@ function cproot() (
     # ensure destination exists
     mkdir -p -- "$new_dir"
     # cp to home, so files are relative to home.
-    sudo cp -rf -T -- "$file" "$new_path"
+    sudo "cp" -rf -T -- "$file" "$new_path"
     sudo chown --preserve-root -hR -- "$(whoami)" "$new_path"
     echo "$new_path"
   done
@@ -96,7 +96,7 @@ function update-root-config() {
       continue
     fi
     # Doesn't need to be recursive bc is only files, not dirs.
-    sudo cp -f -T -- "$rootpath" "$homepath"
+    sudo "cp" -f -T -- "$rootpath" "$homepath"
     sudo chown --preserve-root -h -- "$(whoami)" "$homepath"
 
     #  Fails if not encrypted
