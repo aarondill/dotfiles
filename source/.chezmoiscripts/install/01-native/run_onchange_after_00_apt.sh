@@ -75,8 +75,7 @@ log_and_run 'Updating sources' sudo "$APT" update
 log_and_run 'Installing packages' install_packages
 log_and_run 'Installing graphical packages' install_graphical_packages
 # Gnome comes with it, but I don't want it.
-# Replace the existing cheese package with the flatpak package
-remove_if_installed gnome-characters cheese
+remove_if_installed gnome-characters
 # Install vim symlink to nvim
 if command -v nvim &>/dev/null; then
   if ! [ "$(basename -- "$(update-alternatives --query vim | grep 'Value: /.\+' | cut -d' ' -f2-)")" = nvim ]; then

@@ -82,7 +82,6 @@ log_and_run 'Updating sources/packages' sudo "$PACMAN" -Syu
 log_and_run 'Installing packages' install_packages
 log_and_run 'Installing graphical packages' install_graphical_packages
 # Gnome comes with it, but I don't want it.
-# Replace the existing cheese package with the flatpak package
-remove_if_installed gnome-characters cheese
+remove_if_installed gnome-characters
 # Install vim symlink to nvim - throws is /usr/bin/vim is defined.
 if ! [ -f /usr/bin/vim ] && which nvim &>/dev/null; then sudo ln -s -T "$(which nvim)" /usr/bin/vim; fi
