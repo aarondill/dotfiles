@@ -5,3 +5,6 @@
 # Stores environment variables which don't fit into
 # other catagories
 #
+
+# Case *in*sensitive
+export LESS="-I"
