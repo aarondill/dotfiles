@@ -49,7 +49,7 @@ log "Last chance to safely stop overwrite of root. Press ctrl-c to cancel."
 # On ctrl-c, previous trap will occur, removing temporary file. backup will remain, but not a problem.
 secs=$((5))
 while [ $secs -gt 0 ]; do
-  echo -ne "$secs\033[0K\r"
+  printf "%s\033[0K\r" "$secs"
   sleep 1
   secs=$((secs - 1))
 done
