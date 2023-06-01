@@ -56,7 +56,7 @@ install_from_make() {
     ./configure "${CONFIGURE_ARGS[@]}"
     make "${MAKE_ARGS[@]}"
     # Install the updated application
-    make "${MAKE_ARGS[@]}" install
+    sudo make "${MAKE_ARGS[@]}" install
   )
 
   # cleanup
