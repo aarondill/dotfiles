@@ -12,7 +12,10 @@ ROOTBACKUP="$HOME/.root"
 TARDESTFILE="$(mktemp)"
 trap 'rm -f "$TARDESTFILE"' EXIT
 
-confirm 'Would you like to update / with the contents of %s?' "$ROOTBACKUP" || abort0 "Aborting"
+confirm_message="yes, I would"
+printf "%s" "Would you like to update / with the contents of $ROOTBACKUP? (type '$confirm_message' to confirm) "
+read -re confirmation </dev/tty
+if ! [ "$confirmation" = "$confirm_message" ]; then abort0 "Aborting"; fi
 
 # Find safe backup directory
 BACKUPDIR_ROOT="/backup"
