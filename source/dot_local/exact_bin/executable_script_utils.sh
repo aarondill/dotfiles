@@ -23,7 +23,7 @@ EOF
 }
 
 log() { printf '%s\n' "$@"; }
-err() { printf "${THIS:}: %s\n" "$@" >&2; }
+err() { printf "${THIS:+$THIS: }%s\n" "$@" >&2; }
 abort() { err "$1" && exit "${2:-1}"; }
 
 # Returns a string that should be 'eval'ed to set the positional arguments
