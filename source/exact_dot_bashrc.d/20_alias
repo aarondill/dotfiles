@@ -15,6 +15,12 @@ alias fd="fd -u"
 # Ask before overwriting
 alias mv="mv -i"
 alias cp="cp -ai"
+alias rm="rm -i --preserve-root"
+# Save history on exit
+alias poweroff="exit & poweroff"
+alias reboot="exit & reboot"
+alias halt="exit & halt"
+alias shutdown="exit & shutdown"
 
 alias backup="~/.backup/dobackup"
 alias lastbackup="/usr/bin/cat ~/.backup/backup-time"
