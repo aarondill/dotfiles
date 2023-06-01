@@ -31,7 +31,7 @@ install_from_make() {
     fi
   elif [ -n "$PACMAN" ]; then
     if [ "${#ARCH_DEPS[@]}" -gt 0 ]; then
-      sudo "$PACMAN" -S "${ARCH_DEPS[@]}"
+      sudo "$PACMAN" -S --needed -- "${ARCH_DEPS[@]}"
     fi
   else
     err "Unable to install dependencies to build '$REPO_URL'"

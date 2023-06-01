@@ -50,7 +50,7 @@ if ! is_accessible_cmd wget; then
   if [ -n "$APT" ]; then
     sudo "$APT" install wget
   elif [ -n "$PACMAN" ]; then
-    sudo "$PACMAN" -S wget
+    sudo "$PACMAN" -S --needed -- wget
   else
     abort "wget is required to install n. Please install it and try again." 1
   fi
