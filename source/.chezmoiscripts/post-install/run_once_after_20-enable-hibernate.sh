@@ -7,6 +7,7 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
 GRUB_RESUME_FILE=/etc/default/grub.d/resume.cfg
+# Empty if initramfs-tools is not installed
 INITRAMFS_RESUME_FILE=/etc/initramfs-tools/conf.d/resume
 
 if ! [ -d "$(dirname -- "$INITRAMFS_RESUME_FILE")" ]; then INITRAMFS_RESUME_FILE=''; fi
@@ -39,9 +40,11 @@ confirm "Would you like to use $BIG_SWAP_PATH ($BIG_SWAP_LABEL) as your swap to 
 BIG_SWAP_UUID="$(blkid -o value -s UUID "$BIG_SWAP_PATH")"
 
 # Setup initramfs resume file
-cat <<EOF | sudo tee "$INITRAMFS_RESUME_FILE" >/dev/null
+if [ -n "$INITRAMFS_RESUME_FILE" ]; then
+  cat <<EOF | sudo tee "$INITRAMFS_RESUME_FILE" >/dev/null
 RESUME=UUID=$BIG_SWAP_UUID
 EOF
+fi
 
 # Setup grub config file
 cat <<EOF | sudo tee "$GRUB_RESUME_FILE" >/dev/null
