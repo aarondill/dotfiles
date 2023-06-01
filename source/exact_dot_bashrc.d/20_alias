@@ -101,7 +101,7 @@ if command -v pnpm &>/dev/null; then alias pnpx='pnpm dlx'; fi
 
 # If tealdeer is installed set alias for tldr
 if command -v tldr &>/dev/null; then
-  alias tldrf='tldr --list | fzf --preview "tldr {1} --color=always" --preview-window=right,70% | xargs -R tldr --pager'
+  alias tldrf='tldr --list | fzf --preview "tldr {1} --color=always" --preview-window=right,70% | xargs -r tldr --pager'
 fi
 
 # Shorter lazygit
