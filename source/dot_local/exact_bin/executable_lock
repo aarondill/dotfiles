@@ -9,6 +9,6 @@ trap revert HUP INT TERM EXIT
 # every 5 seconds
 optional xset +dpms dpms 5 5 5
 # force off the first time
-optional sleep .5 && optional xset dpms force off &
+# optional sleep .5 && optional xset dpms force off &
 i3lock -n -f -e -c 000000
 revert
