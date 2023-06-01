@@ -1,1 +1,1 @@
-complete -fc -o nospace -o bashdefault visual
+complete -f -c -o nospace -o bashdefault visual
