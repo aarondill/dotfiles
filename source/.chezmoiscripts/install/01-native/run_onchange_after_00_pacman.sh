@@ -16,7 +16,7 @@ PACKAGES=(
   age cronie cmake curl dconf-editor duf github-cli git
   grep inotify-tools less make neofetch neovim net-tools
   openvpn p7zip python-pynvim rsync shfmt tlp trash-cli tree util-linux
-  xclip xdg-utils zip unzip zoxide htop speedtest-cli ripgrep hexedit
+  xclip xdg-utils zip unzip zoxide speedtest-cli ripgrep hexedit
   luajit python-pip xdotool base-devel wezterm bat
 )
 
