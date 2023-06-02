@@ -31,12 +31,12 @@ EOF
 
   keyring=$(find "$TMP_DIR" -name "volian-archive-keyring_*_all.deb")
   scar=$(find "$TMP_DIR" -name 'volian-archive-scar_*_all.deb')
-  sudo apt-get install --quiet --assume-yes "$keyring" "$scar"
+  sudo apt-get install --assume-yes "$keyring" "$scar"
 
   rm -rf "$TMP_DIR" && trap '' EXIT # cleanup
 
   sudo apt-get update --quiet --assume-yes >/dev/null
-  sudo apt-get install --quiet --assume-yes nala
+  sudo apt-get install --assume-yes nala
 
   # only changes in this file, but should be reevaluated each file
   APT=$(which nala 2>/dev/null)
