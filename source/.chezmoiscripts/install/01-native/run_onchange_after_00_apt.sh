@@ -70,7 +70,7 @@ function install_graphical_packages() {
   install_if_available "${graphical_packages[@]}"
 }
 
-log_and_run 'installing neovim nightly ppa' sudo add-apt-repository -n -y -P ppa:neovim-ppa/unstable
+log_and_run 'installing neovim nightly ppa' sudo add-apt-repository -y -P ppa:neovim-ppa/unstable
 log_and_run 'Updating sources' sudo "$APT" update
 log_and_run 'Installing packages' install_packages
 log_and_run 'Installing graphical packages' install_graphical_packages
