@@ -41,12 +41,12 @@ if command -v google-chrome &>/dev/null; then
   # shellcheck disable=SC2139 # They are intended to expand at definition
   {
     # alias google-chrome="$chrome 2>/dev/null"
-    eval "function google-chrome(){
-      $chrome \"\$@\" 2>/dev/null &
-      local exit = \$?
+    eval 'function google-chrome(){
+      $chrome "$@" 2>/dev/null &
+      local exit=$?
       pkill chrome_crashpad &>/dev/null
-      return \$exit
-    }"
+      return $exit
+    }'
     export -f google-chrome
     alias chrome="$chrome 2>/dev/null"
     export BROWSER="$chrome"
