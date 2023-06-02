@@ -42,7 +42,7 @@ if command -v google-chrome &>/dev/null; then
   {
     # alias google-chrome="$chrome 2>/dev/null"
     eval 'function google-chrome(){
-      $chrome "$@" 2>/dev/null &
+      '"$chrome"' "$@" 2>/dev/null &
       local exit=$?
       pkill chrome_crashpad &>/dev/null
       return $exit
