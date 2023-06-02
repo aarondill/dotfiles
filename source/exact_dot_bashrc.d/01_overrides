@@ -20,9 +20,11 @@ esac
 
 # Rm the stupid files in HOME from chrome
 rm -rf ~/.pki ~/.dotnet/ 2>/dev/null
-# RM the firefox files
+# RM the firefox files - I don't even care.
 rm -rf ~/.mozilla 2>/dev/null
-# RM the hplip files
+# RM the hplip files - This is just configuration
 rm -rf ~/.hplip 2>/dev/null
-# RM the dbus files
+# RM the dbus files - This is fine.
 rm -rf ~/.dbus 2>/dev/null
+# RM the java files - should be in ~/.config/java/
+rm -rf ~/.java 2>/dev/null
