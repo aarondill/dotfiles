@@ -42,6 +42,8 @@ EOF
   APT=$(which nala 2>/dev/null)
 }
 
+if [ "$OS" != "Ubuntu" ]; then abort "Nala is only supported on Ubuntu" 0; fi
+
 is_accessible_cmd apt || exit 0
 if ! is_accessible_cmd nala; then
   log_and_run "Installing nala" install_nala
