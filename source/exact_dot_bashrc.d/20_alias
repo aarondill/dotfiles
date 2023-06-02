@@ -40,7 +40,14 @@ if command -v google-chrome &>/dev/null; then
   chrome='google-chrome --enable-features=WebUIDarkMode --force-dark-mode'
   # shellcheck disable=SC2139 # They are intended to expand at definition
   {
-    alias google-chrome="$chrome 2>/dev/null"
+    # alias google-chrome="$chrome 2>/dev/null"
+    eval "function google-chrome(){
+      $chrome \"\$@\" 2>/dev/null &
+      local exit = \$?
+      pkill chrome_crashpad &>/dev/null
+      return \$exit
+    }"
+    export -f google-chrome
     alias chrome="$chrome 2>/dev/null"
     export BROWSER="$chrome"
   }
