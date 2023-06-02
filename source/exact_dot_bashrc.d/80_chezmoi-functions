@@ -17,7 +17,9 @@ if command -v chezmoi &>/dev/null; then
   alias config='chezmoi'
   # Completion for config alias
   # shellcheck source=/home/aaron/.local/share/bash-completion/completions/config
-  source ~/.local/share/bash-completion/completions/config
+  if [ -f ~/.local/share/bash-completion/completions/config ]; then
+    source ~/.local/share/bash-completion/completions/config
+  fi
 
   vim() {
     # If AN argument is passed, and is in repo
