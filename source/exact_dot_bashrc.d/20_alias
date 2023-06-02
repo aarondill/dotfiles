@@ -37,7 +37,7 @@ if command -v tree &>/dev/null; then alias tree='tree -a'; fi
 if command -v google-chrome &>/dev/null; then
   # Alias to remove error messages on opening google-chrome
   # Also allows css detection of dark mode
-  chrome='google-chrome --enable-features=WebUIDarkMode --force-dark-mode'
+  chrome='command google-chrome --enable-features=WebUIDarkMode --force-dark-mode'
   # shellcheck disable=SC2139 # They are intended to expand at definition
   {
     # alias google-chrome="$chrome 2>/dev/null"
