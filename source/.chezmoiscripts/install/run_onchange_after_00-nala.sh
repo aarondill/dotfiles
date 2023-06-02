@@ -42,6 +42,7 @@ EOF
   APT=$(which nala 2>/dev/null)
 }
 
+# Shouldn't be, but I got an issue about python-markup-it
 if [ "$OS" != "Ubuntu" ]; then abort "Nala is only supported on Ubuntu" 0; fi
 
 is_accessible_cmd apt || exit 0
