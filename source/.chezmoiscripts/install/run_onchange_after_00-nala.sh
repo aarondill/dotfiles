@@ -12,7 +12,7 @@ function install_nala() {
   TMP_DIR=$(mktemp -d)
   trap 'rm -rf "$TMP_DIR"' EXIT
 
-  read -r -d '' PYTHON_CODE <<-'EOF'
+  read -r -d '' PYTHON_CODE <<-'EOF' || true
 import sys, json
 for ln in json.load(sys.stdin)["assets"]["links"]: print(ln["direct_asset_url"], end="\0")
 EOF
