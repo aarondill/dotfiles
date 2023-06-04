@@ -34,8 +34,6 @@ be changed to ensure files don't get lost
 - 03_secrets
   - Anything that needs to be encrypted in the chezmoi repo
   - Includes API keys
-- 05_ENV
-  - stores miscellaneous environment variables
 - 10_util-vars
   - Useful vars for usage, such as $js
 - 20_alias
