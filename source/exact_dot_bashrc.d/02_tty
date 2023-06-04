@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+if [ -t 1 ] && [ "${TERM,,}" = "linux" ]; then
+  if command -v setleds &>/dev/null; then setleds -D +num; fi
+  isotope.dark
+fi
