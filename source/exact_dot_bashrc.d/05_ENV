@@ -8,3 +8,4 @@
 
 # Case *in*sensitive
 export LESS="-I"
+export CARGO_HOME="${XDG_CONFIG_HOME:-$HOME/.config}/cargo"
