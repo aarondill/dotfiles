@@ -29,8 +29,6 @@ be changed to ensure files don't get lost
   - Sets shell options, such as extglob
 - 01_overrides
   - Overrides environment variables, such as LESSHIST
-- 02_path
-  - Sets the PATH variable
 - 03_secrets
   - Anything that needs to be encrypted in the chezmoi repo
   - Includes API keys
