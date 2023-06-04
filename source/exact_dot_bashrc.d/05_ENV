@@ -5,7 +5,3 @@
 # Stores environment variables which don't fit into
 # other catagories
 #
-
-# Case *in*sensitive
-export LESS="-I"
-export CARGO_HOME="${XDG_CONFIG_HOME:-$HOME/.config}/cargo"
