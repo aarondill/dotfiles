@@ -83,6 +83,8 @@ append_path "/usr/local/go/bin"
 export GOPATH="$XDG_DATA_HOME/go"
 if command -v go >/dev/null 2>/dev/null; then
   append_path "$(go env GOPATH)/bin"
+else
+  append_path "$GOPATH/bin"
 fi
 
 # if running bash
