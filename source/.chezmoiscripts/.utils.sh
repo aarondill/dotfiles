@@ -114,6 +114,13 @@ function first_lower() { local t && t="$(cat -)" && printf '%s' "${t,}"; }
 function upper() { local t && t="$(cat -)" && printf '%s' "${t^^}"; }
 # first_upper <<<"hello" -> "Hello"
 function first_upper() { local t && t="$(cat -)" && printf '%s' "${t^}"; }
+# requires sort -V to sort version strings. Errors if $1 is before $2
+function compare_version() {
+  local hasV=$1 ExpecV=$2 versions=
+  versions="$(printf '%s\n' "$hasV" "$ExpecV")"
+  # shellcheck disable=SC2319 # $? *should* refer to the condition, not the sort command
+  test "$versions" != "$(sort -V <<<"$versions")" || exit "$?"
+}
 
 ## --------------------------------------------------------------------------------------------------
 ## --------------------------------------------- GitHub ---------------------------------------------
