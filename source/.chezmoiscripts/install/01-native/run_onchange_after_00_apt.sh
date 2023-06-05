@@ -15,10 +15,17 @@ fi
 PACKAGES=(
   age anacron cmake command-not-found curl
   dconf-editor duf gh git grep inotify-tools less make
-  neofetch neovim net-tools openvpn p7zip-full python3-neovim rsync shfmt tlp
+  neofetch neovim net-tools openvpn p7zip-full python3-neovim rsync tlp
   trash-cli tree util-linux xclip xdg-utils zip zoxide speedtest-cli
-  ripgrep libfuse2 hexedit luajit python3-pip ppa-purge xdotool
+  ripgrep libfuse2 hexedit luajit python3-pip xdotool
 )
+if [ "$OS" = "Debian" ]; then
+  # Different name in debian, also only available in testing
+  PACKAGES+=(golang-mvdan-sh)
+else
+  PACKAGES+=(shfmt)
+fi
+
 GRAPHICAL_PACKAGES=(
   dconf-editor flatpak gparted gucharmap luckybackup zeal
   # VM management. Technically, only virt-manager is graphical, but they are used together
