@@ -25,7 +25,7 @@ ASSET="bat-musl_${VERSION#v}_${arch}.deb"
 
 TMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TMP_DIR"' EXIT
-DESTINATION=$TMP_DIR/wezterm.deb
+DESTINATION=$TMP_DIR/bat.deb
 
 log_github_install "$REPO" "$VERSION" "$ASSET" "$DESTINATION"
 curl -sSL "https://github.com/$REPO/releases/download/$VERSION/$ASSET" -o "$DESTINATION"
