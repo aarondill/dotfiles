@@ -5,7 +5,7 @@
 # tests internet connection by pinging google.com
 set -euC -o pipefail
 
-test_url=google.com
+test_url=1.1.1.1
 
 THIS=internet
 usage() {
@@ -16,7 +16,7 @@ Returns 0 if internet connection is present, else 1
 
 Options:
 -h, --help       show this message
--t, --test=url   use url instead of $test_url to test internet connection
+-t, --test=url   use url/ip instead of $test_url to test internet connection
 -q, --quiet      don't print a message at end of test
 EOF
   return 0
