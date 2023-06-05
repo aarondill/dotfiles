@@ -26,11 +26,12 @@ bash() {
 
 exit() { exitall "$@"; }
 exitall() {
+  exit_code=$?
   [[ ! $(caller 0) ]] && set -- all # if exitall called directly, set $1 to all
   if [[ ${1,,} == "all" ]]; then    #if first argument is "all"
     builtin exit 196 2>/dev/null    # code to close recursively
   else
+    (exit "$exit_code")           # preserve exit code if none provided
     builtin exit "$@" 2>/dev/null # passthrough argument to exit
   fi
 }
-export -f "bash" "exit" "exitall"
