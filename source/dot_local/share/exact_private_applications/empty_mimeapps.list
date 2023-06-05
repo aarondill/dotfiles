@@ -1,5 +1,4 @@
 [Added Associations]
-# use neovim pls
 text/plain=nvim.desktop
 text/css=nvim.desktop
 text/javascript=nvim.desktop
