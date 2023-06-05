@@ -23,12 +23,26 @@ fi
 
 REPO=wez/wezterm
 VERSION=$(get_latest_version_github "$REPO") # v1.0.0
+# true if $1 lt $2
+is_lt() { awk 'BEGIN{exit !(ARGV[1]<ARGV[2])}' "$1" "$2"; }
 case "$OS" in
 Ubuntu)
-  ASSET=wezterm-${VERSION}.Ubuntu22.04.deb # hard coding to Ubuntu22.04.deb for now
+  ubuntu_version=$(lsb_release -sr)
+  if is_lt "$ubuntu_version" "20.04"; then
+    ASSET=wezterm-${VERSION}.Ubuntu20.04.deb
+  else
+    # latest as of writing. may need to be updated
+    ASSET=wezterm-${VERSION}.Ubuntu22.04.deb
+  fi
   ;;
 Debian)
-  ASSET=wezterm-${VERSION}.Debian10.deb # hard coding to Ubuntu22.04.deb for now
+  deb_version=$(lsb_release -sr)
+  if is_lt "$deb_version" 11; then
+    ASSET=wezterm-${VERSION}.Debian10.deb
+  else
+    # latest as of writing. may need to be updated
+    ASSET=wezterm-${VERSION}.Debian11.deb
+  fi
   ;;
 *)
   abort "this is a bug!" 3
