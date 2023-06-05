@@ -41,6 +41,7 @@ function install_yaru() (
     tmp_file="$TMP_DIR/meson-$meson_version.tar.gz"
     install_from_github "mesonbuild/meson" "$meson_version" "meson-$version.tar.gz" "$tmp_file"
     cd "$TMP_DIR"
+    log "Unpacking $tmp_file"
     tar xf "$tmp_file"
     meson="$TMP_DIR/meson-$meson_version/meson.py"
   fi
