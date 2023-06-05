@@ -1,4 +1,5 @@
-[MIME Cache]
+[Added Associations]
+# use neovim pls
 text/plain=nvim.desktop
 text/css=nvim.desktop
 text/javascript=nvim.desktop
@@ -23,6 +24,7 @@ text/x-tex=nvim.desktop
 text/xml=nvim.desktop
 application/javascript=nvim.desktop
 application/x-cgi=nvim.desktop
+application/x-desktop=nvim.desktop;
 application/x-javascript=nvim.desktop
 application/x-perl=nvim.desktop
 application/x-php=nvim.desktop
