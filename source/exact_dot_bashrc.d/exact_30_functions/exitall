@@ -31,7 +31,7 @@ exitall() {
   if [[ ${1,,} == "all" ]]; then    #if first argument is "all"
     builtin exit 196 2>/dev/null    # code to close recursively
   else
-    (exit "$exit_code")           # preserve exit code if none provided
+    (builtin exit "$exit_code")   # preserve exit code if none provided
     builtin exit "$@" 2>/dev/null # passthrough argument to exit
   fi
 }
