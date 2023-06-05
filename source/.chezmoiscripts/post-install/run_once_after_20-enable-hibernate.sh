@@ -58,6 +58,6 @@ GRUB_CMDLINE_LINUX_DEFAULT="\$GRUB_CMDLINE_LINUX_DEFAULT resume=UUID='$BIG_SWAP_
 EOF
 
 success
-log "Run these commands to use the changes:" "'update-initramfs -u -k all'" "'update-grub'" "Press any key to continue."
+log "Run these commands to use the changes:" "'update-initramfs -u -k all'" "'update-grub'" "Press enter to continue."
 # Make sure the user reads this!
-read -r -s -n1 || true
+read -r -s || true
