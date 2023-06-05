@@ -46,6 +46,8 @@ export ASPELL_CONF="per-conf $XDG_CONFIG_HOME/aspell/aspell.conf; personal $XDG_
 export TS_NODE_HISTORY="$XDG_STATE_HOME"/node/ts_node_repl_history
 export GTK2_RC_FILES="$XDG_CONFIG_HOME/gtk-2.0/gtkrc"
 
+# set PATH so it includes system bin (on debian)
+prepend_path "/sbin"
 # set PATH so it includes user's private bin if it exists
 prepend_path "$HOME/bin"
 # set PATH so it includes user's private bin if it exists
