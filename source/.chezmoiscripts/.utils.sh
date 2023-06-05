@@ -216,7 +216,7 @@ KERNEL=$(uname -s)
 # eg: x86_64
 ARCH=$(uname -m)
 # eg: Ubuntu
-OS="$(source /etc/os-release && lower <<<"${NAME:-${ID:-}}" | first_upper)"
+OS="$(source /etc/os-release && lower <<<"${ID:-${NAME:-}}" | first_upper)"
 # eg: /usr/bin/gnome-shell, if empty, gnome not installed
 GNOME=$(which gnome-shell 2>/dev/null || printf '')
 
