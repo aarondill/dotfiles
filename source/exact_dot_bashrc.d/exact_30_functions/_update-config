@@ -41,3 +41,4 @@ vscode/Java/java-format.xml
 .config/gtk-2.0/gtkrc
 .config/gtk-2.0
 .config/udiskie
+.config/mimeapps.list
