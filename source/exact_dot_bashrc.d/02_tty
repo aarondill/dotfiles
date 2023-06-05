@@ -3,5 +3,5 @@
 # Handle tty specific settings
 if [ -t 1 ] && [ "${TERM,,}" = "linux" ]; then
   if command -v setleds &>/dev/null; then setleds -D +num; fi
-  # isotope.dark
+  isotope.dark
 fi
