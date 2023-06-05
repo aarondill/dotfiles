@@ -30,14 +30,18 @@ if [ -f "$GRUB_RESUME_FILE" ]; then
   fi
 fi
 
-BIG_SWAP_LABEL=$(blkid -s LABEL -o value "$BIG_SWAP_PATH" 2>/dev/null || printf '')
+BIG_SWAP_LABEL=$(sudo blkid -s LABEL -o value "$BIG_SWAP_PATH" 2>/dev/null || printf '')
 # fallback to parition label
-[ -z "$BIG_SWAP_LABEL" ] && BIG_SWAP_LABEL="$(blkid -o value -s PARTLABEL "$BIG_SWAP_PATH" 2>/dev/null || printf '')"
+[ -z "$BIG_SWAP_LABEL" ] && BIG_SWAP_LABEL="$(sudo blkid -o value -s PARTLABEL "$BIG_SWAP_PATH" 2>/dev/null || printf '')"
 [ -z "$BIG_SWAP_LABEL" ] && BIG_SWAP_LABEL="No Label"
 
-confirm "Would you like to use $BIG_SWAP_PATH ($BIG_SWAP_LABEL) as your swap to resume from? $WARNING" || abort0 'Aborting'
+BIG_SWAP_UUID="$(sudo blkid -o value -s UUID "$BIG_SWAP_PATH")"
 
-BIG_SWAP_UUID="$(blkid -o value -s UUID "$BIG_SWAP_PATH")"
+if [ -z "$BIG_SWAP_UUID" ]; then
+  abort "failed to get UUID for $BIG_SWAP_PATH" 1
+fi
+
+confirm "Would you like to use $BIG_SWAP_PATH ($BIG_SWAP_LABEL) as your swap to resume from? $WARNING" || abort0 'Aborting'
 
 # Setup initramfs resume file
 if [ -n "$INITRAMFS_RESUME_FILE" ]; then
