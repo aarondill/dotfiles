@@ -119,7 +119,7 @@ function version_gt() {
   local hasV=$1 ExpecV=$2 versions=
   versions="$(printf '%s\n' "$hasV" "$ExpecV")"
   # shellcheck disable=SC2319 # $? *should* refer to the condition, not the sort command
-  test "$versions" != "$(sort -V <<<"$versions")" || exit "$?"
+  test "$versions" != "$(sort -V <<<"$versions")" || return "$?"
 }
 
 ## --------------------------------------------------------------------------------------------------
