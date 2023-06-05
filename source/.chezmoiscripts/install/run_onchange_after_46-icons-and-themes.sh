@@ -50,6 +50,7 @@ function install_yaru() (
   "$meson" build # requires meson >=0.59!
 
   cd build
+  ninja
   sudo ninja install
 
   rm -rf "$TMP_DIR" && trap '' EXIT # cleanup
