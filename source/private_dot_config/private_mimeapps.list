@@ -4,7 +4,7 @@ x-scheme-handler/http=google-chrome.desktop;
 x-scheme-handler/https=google-chrome.desktop;
 x-scheme-handler/about=google-chrome.desktop;
 x-scheme-handler/unknown=google-chrome.desktop;
-# use nvim
+# Use neovim for everything
 text/plain=nvim.desktop;
 text/css=nvim.desktop;
 text/javascript=nvim.desktop;
@@ -47,3 +47,5 @@ image/png=gimp.desktop;
 text/calendar=org.gnome.Calendar.desktop;org.gnome.FileRoller.desktop;
 application/epub+zip=com.github.johnfactotum.Foliate.desktop;
 application/vnd.debian.binary-package=gnome-software-local-file.desktop;
+
+# vim:syntax=toml:
