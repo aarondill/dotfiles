@@ -33,11 +33,21 @@ function install_yaru() (
 
   git clone --filter=tree:0 --single-branch https://github.com/ubuntu/yaru.git "$TMP_DIR"
 
+  local meson=meson
+  if ! version_gt "$(meson --version)" "0.59.0"; then
+    local meson_version tmp_file
+    meson_version=$(get_latest_version_github "mesonbuild/meson")
+    tmp_file="$TMP_DIR/meson-$meson_version.tar.gz"
+    install_from_github "mesonbuild/meson" "$meson_version" "meson-$version.tar.gz" "$tmp_file"
+    cd "$TMP_DIR"
+    tar xf "$tmp_file"
+    meson="$TMP_DIR/meson-$meson_version/meson.py"
+  fi
+
   cd "$TMP_DIR"
+  "$meson" build # requires meson >=0.59!
 
-  meson build # requires meson >=0.59!
   cd build
-
   sudo ninja install
 
   rm -rf "$TMP_DIR" && trap '' EXIT # cleanup
