@@ -234,7 +234,7 @@ format = "[$symbol$state (\\($name\\) )]($style)"
 
 [nodejs]
 symbol = "node "
-format = "[$symbol($version )]($style)"
+format = "[$symbol($version$engines_version )]($style)"
 version_format = "${major}"
 
 [ocaml]
