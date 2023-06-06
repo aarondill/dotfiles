@@ -149,6 +149,7 @@ renamed = "r"
 deleted = "x"
 typechanged = "t"
 conflicted = "≠"
+ignore_submodules = true
 
 [golang]
 symbol = "go "
