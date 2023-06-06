@@ -67,4 +67,5 @@ if [ "$inhibit" = 1 ]; then
 fi
 cmd=("${cmd[@]}" startx "${args[@]}")
 printf '%s ' exec "${cmd[@]}"
+export XDG_SESSION_TYPE=x11
 exec "${cmd[@]}"
