@@ -147,6 +147,7 @@ behind = "<$count"
 diverged = "$behind_count<>$ahead_count"
 renamed = "r"
 deleted = "x"
+typechanged = "t"
 conflicted = "≠"
 
 [golang]
