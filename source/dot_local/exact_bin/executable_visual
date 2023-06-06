@@ -20,11 +20,16 @@ EOF
 log() { printf '%s\n' "$@"; }
 err() { printf "${THIS:-}: %s\n" "$@" >&2; }
 abort() { err "$1" && exit "${2:-1}"; }
+cmd() { command -v "$@" &>/dev/null; }
+
+if ! cmd which; then abort "which is required for this script" 1; fi
+if ! cmd startx; then abort "startx is required for this script" 1; fi
 
 inhibit=0
 if [ "${1:-}" = "--supress-power" ]; then
   inhibit=1
   shift
+  if ! cmd systemd-inhibit; then err "systemd-inhibit is required to inhibit the power key" && inhibit=0; fi
 fi
 
 for arg in "$@"; do
