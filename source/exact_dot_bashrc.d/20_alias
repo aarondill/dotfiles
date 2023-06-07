@@ -142,6 +142,10 @@ if command -v awesome-client &>/dev/null; then
   alias awesome-client='RLWRAP_HOME="$HOME/.cache/awesome" awesome-client'
 fi
 
+if command -v 'ffplay' &>/dev/null; then
+  alias aplay='ffplay -nodisp -hide_banner -autoexit'
+fi
+
 # Allow nvchad if it's installed
 if [ -d "${NVCHAD_CONFIG:-"${XDG_CONFIG_HOME:-$HOME/.config}/NvChad"}" ]; then
   alias nvchad='NVIM_APPNAME=NvChad nvim'
