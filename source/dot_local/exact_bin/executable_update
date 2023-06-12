@@ -85,6 +85,8 @@ fi
 cmd_available() { command -v "$@" &>/dev/null; }
 
 if [ "$native" -eq 1 ]; then
+  log "Updating native packages!"
+  log
   if cmd_available nala; then
     "$SUDO" nala upgrade
   elif cmd_available apt; then
@@ -95,14 +97,20 @@ if [ "$native" -eq 1 ]; then
 fi
 
 if [ "$snap" -eq 1 ] && cmd_available snap; then
+  log "Updating snap packages!"
+  log
   "$SUDO" snap refresh
 fi
 
 if [ "$flatpak" -eq 1 ] && cmd_available flatpak; then
+  log "Updating flatpak packages!"
+  log
   flatpak update # NOT as root!
 fi
 
 if [ "$pnpm" -eq 1 ] && cmd_available pnpm; then
+  log "Updating pnpm packages!"
+  log
   pnpm upgrade -g --latest # NOT as root!
   pnpm_root=0
   for f in /root/.local/share/pnpm/global/*/package.json; do
@@ -112,6 +120,8 @@ if [ "$pnpm" -eq 1 ] && cmd_available pnpm; then
 fi
 
 if [ "$npm" -eq 1 ] && cmd_available npm; then
+  log "Updating npm packages!"
+  log
   if cmd_available ncu; then
     ncu -p npm -g # get them to latest
   else
