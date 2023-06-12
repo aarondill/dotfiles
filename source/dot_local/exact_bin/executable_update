@@ -19,8 +19,16 @@ EOF
   return 0
 }
 
-log() { printf '%s\n' "$@"; }
-err() { printf "${THIS:-$0}: %s\n" "$@" >&2; }
+# COLOR vars to keep from branching to tput repeatedly
+RED_COLOR="$(tput setaf 1 2>/dev/null)"
+YELLOW_COLOR="$(tput setaf 11 2>/dev/null)"
+GREEN_COLOR="$(tput setaf 2 2>/dev/null)"
+BOLD_COLOR="$(tput bold 2>/dev/null)"
+RESET_COLOR="$(tput sgr0 2>/dev/null)"
+
+log() { printf "$YELLOW_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@"; }
+err() { printf "${THIS:+$THIS:}$RED_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@" >&2; }
+success() { printf "$GREEN_COLOR$BOLD_COLOR%s$RESET_COLOR\n" "Success!"; }
 abort() { err "$1" && exit "${2:-1}"; }
 
 # Returns a string that should be 'eval'ed to set the positional arguments
@@ -94,18 +102,21 @@ if [ "$native" -eq 1 ]; then
   elif cmd_available pacman; then
     "$SUDO" pacman -Syu # READ THIS!
   fi
+  success
 fi
 
 if [ "$snap" -eq 1 ] && cmd_available snap; then
   log "Updating snap packages!"
   log
   "$SUDO" snap refresh
+  success
 fi
 
 if [ "$flatpak" -eq 1 ] && cmd_available flatpak; then
   log "Updating flatpak packages!"
   log
   flatpak update # NOT as root!
+  success
 fi
 
 if [ "$pnpm" -eq 1 ] && cmd_available pnpm; then
@@ -117,6 +128,7 @@ if [ "$pnpm" -eq 1 ] && cmd_available pnpm; then
     if [ -f "$f" ]; then pnpm_root=true && break; fi
   done
   [ "$pnpm_root" -eq 1 ] && "$SUDO" pnpm update -g --latest
+  success
 fi
 
 if [ "$npm" -eq 1 ] && cmd_available npm; then
@@ -128,4 +140,5 @@ if [ "$npm" -eq 1 ] && cmd_available npm; then
     log "install 'ncu' to improve this experience"
   fi
   npm upgrade -g # NOT as root!
+  success
 fi
