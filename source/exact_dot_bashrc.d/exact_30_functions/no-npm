@@ -30,4 +30,3 @@ function npm() {
   fi
 
 }
-export -f npm

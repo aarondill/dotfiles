@@ -97,7 +97,6 @@ bd() {
     if [[ -t 1 ]]; then builtin cd "$NEWPWD" || return; fi
   fi
 }
-export -f bd
 
 # Add autocomplete support for bd for bash.
 _bd() {
