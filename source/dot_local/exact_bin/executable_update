@@ -94,13 +94,18 @@ cmd_available() { command -v "$@" &>/dev/null; }
 
 if [ "$native" -eq 1 ]; then
   log "Updating native packages!"
-  log
   if cmd_available nala; then
+    log "Using nala"
     "$SUDO" nala upgrade
   elif cmd_available apt; then
-    "$SUDO" apt update && apt upgrade
+    log "Using apt"
+    "$SUDO" apt update && "$SUDO" apt upgrade
   elif cmd_available pacman; then
+    log "Using pacman"
     "$SUDO" pacman -Syu # READ THIS!
+  elif cmd_available dnf; then
+    log "Using dnf"
+    "$SUDO" dnf upgrade
   fi
   success
 fi
