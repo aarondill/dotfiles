@@ -1,0 +1,121 @@
+#!/usr/bin/env bash
+
+# ~/.local/bin/update-java
+#
+# Updates java symlinks to the path specified using update-alternatives
+#
+set -euC -o pipefail
+
+THIS=update
+usage() {
+  cat <<EOF
+$THIS [OPTIONS]... -- [METHOD]...
+Update system packages and third party packages
+If no method is specified, all packages will be updated
+Options:
+--as-root: allow running as root (Discouraged!)
+EOF
+  EOF
+  return 0
+}
+
+log() { printf '%s\n' "$@"; }
+err() { printf "${THIS:-$0}: %s\n" "$@" >&2; }
+abort() { err "$1" && exit "${2:-1}"; }
+
+# Returns a string that should be 'eval'ed to set the positional arguments
+# Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
+# Input: $LONGOPTS,$SHORTOPTS
+# eval "$(parse_args "$@")"
+function parse_args() {
+  # -allow a command to fail with !’s side effect on errexit
+  # -use return value from ${PIPESTATUS[0]}, because ! hosed $?
+  # shellcheck disable=SC2251
+  ! getopt --test >/dev/null
+  if [[ "${PIPESTATUS[0]}" -ne 4 ]]; then abort "Enhanced getopt is required for this script to work. Please install it." 1; fi
+
+  local parsed
+  if parsed=$(getopt --options="$SHORTOPTS" --longoptions="$LONGOPTS" --name "${THIS-$0}" -- "$@"); then
+    # output getopt’s output this way to handle the quoting right:
+    printf '%s' "set -- $parsed"
+    return 0
+  fi
+  # getopt has already complained about wrong arguments to stdout - Exit script
+  exit 2
+}
+
+SUDO=${SUDO:-sudo}
+LONGOPTS=help,as-root SHORTOPTS=h
+ARGSTRING="$(parse_args "$@")"
+eval "$ARGSTRING"
+
+allow_root=0
+while true; do
+  case "$1" in
+  -h | --help) usage && exit 0 ;;
+  --as-root) allow_root=1 && shift 1 ;;
+  --) shift && break ;;
+  *) abort "This is a bug" 3 ;;
+  esac
+done
+
+if [ "$EUID" -eq 0 ] && [ "$allow_root" -eq 0 ]; then
+  err 'This script should not be run as root (due to flatpak).'
+  err 'Use SUDO environment variable to override sudo program.'
+  err 'Use update --as-root to force the script to run as root'
+  exit 2
+fi
+
+native=0 flatpak=0 snap=0 pnpm=0 npm=0
+if [ "$#" -eq 0 ]; then
+  native=1 flatpak=1 snap=1 pnpm=1 npm=1
+else
+  for arg; do
+    case "$arg" in
+    apt | nala | pacman | native) native=1 ;;
+    flatpak) flatpak=1 ;;
+    snap) snap=1 ;;
+    pnpm) pnpm=1 ;;
+    npm) npm=1 ;;
+    all) native=1 flatpak=1 snap=1 pnpm=1 npm=1 ;;
+    esac
+  done
+fi
+
+cmd_available() { command -v "$@" &>/dev/null; }
+
+if [ "$native" -eq 1 ]; then
+  if cmd_available nala; then
+    "$SUDO" nala upgrade
+  elif cmd_available apt; then
+    "$SUDO" apt update && apt upgrade
+  elif cmd_available pacman; then
+    "$SUDO" pacman -Syu # READ THIS!
+  fi
+fi
+
+if [ "$snap" -eq 1 ] && cmd_available snap; then
+  "$SUDO" snap refresh
+fi
+
+if [ "$flatpak" -eq 1 ] && cmd_available flatpak; then
+  flatpak update # NOT as root!
+fi
+
+if [ "$pnpm" -eq 1 ] && cmd_available pnpm; then
+  pnpm upgrade -g --latest # NOT as root!
+  pnpm_root=0
+  for f in /root/.local/share/pnpm/global/*/package.json; do
+    if [ -f "$f" ]; then pnpm_root=true && break; fi
+  done
+  [ "$pnpm_root" -eq 1 ] && "$SUDO" pnpm update -g --latest
+fi
+
+if [ "$npm" -eq 1 ] && cmd_available npm; then
+  if cmd_available ncu; then
+    ncu -p npm -g # get them to latest
+  else
+    log "install 'ncu' to improve this experience"
+  fi
+  npm upgrade -g # NOT as root!
+fi
