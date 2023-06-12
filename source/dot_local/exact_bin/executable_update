@@ -12,6 +12,11 @@ usage() {
 $THIS [OPTIONS]... -- [METHOD]...
 Update system packages and third party packages
 If no method is specified, all packages will be updated
+This is meant to help avoid forgetting a method,
+not to force yes, or any other convience
+Use \$SUDO to override the sudo command, and use
+METHOD_ARGS to pass additional options to each command. (IE, NATIVE_ARGS)
+Currently supported methods are: native, snap, flatpak, pnpm, npm
 Options:
 --as-root: allow running as root (Discouraged!)
 EOF
@@ -27,6 +32,10 @@ BOLD_COLOR="$(tput bold 2>/dev/null)"
 RESET_COLOR="$(tput sgr0 2>/dev/null)"
 
 log() { printf "$YELLOW_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@"; }
+show_run() {
+  log "running: $*"
+  "$@"
+}
 err() { printf "${THIS:+$THIS:}$RED_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@" >&2; }
 success() { printf "$GREEN_COLOR$BOLD_COLOR%s$RESET_COLOR\n" "Success!"; }
 abort() { err "$1" && exit "${2:-1}"; }
@@ -52,8 +61,7 @@ function parse_args() {
   exit 2
 }
 
-SUDO=${SUDO:-sudo}
-LONGOPTS=help,as-root SHORTOPTS=h
+LONGOPTS=help,as-root,list SHORTOPTS=h,l
 ARGSTRING="$(parse_args "$@")"
 eval "$ARGSTRING"
 
@@ -79,7 +87,7 @@ if [ "$#" -eq 0 ]; then
   native=1 flatpak=1 snap=1 pnpm=1 npm=1
 else
   for arg; do
-    case "$arg" in
+    case "${arg,,}" in
     apt | nala | pacman | native) native=1 ;;
     flatpak) flatpak=1 ;;
     snap) snap=1 ;;
@@ -90,22 +98,33 @@ else
   done
 fi
 
+# Environment variables
+SUDO=${SUDO:-sudo}
+# shellcheck disable=SC2206 # Splitting would otherwise happen on the command line, so this is not *my* problem.
+{
+  NATIVE_ARGS=(${NATIVE_ARGS:-})
+  FLATPAK_ARGS=(${FLATPAK_ARGS:-})
+  SNAP_ARGS=(${SNAP_ARGS:-})
+  PNPM_ARGS=(${PNPM_ARGS:-})
+  NPM_ARGS=(${NPM_ARGS:-})
+}
+
 cmd_available() { command -v "$@" &>/dev/null; }
 
 if [ "$native" -eq 1 ]; then
   log "Updating native packages!"
   if cmd_available nala; then
     log "Using nala"
-    "$SUDO" nala upgrade
+    show_run "$SUDO" nala upgrade "${NATIVE_ARGS[@]}"
   elif cmd_available apt; then
     log "Using apt"
-    "$SUDO" apt update && "$SUDO" apt upgrade
+    show_run "$SUDO" apt update "${NATIVE_ARGS[@]}" && "$SUDO" apt upgrade "${NATIVE_ARGS[@]}"
   elif cmd_available pacman; then
     log "Using pacman"
-    "$SUDO" pacman -Syu # READ THIS!
+    show_run "$SUDO" pacman -Syu "${NATIVE_ARGS[@]}" # READ THIS!
   elif cmd_available dnf; then
     log "Using dnf"
-    "$SUDO" dnf upgrade
+    show_run "$SUDO" dnf upgrade "${NATIVE_ARGS[@]}"
   fi
   success
 fi
@@ -113,26 +132,26 @@ fi
 if [ "$snap" -eq 1 ] && cmd_available snap; then
   log "Updating snap packages!"
   log
-  "$SUDO" snap refresh
+  show_run "$SUDO" snap refresh "${SNAP_ARGS[@]}"
   success
 fi
 
 if [ "$flatpak" -eq 1 ] && cmd_available flatpak; then
   log "Updating flatpak packages!"
   log
-  flatpak update # NOT as root!
+  show_run flatpak update "${FLATPAK_ARGS[@]}" # NOT as root!
   success
 fi
 
 if [ "$pnpm" -eq 1 ] && cmd_available pnpm; then
   log "Updating pnpm packages!"
   log
-  pnpm upgrade -g --latest # NOT as root!
+  show_run pnpm upgrade -g --latest # NOT as root!
   pnpm_root=0
   for f in /root/.local/share/pnpm/global/*/package.json; do
     if [ -f "$f" ]; then pnpm_root=true && break; fi
   done
-  [ "$pnpm_root" -eq 1 ] && "$SUDO" pnpm update -g --latest
+  [ "$pnpm_root" -eq 1 ] && show_run "$SUDO" pnpm update -g --latest "${PNPM_ARGS[@]}"
   success
 fi
 
@@ -140,10 +159,10 @@ if [ "$npm" -eq 1 ] && cmd_available npm; then
   log "Updating npm packages!"
   log
   if cmd_available ncu; then
-    ncu -p npm -g # get them to latest
+    show_run ncu -p npm -g # get them to latest
   else
     log "install 'ncu' to improve this experience"
   fi
-  npm upgrade -g # NOT as root!
+  show_run npm upgrade -g "${NPM_ARGS[@]}" # NOT as root!
   success
 fi
