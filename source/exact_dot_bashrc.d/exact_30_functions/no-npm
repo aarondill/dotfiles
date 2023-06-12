@@ -28,5 +28,4 @@ function npm() {
   else
     command npm "$@"
   fi
-
 }
