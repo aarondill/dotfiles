@@ -41,7 +41,15 @@ if [ -z "$BIG_SWAP_UUID" ]; then
   abort "failed to get UUID for $BIG_SWAP_PATH" 1
 fi
 
-confirm "Would you like to use $BIG_SWAP_PATH ($BIG_SWAP_LABEL) as your swap to resume from? $WARNING" || abort0 'Aborting'
+use=1
+confirm "Would you like to use $BIG_SWAP_PATH ($BIG_SWAP_LABEL) as your swap to resume from? $WARNING" || use=0
+if [ "$use" -eq 0 ]; then
+  if confirm "Would you like to disable resuming from swap? $WARNING"; then
+    BIG_SWAP_UUID=none # This should disable resuming from swap
+  else
+    abort 'Aborting!' 0
+  fi
+fi
 
 # Setup initramfs resume file
 if [ -n "$INITRAMFS_RESUME_FILE" ]; then
