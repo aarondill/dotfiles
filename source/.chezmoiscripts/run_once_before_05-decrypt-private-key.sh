@@ -13,7 +13,7 @@ if ! command -v age &>/dev/null; then
   if [ -n "$APT" ]; then
     sudo "$APT" install age
   elif [ -n "$PACMAN" ]; then
-    sudo "$PACMAN" -S age
+    sudo "$PACMAN" -S --needed age
   else
     abort "age is required to decrypt files. Please install it and try again." 1
   fi

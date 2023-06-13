@@ -26,7 +26,7 @@ function install_yaru() (
   if [ -n "$APT" ]; then
     sudo "$APT" install libgtk-3-dev git meson sassc
   elif [ -n "$PACMAN" ]; then
-    sudo "$PACMAN" -S libgtk-3-dev git meson sassc
+    sudo "$PACMAN" -S --needed libgtk-3-dev git meson sassc
   else
     abort "Could not install dependencies for yaru theme. Please install it yourself manually" 0
   fi
