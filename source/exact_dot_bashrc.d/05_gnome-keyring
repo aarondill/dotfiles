@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # This starts up gnome-keyring-daemon/ssh-agent if not already running
 
+if [ -z "$DISPLAY" ]; then
+  return 0 # Just stop if not running graphically. It won't work right anyways.
+fi
+
 # Incase XDG_RUNTIME_DIR is not set, use ~/.cache
 ENV_FILE="${XDG_RUNTIME_DIR:-$HOME/.cache}/keyring.env"
 quiet() { "$@" &>/dev/null; }
