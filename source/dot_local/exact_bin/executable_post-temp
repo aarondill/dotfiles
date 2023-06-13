@@ -53,8 +53,8 @@ function parse_args() {
 if [ "$#" -eq 0 ]; then usage && exit 0; fi
 
 verbose=false quiet=false
-LONGOPTS=help,short,long:
-SHORTOPTS=h,s,l:
+LONGOPTS=help,verbose,quiet,temp:
+SHORTOPTS=h,v,q,t:
 ARGSTRING="$(parse_args "$@")"
 eval "$ARGSTRING"
 
@@ -83,8 +83,8 @@ for file in "$@"; do
     exitcode=2 && continue
   fi
 
-  result="$(curl -sSfL -F "file=@$file" "$temp_source")" ||
-    abort 'Something went wrong during curl command. Aborting.' 1 # exits program
+  result="$(curl --fail-with-body -L -F "file=@$file" "$temp_source")" ||
+    err 'Something went wrong during curl command.'
   # Example outputs:
   # {"message": "server error"}
   # {"status":"success","data":{"url":"https://tmpfiles.org/######/file"}}
@@ -97,11 +97,11 @@ for file in "$@"; do
 
   # Print the result thru fx to get the data
   # Already strings, if present, but trying to error
-  status="$("$fx" '.status.toString()' <<<"$result" 2>/dev/null)"
-  url="$("$fx" '.data.url.toString()' <<<"$result" 2>/dev/null)"
+  status="$("$fx" '.status.toString()' <<<"$result" 2>/dev/null)" || status=
+  url="$("$fx" '.data.url.toString()' <<<"$result" 2>/dev/null)" || url=
 
   if [ -z "$status" ] || [ -z "$url" ]; then
-    message="$("$fx" '.message.toString()' <<<"$result" 2>/dev/null)"
+    message="$("$fx" '.message.toString()' <<<"$result" 2>/dev/null)" || message=
     if [ -n "$message" ]; then err "$message"; else err "An unknown error occured"; fi
     exitcode=1
   else
