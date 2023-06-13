@@ -15,7 +15,7 @@ elif quiet command -v ssh-agent; then
   fi
 fi
 
-if ! [ -f "$SSH_AUTH_SOCK" ]; then
+if ! [ -f "$SSH_AUTH_SOCK" ] && [ -f "$ENV_FILE" ]; then
   # shellcheck disable=SC1090 # It's not *really* dynamic, but shellcheck can't follow it.
   source "$ENV_FILE" >/dev/null
 fi
