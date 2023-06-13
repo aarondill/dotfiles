@@ -10,7 +10,7 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 install_script="$(curl -sSfL https://starship.rs/install.sh)"
 # If ends in print_install, remove it. It's annoying. Be as safe as possible.
 if [ "print_install" = "$(tail -n1 <<<"$install_script")" ]; then
-  install_script=$(head -n1 <<<"$install_script")
+  install_script=$(head -n-1 <<<"$install_script")
 fi
 log "Installing starship from $install_script"
 sh -c "$install_script" -- -y -b /usr/local/bin
