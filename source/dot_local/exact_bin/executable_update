@@ -143,6 +143,13 @@ if [ "$flatpak" -eq 1 ] && cmd_available flatpak; then
   success
 fi
 
+if [ "$pnpm" -eq 1 ] && cmd_available corepack; then
+  log "Updating pnpm!"
+  log
+  show_run corepack prepare pnpm@latest --activate
+  success
+fi
+
 if [ "$pnpm" -eq 1 ] && cmd_available pnpm; then
   log "Updating pnpm packages!"
   log
