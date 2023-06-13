@@ -12,7 +12,7 @@ INITRAMFS_RESUME_FILE=/etc/initramfs-tools/conf.d/resume
 
 if ! [ -d "$(dirname -- "$INITRAMFS_RESUME_FILE")" ]; then INITRAMFS_RESUME_FILE=''; fi
 
-BIG_SWAP_LINE=$(tail -n+2 </proc/swaps | LC_ALL=C sort -t$'\t' -nk3 | tail -n1)
+BIG_SWAP_LINE=$(tail -n+2 /proc/swaps | grep -v '^/dev/zram' | LC_ALL=C sort -t$'\t' -nk3 | tail -n1) || true
 BIG_SWAP_PATH=$(awk '{print $1}' <<<"$BIG_SWAP_LINE") # /dev/sda1
 BIG_SWAP_TYPE=$(awk '{print $2}' <<<"$BIG_SWAP_LINE") # file | partition
 
