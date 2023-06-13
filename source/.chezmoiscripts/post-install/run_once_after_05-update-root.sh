@@ -37,8 +37,9 @@ if [ $BACKUP -ne 0 ]; then
   # List files
   FILES=$(tar -tf "$TARDESTFILE" | sed 's/^/\//')
   for file in $FILES; do
+    sudo -v
     # Ensure unreadable files are still copied
-    if sudo test -f "$file"; then
+    if sudo test -f "$file" && ! sudo cmp -q -- "$file" "$ROOTBACKUP/$file"; then
       # Ensure destination directory exists -- sudo so can be located at root
       sudo mkdir -p "$BACKUPDIR/$(dirname -- "$file")"
       # copy the file to the destination
