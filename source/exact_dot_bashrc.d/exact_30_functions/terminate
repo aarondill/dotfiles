@@ -23,7 +23,7 @@ terminate() {
   while ps --pid "$process" &>/dev/null; do
     signal=${signals[i]}
     if [ "$signal" = KILL ]; then printf '%s\n' "Attempting to force kill it." >&2; fi
-    kill --signal "$signal" "$process"
+    kill "-$signal" "$process"
     i=$((i + 1))
     if [ "$i" -ge "$signal_qty" ]; then
       printf '%s\n' "It won't die!" >&2
