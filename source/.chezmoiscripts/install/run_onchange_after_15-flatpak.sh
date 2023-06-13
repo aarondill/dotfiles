@@ -8,9 +8,9 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 
 function flatpak_is_installed() { flatpak info -- "$@" &>/dev/null; }
 # usage: flatpak_install [source] package
-function flatpak_install() { flatpak install -y -- "$@"; }
+function flatpak_install() { sudo flatpak install -y -- "$@"; }
 # shellcheck disable=SC2120 # I know it doesn't recieve arguments. it updates all without arguments.
-function flatpak_update() { flatpak update -y -- "$@"; }
+function flatpak_update() { sudo flatpak update -y -- "$@"; }
 
 function install_flatpaks() {
   trap 'err Aborting; exit 1' SIGINT
