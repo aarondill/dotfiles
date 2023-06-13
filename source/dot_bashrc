@@ -74,7 +74,15 @@ esac
 
 # enable color support of ls and also add handy aliases
 if command -v dircolors &>/dev/null; then
-  test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+  dircolors_file="${XDG_CONFIG_HOME:-$HOME/.config}"/dircolors
+  if [ -r "$dircolors_file" ]; then
+    eval "$(dircolors -b "$dircolors_file")"
+  elif [ -r ~/.dircolors ]; then
+    eval "$(dircolors -b ~/.dircolors)"
+  else
+    eval "$(dircolors -b)"
+  fi
+  unset dircolors_file
   alias ls='ls --color=auto'
   alias dir='dir --color=auto'
   alias vdir='vdir --color=auto'
