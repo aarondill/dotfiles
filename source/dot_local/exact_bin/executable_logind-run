@@ -37,10 +37,10 @@ for arg; do
 done
 
 if [ "$#" -lt 1 ]; then
-  printf 'tty must be specified'
+  log 'tty must be specified'
   exit 2
 elif [ -z "${2:-}" ]; then
-  printf 'command must be specified'
+  log 'command must be specified'
   exit 2
 fi
 ttynum=${1-34}
