@@ -68,8 +68,8 @@ function cproot() (
       exitCode=1 && continue
     fi
     local old_path new_dir new_path
-    old_path="$(realpath -s -- "$file")"
-    new_path="$HOME/.root/${old_path#/}"
+    old_path="$(realpath -se -- "$file")"
+    new_path="$HOME/.root$old_path"
     new_dir="$(dirname -- "$new_path")"
     # ensure destination exists
     mkdir -p -- "$new_dir"
