@@ -49,7 +49,9 @@ case "$ttynum" in
 esac
 
 re='^[0-9]+$'
-if ! [[ "$ttynum" =~ $re ]]; then
+if [ -z "$ttynum" ]; then
+  abort "tty can't be empty" 2
+elif ! [[ "$ttynum" =~ $re ]]; then
   abort 'tty must be a number' 2
 elif ! [ -f "/dev/tty$ttynum" ]; then
   abort "tty must be a file in /dev/tty*" 2
