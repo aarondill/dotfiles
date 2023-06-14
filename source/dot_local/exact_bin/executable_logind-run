@@ -57,6 +57,10 @@ elif ! [ -c "/dev/tty$ttynum" ]; then # Character special file
   abort "tty must be a file in /dev/tty*" 2
 fi
 
+if pgrep 'tty' -t "tty$ttynum" &>/dev/null; then
+  abort "It seems like this tty is in use. Please try a different tty" 1
+fi
+
 SUDO=${SUDO:-sudo}
 if [ "$EUID" -eq 0 ]; then SUDO=; fi
 exec $SUDO env "PATH=$PATH" systemd-run \
