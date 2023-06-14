@@ -37,13 +37,23 @@ for arg; do
 done
 
 if [ "$#" -lt 1 ]; then
-  log 'tty must be specified'
-  exit 2
+  abort 'tty must be specified' 2
 elif [ -z "${2:-}" ]; then
-  log 'command must be specified'
-  exit 2
+  abort 'command must be specified' 2
 fi
+
 ttynum=${1-34}
+# permit /dev/tty2 to work
+case "$ttynum" in
+/dev/tty*) ttynum=${ttynum#/dev/tty} ;;
+esac
+
+if ! [[ "$ttynum" =~ [:digit:]+ ]]; then
+  abort 'tty must be a number' 2
+elif ! [ -f "/dev/tty$ttynum" ]; then
+  abort "tty must be a file in /dev/tty*" 2
+fi
+
 SUDO=${SUDO:-sudo}
 if [ "$EUID" -eq 0 ]; then SUDO=; fi
 exec $SUDO env "PATH=$PATH" systemd-run \
