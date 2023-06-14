@@ -11,7 +11,7 @@ quiet() { "$@" &>/dev/null; }
 
 if quiet command -v gnome-keyring-daemon; then
   if ! quiet pgrep -u "$USER" gnome-keyring-d; then
-    gnome-keyring-daemon --daemonize --components=pkcs11,secrets,ssh,gpg >|"$ENV_FILE"
+    gnome-keyring-daemon --daemonize --components=pkcs11,secrets,ssh,gpg >|"$ENV_FILE" 2>/dev/null
   fi
 elif quiet command -v ssh-agent; then
   if ! quiet pgrep -u "$USER" ssh-agent; then
