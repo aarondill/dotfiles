@@ -48,7 +48,8 @@ case "$ttynum" in
 /dev/tty*) ttynum=${ttynum#/dev/tty} ;;
 esac
 
-if ! [[ "$ttynum" =~ [:digit:]+ ]]; then
+re='^[0-9]+$'
+if ! [[ "$ttynum" =~ $re ]]; then
   abort 'tty must be a number' 2
 elif ! [ -f "/dev/tty$ttynum" ]; then
   abort "tty must be a file in /dev/tty*" 2
