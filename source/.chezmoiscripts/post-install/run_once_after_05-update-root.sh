@@ -46,6 +46,9 @@ if [ $BACKUP -ne 0 ]; then
       sudo cp -T -- "$file" "$BACKUPDIR/$file"
     fi
   done
+  if ! sudo test -d "$BACKUPDIR"; then # Didn't even create the directory
+    log "No files will be overwritten! :)"
+  fi
 fi
 
 log "Last chance to safely stop overwrite of root. Press ctrl-c to cancel."
