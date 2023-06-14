@@ -35,4 +35,4 @@
 control keycode 105 = Meta_b
 control keycode 106 = Meta_f
 # No more caps lock.
-keycode 58 = Escape
+keycode 58 = Control
