@@ -31,5 +31,8 @@
 #  036   'j'    'J'    nl     nl     nscr   nscr   nl     nl      C
 #  037   'k'    'K'    vt     vt     pscr   pscr   nl     nl      C
 
+# Ctrl+right/left
 control keycode 105 = Meta_b
 control keycode 106 = Meta_f
+# No more caps lock.
+keycode 58 = Escape
