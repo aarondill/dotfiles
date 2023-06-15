@@ -16,3 +16,9 @@ fi
 if command -v isotope.dark &>/dev/null; then
   isotope.dark
 fi
+if [ -f /run/motd.dynamic ]; then
+  \cat /run/motd.dynamic
+elif [ -f /var/run/motd.dynamic ]; then
+  \cat /var/run/motd.dynamic
+fi
+[ -f /etc/motd ] && \cat /etc/motd
