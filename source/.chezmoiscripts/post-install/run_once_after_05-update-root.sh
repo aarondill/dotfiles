@@ -65,5 +65,10 @@ done
 # --no-same-owner to ensure owned by root (sudo)
 sudo tar --no-same-owner -xf "$TARDESTFILE" -C /
 
-log "NOTE: Please consider running 'update-grub' and 'update-initramfs -u' 'dpkg-reconfigure console-setup -phigh' in case these files changed (or the corresponding commmands)."
+log "NOTE: Please consider running"
+log "    update-grub"
+log "    update-initramfs -u   ||   mkinitcpio -P"
+log "    dpkg-reconfigure console-setup -phigh   # On debian/ubuntu!!"
+log "in the case that these files changed (or the corresponding commmands)."
+log "Press enter to continue" && read -n1 -r
 success
