@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
 # this is a hack to make desktop files with Terminal=true open in the right application
 set -euC -o pipefail
+terms=(x-terminal-emulator wezterm gnome-terminal xterm)
 
 if [ "${1:-}" != "--" ]; then
   exec /usr/bin/gnome-terminal "$@"
 else
-  exec x-terminal-emulator -e "${@:2}"
+  for t in "${terms[@]}"; do # Find first installed terminal application in $terms
+    if command -v "$t" &>/dev/null; then break; fi
+  done
+  # may fail if none installed. This is fine.
+  exec "$t" -e "${@:2}"
 fi
