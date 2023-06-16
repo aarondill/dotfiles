@@ -44,3 +44,5 @@ vscode/Java/java-format.xml
 .config/mimeapps.list
 .config/dircolors
 .config/screenkey.json
+.config/gtk-3.0/settings.ini
+.config/gtk-2.0/gtkfilechooser.ini
