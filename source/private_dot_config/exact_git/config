@@ -98,4 +98,5 @@ u%(upstream:trackshort)%(end)\
 	shallowify = "!bash -c 'git pull --depth \"${1:-1}\" \"${@:2}\" && git gc --prune=all' -- "
 	blobless = clone --filter=blob:none
 	treeless = clone --filter=tree:0
+	rh = reset --hard
 
