@@ -25,7 +25,7 @@ alias shutdown="history -a; /sbin/shutdown"
 
 alias backup="~/.backup/dobackup"
 alias lastbackup="/usr/bin/cat ~/.backup/backup-time"
-alias browser="sensible-browser"
+alias browser="google-chrome-stable"
 alias fslite="browser fslite.vercel.app 2>/dev/null"
 alias bc="bc --quiet --warn"
 alias lsblk="lsblk -e 7"
