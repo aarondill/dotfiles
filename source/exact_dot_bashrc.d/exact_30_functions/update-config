@@ -91,6 +91,10 @@ function update-root-config() {
   while IFS= read -r -d $'\0' file; do
     rootpath="/$file"
     homepath="$dotroot/$file"
+    if ! [ -f "$rootpath" ]; then
+      # Hasn't yet been copied to root (or deleted, but that's up to the user), so ignore it.
+      continue
+    fi
     if sudo cmp --quiet "$rootpath" "$homepath"; then
       # if same, move on
       continue
