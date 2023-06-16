@@ -25,7 +25,7 @@ alias shutdown="history -a; /sbin/shutdown"
 
 alias backup="~/.backup/dobackup"
 alias lastbackup="/usr/bin/cat ~/.backup/backup-time"
-alias browser="google-chrome-stable"
+alias browser="sensible-browser"
 alias fslite="browser fslite.vercel.app 2>/dev/null"
 alias bc="bc --quiet --warn"
 alias lsblk="lsblk -e 7"
@@ -37,12 +37,13 @@ if command -v tty-clock &>/dev/null; then alias clock='tty-clock  -sScbtrn'; fi
 # show hidden
 if command -v tree &>/dev/null; then alias tree='tree -a'; fi
 
-if command -v google-chrome &>/dev/null; then
+if command -v google-chrome-stable &>/dev/null; then
   # Alias to remove error messages on opening google-chrome
   # Also allows css detection of dark mode
-  chrome='google-chrome --enable-features=WebUIDarkMode --force-dark-mode'
+  chrome='google-chrome-stable --enable-features=WebUIDarkMode --force-dark-mode'
   # shellcheck disable=SC2139 # They are intended to expand at definition
   {
+    alias browser="$chrome"
     alias google-chrome="$chrome 2>/dev/null"
     alias chrome="$chrome 2>/dev/null"
     export BROWSER="$chrome"
