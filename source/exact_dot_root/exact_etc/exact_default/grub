@@ -33,6 +33,17 @@ GRUB_CMDLINE_LINUX=""
 # note that you can use only modes which your graphic card supports via VBE
 # you can see them in real GRUB with the command `vbeinfo'
 #GRUB_GFXMODE="640x480"
+GRUB_GFXMODE="auto"
+
+# Attempt to preserve the grub resolution into linux boot
+GRUB_GFXPAYLOAD_LINUX=keep
+
+# Use a PNG or 8-bit JPG file for grub background image
+GRUB_BACKGROUND=""
+
+# Set menu coloring
+GRUB_COLOR_NORMAL=white/black
+GRUB_COLOR_HIGHLIGHT=black/light-gray
 
 # Uncomment if you don't want GRUB to pass "root=UUID=xxx" parameter to Linux
 #GRUB_DISABLE_LINUX_UUID="true"
