@@ -40,6 +40,7 @@ GRUB_GFXPAYLOAD_LINUX=keep
 
 # Use a PNG or 8-bit JPG file for grub background image
 GRUB_BACKGROUND=""
+GRUB_THEME="/boot/grub/themes/argon/theme.txt"
 
 # Set menu coloring
 GRUB_COLOR_NORMAL=white/black
