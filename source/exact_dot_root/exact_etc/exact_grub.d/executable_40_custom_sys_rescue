@@ -28,7 +28,7 @@ ROOT_UUID="$(blkid -o value -s UUID -- "$mount")"
 
 CLASS="--class gnu-linux --class gnu --class os --class rescue"
 
-log "Creating rescue mode linux with the iso '$system_rescue_iso'"
+log "Found rescue mode linux: $system_rescue_iso"
 
 # DO NOT output anything to stdout BEFORE THIS!
 # At any point before this cat, you should assume
