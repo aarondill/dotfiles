@@ -1,0 +1,55 @@
+#!/bin/sh
+# Create a "rescue mode" grub entry that boots into a /boot/systemrescue.iso file
+
+set -euC
+# log to stderr bc stdout is to grub
+log() { printf '%s\n' "$@" >&2; }
+err() { printf '%s\n' "$@" >&2; }
+abort() {
+  log "$1"
+  exit 1
+}
+
+# This file provides text mode grub entries to boot without gui.
+if ! [ "$(printf '%s\n' 'v0.1.1' 'v0.10.0' | sort -V)" = "$(printf '%s\n' 'v0.1.1' 'v0.10.0')" ]; then
+  abort "This requires a sort that supports version sorting"
+fi
+
+system_rescue_iso=${SYSTEM_RESCUE_ISO:-/boot/systemrescue.iso}
+if ! [ -f "$system_rescue_iso" ]; then
+  abort "'$system_rescue_iso' not found. Not creating rescue entry." 0
+fi
+
+mount=$(df -P "$system_rescue_iso" | awk 'END{print $1}')
+if ! [ -b "$mount" ]; then
+  abort "could not find mount point for '$system_rescue_iso'" 1
+fi
+ROOT_UUID="$(blkid -o value -s UUID -- "$mount")"
+
+CLASS="--class gnu-linux --class gnu --class os --class rescue"
+
+log "Creating rescue mode linux with the iso '$system_rescue_iso'"
+
+# DO NOT output anything to stdout BEFORE THIS!
+# At any point before this cat, you should assume
+# that the program can end at any time, and that
+# if it does, the user's computer *will not* boot
+# This is likely exaggerated, as grub would likely save it
+# but that's not a risk that should be unnecessarily taken.
+
+cat <<-EOF
+menuentry "systemrescue.iso" $CLASS {
+        insmod part_gpt
+        insmod ext2
+        search --no-floppy --fs-uuid --set=root "$ROOT_UUID"
+        iso_path="$system_rescue_iso"
+        export iso_path
+        kernelopts="   "
+        export kernelopts
+        # support booting recent GRUB versions on UEFI systems
+        rmmod tpm
+        loopback loop "$system_rescue_iso"
+        set root=(loop)
+        configfile /boot/grub/loopback.cfg
+}
+EOF
