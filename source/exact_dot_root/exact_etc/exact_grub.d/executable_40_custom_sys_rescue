@@ -26,7 +26,7 @@ if ! [ -b "$mount" ]; then
 fi
 ROOT_UUID="$(blkid -o value -s UUID -- "$mount")"
 
-CLASS="--class gnu-linux --class gnu --class os --class rescue"
+CLASS="--class rescue --class gnu-linux --class gnu --class os"
 
 log "Found rescue mode linux: $system_rescue_iso"
 
