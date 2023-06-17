@@ -5,7 +5,7 @@
 title-text: ""
 desktop-image: "background.png"
 desktop-color: "#000000"
-terminal-font: "Console Bold 32"
+terminal-font: "Console Bold 16"
 terminal-left: "0%"
 terminal-top: "0%"
 terminal-width: "100%"
@@ -26,7 +26,7 @@ terminal-border: "0"
   item_icon_space = 34
   item_height = 74
   item_padding = 16
-  item_spacing = 21
+  item_spacing = 11
   selected_item_pixmap_style = "select_*.png"
 }
 
