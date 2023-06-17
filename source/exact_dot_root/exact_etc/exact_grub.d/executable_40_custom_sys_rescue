@@ -7,7 +7,7 @@ log() { printf '%s\n' "$@" >&2; }
 err() { printf '%s\n' "$@" >&2; }
 abort() {
   log "$1"
-  exit 1
+  exit "${2:-1}"
 }
 
 # This file provides text mode grub entries to boot without gui.
