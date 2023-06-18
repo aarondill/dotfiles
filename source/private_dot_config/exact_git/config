@@ -69,7 +69,7 @@
 	ammend = commit --amend
 
         # Pretty log
-	hist = log --color --graph '--pretty=format:%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+	hist = log --graph '--pretty=format:%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
         history = hist
 
         # Things I forget
