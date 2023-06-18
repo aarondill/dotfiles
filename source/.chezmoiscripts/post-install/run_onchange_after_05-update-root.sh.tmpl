@@ -5,7 +5,7 @@
 
 # rerun this script every time any file in the '~/.root' directory is changed:
 # {{ $files_arr := glob ( joinPath .chezmoi.sourceDir "*dot_root" "**" "*" ) }}
-# {{ $filename = ( osBase .chezmoi.sourceFile ) }}
+# {{ $filename := ( osBase .chezmoi.sourceFile ) }}
 #
 # length so added/removed reruns
 # {{$filename}} hash: {{ len $files_arr }}
