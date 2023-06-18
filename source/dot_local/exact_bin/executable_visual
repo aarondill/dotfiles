@@ -38,7 +38,13 @@ disp_regex="^:[[:digit:]]+$"
 if [ -z "$server" ] && [[ "$wm" =~ $disp_regex ]]; then server="$wm" wm=''; fi
 
 # visual :3 OR visual awesome
-if [ -z "$wm" ]; then wm="x-window-manager"; fi
+if [ -z "$wm" ]; then
+  if [ -x "$(command -v x-window-manager)" ]; then
+    wm=x-window-manager
+  elif [ -x "$(command -v x-terminal-emulator)" ]; then
+    wm=x-terminal-emulator
+  fi
+fi
 
 if ! wmpath=$(which "$wm" 2>/dev/null); then
   printf '%s\n' "Unable to find $wm in \$PATH" >&2
@@ -53,7 +59,7 @@ fi
 # $"" # <-- fix highlighting
 cmd=("${cmd[@]}" "$server" "${rest[@]}")
 
-if command -v dbus-launch &>/dev/null; then
+if command -v dbus-launch &>/dev/null; then # Handle user dbus if command is available
   cmd=(dbus-launch --exit-with-session -- "${cmd[@]}")
 fi
 
