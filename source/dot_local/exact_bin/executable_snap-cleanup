@@ -24,7 +24,15 @@ EOF
 log() { printf '%s\n' "$@"; }
 color() { printf '%b' "$@"; }
 err() { printf "$RED_COLOR$THIS: %s\n$OFF_COLOR" "$@" >&2; }
-abort() { err "$1" && exit "${2:-1}"; }
+abort() {
+  err "$1"
+  exit "${2:-1}"
+}
+# use like '$sudo do_something' - could break with SUDO="something with spaces"
+sudo=
+if [ "$(id -u)" -ne 0 ]; then
+  sudo="${SUDO:-sudo}"
+fi
 
 # Returns a string that should be 'eval'ed to set the positional arguments
 # Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
@@ -60,27 +68,24 @@ while true; do
   esac
 done
 
-# Execute it as root user
-if [ "${USER}" != root ]; then abort "Must be root! Aborting..."; fi
-
 # Current status
 USED_BEFORE="$(df -k / | awk 'NR>1 {print $3}')"
 
 # snapd revisions clean
-if [ -n "$(command -v snap)" ]; then
+if [ -x "$(command -v snap)" ]; then
   # shellcheck disable=SC2162
   read -p "→ Do you want to remove unused snapd revisions? [Y/n] " KEY
   KEY="${KEY:0:1}" && KEY="${KEY,,}"
   if [ "${KEY}" = "y" ] || [ "${KEY}" = "" ]; then
     # remove unused snapd revisions
     log "Removing unused snapd revisions..."
-    snap set system refresh.retain=2
-    snap list --all | awk '/disabled/ {print $1, $3}' |
+    $sudo snap set system refresh.retain=2
+    $sudo snap list --all | awk '/disabled/ {print $1, $3}' |
       while read -r SNAP_NAME SNAP_REV; do
-        snap remove "${SNAP_NAME}" --revision="${SNAP_REV}"
+        $sudo snap remove "${SNAP_NAME}" --revision="${SNAP_REV}"
       done
-    if [ -d /var/lib/snapd/cache ] && [ -n "$(find /var/lib/snapd/cache/ -mindepth 1)" ]; then
-      rm /var/lib/snapd/cache/*
+    if [ -d /var/lib/snapd/cache ] && [ -n "$($sudo find /var/lib/snapd/cache/ -mindepth 1)" ]; then
+      $sudo rm /var/lib/snapd/cache/*
     fi
     log "Nothing unused to uninstall"
   else
