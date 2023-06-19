@@ -17,7 +17,7 @@ not to force yes, or any other convience
 Use \$SUDO to override the sudo command, and use
 METHOD_ARGS to pass additional options to each command. (IE, NATIVE_ARGS)
 Currently supported methods are: native, snap, flatpak, pnpm, npm
-use 'native' to enable or 'native-' to disable. ORDER MATTERS!
+use 'native' to enable or '+native' to disable. ORDER MATTERS!
 Options:
 --as-root: allow running as root (Discouraged!)
 EOF
@@ -90,13 +90,13 @@ else
   for arg; do
     case "${arg,,}" in # Allow `native` to enable or `native-` to disable. ORDER MATTERS!
     apt | nala | pacman | native) native=1 ;;
-    apt- | nala- | pacman- | native-) native=0 ;;
-    flatpak) flatpak=1 ;; flatpak-) flatpak=0 ;;
-    snap) snap=1 ;; snap-) snap=0 ;;
-    pnpm) pnpm=1 ;; pnpm-) pnpm=0 ;;
-    npm) npm=1 ;; npm-) npm=0 ;;
+    +apt | +nala | +pacman | +native) native=0 ;;
+    flatpak) flatpak=1 ;; +flatpak) flatpak=0 ;;
+    snap) snap=1 ;; +snap) snap=0 ;;
+    pnpm) pnpm=1 ;; +pnpm) pnpm=0 ;;
+    npm) npm=1 ;; +npm) npm=0 ;;
     all) native=1 flatpak=1 snap=1 pnpm=1 npm=1 ;;
-    all-) native=0 flatpak=0 snap=0 pnpm=0 npm=0 ;;
+    +all) native=0 flatpak=0 snap=0 pnpm=0 npm=0 ;;
     esac
   done
 fi
