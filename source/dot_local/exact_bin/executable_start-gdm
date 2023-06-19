@@ -15,6 +15,11 @@ EOF
 log() { printf '%s\n' "$@"; }
 err() { printf "$THIS: %s\n" "$@" >&2; }
 abort() { err "$1" && exit "${2:-1}"; }
+# use like '$sudo do_something' - could break with SUDO="something with spaces"
+sudo=
+if [ "$(id -u)" -ne 0 ]; then
+  sudo="${SUDO:-sudo}"
+fi
 
 # Basic arg handling
 invalid=false
@@ -40,15 +45,15 @@ concat() { printf '%s ' "$@"; }
 tmp_file="$(mktemp)" || abort "Error making tmp file"
 trap 'rm -f "$tmp_file"' EXIT
 
-sudo kill -s SIGRTMIN+21 1 || abort "Error setting systemd to hide status"
+$sudo kill -s SIGRTMIN+21 1 || abort "Error setting systemd to hide status"
 # reads from mount if present
 concat "$(remove_from_file /proc/cmdline 'splash' 'nosplash' 'plymouth.enable=0')" "splash" >|"$tmp_file"
 # This fails if not a mount
-sudo umount /proc/cmdline -q || true
-sudo mount -n --bind -o ro "$tmp_file" /proc/cmdline || abort 'Failed to make bind mount on /proc/cmdline'
+$sudo umount /proc/cmdline -q || true
+$sudo mount -n --bind -o ro "$tmp_file" /proc/cmdline || abort 'Failed to make bind mount on /proc/cmdline'
 
 # Cleanup
 rm -f "$tmp_file" && trap '' EXIT
 
 # start the graphical system
-exec sudo systemctl isolate graphical.target
+exec $sudo systemctl isolate graphical.target

@@ -109,7 +109,7 @@ else
   BrNew="$((BrNew > BrMax ? BrMax : BrNew))"
 
   sudo=""
-  if ! [ -w "$BrPath"/brightness ]; then sudo="sudo"; fi
+  if ! [ -w "$BrPath"/brightness ]; then sudo="${SUDO:-sudo}"; fi
 
   printf '%s' "$BrNew" | $sudo tee "$BrPath/brightness" >/dev/null
 fi

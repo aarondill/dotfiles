@@ -102,7 +102,7 @@ else
 fi
 
 # Environment variables
-SUDO=${SUDO:-sudo}
+SUDO="${SUDO:-sudo}"
 # shellcheck disable=SC2206 # Splitting would otherwise happen on the command line, so this is not *my* problem.
 {
   NATIVE_ARGS=(${NATIVE_ARGS:-})

@@ -16,6 +16,11 @@ EOF
 log() { printf '%s\n' "$@"; }
 err() { printf "$THIS: %s\n" "$@" >&2; }
 abort() { err "$1" && exit "${2:-1}"; }
+# use like '$sudo do_something' - could break with SUDO="something with spaces"
+sudo=
+if [ "$(id -u)" -ne 0 ]; then
+  sudo="${SUDO:-sudo}"
+fi
 
 # Returns a string that should be 'eval'ed to set the positional arguments
 # Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
@@ -48,14 +53,14 @@ while true; do
   esac
 done
 
-sudo du -h --max-depth=1 -a --one-file-system -- "$@" |
+# shellcheck disable=SC2016 # it's awk, you just don't know
+$sudo du -h --max-depth=1 -a --one-file-system -- "$@" |
   sort -hs |
-  # coloring
-  awk '{
+  $sudo awk '{
     printf("%4s ", $1);
     s="";
     for (i = 2; i <= NF; i++) s = s $i " ";
     s = substr(s, 1, length(s)-1);
     sub( /^.\//, "", s)
-    system("sudo ls --color=always -d -- \"" s "\"")
+    system("ls --color=always -d -- \"" s "\"")
     }'

@@ -24,6 +24,11 @@ EOF
 log() { printf '%s\n' "$@"; }
 err() { printf "${THIS:-$0}: %s\n" "$@" >&2; }
 abort() { err "$1" && exit "${2:-1}"; }
+# use like '$sudo do_something' - could break with SUDO="something with spaces"
+sudo=
+if [ "$(id -u)" -ne 0 ]; then
+  sudo="${SUDO:-sudo}"
+fi
 
 # Returns a string that should be 'eval'ed to set the positional arguments
 # Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
@@ -96,15 +101,12 @@ if ! [ "$yes" -eq 1 ]; then
   fi
 fi
 
-# Update sudo timestamp
-sudo --validate
-
-sudo mkdir -p "$JVM_VERS_DIR"
+$sudo mkdir -p "$JVM_VERS_DIR"
 JVM_VERS_DIR=$(realpath -- "$JVM_VERS_DIR")
 
 if [[ $(dirname -- "$JAVADIR") != "$JVM_VERS_DIR" ]]; then
   printf 'Copying files to "%s"\n' "$JVM_VERS_DIR" >&2
-  sudo -E -H -- cp --archive --interactive "$JAVADIR" "$JVM_VERS_DIR"
+  $sudo cp --archive --interactive "$JAVADIR" "$JVM_VERS_DIR"
   JAVADIR="$JVM_VERS_DIR/$(basename -- "$JAVADIR")"
 fi
 
@@ -112,14 +114,14 @@ if command -v update-alternatives &>/dev/null; then
   function link() {
     dest_path=$1 name=$2 from_path=$3 priority=$4
     [ "$quiet" != 1 ] && printf '%s\n' "update-alternatives --install \"$dest_path\" \"$name\" \"$from_path\" \"$priority\""
-    sudo -EH -- update-alternatives --install "$dest_path" "$name" "$from_path" "$priority"
+    $sudo update-alternatives --install "$dest_path" "$name" "$from_path" "$priority"
   }
 else
   # use ln because update-alternatives is not available
   function link() {
     dest_path=$1 name=$2 from_path=$3 priority=$4
     [ "$quiet" != 1 ] && printf '%s\n' "ln -s -T \"$from_path\" \"$dest_path\""
-    sudo -EH -- ln -s -T "$from_path" "$dest_path"
+    $sudo ln -s -T "$from_path" "$dest_path"
   }
 fi
 
@@ -131,6 +133,11 @@ done < <(find "$JAVADIR" -perm /u=x,g=x,o=x -type f -print0)
 
 # Link the default-java file to this folder
 cmd=(ln -sf -T "$JAVADIR" "$JVM_VERS_DIR/default-java")
-log "sudo ${cmd[*]}"
-sudo "${cmd[@]}"
+
+if [ -n "$sudo" ]; then
+  cmd=("$sudo" "${cmd[@]}")
+fi
+
+log "${cmd[*]}"
+"${cmd[@]}"
 unset -v cmd
