@@ -165,6 +165,13 @@ if [ "$pnpm" -eq 1 ] && cmd_available pnpm; then
   success
 fi
 
+if [ "$npm" -eq 1 ] && cmd_available n; then
+  log "Updating npm!"
+  log
+  show_run n lts
+  success
+fi
+
 if [ "$npm" -eq 1 ] && cmd_available npm; then
   log "Updating npm packages!"
   log
