@@ -1,102 +1,103 @@
 # ~/.gitconfig
 [user]
-	name = aarondill
-	email = aaronsacks2006@gmail.com
+  name = aarondill
+  email = aaronsacks2006@gmail.com
 [credential "https://github.com"]
-	helper = 
-	helper = !/usr/bin/gh auth git-credential
+  helper = 
+  helper = !/usr/bin/gh auth git-credential
 [credential "https://gist.github.com"]
-	helper = 
-	helper = !/usr/bin/gh auth git-credential
+  helper = 
+  helper = !/usr/bin/gh auth git-credential
 [core]
-	editor = vim
-	excludesFile = ~/vscode/js/.gitignore
+  editor = vim
+  excludesFile = ~/vscode/js/.gitignore
 
 [init]
-	defaultBranch = main
+  defaultBranch = main
 [fetch]
-        prune = true
+  prune = true
 [push]
-	default = current
+  default = current
 [pull]
-        ff = yes
+  ff = yes
+  rebase = merges
 [merge]
-        ff = no
+  ff = no
 [rebase]
-        autosquash = true
+  autosquash = true
 [rerere]
-	enabled = 1
+  enabled = 1
 
 [format]
-        pretty = format:"%C(yellow)commit %H%C(auto)%d%n%C(reset)%C(brightblue)Author: %an <%ae>%C(reset)%n%C(green)Date:   %ad%C(reset)%n%n%C(brightyellow)%w(0,4,4)%s%n%n%C(reset)%b%n" 
+  pretty = format:"%C(yellow)commit %H%C(auto)%d%n%C(reset)%C(brightblue)Author: %an <%ae>%C(reset)%n%C(green)Date:   %ad%C(reset)%n%n%C(brightyellow)%w(0,4,4)%s%n%n%C(reset)%b%n" 
 [color]
-	ui = auto
+  ui = auto
 [color "branch"]
-    remote = brightgreen
-    local = brightblue
-    current = brightcyan bold
-    upstream = yellow
+  remote = brightgreen
+  local = brightblue
+  current = brightcyan bold
+  upstream = yellow
 
 [alias]
         # Create new aliases with git alias 'name' 'cmd'
-	alias = "!_no_user_made_f(){ if [ \"$1\" = \"--unset\" ]; then git config --global --unset \"alias.$2\" ;else local a=$1; shift ; git config --global \"alias.$a\" \"$@\" ; fi ; unset _no_user_made_f ; } ; _no_user_made_f"
+  alias = "!_no_user_made_f(){ if [ \"$1\" = \"--unset\" ]; then git config --global --unset \"alias.$2\" ;else local a=$1; shift ; git config --global \"alias.$a\" \"$@\" ; fi ; unset _no_user_made_f ; } ; _no_user_made_f"
         # Last commit
-	last = log -1 HEAD
+  last = log -1 HEAD
 
         # Remove from staging area
-	unstage = reset HEAD --
+  unstage = reset HEAD --
 
         # Verbose committing
-	commit = commit -v
+  commit = commit -v
 
         # Abbreviations
-	sw = switch
-	res = restore
-	ci = commit -v
-	co = commit -v
-	st = status
-	br = branch
-	p = !git push origin $(git rev-parse --abbrev-ref HEAD) -u
-        new = switch -c
+  sw = switch
+  res = restore
+  ci = commit -v
+  co = commit -v
+  st = status
+  br = branch
+  p = !git push origin $(git rev-parse --abbrev-ref HEAD) -u
+  new = switch -c
 
         # Less destructive pushing
-	fpush = push --force-with-lease
-	pushf = push --force-with-lease
+  fpush = push --force-with-lease
+  pushf = push --force-with-lease
 
         # Fix my typos
-	branches = branch
-	amend = commit --amend
-	ammend = commit --amend
+  branches = branch
+  amend = commit --amend
+  ammend = commit --amend
 
         # Pretty log
-	hist = log --graph '--pretty=format:%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
-        history = hist
+  hist = log --graph '--pretty=format:%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+  history = hist
 
         # Things I forget
-	rmremotebranch = push --delete 
-        mvbranch = "!__moveit() { git branch -m \"$1\" \"$2\"; git push origin :\"$1\"; git push --set-upstream origin \"$2\"; }; __moveit"
+  rmremotebranch = push --delete 
+  mvbranch = "!__moveit() { git branch -m \"$1\" \"$2\"; git push origin :\"$1\"; git push --set-upstream origin \"$2\"; }; __moveit"
 
         # Show branches
-        local-branches = "!git branch --format \"%(color:red)%(HEAD) \
-%(color:brightblue)%(refname:short)%(color:reset)\
-%(if) %(upstream) %(then) --> %(color:brightgreen)%(upstream:short) \
-u%(upstream:trackshort)%(end)\
-%(if) %(symref) %(then): %(symref:short)%(end)\"" 
-        remote-branches = branch -r
-        all-branches = !git remote-branches && git local-branches
+  local-branches = "!git branch --format \"%(color:red)%(HEAD) \
+    %(color:brightblue)%(refname:short)%(color:reset)\
+    %(if) %(upstream) %(then) --> %(color:brightgreen)%(upstream:short) \
+    u%(upstream:trackshort)%(end)\
+    %(if) %(symref) %(then): %(symref:short)%(end)\"" 
+  remote-branches = branch -r
+  all-branches = !git remote-branches && git local-branches
 
         # Random Utilities
-	root = rev-parse --show-toplevel
+  root = rev-parse --show-toplevel
         # Get to a detached HEAD state on purpose! Usage: `git detach [REF]`
-        detach = switch -d
+  detach = switch -d
         # Print short sha1; usage: `git sha1 [REF]`
-        sha1 = !sh -c 'git rev-parse --short ${1:-HEAD}' --
+  sha1 = !sh -c 'git rev-parse --short ${1:-HEAD}' --
         # Commit a fixup
-        fixup = commit --fixup
-        merge-remote = "!git fetch --all && git merge"
-	pf = push --force-with-lease
-	shallowify = "!bash -c 'git pull --depth \"${1:-1}\" \"${@:2}\" && git gc --prune=all' -- "
-	blobless = clone --filter=blob:none
-	treeless = clone --filter=tree:0
-	rh = reset --hard
+  fixup = commit --fixup
+  merge-remote = "!git fetch --all && git merge"
+  pf = push --force-with-lease
+  shallowify = "!bash -c 'git pull --depth \"${1:-1}\" \"${@:2}\" && git gc --prune=all' -- "
+  blobless = clone --filter=blob:none
+  treeless = clone --filter=tree:0
+  rh = reset --hard
 
