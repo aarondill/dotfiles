@@ -13,7 +13,7 @@ LANG=en_US.UTF-8
 usage() {
   cat <<EOF
 $THIS [options] [--] [arguments]
-Cleans up the excess snap revisions and files. Must be run as root.
+Cleans up the excess snap revisions and files. Use \$SUDO to change the program used.
 
 Options:
 -h, --help        show this message
