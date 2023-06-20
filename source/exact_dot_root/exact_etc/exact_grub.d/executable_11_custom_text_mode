@@ -18,8 +18,6 @@ abort() {
   exit "${2:-1}"
 }
 
-log "Creating text mode linux: $LINUX_ROOT_DEVICE"
-
 # taken from 10_linux
 # btrfs may reside on multiple devices. We cannot pass them as value of root= parameter
 # and mounting btrfs requires user space scanning, so force UUID in this case.
@@ -35,6 +33,8 @@ elif [ -z "$GRUB_DEVICE_UUID" ] || [ "${GRUB_DISABLE_LINUX_UUID:-}" = "true" ]; 
 else
   LINUX_ROOT_DEVICE=UUID=$GRUB_DEVICE_UUID
 fi
+
+log "Creating text mode linux: $LINUX_ROOT_DEVICE"
 
 get_init_rd_path() { # {{{1
   _linux=$1
