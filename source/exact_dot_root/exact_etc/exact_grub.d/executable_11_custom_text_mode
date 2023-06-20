@@ -112,7 +112,7 @@ get_linux_kernal() { # {{{1
 }
 
 linux=$(get_linux_kernal)
-dirname=$(dirname "$_linux")
+dirname=$(dirname "$linux")
 rel_dirname=$(make_system_path_relative_to_its_root "$dirname")
 initrd=$(get_init_rd_path "$linux")
 
