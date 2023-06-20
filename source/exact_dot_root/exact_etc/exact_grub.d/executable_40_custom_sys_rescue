@@ -35,15 +35,15 @@ log "Found rescue mode linux: $system_rescue_iso"
 
 cat <<-EOF
 menuentry "systemrescue.iso" $CLASS {
-        $(prepare_grub_to_access_device "$mount")
-        iso_path="$system_rescue_iso"
-        export iso_path
-        kernelopts="   "
-        export kernelopts
-        # support booting recent GRUB versions on UEFI systems
-        rmmod tpm
-        loopback loop "\$is_path"
-        set root=(loop)
-        configfile /boot/grub/loopback.cfg
+$(prepare_grub_to_access_device "$mount" | grub_add_tab)
+	iso_path="$system_rescue_iso"
+	export iso_path
+	kernelopts="   "
+	export kernelopts
+	# support booting recent GRUB versions on UEFI systems
+	rmmod tpm
+	loopback loop "\$is_path"
+	set root=(loop)
+	configfile /boot/grub/loopback.cfg
 }
 EOF
