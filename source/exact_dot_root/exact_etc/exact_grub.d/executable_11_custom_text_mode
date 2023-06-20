@@ -40,8 +40,8 @@ get_init_rd_path() { # {{{1
   _linux=$1
   version="$(printf "%s" "$(basename "$linux")" | sed -e "s,^[^0-9]*-,,g")"
   alt_version=$(echo "$version" | sed -e "s,\.old$,,g")
-  dirname=$(dirname "$_linux")
-  rel_dirname=$(make_system_path_relative_to_its_root "$dirname")
+  _dirname=$(dirname "$_linux")
+  _rel_dirname=$(make_system_path_relative_to_its_root "$_dirname")
 
   case "$(uname -m)" in
   i?86) GENKERNEL_ARCH="x86" ;;
@@ -84,7 +84,7 @@ get_init_rd_path() { # {{{1
 
   initrd_path=
   for i in ${initrd}; do
-    initrd_path="${initrd_path} ${rel_dirname}/${i}"
+    initrd_path="${initrd_path} ${_rel_dirname}/${i}"
   done
   printf "%s" "$initrd_path"
   # }}}
@@ -112,6 +112,8 @@ get_linux_kernal() { # {{{1
 }
 
 linux=$(get_linux_kernal)
+dirname=$(dirname "$_linux")
+rel_dirname=$(make_system_path_relative_to_its_root "$dirname")
 initrd=$(get_init_rd_path "$linux")
 
 # Remove splash and quiet args from GRUB_CMDLINE_LINUX_DEFAULT
@@ -156,7 +158,7 @@ cat <<-EOF
 EOF
 prepare_grub_to_access_device "$GRUB_DEVICE" | grub_add_tab
 cat <<-EOF
-  linux "$linux" "root=$LINUX_ROOT_DEVICE" ro $GRUB_CMDLINE_ARGS init 3
-  initrd $initrd
+  linux	$rel_dirname/$basename "root=$LINUX_ROOT_DEVICE" ro $GRUB_CMDLINE_ARGS init 3
+  initrd	$initrd
 }
 EOF
