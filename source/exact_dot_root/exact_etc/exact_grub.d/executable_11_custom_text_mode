@@ -1,6 +1,9 @@
 #!/bin/sh
 # Create a "text mode" grub entry that boots to runlevel 3, instead of graphical.target
 
+# hardcoded in 10_linux
+gfxpayload_dynamic="1"
+
 # Source grub library
 # shellcheck source=/usr/lib/grub/grub-mkconfig_lib
 . "$pkgdatadir/grub-mkconfig_lib"
@@ -41,14 +44,16 @@ one_match_glob() {
   printf '%s' "$file"
 }
 
-VMLINUZ=$(find_highest_version /boot 'vmlinuz-*-generic')
-INITRD=$(find_highest_version /boot 'initrd.img-*-generic')
+VMLINUZ=$(find_highest_version /boot 'vmlinuz-*')
 # Fallbacks - desperately try to find one.
 if [ -z "$VMLINUZ" ]; then VMLINUZ="$(one_match_glob /boot/vmlinuz*)" || abort "Could not find vmlinuz"; fi
 
+INITRD=$(find_highest_version /boot 'initrd.img-*')
 if [ -z "$INITRD" ]; then
   INITRD=$(one_match_glob /boot/initrd.img*) || INITRD=$(one_match_glob /boot/initramfs*) || abort "Could not find initrd.img"
 fi
+
+VERSION=$(printf "%s" "$(basename "$VMLINUZ")" | sed -e "s,^[^0-9]*-,,g")
 
 # Remove splash and quiet args from GRUB_CMDLINE_LINUX_DEFAULT
 GRUB_CMDLINE_ARGS=$(printf '%s' "$GRUB_CMDLINE_LINUX_DEFAULT" | sed -e 's/\bsplash\b//g' -e 's/\bquiet\b//g' -e 's/^ \+//g')
@@ -63,7 +68,7 @@ if [ -n "$GRUB_DISTRIBUTOR" ]; then
   esac
   CLASS="--class $(echo "$GRUB_DISTRIBUTOR" | tr '[:upper:]' '[:lower:]' | cut -d' ' -f1 | LC_ALL=C sed 's,[^[:alnum:]_],_,g') $CLASS"
 fi
-TITLE="$(gettext_printf "%s (Text mode)" "$OS")"
+TITLE="$(gettext_printf "%s, with Linux %s (Text mode)" "$OS" "$VERSION")"
 
 log "Creating text mode linux at the current root drive '$LINUX_ROOT_DEVICE'"
 log "Found vmlinuz '$VMLINUZ'"
@@ -81,8 +86,16 @@ menuentry '$(printf "%s" "$TITLE" | grub_quote)' $CLASS {
   recordfail
 EOF
 save_default_entry | grub_add_tab
+# taken from 10_linux
+if [ -z "$GRUB_GFXPAYLOAD_LINUX" ] || [ "$GRUB_GFXPAYLOAD_LINUX" != text ]; then
+  echo "load_video" | grub_add_tab
+fi
+if [ -n "$GRUB_GFXPAYLOAD_LINUX" ] || [ "$gfxpayload_dynamic" = 1 ]; then
+  # This variable is set in 10_linux, so this script *must* come after.
+  echo "gfxmode \$linux_gfx_mode" | grub_add_tab
+fi
+
 cat <<-EOF
-  gfxmode \$linux_gfx_mode
   insmod gzio
   if [ x\$grub_platform = xxen ]; then insmod xzio; insmod lzopio; fi
 EOF
