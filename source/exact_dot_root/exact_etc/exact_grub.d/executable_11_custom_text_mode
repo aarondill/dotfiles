@@ -70,9 +70,9 @@ if [ -n "$GRUB_DISTRIBUTOR" ]; then
 fi
 TITLE="$(gettext_printf "%s, with Linux %s (Text mode)" "$OS" "$VERSION")"
 
-log "Creating text mode linux at the current root drive '$LINUX_ROOT_DEVICE'"
-log "Found vmlinuz '$VMLINUZ'"
-log "Found initrd '$INITRD'"
+log "Creating text mode linux: $LINUX_ROOT_DEVICE"
+log "Found vmlinuz: $VMLINUZ"
+log "Found initrd: $INITRD"
 
 # DO NOT output anything to stdout BEFORE THIS!
 # At any point before this cat, you should assume
