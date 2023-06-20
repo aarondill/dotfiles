@@ -158,7 +158,7 @@ else
 fi
 cat <<-EOF
   echo  "$(gettext_printf "Loading Linux %s ..." "$version" | grub_quote)"
-  linux	$rel_dirname/$basename "root=$LINUX_ROOT_DEVICE" ro $GRUB_CMDLINE_ARGS init 3
+  linux	$rel_dirname/$basename "root=$LINUX_ROOT_DEVICE" ro $GRUB_CMDLINE_ARGS 3
   echo  "$(gettext_printf "Loading initial ramdisk ..." | grub_quote)"
   initrd	$initrd
 }

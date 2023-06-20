@@ -1,7 +1,12 @@
 #!/bin/sh
 # Create a "rescue mode" grub entry that boots into a /boot/systemrescue.iso file
 
-set -euC
+# Source grub library
+# shellcheck source=/usr/lib/grub/grub-mkconfig_lib
+. "$pkgdatadir/grub-mkconfig_lib"
+
+set -eC # HACK: -u is disabled because the grub libraries don't expect it.
+
 # log to stderr bc stdout is to grub
 log() { printf '%s\n' "$@" >&2; }
 err() { printf '%s\n' "$@" >&2; }
@@ -10,18 +15,12 @@ abort() {
   exit "${2:-1}"
 }
 
-# This file provides text mode grub entries to boot without gui.
-if ! [ "$(printf '%s\n' 'v0.1.1' 'v0.10.0' | sort -V)" = "$(printf '%s\n' 'v0.1.1' 'v0.10.0')" ]; then
-  abort "This requires a sort that supports version sorting"
-fi
-
 system_rescue_iso=${SYSTEM_RESCUE_ISO:-/boot/systemrescue.iso}
 if ! [ -f "$system_rescue_iso" ]; then
   abort "'$system_rescue_iso' not found. Not creating rescue entry." 0
 fi
 
-mount=$(grub-probe --target=device "$system_rescue_iso")
-ROOT_UUID="$(blkid -o value -s UUID -- "$mount")"
+mount=$("$grub_probe" --target=device "$system_rescue_iso")
 
 CLASS="--class rescue --class gnu-linux --class gnu --class os"
 
@@ -36,16 +35,14 @@ log "Found rescue mode linux: $system_rescue_iso"
 
 cat <<-EOF
 menuentry "systemrescue.iso" $CLASS {
-        insmod part_gpt
-        insmod ext2
-        search --no-floppy --fs-uuid --set=root "$ROOT_UUID"
+        $(prepare_grub_to_access_device "$mount")
         iso_path="$system_rescue_iso"
         export iso_path
         kernelopts="   "
         export kernelopts
         # support booting recent GRUB versions on UEFI systems
         rmmod tpm
-        loopback loop "$system_rescue_iso"
+        loopback loop "\$is_path"
         set root=(loop)
         configfile /boot/grub/loopback.cfg
 }
