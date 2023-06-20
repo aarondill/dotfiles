@@ -15,8 +15,21 @@ if ! [ "$(printf '%s\n' 'v0.1.1' 'v0.10.0' | sort -V)" = "$(printf '%s\n' 'v0.1.
   abort "This requires a sort that supports version sorting"
 fi
 
-ROOT_DEV=$("$grub_probe" --target=device /)
-ROOT_UUID="$(blkid "$ROOT_DEV" -s UUID -o value)"
+# taken from 10_linux
+# btrfs may reside on multiple devices. We cannot pass them as value of root= parameter
+# and mounting btrfs requires user space scanning, so force UUID in this case.
+if
+  { [ -z "$GRUB_DEVICE_UUID" ] && [ -z "$GRUB_DEVICE_PARTUUID" ]; } ||
+    { [ "$GRUB_DISABLE_LINUX_UUID" = "true" ] && [ "$GRUB_DISABLE_LINUX_PARTUUID" = "true" ]; } ||
+    { ! test -e "/dev/disk/by-uuid/$GRUB_DEVICE_UUID" && ! test -e "/dev/disk/by-partuuid/$GRUB_DEVICE_PARTUUID"; } ||
+    { test -e "$GRUB_DEVICE" && uses_abstraction "$GRUB_DEVICE" lvm; }
+then
+  LINUX_ROOT_DEVICE=$GRUB_DEVICE
+elif [ -z "$GRUB_DEVICE_UUID" ] || [ "$GRUB_DISABLE_LINUX_UUID" = "true" ]; then
+  LINUX_ROOT_DEVICE=PARTUUID=$GRUB_DEVICE_PARTUUID
+else
+  LINUX_ROOT_DEVICE=UUID=$GRUB_DEVICE_UUID
+fi
 
 # First argument is path, then name, all others are find arguments
 find_highest_version() {
@@ -60,8 +73,9 @@ if [ -n "$GRUB_DISTRIBUTOR" ]; then
 else
   OS=GNU/Linux
 fi
+TITLE="$(gettext_printf "%s (Text mode)" "${OS}")"
 
-log "Creating text mode linux at the current root drive '$ROOT_UUID'"
+log "Creating text mode linux at the current root drive '$LINUX_ROOT_DEVICE'"
 log "Found vmlinuz '$VMLINUZ'"
 log "Found initrd '$INITRD'"
 
@@ -74,16 +88,14 @@ log "Found initrd '$INITRD'"
 
 cat <<-EOF
 
-menuentry '$OS (Text mode)' $CLASS {
+menuentry '$(printf "%s" "$TITLE" | grub_quote)' $CLASS {
   recordfail
-  savedefault
+  $(save_default_entry)
   gfxmode \$linux_gfx_mode
   insmod gzio
   if [ x\$grub_platform = xxen ]; then insmod xzio; insmod lzopio; fi
-  insmod part_gpt
-  insmod ext2
-  search --no-floppy --fs-uuid --set=root "$ROOT_UUID"
-  linux "$VMLINUZ" "root=UUID=$ROOT_UUID" ro $GRUB_CMDLINE_ARGS init 3
+  $(prepare_grub_to_access_device "$LINUX_ROOT_DEVICE")
+  linux "$VMLINUZ" "root=$LINUX_ROOT_DEVICE" ro $GRUB_CMDLINE_ARGS init 3
   initrd "$INITRD"
 }
 
