@@ -137,7 +137,7 @@ TITLE="$(gettext_printf "%s (Text mode)" "$OS")"
 # This is likely exaggerated, as grub would likely save it
 # but that's not a risk that should be unnecessarily taken.
 
-cat <<-EOF
+cat <<EOF
 menuentry '$(printf "%s" "$TITLE" | grub_quote)' $CLASS {
 EOF
 
@@ -148,7 +148,7 @@ if [ -z "$GRUB_GFXPAYLOAD_LINUX" ] || [ "$GRUB_GFXPAYLOAD_LINUX" != text ]; then
 fi
 echo "set gfxpayload=$GRUB_GFXPAYLOAD_LINUX" | grub_add_tab
 
-cat <<-EOF
+cat <<EOF
 	insmod gzio
 	if [ x\$grub_platform = xxen ]; then insmod xzio; insmod lzopio; fi
 EOF
@@ -157,7 +157,7 @@ if [ "$dirname" = '/' ]; then
 else
   prepare_grub_to_access_device "$GRUB_DEVICE_BOOT" | grub_add_tab
 fi
-cat <<-EOF
+cat <<EOF
 	echo  "$(gettext_printf "Loading Linux %s ..." "$version" | grub_quote)"
 	linux	$rel_dirname/$basename "root=$LINUX_ROOT_DEVICE" ro $GRUB_CMDLINE_ARGS 3
 	echo  "$(gettext_printf "Loading initial ramdisk ..." | grub_quote)"

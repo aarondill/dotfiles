@@ -33,7 +33,7 @@ log "Found rescue mode linux: $system_rescue_iso"
 # This is likely exaggerated, as grub would likely save it
 # but that's not a risk that should be unnecessarily taken.
 
-cat <<-EOF
+cat <<EOF
 menuentry "systemrescue.iso" $CLASS {
 $(prepare_grub_to_access_device "$mount" | grub_add_tab)
 	iso_path="$system_rescue_iso"
