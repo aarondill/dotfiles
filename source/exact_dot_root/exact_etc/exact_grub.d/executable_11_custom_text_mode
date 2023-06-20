@@ -38,8 +38,8 @@ log "Creating text mode linux: $LINUX_ROOT_DEVICE"
 
 get_init_rd_path() { # {{{1
   _linux=$1
-  version="$(printf "%s" "$(basename "$linux")" | sed -e "s,^[^0-9]*-,,g")"
-  alt_version=$(echo "$version" | sed -e "s,\.old$,,g")
+  _version="$(printf "%s" "$(basename "$linux")" | sed -e "s,^[^0-9]*-,,g")"
+  _alt_version=$(echo "$_version" | sed -e "s,\.old$,,g")
   _dirname=$(dirname "$_linux")
   _rel_dirname=$(make_system_path_relative_to_its_root "$_dirname")
 
@@ -53,19 +53,19 @@ get_init_rd_path() { # {{{1
 
   initrd_early=
   for i in ${GRUB_EARLY_INITRD_LINUX_STOCK} ${GRUB_EARLY_INITRD_LINUX_CUSTOM}; do
-    if test -e "${dirname}/${i}"; then initrd_early="${initrd_early} ${i}"; fi
+    if test -e "${_dirname}/${i}"; then initrd_early="${initrd_early} ${i}"; fi
   done
 
   initrd_real=
-  for i in "initrd.img-${version}" "initrd-${version}.img" "initrd-${version}.gz" \
-    "initrd-${version}" "initramfs-${version}.img" \
-    "initrd.img-${alt_version}" "initrd-${alt_version}.img" \
-    "initrd-${alt_version}" "initramfs-${alt_version}.img" \
-    "initramfs-genkernel-${version}" \
-    "initramfs-genkernel-${alt_version}" \
-    "initramfs-genkernel-${GENKERNEL_ARCH}-${version}" \
-    "initramfs-genkernel-${GENKERNEL_ARCH}-${alt_version}"; do
-    if test -e "${dirname}/${i}"; then
+  for i in "initrd.img-${_version}" "initrd-${_version}.img" "initrd-${_version}.gz" \
+    "initrd-${_version}" "initramfs-${_version}.img" \
+    "initrd.img-${_alt_version}" "initrd-${_alt_version}.img" \
+    "initrd-${_alt_version}" "initramfs-${_alt_version}.img" \
+    "initramfs-genkernel-${_version}" \
+    "initramfs-genkernel-${_alt_version}" \
+    "initramfs-genkernel-${GENKERNEL_ARCH}-${_version}" \
+    "initramfs-genkernel-${GENKERNEL_ARCH}-${_alt_version}"; do
+    if test -e "${_dirname}/${i}"; then
       initrd_real="${i}"
       break
     fi
@@ -77,7 +77,7 @@ get_init_rd_path() { # {{{1
 
     initrd_display=
     for i in ${initrd}; do
-      initrd_display="${initrd_display} ${dirname}/${i}"
+      initrd_display="${initrd_display} ${_dirname}/${i}"
     done
     log "Found initrd image: ${initrd_display}"
   fi
