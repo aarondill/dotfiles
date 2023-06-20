@@ -20,10 +20,7 @@ if ! [ -f "$system_rescue_iso" ]; then
   abort "'$system_rescue_iso' not found. Not creating rescue entry." 0
 fi
 
-mount=$(df -P "$system_rescue_iso" | awk 'END{print $1}')
-if ! [ -b "$mount" ]; then
-  abort "could not find mount point for '$system_rescue_iso'" 1
-fi
+mount=$(grub-probe --target=device "$system_rescue_iso")
 ROOT_UUID="$(blkid -o value -s UUID -- "$mount")"
 
 CLASS="--class rescue --class gnu-linux --class gnu --class os"
