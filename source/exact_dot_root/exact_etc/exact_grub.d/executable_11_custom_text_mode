@@ -18,6 +18,8 @@ abort() {
   exit "${2:-1}"
 }
 
+log "Creating text mode linux: $LINUX_ROOT_DEVICE"
+
 # taken from 10_linux
 # btrfs may reside on multiple devices. We cannot pass them as value of root= parameter
 # and mounting btrfs requires user space scanning, so force UUID in this case.
@@ -36,7 +38,7 @@ fi
 
 get_init_rd_path() { # {{{1
   _linux=$1
-  version=$2
+  version="$(printf "%s" "$(basename "$linux")" | sed -e "s,^[^0-9]*-,,g")"
   alt_version=$(echo "$version" | sed -e "s,\.old$,,g")
   dirname=$(dirname "$_linux")
   rel_dirname=$(make_system_path_relative_to_its_root "$dirname")
@@ -77,7 +79,7 @@ get_init_rd_path() { # {{{1
     for i in ${initrd}; do
       initrd_display="${initrd_display} ${dirname}/${i}"
     done
-    log "Found initrd image: $initrd_display"
+    log "Found initrd image: ${initrd_display}"
   fi
 
   initrd_path=
@@ -104,13 +106,13 @@ get_linux_kernal() { # {{{1
   esac
   _linux=$(printf '%s' "$list" | tr ' ' '\n' | version_sort | tail -n1)
   if [ -z "$_linux" ]; then abort "Could not find linux image"; fi
+  log "Found linux image: $_linux"
   printf '%s' "$_linux"
   # }}}
 }
 
 linux=$(get_linux_kernal)
-version=$(printf "%s" "$(basename "$linux")" | sed -e "s,^[^0-9]*-,,g")
-initrd=$(get_init_rd_path "$linux" "$version")
+initrd=$(get_init_rd_path "$linux")
 
 # Remove splash and quiet args from GRUB_CMDLINE_LINUX_DEFAULT
 GRUB_CMDLINE_ARGS=$(printf '%s' "$GRUB_CMDLINE_LINUX_DEFAULT" | sed -e 's/\bsplash\b//g' -e 's/\bquiet\b//g' -e 's/^ \+//g')
@@ -125,11 +127,7 @@ if [ -n "$GRUB_DISTRIBUTOR" ]; then
   esac
   CLASS="--class $(echo "$GRUB_DISTRIBUTOR" | tr '[:upper:]' '[:lower:]' | cut -d' ' -f1 | LC_ALL=C sed 's,[^[:alnum:]_],_,g') $CLASS"
 fi
-TITLE="$(gettext_printf "%s, with Linux %s (Text mode)" "$OS" "$version")"
-
-log "Creating text mode linux: $LINUX_ROOT_DEVICE"
-log "Found linux image: $linux"
-log "Found initrd image: $initrd"
+TITLE="$(gettext_printf "%s (Text mode)" "$OS")"
 
 # DO NOT output anything to stdout BEFORE THIS!
 # At any point before this cat, you should assume
@@ -159,6 +157,6 @@ EOF
 prepare_grub_to_access_device "$GRUB_DEVICE" | grub_add_tab
 cat <<-EOF
   linux "$linux" "root=$LINUX_ROOT_DEVICE" ro $GRUB_CMDLINE_ARGS init 3
-  initrd "$initrd"
+  initrd $initrd
 }
 EOF
