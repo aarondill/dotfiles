@@ -1,6 +1,6 @@
 #!/bin/sh
 # This file provides an easy way to add custom menu entries.
-cat <<-EOF
+cat <<EOF
 menuentry "Shut Down" --class poweroff --class shutdown {
   halt
 }
