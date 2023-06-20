@@ -109,6 +109,7 @@ get_linux_kernal() { # {{{1
 }
 
 linux=$(get_linux_kernal)
+version="$(printf "%s" "$(basename "$linux")" | sed -e "s,^[^0-9]*-,,g")"
 basename=$(basename "$linux")
 dirname=$(dirname "$linux")
 rel_dirname=$(make_system_path_relative_to_its_root "$dirname")
@@ -156,7 +157,9 @@ else
   prepare_grub_to_access_device "$GRUB_DEVICE_BOOT" | grub_add_tab
 fi
 cat <<-EOF
+  echo  "$(gettext_printf "Loading Linux %s ..." "$version" | grub_quote)"
   linux	$rel_dirname/$basename "root=$LINUX_ROOT_DEVICE" ro $GRUB_CMDLINE_ARGS init 3
+  echo  "$(gettext_printf "Loading initial ramdisk ..." | grub_quote)"
   initrd	$initrd
 }
 EOF
