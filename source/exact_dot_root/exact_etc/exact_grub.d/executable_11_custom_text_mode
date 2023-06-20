@@ -128,8 +128,8 @@ fi
 TITLE="$(gettext_printf "%s, with Linux %s (Text mode)" "$OS" "$version")"
 
 log "Creating text mode linux: $LINUX_ROOT_DEVICE"
-log "Found vmlinuz: $linux"
-log "Found initrd: $initrd"
+log "Found linux image: $linux"
+log "Found initrd image: $initrd"
 
 # DO NOT output anything to stdout BEFORE THIS!
 # At any point before this cat, you should assume
