@@ -1,7 +1,12 @@
 #!/bin/sh
 # Create a "text mode" grub entry that boots to runlevel 3, instead of graphical.target
 
-set -euC
+# Source grub library
+# shellcheck source=/usr/lib/grub/grub-mkconfig_lib
+. "$pkgdatadir/grub-mkconfig_lib"
+
+set -eC # HACK: -u is disabled because the grub libraries don't expect it.
+
 # log to stderr bc stdout is to grub
 log() { printf '%s\n' "$@" >&2; }
 err() { printf '%s\n' "$@" >&2; }
@@ -10,70 +15,55 @@ abort() {
   exit "${2:-1}"
 }
 
-# This file provides text mode grub entries to boot without gui.
-if ! [ "$(printf '%s\n' 'v0.1.1' 'v0.10.0' | sort -V)" = "$(printf '%s\n' 'v0.1.1' 'v0.10.0')" ]; then
-  abort "This requires a sort that supports version sorting"
-fi
-
 # taken from 10_linux
 # btrfs may reside on multiple devices. We cannot pass them as value of root= parameter
 # and mounting btrfs requires user space scanning, so force UUID in this case.
 if
   { [ -z "$GRUB_DEVICE_UUID" ] && [ -z "$GRUB_DEVICE_PARTUUID" ]; } ||
-    { [ "$GRUB_DISABLE_LINUX_UUID" = "true" ] && [ "$GRUB_DISABLE_LINUX_PARTUUID" = "true" ]; } ||
+    { [ "${GRUB_DISABLE_LINUX_UUID:-}" = "true" ] && [ "${GRUB_DISABLE_LINUX_PARTUUID:-}" = "true" ]; } ||
     { ! test -e "/dev/disk/by-uuid/$GRUB_DEVICE_UUID" && ! test -e "/dev/disk/by-partuuid/$GRUB_DEVICE_PARTUUID"; } ||
     { test -e "$GRUB_DEVICE" && uses_abstraction "$GRUB_DEVICE" lvm; }
 then
   LINUX_ROOT_DEVICE=$GRUB_DEVICE
-elif [ -z "$GRUB_DEVICE_UUID" ] || [ "$GRUB_DISABLE_LINUX_UUID" = "true" ]; then
+elif [ -z "$GRUB_DEVICE_UUID" ] || [ "${GRUB_DISABLE_LINUX_UUID:-}" = "true" ]; then
   LINUX_ROOT_DEVICE=PARTUUID=$GRUB_DEVICE_PARTUUID
 else
   LINUX_ROOT_DEVICE=UUID=$GRUB_DEVICE_UUID
 fi
 
-# First argument is path, then name, all others are find arguments
-find_highest_version() {
-  path="$1" && shift 1
-  find "$path" -maxdepth 1 -name "$@" -print0 | sort -zVr | head -zn1 | tr -d '\0'
-}
+# First argument is path, then name glob
+find_highest_version() { find "$1" -maxdepth 1 -name "$2" -print | version_sort | tail -n1; }
 
 one_match_glob() {
-  file=$(printf '%s\0' "$@" | sort -z | head -zn1 | tr -d '\0')
+  file=$(printf '%s\n' "$@" | sort | head -n1)
   # if exists, output
-  if [ -e "$file" ]; then
-    printf '%s' "$file"
-  else
-    return 1
-  fi
-
+  [ -e "$file" ] || return 1
+  printf '%s' "$file"
 }
 
 VMLINUZ=$(find_highest_version /boot 'vmlinuz-*-generic')
 INITRD=$(find_highest_version /boot 'initrd.img-*-generic')
 # Fallbacks - desperately try to find one.
-if [ -z "$VMLINUZ" ]; then
-  VMLINUZ="$(one_match_glob /boot/vmlinuz*)" || abort "Could not find vmlinuz"
-fi
+if [ -z "$VMLINUZ" ]; then VMLINUZ="$(one_match_glob /boot/vmlinuz*)" || abort "Could not find vmlinuz"; fi
 
 if [ -z "$INITRD" ]; then
   INITRD=$(one_match_glob /boot/initrd.img*) || INITRD=$(one_match_glob /boot/initramfs*) || abort "Could not find initrd.img"
 fi
 
 # Remove splash and quiet args from GRUB_CMDLINE_LINUX_DEFAULT
-GRUB_CMDLINE_ARGS=$(printf '%s\n' "$GRUB_CMDLINE_LINUX_DEFAULT" | sed -e 's/\bsplash\b//g' -e 's/\bquiet\b//g')
+GRUB_CMDLINE_ARGS=$(printf '%s' "$GRUB_CMDLINE_LINUX_DEFAULT" | sed -e 's/\bsplash\b//g' -e 's/\bquiet\b//g' -e 's/^ \+//g')
 
 CLASS="--class gnu-linux --class gnu --class os"
 
+OS=GNU/Linux
 if [ -n "$GRUB_DISTRIBUTOR" ]; then
   case $GRUB_DISTRIBUTOR in
   Ubuntu | Kubuntu) OS="$GRUB_DISTRIBUTOR" ;;
   *) OS="$GRUB_DISTRIBUTOR GNU/Linux" ;;
   esac
   CLASS="--class $(echo "$GRUB_DISTRIBUTOR" | tr '[:upper:]' '[:lower:]' | cut -d' ' -f1 | LC_ALL=C sed 's,[^[:alnum:]_],_,g') $CLASS"
-else
-  OS=GNU/Linux
 fi
-TITLE="$(gettext_printf "%s (Text mode)" "${OS}")"
+TITLE="$(gettext_printf "%s (Text mode)" "$OS")"
 
 log "Creating text mode linux at the current root drive '$LINUX_ROOT_DEVICE'"
 log "Found vmlinuz '$VMLINUZ'"
@@ -87,16 +77,18 @@ log "Found initrd '$INITRD'"
 # but that's not a risk that should be unnecessarily taken.
 
 cat <<-EOF
-
 menuentry '$(printf "%s" "$TITLE" | grub_quote)' $CLASS {
   recordfail
-  $(save_default_entry)
+EOF
+save_default_entry | grub_add_tab
+cat <<-EOF
   gfxmode \$linux_gfx_mode
   insmod gzio
   if [ x\$grub_platform = xxen ]; then insmod xzio; insmod lzopio; fi
-  $(prepare_grub_to_access_device "$LINUX_ROOT_DEVICE")
+EOF
+prepare_grub_to_access_device "$GRUB_DEVICE" | grub_add_tab
+cat <<-EOF
   linux "$VMLINUZ" "root=$LINUX_ROOT_DEVICE" ro $GRUB_CMDLINE_ARGS init 3
   initrd "$INITRD"
 }
-
 EOF
