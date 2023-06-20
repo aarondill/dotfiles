@@ -112,8 +112,8 @@ get_linux_kernal() { # {{{1
 }
 
 linux=$(get_linux_kernal)
-dirname=$(dirname "$linux")
-rel_dirname=$(make_system_path_relative_to_its_root "$dirname")
+basename=$(basename "$linux")
+rel_dirname=$(make_system_path_relative_to_its_root "$(dirname "$linux")")
 initrd=$(get_init_rd_path "$linux")
 
 # Remove splash and quiet args from GRUB_CMDLINE_LINUX_DEFAULT
