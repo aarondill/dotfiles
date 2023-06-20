@@ -113,7 +113,8 @@ get_linux_kernal() { # {{{1
 
 linux=$(get_linux_kernal)
 basename=$(basename "$linux")
-rel_dirname=$(make_system_path_relative_to_its_root "$(dirname "$linux")")
+dirname=$(dirname "$linux")
+rel_dirname=$(make_system_path_relative_to_its_root "$dirname")
 initrd=$(get_init_rd_path "$linux")
 
 # Remove splash and quiet args from GRUB_CMDLINE_LINUX_DEFAULT
@@ -156,7 +157,11 @@ cat <<-EOF
   insmod gzio
   if [ x\$grub_platform = xxen ]; then insmod xzio; insmod lzopio; fi
 EOF
-prepare_grub_to_access_device "$GRUB_DEVICE" | grub_add_tab
+if [ "$dirname" = '/' ]; then
+  prepare_grub_to_access_device "$GRUB_DEVICE" | grub_add_tab
+else
+  prepare_grub_to_access_device "$GRUB_DEVICE_BOOT" | grub_add_tab
+fi
 cat <<-EOF
   linux	$rel_dirname/$basename "root=$LINUX_ROOT_DEVICE" ro $GRUB_CMDLINE_ARGS init 3
   initrd	$initrd
