@@ -42,7 +42,7 @@ $(prepare_grub_to_access_device "$mount" | grub_add_tab)
 	export kernelopts
 	# support booting recent GRUB versions on UEFI systems
 	rmmod tpm
-	loopback loop "\$is_path"
+	loopback loop "\$iso_path"
 	set root=(loop)
 	configfile /boot/grub/loopback.cfg
 }
