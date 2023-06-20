@@ -103,8 +103,8 @@ get_linux_kernal() { # {{{1
     ;;
   esac
   _linux=$(printf '%s' "$list" | tr ' ' '\n' | version_sort | tail -n1)
-  if [ -z "$linux" ]; then abort "Could not find linux image"; fi
-  printf '%s' "$linux"
+  if [ -z "$_linux" ]; then abort "Could not find linux image"; fi
+  printf '%s' "$_linux"
   # }}}
 }
 
