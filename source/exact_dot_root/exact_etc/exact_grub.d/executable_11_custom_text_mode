@@ -1,9 +1,6 @@
 #!/bin/sh
 # Create a "text mode" grub entry that boots to runlevel 3, instead of graphical.target
 
-# hardcoded in 10_linux
-gfxpayload_dynamic="1"
-
 # Source grub library
 # shellcheck source=/usr/lib/grub/grub-mkconfig_lib
 . "$pkgdatadir/grub-mkconfig_lib"
@@ -148,10 +145,7 @@ save_default_entry | grub_add_tab
 if [ -z "$GRUB_GFXPAYLOAD_LINUX" ] || [ "$GRUB_GFXPAYLOAD_LINUX" != text ]; then
   echo "load_video" | grub_add_tab
 fi
-if [ -n "$GRUB_GFXPAYLOAD_LINUX" ] || [ "$gfxpayload_dynamic" = 1 ]; then
-  # This variable is set in 10_linux, so this script *must* come after.
-  echo "gfxmode \$linux_gfx_mode" | grub_add_tab
-fi
+echo "set gfxpayload=$GRUB_GFXPAYLOAD_LINUX" | grub_add_tab
 
 cat <<-EOF
   insmod gzio
