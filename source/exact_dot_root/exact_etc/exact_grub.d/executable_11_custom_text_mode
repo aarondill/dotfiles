@@ -138,7 +138,6 @@ TITLE="$(gettext_printf "%s (Text mode)" "$OS")"
 
 cat <<-EOF
 menuentry '$(printf "%s" "$TITLE" | grub_quote)' $CLASS {
-  recordfail
 EOF
 save_default_entry | grub_add_tab
 # taken from 10_linux
