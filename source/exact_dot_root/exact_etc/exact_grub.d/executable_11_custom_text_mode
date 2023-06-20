@@ -34,26 +34,83 @@ else
   LINUX_ROOT_DEVICE=UUID=$GRUB_DEVICE_UUID
 fi
 
-# First argument is path, then name glob
-find_highest_version() { find "$1" -maxdepth 1 -name "$2" -print | version_sort | tail -n1; }
+get_init_rd_path() { # {{{1
+  _linux=$1
+  version=$2
+  alt_version=$(echo "$version" | sed -e "s,\.old$,,g")
+  dirname=$(dirname "$_linux")
+  rel_dirname=$(make_system_path_relative_to_its_root "$dirname")
 
-one_match_glob() {
-  file=$(printf '%s\n' "$@" | sort | head -n1)
-  # if exists, output
-  [ -e "$file" ] || return 1
-  printf '%s' "$file"
+  case "$(uname -m)" in
+  i?86) GENKERNEL_ARCH="x86" ;;
+  mips | mips64) GENKERNEL_ARCH="mips" ;;
+  mipsel | mips64el) GENKERNEL_ARCH="mipsel" ;;
+  arm*) GENKERNEL_ARCH="arm" ;;
+  *) GENKERNEL_ARCH="$(uname -m)" ;;
+  esac
+
+  initrd_early=
+  for i in ${GRUB_EARLY_INITRD_LINUX_STOCK} ${GRUB_EARLY_INITRD_LINUX_CUSTOM}; do
+    if test -e "${dirname}/${i}"; then initrd_early="${initrd_early} ${i}"; fi
+  done
+
+  initrd_real=
+  for i in "initrd.img-${version}" "initrd-${version}.img" "initrd-${version}.gz" \
+    "initrd-${version}" "initramfs-${version}.img" \
+    "initrd.img-${alt_version}" "initrd-${alt_version}.img" \
+    "initrd-${alt_version}" "initramfs-${alt_version}.img" \
+    "initramfs-genkernel-${version}" \
+    "initramfs-genkernel-${alt_version}" \
+    "initramfs-genkernel-${GENKERNEL_ARCH}-${version}" \
+    "initramfs-genkernel-${GENKERNEL_ARCH}-${alt_version}"; do
+    if test -e "${dirname}/${i}"; then
+      initrd_real="${i}"
+      break
+    fi
+  done
+
+  initrd=
+  if test -n "${initrd_early}" || test -n "${initrd_real}"; then
+    initrd="${initrd_early} ${initrd_real}"
+
+    initrd_display=
+    for i in ${initrd}; do
+      initrd_display="${initrd_display} ${dirname}/${i}"
+    done
+    log "Found initrd image: $initrd_display"
+  fi
+
+  initrd_path=
+  for i in ${initrd}; do
+    initrd_path="${initrd_path} ${rel_dirname}/${i}"
+  done
+  printf "%s" "$initrd_path"
+  # }}}
 }
 
-VMLINUZ=$(find_highest_version /boot 'vmlinuz-*')
-# Fallbacks - desperately try to find one.
-if [ -z "$VMLINUZ" ]; then VMLINUZ="$(one_match_glob /boot/vmlinuz*)" || abort "Could not find vmlinuz"; fi
+get_linux_kernal() { # {{{1
+  list=
+  case "$(uname -m)" in
+  i?86 | x86_64)
+    for i in /boot/vmlinuz-* /vmlinuz-* /boot/kernel-*; do
+      if grub_file_is_not_garbage "$i"; then list="$list $i"; fi
+    done
+    ;;
+  *)
+    for i in /boot/vmlinuz-* /boot/vmlinux-* /vmlinuz-* /vmlinux-* /boot/kernel-*; do
+      if grub_file_is_not_garbage "$i"; then list="$list $i"; fi
+    done
+    ;;
+  esac
+  _linux=$(printf '%s' "$list" | tr ' ' '\n' | version_sort | tail -n1)
+  if [ -z "$linux" ]; then abort "Could not find linux image"; fi
+  printf '%s' "$linux"
+  # }}}
+}
 
-INITRD=$(find_highest_version /boot 'initrd.img-*')
-if [ -z "$INITRD" ]; then
-  INITRD=$(one_match_glob /boot/initrd.img*) || INITRD=$(one_match_glob /boot/initramfs*) || abort "Could not find initrd.img"
-fi
-
-VERSION=$(printf "%s" "$(basename "$VMLINUZ")" | sed -e "s,^[^0-9]*-,,g")
+linux=$(get_linux_kernal)
+version=$(printf "%s" "$(basename "$linux")" | sed -e "s,^[^0-9]*-,,g")
+initrd=$(get_init_rd_path "$linux" "$version")
 
 # Remove splash and quiet args from GRUB_CMDLINE_LINUX_DEFAULT
 GRUB_CMDLINE_ARGS=$(printf '%s' "$GRUB_CMDLINE_LINUX_DEFAULT" | sed -e 's/\bsplash\b//g' -e 's/\bquiet\b//g' -e 's/^ \+//g')
@@ -68,11 +125,11 @@ if [ -n "$GRUB_DISTRIBUTOR" ]; then
   esac
   CLASS="--class $(echo "$GRUB_DISTRIBUTOR" | tr '[:upper:]' '[:lower:]' | cut -d' ' -f1 | LC_ALL=C sed 's,[^[:alnum:]_],_,g') $CLASS"
 fi
-TITLE="$(gettext_printf "%s, with Linux %s (Text mode)" "$OS" "$VERSION")"
+TITLE="$(gettext_printf "%s, with Linux %s (Text mode)" "$OS" "$version")"
 
 log "Creating text mode linux: $LINUX_ROOT_DEVICE"
-log "Found vmlinuz: $VMLINUZ"
-log "Found initrd: $INITRD"
+log "Found vmlinuz: $linux"
+log "Found initrd: $initrd"
 
 # DO NOT output anything to stdout BEFORE THIS!
 # At any point before this cat, you should assume
@@ -101,7 +158,7 @@ cat <<-EOF
 EOF
 prepare_grub_to_access_device "$GRUB_DEVICE" | grub_add_tab
 cat <<-EOF
-  linux "$VMLINUZ" "root=$LINUX_ROOT_DEVICE" ro $GRUB_CMDLINE_ARGS init 3
-  initrd "$INITRD"
+  linux "$linux" "root=$LINUX_ROOT_DEVICE" ro $GRUB_CMDLINE_ARGS init 3
+  initrd "$initrd"
 }
 EOF
