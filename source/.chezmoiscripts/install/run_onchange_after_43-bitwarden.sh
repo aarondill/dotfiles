@@ -22,6 +22,9 @@ function install_bitwarden_cli() (
     sudo=${SUDO:-sudo}
     $sudo mkdir -p "$(dirname "$DESTINATION")"
   fi
+  if ! [ -w "$DESTINATION" ]; then
+    sudo=${SUDO:-sudo}
+  fi
   $sudo install "$temp_dir/bw" "$DESTINATION"
   $sudo chmod +x "$DESTINATION"
   cleanup "$temp_dir" && trap '' EXIT # cleanup
