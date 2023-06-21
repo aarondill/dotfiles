@@ -225,9 +225,8 @@ function download_file() {
     $sudo install -d "$(dirname "$dest")"
   fi
 
-  content=$(download "$file_url")
-  temp=$(mktemp) # do this after to reduce chances of still existing on cancel
-  printf '%s' "$content" >|"$temp"
+  temp=$(mktemp)
+  download "$file_url" >|"$temp"
   $sudo install "--mode=${mode-rwxr-xr-x}" -D --no-target-directory -- "$temp" "$dest"
   rm -f "$temp" # might still exist if the user cancels with SIGINT - can't be avoided without overwriting global trap states
 }
