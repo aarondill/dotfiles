@@ -210,6 +210,7 @@ function download() {
 }
 
 # download_file [sudo] <URL> <destination> [mode]
+# destination should be the *final* filename, not a directory.
 function download_file() {
   local cmd=()
 
@@ -220,21 +221,15 @@ function download_file() {
   fi
   local file_url=$1 dest=$2 mode=${3:-}
 
-  cmd=(mkdir -p "$(dirname "$dest")")
-  [ -n "$sudo" ] && cmd=("$sudo" "${cmd[@]}")
-  "${cmd[@]}"
-
-  contents=$(download "$file_url") || return 1
-
-  cmd=(tee "$dest")
-  [ -n "$sudo" ] && cmd=("$sudo" "${cmd[@]}")
-  printf '%s' "$contents" | "${cmd[@]}" >/dev/null
-
-  if [ -n "$mode" ]; then
-    cmd=(chmod "$mode" "$dest")
-    [ -n "$sudo" ] && cmd=("$sudo" "${cmd[@]}")
-    "${cmd[@]}" # Run the constructed command
+  if ! [ -d "$(dirname "$dest")" ]; then
+    $sudo install -d "$(dirname "$dest")"
   fi
+
+  content=$(download "$file_url")
+  temp=$(mktemp) # do this after to reduce chances of still existing on cancel
+  printf '%s' "$content" >|"$temp"
+  $sudo install "--mode=${mode-rwxr-xr-x}" -D --no-target-directory -- "$temp" "$dest"
+  rm -f "$temp" # might still exist if the user cancels with SIGINT - can't be avoided without overwriting global trap states
 }
 
 ## --------------------------------------------------------------------------------------------------
