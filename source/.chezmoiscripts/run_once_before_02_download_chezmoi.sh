@@ -10,5 +10,11 @@ URL=https://get.chezmoi.io
 bin_dir="/usr/local/bin" # Fixed location
 
 log "Installing chezmoi to '${bin_dir}/chezmoi'"
-sh -c "$(download "$URL" progress)" -- -b "${bin_dir}"
+# use like '$sudo do_something' - could break with SUDO="something with spaces"
+sudo=
+if ! [ -w "${bin_dir}/chezmoi" ]; then
+  sudo="${SUDO:-sudo}" # not writeable
+fi
+
+$sudo sh -c "$(download "$URL" progress)" "chezmoi-updater" -b "$bin_dir"
 success
