@@ -209,6 +209,14 @@ function download() {
   fi
 }
 
+# This function deletes the file in the first argument, then returns the previous code
+function cleanup() {
+  local last_exit=$?
+  local file=${1:-}
+  rm -fr -- "$file"
+  return "${last_exit}"
+}
+
 # download_file [sudo] <URL> <destination> [mode]
 # destination should be the *final* filename, not a directory.
 function download_file() {
@@ -221,14 +229,13 @@ function download_file() {
   fi
   local file_url=$1 dest=$2 mode=${3:-}
 
+  temp=$(mktemp)
+  download "$file_url" >|"$temp" || cleanup "$temp"
   if ! [ -d "$(dirname "$dest")" ]; then
     $sudo install -d "$(dirname "$dest")"
   fi
-
-  temp=$(mktemp)
-  download "$file_url" >|"$temp"
-  $sudo install "--mode=${mode-rwxr-xr-x}" -D --no-target-directory -- "$temp" "$dest"
-  rm -f "$temp" # might still exist if the user cancels with SIGINT - can't be avoided without overwriting global trap states
+  $sudo install "--mode=${mode-rwxr-xr-x}" -D --no-target-directory -- "$temp" "$dest" || cleanup "$temp"
+  cleanup "$temp" # might still exist if the user cancels with SIGINT - can't be avoided without overwriting global trap states
 }
 
 ## --------------------------------------------------------------------------------------------------
