@@ -188,24 +188,53 @@ function log_github_install() {
 ## -------------------------------------------- Download --------------------------------------------
 ## --------------------------------------------------------------------------------------------------
 
-# download_file [sudo] <file> <destination> [mode]
+# download <URL> ['progress']- outputs to stdout. Pipe it where you need.
+# if the exact string 'progress' is passed as the second argument,
+# the command will output progress information to stderr. This is for the user, not to parse.
+# this should output *only* the contents and should follow redirects.
+function download() {
+  if [ -z "${1:-}" ]; then
+    abort "'download' requires a URL argument." 3
+  fi
+  local progress=0
+  if [ "${2:-}" = progress ]; then progress=1; fi
+  if command -v curl &>/dev/null; then
+    local quiet=-s
+    [ "$progress" -eq 1 ] && quiet=
+    curl $quiet -SfL "$1" || return
+  elif command -v wget &>/dev/null; then
+    local quiet=-q
+    [ "$progress" -eq 1 ] && quiet=
+    wget $quiet -O- "$1" || return
+  fi
+}
+
+# download_file [sudo] <URL> <destination> [mode]
 function download_file() {
   local cmd=()
 
   local sudo=''
   if [ "$1" = "sudo" ]; then
-    sudo='sudo'
+    sudo="${SUDO:-sudo}"
     shift
   fi
-  local file_url=$1 dest=$2 mode=$3
+  local file_url=$1 dest=$2 mode=${3:-}
 
-  cmd=(curl -sSfL "$file_url" -o "$dest" --create-dirs)
-  printf '%s ' $sudo "${cmd[@]}" # Show the constructed command
-  $sudo "${cmd[@]}"              # Run the constructed command
+  cmd=(mkdir -p "$(dirname "$dest")")
+  [ -n "$sudo" ] && cmd=("$sudo" "${cmd[@]}")
+  "${cmd[@]}"
 
-  cmd=(chmod "$mode" "$dest")
-  printf '%s ' $sudo "${cmd[@]}" # Show the constructed command
-  $sudo "${cmd[@]}"              # Run the constructed command
+  contents=$(download "$file_url") || return 1
+
+  cmd=(tee "$dest")
+  [ -n "$sudo" ] && cmd=("$sudo" "${cmd[@]}")
+  printf '%s' "$contents" | "${cmd[@]}" >/dev/null
+
+  if [ -n "$mode" ]; then
+    cmd=(chmod "$mode" "$dest")
+    [ -n "$sudo" ] && cmd=("$sudo" "${cmd[@]}")
+    "${cmd[@]}" # Run the constructed command
+  fi
 }
 
 ## --------------------------------------------------------------------------------------------------
