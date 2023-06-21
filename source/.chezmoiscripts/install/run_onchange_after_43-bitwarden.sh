@@ -8,9 +8,7 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 
 function install_bitwarden_desktop() {
   declare DESTINATION=/usr/local/bin/bitwarden
-  sudo curl -sSL 'https://vault.bitwarden.com/download/?app=desktop&platform=linux&variant=appimage' -o "$DESTINATION"
-  sudo chown root "$DESTINATION"
-  sudo chmod +x "$DESTINATION"
+  download_file 'https://vault.bitwarden.com/download/?app=desktop&platform=linux&variant=appimage' "$DESTINATION" "+x"
 }
 
 function install_bitwarden_cli() (
