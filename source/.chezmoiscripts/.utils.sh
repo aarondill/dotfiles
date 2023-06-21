@@ -229,13 +229,19 @@ function download_file() {
   fi
   local file_url=$1 dest=$2 mode=${3:-}
 
+  # might still exist if the user cancels with SIGINT - can't be avoided without overwriting global trap states
   temp=$(mktemp)
-  download "$file_url" >|"$temp" || cleanup "$temp"
-  if ! [ -d "$(dirname "$dest")" ]; then
-    $sudo install -d "$(dirname "$dest")"
-  fi
-  $sudo install "--mode=${mode-rwxr-xr-x}" -D --no-target-directory -- "$temp" "$dest" || cleanup "$temp"
-  cleanup "$temp" # might still exist if the user cancels with SIGINT - can't be avoided without overwriting global trap states
+  {
+    download "$file_url" >|"$temp"
+    if ! [ -d "$(dirname "$dest")" ]; then
+      $sudo install -d "$(dirname "$dest")"
+    fi
+    $sudo install -D --no-target-directory -- "$temp" "$dest"
+    if [ -n "$mode" ]; then
+      $sudo chmod "$mode" "$temp"
+    fi
+    cleanup "$temp"
+  } || cleanup "$temp"
 }
 
 ## --------------------------------------------------------------------------------------------------
