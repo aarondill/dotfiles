@@ -217,29 +217,38 @@ function cleanup() {
   return "${last_exit}"
 }
 
-# download_file [sudo] <URL> <destination> [mode]
-# destination should be the *final* filename, not a directory.
-function download_file() {
-  local cmd=()
+# creates a directory recursively. Tries to be smart with 'sudo', and returns exit code 9 if sudo is needed
+function create_dir_rec() {
+  local sudo=
+  oldifs=$IFS
+  IFS=/
+  for p in $1; do
+    [ -e "$p" ] && continue
+    if ! [ -w "$p" ]; then
+      sudo=${SUDO:-sudo}
+    fi
+    $sudo mkdir "$p" || return
+  done
+  IFS=$oldifs
+  [ -n "$sudo" ] && return 9
+}
 
-  local sudo=''
-  if [ "$1" = "sudo" ]; then
-    sudo="${SUDO:-sudo}"
-    shift
-  fi
+# download_file <URL> <destination> [mode]
+# destination should be the *final* filename, not a directory.
+# this function handles escalation to root when possible.
+function download_file() {
+  # this needs a major refactor...
+  local cmd=() sudo=''
   local file_url=$1 dest=$2 mode=${3:-}
 
   # might still exist if the user cancels with SIGINT - can't be avoided without overwriting global trap states
   temp=$(mktemp)
   {
     download "$file_url" >|"$temp"
-    if ! [ -d "$(dirname "$dest")" ]; then
-      $sudo install -d "$(dirname "$dest")"
-    fi
-    $sudo install -D --no-target-directory -- "$temp" "$dest"
-    if [ -n "$mode" ]; then
-      $sudo chmod "$mode" "$temp"
-    fi
+    create_dir_rec "$(dirname "$temp")" || (e=$? && [ "$e" -eq 9 ] && sudo=${SUDO:-sudo} || exit "$e")
+    if ! [ -w "$dest" ]; then sudo=${SUDO:-sudo}; fi
+    $sudo install --no-target-directory -- "$temp" "$dest"
+    if [ -n "$mode" ]; then $sudo chmod "$mode" "$temp"; fi
     cleanup "$temp"
   } || cleanup "$temp"
 }
