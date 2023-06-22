@@ -5,6 +5,11 @@
 # For full documentation of the options in this file, see:
 #   info -f grub -n 'Simple configuration'
 
+# run this command to create a new grub font (-b means bold, else omit)
+# sudo grub-mkfont -s <SIZE> -n '<NAME>' -b -o /boot/grub/themes/<THEME>/<NAME>_<SIZE>.pf2 <FONT_PATH>.ttf
+# Example using Terminus Bold 32:
+# sudo grub-mkfont -s 32 -n 'Terminus' -b -o /boot/grub/themes/argon/Terminus_32.pf2 /usr/share/fonts/truetype/terminus/TerminusTTF-4.46.0.ttf
+
 # Set default to the last OS used
 GRUB_DEFAULT="saved"
 GRUB_SAVEDEFAULT="true"
