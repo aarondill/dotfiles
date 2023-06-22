@@ -13,6 +13,8 @@ alias sudo="sudo -E env PATH=\"\$PATH\" "
 # Unrestrict fd by default
 alias fd="fd -u"
 alias rg="rg -uui"
+# Show progress pls
+alias dd="dd status=progress"
 # Ask before overwriting
 alias mv="mv -i"
 alias cp="cp -ai"
