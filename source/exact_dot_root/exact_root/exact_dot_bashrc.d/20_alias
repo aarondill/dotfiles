@@ -1,0 +1,170 @@
+#!/usr/bin/env bash
+
+# ~/.bashrc.d/20_alias
+#
+# Sets up aliases for user usage
+#
+
+# I'm stupid and can't remember what to type
+alias quit='exit'
+alias :q='exit'
+# Alias sudo to call sudo with *my* $HOME/ENV/PATH
+alias sudo="sudo -E env PATH=\"\$PATH\" "
+# Unrestrict fd by default
+alias fd="fd -u"
+alias rg="rg -uui"
+# Ask before overwriting
+alias mv="mv -i"
+alias cp="cp -ai"
+alias rm="rm --preserve-root"
+# Save history on exit
+alias poweroff="history -a; /sbin/poweroff"
+alias reboot="history -a; /sbin/reboot"
+alias halt="history -a; /sbin/halt"
+alias shutdown="history -a; /sbin/shutdown"
+
+alias backup="~/.backup/dobackup"
+alias lastbackup="/usr/bin/cat ~/.backup/backup-time"
+alias browser="sensible-browser"
+alias fslite="browser fslite.vercel.app 2>/dev/null"
+alias bc="bc --quiet --warn"
+alias lsblk="lsblk -e 7"
+alias la="ls -A"
+alias ll="ls -hl"
+alias lla="ls -Ahl"
+alias cl='clear'
+if command -v tty-clock &>/dev/null; then alias clock='tty-clock  -sScbtrn'; fi
+# show hidden
+if command -v tree &>/dev/null; then alias tree='tree -a'; fi
+
+if command -v google-chrome-stable &>/dev/null; then
+  # Alias to remove error messages on opening google-chrome
+  # Also allows css detection of dark mode
+  chrome='google-chrome-stable --enable-features=WebUIDarkMode --force-dark-mode'
+  # shellcheck disable=SC2139 # They are intended to expand at definition
+  {
+    alias browser="$chrome"
+    alias google-chrome="$chrome 2>/dev/null"
+    alias chrome="$chrome 2>/dev/null"
+    export BROWSER="$chrome"
+  }
+  unset chrome
+fi
+# Show battery information
+alias battery='upower -i $(upower -e | grep BAT)'
+
+if command -v 7z &>/dev/null; then
+  # alias for 7z zipping files that should be hidden
+  alias secret-zip='7z a -r -P -mhe=on'
+  alias secret-unzip='7z x'
+fi
+
+# Allow usage of `has` with non-defined programs
+if command -v has >/dev/null; then alias has='HAS_ALLOW_UNSAFE=y has'; fi
+
+# Replace `cat` with `bat`, if installed
+bat=$(which bat 2>/dev/null || which batcat 2>/dev/null)
+# shellcheck disable=SC2139 # It's intended to expand at definition
+if [ -n "$bat" ]; then
+  alias cat="$bat"
+  export MANPAGER="sh -c 'col -bx | $bat -l man -p'"
+  # Tests bat version and exits 0 if version is high enough
+  # subshell to avoid leaving behind variables
+  (
+    # 0.21.0 is the latest version where PAGER=bat will cause
+    # recursive forks, thus require greater than this before setting PAGER
+    ExpecV="0.21.0"
+    versions="$(printf '%s\n' "$(bat --version | cut -d' ' -f 2)" "$ExpecV")"
+    # shellcheck disable=SC2319 # $? *should* refer to the condition, not the sort command
+    test "$versions" != "$(sort -V <<<"$versions")" || exit "$?"
+  ) && export PAGER="$bat"
+
+  if ! command -v bat &>/dev/null; then
+    alias bat="$bat"
+  elif ! command -v batcat &>/dev/null; then
+    alias batcat="bat"
+  fi
+
+fi
+unset bat
+
+# if `z` is installed, initiate it and set `cd` to `z`
+if zoxide -V &>/dev/null; then
+  eval "$(zoxide init bash)"
+  # Reuse cd completion if present (overwritten already), else default to directories
+  complete=$(complete -p cd 2>/dev/null || printf '%s ' complete -d cd)
+  # remove ' cd' and replace with ' z'. Lack of quotes is intentional!
+  ${complete% cd} z
+  alias cd='z'
+  # Fixes warning if set -u
+  export _ZO_ECHO=0
+fi
+
+# if `bc` is installed set aliases for it
+if command -v bc &>/dev/null; then
+  alias bc='bc -l'
+  alias calc='bc -l'
+fi
+
+# if `pnpm` is installed set alias for pnpx
+if command -v pnpm &>/dev/null; then alias pnpx='pnpm dlx'; fi
+
+# If tealdeer is installed set alias for tldr
+if command -v tldr &>/dev/null; then
+  alias tldrf='tldr --list | fzf --preview "tldr {1} --color=always" --preview-window=right,70% | xargs -r tldr --pager'
+fi
+
+# Shorter lazygit
+if command -v lazygit &>/dev/null; then alias lg='lazygit'; fi
+
+# Shorter git
+if command -v git &>/dev/null; then
+  alias g='git'
+  # Reuse git completion if present (overwritten already), else default to directories
+  complete=$(complete -p git 2>/dev/null || printf '%s ' complete -o bashdefault -o default -o nospace -F __git_wrap__git_main git)
+  # remove ' git' and replace with ' g'. Lack of quotes is intentional!
+  ${complete% git} g
+  # if not defined, just wait till git is used
+  if command -v __load_completion &>/dev/null; then
+    __load_completion git
+  fi
+fi
+
+IBus="org.freedesktop.IBus.session.GNOME.service"
+# If it's enabled in the first place
+if systemctl list-unit-files --quiet --all --type=service --user --state=enabled "$IBus" &>/dev/null; then
+  # shellcheck disable=SC2139 # I exect it to expand now
+  alias restart-ibus="systemctl --user restart '$IBus'"
+fi
+unset IBus
+
+# Don't you DARE open a window
+if command -v emacs &>/dev/null; then alias emacs='emacs -nw'; fi
+
+if command -v awesome-client &>/dev/null; then
+  # Save history to ~/.cache/awesome
+  alias awesome-client='RLWRAP_HOME="$HOME/.cache/awesome" awesome-client'
+fi
+
+if command -v 'ffplay' &>/dev/null; then
+  alias aplay='ffplay -nodisp -hide_banner -autoexit'
+fi
+
+# Allow nvchad if it's installed
+if [ -d "${NVCHAD_CONFIG:-"${XDG_CONFIG_HOME:-$HOME/.config}/NvChad"}" ]; then
+  alias nvchad='NVIM_APPNAME=NvChad nvim'
+else
+  function nvchad-install() {
+    local DESTINATION="${NVCHAD_CONFIG:-"${XDG_CONFIG_HOME:-$HOME/.config}/NvChad"}"
+    printf '%s\n' "Creating a treeless clone of the nvchad repository in $DESTINATION"
+    git clone --filter=tree:0 "https://github.com/NvChad/NvChad" "$DESTINATION" || {
+      local err=$?
+      printf 'Something went wrong while cloning the nvchad repository!' >&2
+      return "$err"
+    }
+    alias nvchad='NVIM_APPNAME=NvChad nvim'
+    printf '%s\n' 'Please run "nvchad" to complete the installation'
+    unset -f nvchad-install
+  }
+fi
+# https://nvchad.com/
