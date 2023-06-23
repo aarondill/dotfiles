@@ -14,6 +14,9 @@ usage() {
 $THIS [options] [--] [arguments]
                   
 This does SOMETHING
+the environment variable \`SUDO\` can be set to use a different
+program for root elevation. It will be split by the shell, so
+spaces in the program name will likely be mutilited.
 
 Options:
 -h, --help        show this message
@@ -28,11 +31,10 @@ abort() {
   err "$1"
   exit "${2:-1}"
 }
-# use like '$sudo do_something' - could break with SUDO="something with spaces"
-sudo=
-if [ "$(id -u)" -ne 0 ]; then
-  sudo="${SUDO:-sudo}"
-fi
+# use like '"${sudo[@]}" do_something'
+# shellcheck disable=SC2206 # Splitting is intentional.
+sudo=(${SUDO:-sudo})
+[ "$(id -u)" -eq 0 ] && sudo=()
 
 # Returns a string that should be 'eval'ed to set the positional arguments
 # Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.

@@ -104,7 +104,7 @@ fi
 # Environment variables
 # shellcheck disable=SC2206 # Splitting is intentional.
 sudo=(${SUDO:-sudo})
-if [ "$EUID" -eq 0 ]; then sudo=(); fi
+[ "$(id -u)" -eq 0 ] && sudo=()
 # shellcheck disable=SC2206 # Splitting would otherwise happen on the command line, so this is not *my* problem.
 {
   NATIVE_ARGS=(${NATIVE_ARGS:-})
