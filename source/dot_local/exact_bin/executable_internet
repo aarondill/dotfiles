@@ -38,7 +38,7 @@ function parse_args() {
   if [[ "${PIPESTATUS[0]}" -ne 4 ]]; then abort "Enhanced getopt is required for this script to work. Please install it." 1; fi
 
   local parsed
-  if parsed=$(getopt --options="$SHORTOPTS" --longoptions="$LONGOPTS" --name "${THIS-$0}" -- "$@"); then
+  if parsed=$(getopt --options="$SHORTOPTS" --longoptions="$LONGOPTS" --name "${THIS:-$0}" -- "$@"); then
     # output getopt’s output this way to handle the quoting right:
     printf '%s' "set -- $parsed"
     return 0

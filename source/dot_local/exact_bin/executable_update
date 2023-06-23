@@ -53,7 +53,7 @@ function parse_args() {
   if [[ "${PIPESTATUS[0]}" -ne 4 ]]; then abort "Enhanced getopt is required for this script to work. Please install it." 1; fi
 
   local parsed
-  if parsed=$(getopt --options="$SHORTOPTS" --longoptions="$LONGOPTS" --name "${THIS-$0}" -- "$@"); then
+  if parsed=$(getopt --options="$SHORTOPTS" --longoptions="$LONGOPTS" --name "${THIS:-$0}" -- "$@"); then
     # output getopt’s output this way to handle the quoting right:
     printf '%s' "set -- $parsed"
     return 0
@@ -102,7 +102,9 @@ else
 fi
 
 # Environment variables
-SUDO="${SUDO:-sudo}"
+# shellcheck disable=SC2206 # Splitting is intentional.
+sudo=(${SUDO:-sudo})
+if [ "$EUID" -eq 0 ]; then sudo=(); fi
 # shellcheck disable=SC2206 # Splitting would otherwise happen on the command line, so this is not *my* problem.
 {
   NATIVE_ARGS=(${NATIVE_ARGS:-})
@@ -113,21 +115,22 @@ SUDO="${SUDO:-sudo}"
 }
 
 cmd_available() { command -v "$@" &>/dev/null; }
+cmd_path() { command -v "$@"; }
 
 if [ "$native" -eq 1 ]; then
   log "Updating native packages!"
   if cmd_available nala; then
     log "Using nala"
-    show_run "$SUDO" nala upgrade "${NATIVE_ARGS[@]}"
+    show_run "${sudo[@]}" "$(cmd_path nala)" upgrade "${NATIVE_ARGS[@]}"
   elif cmd_available apt; then
     log "Using apt"
-    show_run "$SUDO" apt update "${NATIVE_ARGS[@]}" && "$SUDO" apt upgrade "${NATIVE_ARGS[@]}"
+    show_run "${sudo[@]}" "$(cmd_path apt)" update "${NATIVE_ARGS[@]}" && "${sudo[@]}" apt upgrade "${NATIVE_ARGS[@]}"
   elif cmd_available pacman; then
     log "Using pacman"
-    show_run "$SUDO" pacman -Syu "${NATIVE_ARGS[@]}" # READ THIS!
+    show_run "${sudo[@]}" "$(cmd_path pacman)" -Syu "${NATIVE_ARGS[@]}" # READ THIS!
   elif cmd_available dnf; then
     log "Using dnf"
-    show_run "$SUDO" dnf upgrade "${NATIVE_ARGS[@]}"
+    show_run "${sudo[@]}" "$(cmd_path dnf)" upgrade "${NATIVE_ARGS[@]}"
   fi
   success
 fi
@@ -135,40 +138,47 @@ fi
 if [ "$snap" -eq 1 ] && cmd_available snap; then
   log "Updating snap packages!"
   log
-  show_run "$SUDO" snap refresh "${SNAP_ARGS[@]}"
+  show_run "${sudo[@]}" "$(cmd_path snap)" refresh "${SNAP_ARGS[@]}"
+  success
+fi
+
+if [ "$snap" -eq 1 ] && cmd_available snap-cleanup; then
+  log "Cleaning up snap packages"
+  log
+  show_run "${sudo[@]}" "$(cmd_path snap-cleanup)"
   success
 fi
 
 if [ "$flatpak" -eq 1 ] && cmd_available flatpak; then
   log "Updating flatpak packages!"
   log
-  show_run flatpak update "${FLATPAK_ARGS[@]}" # NOT as root!
+  show_run "$(cmd_path flatpak)" update "${FLATPAK_ARGS[@]}" # NOT as root!
   success
 fi
 
 if [ "$pnpm" -eq 1 ] && cmd_available corepack; then
   log "Updating pnpm!"
   log
-  show_run corepack prepare pnpm@latest --activate
+  show_run "$(cmd_path corepack)" prepare pnpm@latest --activate
   success
 fi
 
 if [ "$pnpm" -eq 1 ] && cmd_available pnpm; then
   log "Updating pnpm packages!"
   log
-  show_run pnpm upgrade -g --latest # NOT as root!
+  show_run "$(cmd_path pnpm)" upgrade -g --latest # NOT as root!
   pnpm_root=0
   for f in /root/.local/share/pnpm/global/*/package.json; do
     if [ -f "$f" ]; then pnpm_root=true && break; fi
   done
-  [ "$pnpm_root" -eq 1 ] && show_run "$SUDO" pnpm update -g --latest "${PNPM_ARGS[@]}"
+  [ "$pnpm_root" -eq 1 ] && show_run "${sudo[@]}" "$(cmd_path pnpm)" update -g --latest "${PNPM_ARGS[@]}"
   success
 fi
 
 if [ "$npm" -eq 1 ] && cmd_available n; then
   log "Updating npm!"
   log
-  show_run n lts
+  show_run "${sudo[@]}" "$(cmd_path n)" lts
   success
 fi
 
@@ -176,10 +186,10 @@ if [ "$npm" -eq 1 ] && cmd_available npm; then
   log "Updating npm packages!"
   log
   if cmd_available ncu; then
-    show_run ncu -p npm -g # get them to latest
+    show_run "$(cmd_path ncu)" -p npm -g # get them to latest
   else
     log "install 'ncu' to improve this experience"
   fi
-  show_run npm upgrade -g "${NPM_ARGS[@]}" # NOT as root!
+  show_run "$(cmd_path npm)" upgrade -g "${NPM_ARGS[@]}" # NOT as root!
   success
 fi
