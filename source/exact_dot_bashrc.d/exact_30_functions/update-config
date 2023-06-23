@@ -61,6 +61,10 @@ function update-config() (
 # Copies the files to $HOME/.root/FILEPATH. `.root` should be backed up
 function cproot() (
   declare -i exitCode=0
+  # shellcheck disable=SC2206 # Splitting is intentional.
+  local sudo=(${SUDO:-sudo})
+  [ "$(id -u)" -eq 0 ] && sudo=()
+
   for file in "$@"; do
     if ! [ -e "$file" ]; then
       printf '%s is not a file\n' "$file" >&2
@@ -74,8 +78,8 @@ function cproot() (
     # ensure destination exists
     mkdir -p -- "$new_dir"
     # cp to home, so files are relative to home.
-    sudo "cp" -rf -T -- "$file" "$new_path"
-    sudo chown --preserve-root -hR -- "$(whoami)" "$new_path"
+    "${sudo[@]}" "cp" -rf -T -- "$file" "$new_path"
+    "${sudo[@]}" chown --preserve-root -hR -- "$(whoami)" "$new_path"
     echo "$new_path"
   done
 
@@ -85,6 +89,10 @@ function cproot() (
 
 function update-root-config() {
   local files rootpath homepath dotroot encrypted_files add_files
+  # shellcheck disable=SC2206 # Splitting is intentional.
+  local sudo=(${SUDO:-sudo})
+  [ "$(id -u)" -eq 0 ] && sudo=()
+
   dotroot="$HOME/.root"
   encrypted_files=()
   add_files=()
@@ -95,13 +103,13 @@ function update-root-config() {
       # Hasn't yet been copied to root (or deleted, but that's up to the user), so ignore it.
       continue
     fi
-    if sudo cmp --quiet "$rootpath" "$homepath"; then
+    if "${sudo[@]}" cmp --quiet "$rootpath" "$homepath"; then
       # if same, move on
       continue
     fi
     # Doesn't need to be recursive bc is only files, not dirs.
-    sudo "cp" -f -T -- "$rootpath" "$homepath"
-    sudo chown --preserve-root -h -- "$(whoami)" "$homepath"
+    "${sudo[@]}" "cp" -f -T -- "$rootpath" "$homepath"
+    "${sudo[@]}" chown --preserve-root -h -- "$(whoami)" "$homepath"
 
     #  Fails if not encrypted
     if [[ -n "$(chezmoi list --include=encrypted -- "$homepath")" ]]; then
