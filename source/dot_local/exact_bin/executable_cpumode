@@ -12,6 +12,10 @@ usage: $THIS [OPTS]... [newmode]
 Sets the kernal power saving/performance mode
 Call without arguments to show the current and available modes
 
+the environment variable \`SUDO\` can be set to use a different
+program for root elevation. It will be split by the shell, so
+spaces in the program name will likely be mutilited.
+
 Options:
   -h, --help         Show this help message.
 EOF
@@ -20,11 +24,10 @@ EOF
 log() { printf '%s\n' "$@"; }
 err() { printf "%s\n" "$@" >&2; }
 abort() { err "$1" && exit "${2:-1}"; }
-# use like '$sudo do_something' - could break with SUDO="something with spaces"
-sudo=
-if [ "$(id -u)" -ne 0 ]; then
-  sudo="${SUDO:-sudo}"
-fi
+# use like `"${sudo[@]}" do_something`
+# shellcheck disable=SC2206 # Splitting is intentional.
+sudo=(${SUDO:-sudo})
+[ "$(id -u)" -eq 0 ] && sudo=()
 
 # Returns a string that should be 'eval'ed to set the positional arguments
 # Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
@@ -85,7 +88,7 @@ EOF
     abort "Available modes are: $avail_options" 2
     ;;
   esac
-  printf '%s' "$mode" | $sudo tee "${PATHS[@]}" >/dev/null
+  printf '%s' "$mode" | "${sudo[@]}" tee "${PATHS[@]}" >/dev/null
   ;;
 *) abort 'Too many arguments.' 2 ;;
 esac

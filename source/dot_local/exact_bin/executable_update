@@ -14,7 +14,11 @@ Update system packages and third party packages
 If no method is specified, all packages will be updated
 This is meant to help avoid forgetting a method,
 not to force yes, or any other convience
-Use \$SUDO to override the sudo command, and use
+
+the environment variable \`SUDO\` can be set to use a different
+program for root elevation. It will be split by the shell, so
+spaces in the program name will likely be mutilited.
+
 METHOD_ARGS to pass additional options to each command. (IE, NATIVE_ARGS)
 Currently supported methods are: native, snap, flatpak, pnpm, npm
 use 'native' to enable or '+native' to disable. ORDER MATTERS!

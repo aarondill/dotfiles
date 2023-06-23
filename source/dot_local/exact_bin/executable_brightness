@@ -11,6 +11,10 @@ Sets the brightness to the specified integer percentage. Use n{+,-} to increment
 Without a percentage, outputs the current brightness percentage
 NOTE: 1 is the minimum brightness, while 100 is the maximum brightness
 
+the environment variable \`SUDO\` can be set to use a different
+program for root elevation. It will be split by the shell, so
+spaces in the program name will likely be mutilited.
+
 Options:
   -h, --help         Show this help message.
   -d, --device=dev   the /sys style device to set the brightness on. \$device/brightness will be writen to!
@@ -108,8 +112,8 @@ else
   BrNew="$((BrNew < BrMin ? BrMin : BrNew))"
   BrNew="$((BrNew > BrMax ? BrMax : BrNew))"
 
-  sudo=""
-  if ! [ -w "$BrPath"/brightness ]; then sudo="${SUDO:-sudo}"; fi
+  sudo=()
+  if ! [ -w "$BrPath"/brightness ]; then sudo=("${SUDO:-sudo}"); fi
 
-  printf '%s' "$BrNew" | $sudo tee "$BrPath/brightness" >/dev/null
+  printf '%s' "$BrNew" | "${sudo[@]}" tee "$BrPath/brightness" >/dev/null
 fi

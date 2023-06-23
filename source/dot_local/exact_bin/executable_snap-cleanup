@@ -14,6 +14,9 @@ usage() {
   cat <<EOF
 $THIS [options] [--] [arguments]
 Cleans up the excess snap revisions and files. Use \$SUDO to change the program used.
+the environment variable \`SUDO\` can be set to use a different
+program for root elevation. It will be split by the shell, so
+spaces in the program name will likely be mutilited.
 
 Options:
 -h, --help        show this message
@@ -28,11 +31,10 @@ abort() {
   err "$1"
   exit "${2:-1}"
 }
-# use like '$sudo do_something' - could break with SUDO="something with spaces"
-sudo=
-if [ "$(id -u)" -ne 0 ]; then
-  sudo="${SUDO:-sudo}"
-fi
+# use like `"${sudo[@]}" do_something`
+# shellcheck disable=SC2206 # Splitting is intentional.
+sudo=(${SUDO:-sudo})
+[ "$(id -u)" -eq 0 ] && sudo=()
 
 # Returns a string that should be 'eval'ed to set the positional arguments
 # Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
@@ -79,13 +81,13 @@ if [ -x "$(command -v snap)" ]; then
   if [ "${KEY}" = "y" ] || [ "${KEY}" = "" ]; then
     # remove unused snapd revisions
     log "Removing unused snapd revisions..."
-    $sudo snap set system refresh.retain=2
-    $sudo snap list --all | awk '/disabled/ {print $1, $3}' |
+    "${sudo[@]}" snap set system refresh.retain=2
+    "${sudo[@]}" snap list --all | awk '/disabled/ {print $1, $3}' |
       while read -r SNAP_NAME SNAP_REV; do
-        $sudo snap remove "${SNAP_NAME}" --revision="${SNAP_REV}"
+        "${sudo[@]}" snap remove "${SNAP_NAME}" --revision="${SNAP_REV}"
       done
-    if [ -d /var/lib/snapd/cache ] && [ -n "$($sudo find /var/lib/snapd/cache/ -mindepth 1)" ]; then
-      $sudo rm /var/lib/snapd/cache/*
+    if [ -d /var/lib/snapd/cache ] && [ -n "$("${sudo[@]}" find /var/lib/snapd/cache/ -mindepth 1)" ]; then
+      "${sudo[@]}" rm /var/lib/snapd/cache/*
     fi
     log "Nothing unused to uninstall"
   else
