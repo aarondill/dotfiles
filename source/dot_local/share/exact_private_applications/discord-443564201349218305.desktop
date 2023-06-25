@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Game 443564201349218305
+Exec=/home/aaron/.var/app/com.valvesoftware.Steam/.local/share/Steam/steamapps/common/Slime Rancher/SlimeRancher.x86_64 %u
+Type=Application
+NoDisplay=true
+Categories=Discord;Games;
+MimeType=x-scheme-handler/discord-443564201349218305;
