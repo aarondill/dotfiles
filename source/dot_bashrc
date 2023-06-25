@@ -175,7 +175,7 @@ fi
 if [ -f ~/.config/tabtab/bash/__tabtab.bash ]; then . ~/.config/tabtab/bash/__tabtab.bash; fi
 
 # Startx on tty1 -- tty should not return tty* in an emulator or ssh
-if [ -z "$DISPLAY" ] && [ "$TERM" = "Linux" ] && [ "$(tty)" = /dev/tty1 ]; then
+if [ -z "$DISPLAY" ] && [ "$TERM" = "linux" ] && [ "$(tty)" = /dev/tty1 ]; then
   if command -v visual &>/dev/null; then
     exec visual
   else
