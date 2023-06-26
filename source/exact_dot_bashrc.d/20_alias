@@ -44,19 +44,6 @@ alias cl='clear'
 alias tree='tree -a' # show hidden
 if command -v tty-clock &>/dev/null; then alias clock='tty-clock  -sScbtrn'; fi
 
-if command -v nala &>/dev/null; then
-  # works even with 'sudo' bc sudo alias ends in a space.
-  # use \apt to invoke default apt
-  alias apt='nala'
-
-  if command -v __load_completion &>/dev/null; then __load_completion nala; fi
-  # HACK: relies on nala completion to always be named _nala_completion
-  if command -v _nala_completion &>/dev/null; then
-    _apt_completion() { _nala_completion nala; }
-    complete -o default -F _apt_completion apt
-  fi
-fi
-
 if command -v google-chrome-stable &>/dev/null; then
   # Alias to remove error messages on opening google-chrome
   # Also allows css detection of dark mode
