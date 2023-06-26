@@ -14,6 +14,7 @@ abort() {
   log "$1"
   exit "${2:-1}"
 }
+tolower() { echo "$1" | tr '[:upper:]' '[:lower:]'; }
 
 # taken from 10_linux
 # btrfs may reside on multiple devices. We cannot pass them as value of root= parameter
@@ -31,7 +32,25 @@ else
   LINUX_ROOT_DEVICE=UUID=$GRUB_DEVICE_UUID
 fi
 
-log "Creating text mode linux: $LINUX_ROOT_DEVICE"
+target=
+if command -v systemctl >/dev/null 2>/dev/null; then
+  case "$(systemctl get-default 2>/dev/null)" in
+  graphical.target) target=systemd.unit=multi-user.target ;;
+  multi-user.target) target=systemd.unit=graphical.target ;;
+  *) target=systemd.unit=graphical.target ;; # Something else. Likely not graphical, so lets do graphical.
+  esac
+else
+  target=3 # Not systemd. Just use 3 for multi-user. This is just here for minimial support
+fi
+
+title_type=
+case "$target" in
+systemd.unit=graphical.target | 5) title_type="Graphical mode" ;;
+systemd.unit=multi-user.target | 3) title_type="Text mode" ;;
+*) title_type="Unknown mode" ;; # BUG?
+esac
+
+log "Creating $(tolower "$title_type") linux: $LINUX_ROOT_DEVICE"
 
 get_init_rd_path() { # {{{1
   _linux=$1
@@ -128,7 +147,7 @@ if [ -n "$GRUB_DISTRIBUTOR" ]; then
   esac
   CLASS="--class $(echo "$GRUB_DISTRIBUTOR" | tr '[:upper:]' '[:lower:]' | cut -d' ' -f1 | LC_ALL=C sed 's,[^[:alnum:]_],_,g') $CLASS"
 fi
-TITLE="$(gettext_printf "%s (Text mode)" "$OS")"
+TITLE="$(gettext_printf "%s ($title_type)" "$OS")"
 
 # DO NOT output anything to stdout BEFORE THIS!
 # At any point before this cat, you should assume
@@ -159,7 +178,7 @@ else
 fi
 cat <<EOF
 	echo  "$(gettext_printf "Loading Linux %s ..." "$version" | grub_quote)"
-	linux	$rel_dirname/$basename "root=$LINUX_ROOT_DEVICE" ro $GRUB_CMDLINE_ARGS 3
+	linux	$rel_dirname/$basename "root=$LINUX_ROOT_DEVICE" ro $GRUB_CMDLINE_ARGS $target
 	echo  "$(gettext_printf "Loading initial ramdisk ..." | grub_quote)"
 	initrd	$initrd
 }
