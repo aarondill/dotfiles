@@ -69,10 +69,9 @@ function install_packages() { install_if_available "${PACKAGES[@]}"; }
 function install_graphical_packages() {
   local graphical_packages=("${GRAPHICAL_PACKAGES[@]}")
   # If gnome is not installed, ask confirmation, else just install
-  if [ -z "$GNOME" ]; then
-    confirm "Gnome is not installed, would you still like to install gui applications?"
-  else
-    graphical_packages+=("${GNOME_PACKAGES[@]}")
+  if [ -n "$GNOME" ]; then graphical_packages+=("${GNOME_PACKAGES[@]}"); fi
+  if ! is_accessible_cmd X && ! is_accessible_cmd Xorg && [ -z "$GNOME" ]; then
+    confirm "Xorg is not installed, would you still like to install gui applications?"
   fi
   install_if_available "${graphical_packages[@]}"
 }
