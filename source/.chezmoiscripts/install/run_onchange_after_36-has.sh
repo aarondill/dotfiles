@@ -15,6 +15,6 @@ if [ -f "$DESTINATION" ] && ! [ -w "$DESTINATION" ]; then sudo='sudo'; fi
 if ! [ -f "$DESTINATION" ] && ! [ -w "$(dirname -- "$DESTINATION")" ]; then sudo=sudo; fi
 
 $sudo curl -sSfL https://git.io/_has -o "$DESTINATION"
-chmod +x "$DESTINATION"
+$sudo chmod +x "$DESTINATION"
 
 success
