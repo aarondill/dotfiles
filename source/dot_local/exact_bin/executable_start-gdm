@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# This sets systemd to hide it's status, shows plymouth on shutdown, and starts gdm through systemd graphical.target
+# This starts gdm through systemd graphical.target
 set -euC -o pipefail
 
 THIS=start-gdm
@@ -8,7 +8,7 @@ usage() {
   cat <<-EOF
 usage: $THIS 
 
-Sets systemd to hide its status, shows plymouth on shutdown, and starts gdm through systemd graphical.target
+starts gdm through systemd graphical.target
 No options or arguments are accepted except --help
 
 the environment variable \`SUDO\` can be set to use a different
@@ -34,30 +34,5 @@ for arg; do
   esac
 done
 if [ "$invalid" = true ]; then exit 2; fi
-
-remove_from_file() {
-  local file=$1
-  local remove=("${@:2}")
-  local args=()
-  for word in "${remove[@]}"; do
-    args+=(-e "s/\b$word\b//g")
-  done
-  sed "$file" "${args[@]}" # output
-}
-concat() { printf '%s ' "$@"; }
-
-tmp_file="$(mktemp)" || abort "Error making tmp file"
-trap 'rm -f "$tmp_file"' EXIT
-
-"${sudo[@]}" kill -s SIGRTMIN+21 1 || abort "Error setting systemd to hide status"
-# reads from mount if present
-concat "$(remove_from_file /proc/cmdline 'splash' 'nosplash' 'plymouth.enable=0')" "splash" >|"$tmp_file"
-# This fails if not a mount
-"${sudo[@]}" umount /proc/cmdline -q || true
-"${sudo[@]}" mount -n --bind -o ro "$tmp_file" /proc/cmdline || abort 'Failed to make bind mount on /proc/cmdline'
-
-# Cleanup
-rm -f "$tmp_file" && trap '' EXIT
-
 # start the graphical system
 exec "${sudo[@]}" systemctl isolate graphical.target

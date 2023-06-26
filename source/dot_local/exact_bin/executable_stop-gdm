@@ -7,7 +7,7 @@ usage() {
   cat <<-EOF
 usage: $THIS 
 
-Sets systemd to show its status, hides plymouth on shutdown, and stops gdm through systemd multi-user.target
+stops gdm through systemd multi-user.target
 No options or arguments are accepted except --help
 
 the environment variable \`SUDO\` can be set to use a different
@@ -33,28 +33,5 @@ for arg; do
   esac
 done
 if [ "$invalid" = true ]; then exit 2; fi
-
-remove_from_file() {
-  local file=$1
-  local remove=("${@:2}")
-  local args=()
-  for word in "${remove[@]}"; do
-    args+=(-e "s/\b$word\b//g")
-  done
-  sed "$file" "${args[@]}" # output
-}
-concat() { printf '%s ' "$@"; }
-
-tmp_file="$(mktemp)" || return 1
-trap 'rm -f "$tmp_file"' EXIT
-"${sudo[@]}" kill -s SIGRTMIN+20 1 || abort "Error setting systemd to output messages"
-# make plymouth hidden
-concat "$(remove_from_file /proc/cmdline 'splash')" 'nosplash' >|"$tmp_file"
-
-"${sudo[@]}" umount /proc/cmdline -q || true
-"${sudo[@]}" mount -n --bind -o ro "$tmp_file" /proc/cmdline || abort 'Error mounting /proc/cmdline'
-
-# cleanup
-rm -f "$tmp_file" && trap '' EXIT
 
 exec "${sudo[@]}" systemctl isolate multi-user.target
