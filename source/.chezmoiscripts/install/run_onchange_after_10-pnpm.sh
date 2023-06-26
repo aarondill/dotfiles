@@ -24,8 +24,9 @@ function install_pnpm_and_node() {
 
   log 'installing node lts through n...'
   (
+    # NOTE: latest is needed on my machine to avoid EHOSTUNREACH from npm repos
     export -n SHELLOPTS &&
-      curl -fsSL https://raw.githubusercontent.com/tj/n/master/bin/n | /usr/bin/env bash -s -- lts
+      curl -fsSL https://raw.githubusercontent.com/tj/n/master/bin/n | /usr/bin/env bash -s -- latest
   )
 
   # Setup pnpm
