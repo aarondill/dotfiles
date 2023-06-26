@@ -134,8 +134,8 @@ dirname=$(dirname "$linux")
 rel_dirname=$(make_system_path_relative_to_its_root "$dirname")
 initrd=$(get_init_rd_path "$linux")
 
-# Remove splash and quiet args from GRUB_CMDLINE_LINUX_DEFAULT
-GRUB_CMDLINE_ARGS=$(printf '%s' "$GRUB_CMDLINE_LINUX_DEFAULT" | sed -e 's/\bsplash\b//g' -e 's/\bquiet\b//g' -e 's/^ \+//g')
+### Remove splash and quiet args from GRUB_CMDLINE_LINUX_DEFAULT
+## GRUB_CMDLINE_ARGS=$(printf '%s' "$GRUB_CMDLINE_LINUX_DEFAULT" | sed -e 's/\bsplash\b//g' -e 's/\bquiet\b//g' -e 's/^ \+//g')
 
 CLASS="--class gnu-linux --class gnu --class os"
 
