@@ -149,7 +149,7 @@ fi
 if [ "$snap" -eq 1 ] && cmd_available snap-cleanup; then
   log "Cleaning up snap packages"
   log
-  show_run "${sudo[@]}" "$(cmd_path snap-cleanup)"
+  show_run "${sudo[@]}" "$(cmd_path snap-cleanup)" -y
   success
 fi
 
