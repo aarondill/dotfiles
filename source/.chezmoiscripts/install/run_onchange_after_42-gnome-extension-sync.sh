@@ -7,6 +7,8 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 # shellcheck source=../.utils.sh
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
+# non-fatal. exit 0
+function sync_extensions_abort() { abort 'Something went wrong syncing extensions' 0; }
 function sync_extensions() {
   ## Sync if present
   if ! [ -f "$HOME/.config/extensions-sync.json" ]; then
@@ -15,11 +17,11 @@ function sync_extensions() {
 
   # If sync file exists, read from it
   # Set local file mode
-  dconf write '/org/gnome/shell/extensions/extensions-sync/provider' '"Local"' || abort0
+  dconf write '/org/gnome/shell/extensions/extensions-sync/provider' '"Local"' || sync_extensions_abort
   # Set backup location
-  dconf write '/org/gnome/shell/extensions/extensions-sync/backup-file-location' '"file://'"$HOME"'/.config/extensions-sync.json"' || abort0
+  dconf write '/org/gnome/shell/extensions/extensions-sync/backup-file-location' '"file://'"$HOME"'/.config/extensions-sync.json"' || sync_extensions_abort
   # Allow no matter what version - not safe, but idc
-  dconf write '/org/gnome/shell/disable-extension-version-validation' "true" || abort0
+  dconf write '/org/gnome/shell/disable-extension-version-validation' "true" || sync_extensions_abort
   # load from the file
   busctl --user call org.gnome.Shell /io/elhan/ExtensionsSync io.elhan.ExtensionsSync read || {
     err "failed to sync extensions, check that extensions-sync supports your current gnome version"
@@ -29,7 +31,7 @@ function sync_extensions() {
 
 if ! [ -f /usr/bin/gnome-session ]; then
   # Gnome is not installed
-  abort0 "gnome is not installed, so skipping extension synchronization"
+  abort "gnome is not installed, so skipping extension synchronization" 0
 fi
 DESTINATION="$HOME/.local/share/gnome-shell/extensions/extensions-sync@elhan.io"
 

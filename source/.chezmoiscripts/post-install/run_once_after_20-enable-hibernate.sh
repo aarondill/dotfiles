@@ -17,7 +17,7 @@ if [ -z "$BIG_SWAP_LINE" ]; then abort 'No swap partitions could be found' 0; fi
 BIG_SWAP_PATH=$(awk '{print $1}' <<<"$BIG_SWAP_LINE") # /dev/sda1
 BIG_SWAP_TYPE=$(awk '{print $2}' <<<"$BIG_SWAP_LINE") # file | partition
 
-if [ "$BIG_SWAP_TYPE" = "file" ]; then abort0 "Swap files are not supported by this script. Please use a swap partition or setup youself :)"; fi
+if [ "$BIG_SWAP_TYPE" = "file" ]; then abort "Swap files are not supported by this script. Please use a swap partition or setup youself :)" 0; fi
 
 WARNING=""
 if [ -f "$INITRAMFS_RESUME_FILE" ]; then

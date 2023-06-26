@@ -11,7 +11,7 @@ VERSION=20.0.1
 URL=https://download.java.net/java/GA/jdk20.0.1/b4887098932d415489976708ad6d1a4b/9/GPL/openjdk-20.0.1_linux-x64_bin.tar.gz
 
 if [ -x "$DESTINATION/jdk-$VERSION/bin/java" ]; then
-  abort0 "jdk-$VERSION is already installed."
+  abort "jdk-$VERSION is already installed." 0
 fi
 
 log "downloading jdk-$VERSION (fixed version)"

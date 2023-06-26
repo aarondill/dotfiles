@@ -36,7 +36,7 @@ trap 'rm -f "$TARDESTFILE"' EXIT
 confirm_message="yes, I would"
 printf "%s" "Would you like to update / with the contents of $ROOTBACKUP? (type '$confirm_message' to confirm) "
 read -re confirmation </dev/tty
-if ! [ "$confirmation" = "$confirm_message" ]; then abort0 "Aborting"; fi
+if ! [ "$confirmation" = "$confirm_message" ]; then abort "Aborting" 0; fi
 
 # Find safe backup directory
 BACKUPDIR_ROOT="/backup"

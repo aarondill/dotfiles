@@ -11,7 +11,7 @@ log 'installing bat'
 REPO=sharkdp/bat
 # Wezterm will inform of updates itself, only run if not already installed (and apt is available to install with)
 if ! is_accessible_cmd apt; then
-  abort0 "This script only supports debian-based distos. install manually from $REPO"
+  abort "This script only supports debian-based distos. install manually from $REPO" 0
 fi
 
 VERSION=$(get_latest_version_github "$REPO") # v0.23.0

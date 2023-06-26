@@ -7,7 +7,7 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
 if ! is_accessible_cmd apt; then
-  abort0 "Apt not installed, skipping ppa setup"
+  abort "Apt not installed, skipping ppa setup" 0
 fi
 
 function setup_ppa_spotify() {

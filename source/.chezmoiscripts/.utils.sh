@@ -39,8 +39,6 @@ function success() { printf "$GREEN_COLOR$BOLD_COLOR%s$RESET_COLOR\n" "Success!"
 
 # abort "something went wrong!" 1
 function abort() { err "$1" && exit "${2:-2}"; }
-# abort0 "something went wrong!" -- exits 0
-function abort0() { abort "$1" 0; }
 # confirm "do you really want to do %s?" "that" --> ...do that? (Y/n)
 # Strings are evaluated using printf
 function confirm() {

@@ -9,7 +9,7 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 # Defined in utils.sh
 if [ -z "$PACMAN" ]; then
   # STOP! deps may not be installed, hopefully handled elsewhere
-  abort0 "pacman is not installed, skipping pacman installation"
+  abort "pacman is not installed, skipping pacman installation" 0
 fi
 # find-the-command
 PACKAGES=(
