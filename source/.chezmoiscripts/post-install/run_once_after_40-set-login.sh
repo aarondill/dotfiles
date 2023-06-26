@@ -11,7 +11,11 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 log "Installing ubuntu-gdm-set-background"
 
 if [ "$OS" != "Ubuntu" ]; then
-  abort0 "This script is only available for Ubuntu"
+  abort "This script is only available for Ubuntu" 0
+fi
+
+if ! command -v gdm3 &>/dev/null && ! command -v gdm &>/dev/null; then
+  abort "This script requires gdm to be installed" 0
 fi
 
 OWNER="PRATAP-KUMAR"
