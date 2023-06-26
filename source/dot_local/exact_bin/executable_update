@@ -165,25 +165,6 @@ if [ "$flatpak" -eq 1 ] && cmd_available flatpak; then
   success
 fi
 
-if [ "$pnpm" -eq 1 ] && cmd_available corepack; then
-  log "Updating pnpm!"
-  log
-  show_run "$(cmd_path corepack)" prepare pnpm@latest --activate
-  success
-fi
-
-if [ "$pnpm" -eq 1 ] && cmd_available pnpm; then
-  log "Updating pnpm packages!"
-  log
-  show_run "$(cmd_path pnpm)" upgrade -g --latest # NOT as root!
-  pnpm_root=0
-  for f in /root/.local/share/pnpm/global/*/package.json; do
-    if [ -f "$f" ]; then pnpm_root=true && break; fi
-  done
-  [ "$pnpm_root" -eq 1 ] && show_run "${sudo[@]}" "$(cmd_path pnpm)" update -g --latest "${PNPM_ARGS[@]}"
-  success
-fi
-
 if [ "$npm" -eq 1 ] && cmd_available n; then
   log "Updating npm!"
   log
@@ -201,5 +182,26 @@ if [ "$npm" -eq 1 ] && cmd_available npm; then
     log "install 'ncu' to improve this experience"
   fi
   show_run "$(cmd_path npm)" upgrade -g "${NPM_ARGS[@]}" # NOT as root!
+  success
+fi
+
+# NOTE: nodejs < 20.x.x is broken on my machine, as this corepack can't access npm.org
+#This is fixed by updating to latest before updating pnpm - see above.
+if [ "$pnpm" -eq 1 ] && cmd_available corepack; then
+  log "Updating pnpm!"
+  log
+  show_run "$(cmd_path corepack)" prepare pnpm@latest --activate
+  success
+fi
+
+if [ "$pnpm" -eq 1 ] && cmd_available pnpm; then
+  log "Updating pnpm packages!"
+  log
+  show_run "$(cmd_path pnpm)" upgrade -g --latest # NOT as root!
+  pnpm_root=0
+  for f in /root/.local/share/pnpm/global/*/package.json; do
+    if [ -f "$f" ]; then pnpm_root=true && break; fi
+  done
+  [ "$pnpm_root" -eq 1 ] && show_run "${sudo[@]}" "$(cmd_path pnpm)" update -g --latest "${PNPM_ARGS[@]}"
   success
 fi
