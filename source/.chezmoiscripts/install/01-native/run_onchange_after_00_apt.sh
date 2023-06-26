@@ -76,7 +76,7 @@ function install_graphical_packages() {
   install_if_available "${graphical_packages[@]}"
 }
 
-if [ "$OS" = "Ubuntu" ]; then
+if [ "$OS" = "Ubuntu" ] && ! [ -f /etc/apt/sources.list.d/neovim-ppa-ubuntu-unstable-jammy.list ]; then
   log_and_run 'installing neovim nightly ppa' sudo add-apt-repository -y ppa:neovim-ppa/unstable
 fi
 log_and_run 'Updating sources' sudo "$APT" update
