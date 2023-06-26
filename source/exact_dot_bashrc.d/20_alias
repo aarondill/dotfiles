@@ -49,9 +49,8 @@ if command -v nala &>/dev/null; then
   # use \apt to invoke default apt
   alias apt='nala'
 
-  if command -v __load_completion &>/dev/null; then
-    __load_completion nala
-  fi
+  if command -v __load_completion &>/dev/null; then __load_completion nala; fi
+  # HACK: relies on nala completion to always be named _nala_completion
   if command -v _nala_completion &>/dev/null; then
     _apt_completion() { _nala_completion nala; }
     complete -o default -F _apt_completion apt
