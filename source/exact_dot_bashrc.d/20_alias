@@ -48,6 +48,14 @@ if command -v nala &>/dev/null; then
   # works even with 'sudo' bc sudo alias ends in a space.
   # use \apt to invoke default apt
   alias apt='nala'
+
+  if command -v __load_completion &>/dev/null; then
+    __load_completion nala
+  fi
+  if command -v _nala_completion &>/dev/null; then
+    _apt_completion() { _nala_completion nala; }
+    complete -o default -F _apt_completion apt
+  fi
 fi
 
 if command -v google-chrome-stable &>/dev/null; then
@@ -107,7 +115,9 @@ if zoxide -V &>/dev/null; then
   # Reuse cd completion if present (overwritten already), else default to directories
   complete=$(complete -p cd 2>/dev/null || printf '%s ' complete -d cd)
   # remove ' cd' and replace with ' z'. Lack of quotes is intentional!
-  ${complete% cd} z
+  if [ -n "$complete" ]; then
+    eval "${complete% cd} z"
+  fi
   alias cd='z'
   # Fixes warning if set -u
   export _ZO_ECHO=0
@@ -136,7 +146,9 @@ if command -v git &>/dev/null; then
   # Reuse git completion if present (overwritten already), else default to directories
   complete=$(complete -p git 2>/dev/null || printf '%s ' complete -o bashdefault -o default -o nospace -F __git_wrap__git_main git)
   # remove ' git' and replace with ' g'. Lack of quotes is intentional!
-  ${complete% git} g
+  if [ -n "$complete" ]; then
+    eval "${complete% git} g"
+  fi
   # if not defined, just wait till git is used
   if command -v __load_completion &>/dev/null; then
     __load_completion git
