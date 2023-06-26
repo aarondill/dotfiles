@@ -15,7 +15,7 @@ fi
 PACKAGES=(
   age anacron cmake command-not-found curl
   dconf-editor duf gh git grep inotify-tools less make
-  neofetch neovim net-tools openvpn p7zip-full python3-neovim rsync tlp
+  neofetch neovim net-tools openvpn p7zip-full rsync tlp
   trash-cli tree util-linux xclip xdg-utils zip zoxide speedtest-cli
   ripgrep libfuse2 hexedit luajit python3-pip xdotool
 )
