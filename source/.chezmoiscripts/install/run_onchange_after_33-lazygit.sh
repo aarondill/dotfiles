@@ -20,7 +20,7 @@ function install_lazygit() (
 
   curl -SsLf "https://github.com/$REPO/releases/download/v$LAZYGIT_VERSION/$FILE" -o "$TMP"
   # output to destination
-  tar -xvz -C "$BINDIR" -f "$TMP" lazygit
+  sudo tar -xvz -C "$BINDIR" -f "$TMP" lazygit
   sudo chmod +x "$BINDIR/lazygit"
 
   rm -f "$TMP" && trap '' EXIT # Cleanup
