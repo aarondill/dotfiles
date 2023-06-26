@@ -12,7 +12,7 @@
     "n": "^9.1.0",
     "neovim": "^4.10.1",
     "npkill": "^0.11.3",
-    "npm-check-updates": "^16.10.12",
+    "npm-check-updates": "^16.10.13",
     "prettier": "^2.8.8",
     "release-it": "^15.11.0",
     "sort-package-json": "^2.4.1",

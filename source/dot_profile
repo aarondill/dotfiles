@@ -78,7 +78,7 @@ export CARGO_HOME="$XDG_CONFIG_HOME/cargo"
 append_path "$CARGO_HOME"
 
 # include flatpaks in path. (Have org.example.app names)
-append_path "/var/lib/flatpak/exports/bin/"
+append_path "/var/lib/flatpak/exports/bin"
 
 # include go in path
 append_path "/usr/local/go/bin"
