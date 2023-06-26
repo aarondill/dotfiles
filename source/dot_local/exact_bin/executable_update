@@ -187,7 +187,8 @@ fi
 if [ "$npm" -eq 1 ] && cmd_available n; then
   log "Updating npm!"
   log
-  show_run "${sudo[@]}" "$(cmd_path n)" lts
+  show_run "${sudo[@]}" "$(cmd_path n)" -d lts # download
+  show_run "${sudo[@]}" "$(cmd_path n)" latest # activate latest
   success
 fi
 
