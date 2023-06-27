@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@aarondill/create-ts": "^3.0.1",
-    "@types/node": "20.3.1",
+    "@types/node": "20.3.2",
     "@vscode/vsce": "^2.19.0",
     "auto-changelog": "^2.4.0",
     "depcheck": "^1.4.3",
