@@ -138,6 +138,7 @@ fi
 
 # ---------------------------BEGIN CUSTOM CODE---------------------------
 
+will_startx() { [ -z "$DISPLAY" ] && [ "$TERM" = "linux" ] && [ "$(tty)" = /dev/tty1 ] && [ -z "$SKIP_STARTX_LOGIN" ]; }
 # All code above this point is part of the distrobution.
 # Any code below is part of my personal installation
 #
@@ -147,6 +148,11 @@ if command -v starship &>/dev/null; then
   # Allow user to override by setting the environment variable to empty string
   export DISABLE_CUSTOM_PS1=${DISABLE_CUSTOM_PS1-1}
 fi
+
+# HACK: Stop neofetch from starting on tty when starting WM. This decreases initial login time.
+# This doesn't leak bc it's not exported and if will_startx then this bash instance is replaced with startx
+if will_startx; then NONEOFETCH=1; fi
+
 # Initialize `~/.bashrc.d`
 if [ -d "$HOME/.bashrc.d/" ]; then
   # Find all files not starting with _, and sort, ensuring base lang
@@ -175,7 +181,7 @@ fi
 if [ -f ~/.config/tabtab/bash/__tabtab.bash ]; then . ~/.config/tabtab/bash/__tabtab.bash; fi
 
 # Startx on tty1 -- tty should not return tty* in an emulator or ssh
-if [ -z "$DISPLAY" ] && [ "$TERM" = "linux" ] && [ "$(tty)" = /dev/tty1 ]; then
+if will_startx; then
   if command -v visual &>/dev/null; then
     exec visual
   else
