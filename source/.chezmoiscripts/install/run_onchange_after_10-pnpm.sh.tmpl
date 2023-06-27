@@ -2,6 +2,7 @@
 set -euC -o pipefail
 export SHELLOPTS
 
+# Find package.json and include it's hash to update when it does
 # {{ $files_arr := glob ( joinPath .chezmoi.sourceDir "*dot_local" "*share" "*pnpm" "*global" "*5" "*package.json" ) }}
 # package.json hash: {{ include ( index $files_arr 0 ) | sha256sum }}
 
