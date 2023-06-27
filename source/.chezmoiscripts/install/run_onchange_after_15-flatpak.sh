@@ -18,7 +18,7 @@ function install_flatpaks() {
   flatpak_apps=(
     com.github.johnfactotum.Foliate com.github.tchx84.Flatseal
     com.valvesoftware.Steam io.mrarm.mcpelauncher org.gnome.Cheese
-    org.libretro.RetroArch com.github.alainm23.planner
+    org.libretro.RetroArch io.github.alainm23.planify
   )
   for flatpak_app in "${flatpak_apps[@]}"; do
     if ! flatpak_is_installed "$flatpak_app"; then
