@@ -25,5 +25,5 @@ if ! [ -f "$SSH_AUTH_SOCK" ] && [ -f "$ENV_FILE" ]; then
 fi
 export GNOME_KEYRING_CONTROL GNOME_KEYRING_PID GPG_AGENT_INFO SSH_AUTH_SOCK
 
-unset "$ENV_FILE" # Not needed outside this file
-unset -f quiet    # Don't leak to the shell
+unset ENV_FILE # Not needed outside this file
+unset -f quiet # Don't leak to the shell

@@ -1,6 +1,10 @@
 #! /usr/bin/env bash
 set -euC -o pipefail
 export SHELLOPTS
+
+# {{ $files_arr := glob ( joinPath .chezmoi.sourceDir "*dot_local" "*share" "*pnpm" "*global" "*5" "*package.json" ) }}
+# package.json hash: {{ include ( index $files_arr 0 ) | sha256sum }}
+
 # Source utils
 SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 # shellcheck source=../.utils.sh
