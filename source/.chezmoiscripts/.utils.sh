@@ -262,7 +262,7 @@ GNOME=$(which gnome-shell 2>/dev/null || printf '')
 # Path to apt (or nala) for installation/removal of packages
 APT=$(which nala 2>/dev/null || which apt 2>/dev/null || printf '')
 # Path to pacman for installation/removal of packages
-PACMAN=$(which pacman 2>/dev/null || printf '')
+PACMAN=$(which yay 2>/dev/null || which pacman 2>/dev/null || printf '')
 
 export ARCH KERNEL OS APT GNOME PACMAN
 # Code to source *this* file. DON'T MOVE THIS FILE!
