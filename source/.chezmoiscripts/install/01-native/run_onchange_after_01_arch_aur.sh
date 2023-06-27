@@ -42,12 +42,12 @@ if ! which yay &>/dev/null; then
   yay -Y --gendb # Check the cache on first install
 else err "yay is already installed, skipping installation"; fi
 
-# Zeal
-if ! which zeal &>/dev/null; then
-  # Dependancy that's no longer supplied by pacman
-  sudo pacman -U https://archive.archlinux.org/packages/q/qt5-webkit/qt5-webkit-5.212.0alpha4-18-x86_64.pkg.tar.zst
-  aur_install "zeal"
-else err "Zeal is already installed, skipping installation"; fi
+## Zeal -- I don't like the qt5-webkit package. It's too big.
+# if ! which zeal &>/dev/null; then
+#   # Dependancy that's no longer supplied by pacman
+#   sudo pacman -U https://archive.archlinux.org/packages/q/qt5-webkit/qt5-webkit-5.212.0alpha4-18-x86_64.pkg.tar.zst
+#   aur_install "zeal"
+# else err "Zeal is already installed, skipping installation"; fi
 
 # Google chrome
 if ! which google-chrome-stable &>/dev/null; then
