@@ -9,8 +9,12 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 # shellcheck source=../.utils.sh
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
-# Wezterm will inform of updates itself, only run if not already installed (and apt is available to install with)
-if ! is_accessible_cmd apt || is_available_apt wezterm; then
+if [ -z "$APT" ]; then
+  abort 'This script only supports apt. Install from your disto repos' 0
+fi
+
+# Wezterm will inform of updates itself, only run if not already installed
+if is_available_apt wezterm; then
   abort "wezterm is already installed" 0
 fi
 

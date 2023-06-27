@@ -28,6 +28,6 @@ function install_grub_editor() (
   rm -rf "$temp_dir" && trap '' EXIT
 )
 
-if is_accessible_cmd apt && ! is_available_apt grub-editor; then
+if [ -n "$APT" ] && ! is_available_apt grub-editor; then
   log_and_run "Installing grub-editor" install_grub_editor
 fi

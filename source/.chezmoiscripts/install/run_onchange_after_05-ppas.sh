@@ -6,7 +6,7 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 # shellcheck source=../.utils.sh
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
-if ! is_accessible_cmd apt; then
+if [ -z "$APT" ]; then
   abort "Apt not installed, skipping ppa setup" 0
 fi
 
