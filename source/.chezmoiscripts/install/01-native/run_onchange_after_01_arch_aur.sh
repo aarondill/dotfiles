@@ -11,8 +11,22 @@ if [ -z "$PACMAN" ]; then
   exit 0 # Assume already knows
 fi
 
+pacman_install_aur_deps() {
+  # check first to avoid message every time
+  if ! pacman -Q 'git' || ! pacman -Q 'base-devel'; then
+    pacman -S --needed git base-devel
+  fi
+}
+
 aur_install() {
-  local REPO=$1 tmpdir
+  # shellcheck disable=SC2155 # assign and declare seperately
+  local YAY="$(which yay 2>/dev/null || printf '')"
+  local tmpdir REPO="https://aur.archlinux.org/$1.git"
+  if [ -n "$YAY" ]; then
+    "$YAY" -S --needed -- "$1"
+    return
+  fi
+  pacman_install_aur_deps
   tmpdir="$(mktemp -d)"
   trap 'rm -rf "$tmpdir"' EXIT
 
@@ -23,19 +37,24 @@ aur_install() {
   rm -rf "$tmpdir" && trap '' EXIT
 }
 
+if ! which yay &>/dev/null; then
+  aur_install "yay"
+  yay -Y --gendb # Check the cache on first install
+else err "yay is already installed, skipping installation"; fi
+
 # Zeal
 if ! which zeal &>/dev/null; then
   # Dependancy that's no longer supplied by pacman
   sudo pacman -U https://archive.archlinux.org/packages/q/qt5-webkit/qt5-webkit-5.212.0alpha4-18-x86_64.pkg.tar.zst
-  aur_install "https://aur.archlinux.org/zeal.git"
+  aur_install "zeal"
 else err "Zeal is already installed, skipping installation"; fi
 
 # Google chrome
 if ! which google-chrome-stable &>/dev/null; then
-  aur_install "https://aur.archlinux.org/google-chrome.git"
+  aur_install "google-chrome"
 else err "google-chrome is already installed, skipping installation"; fi
 
 # grub-editor
 if ! [ -x /opt/grub-editor/grub-editor.py ]; then
-  aur_install "https://aur.archlinux.org/grub-editor.git"
+  aur_install "grub-editor"
 else err "grub-editor is already installed, skipping installation"; fi
