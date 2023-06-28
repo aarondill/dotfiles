@@ -82,4 +82,6 @@ C-b:unix-filename-rubout
 set enable-bracketed-paste on
 # Display matches for ambiguous patterns at first tab press
 set show-all-if-ambiguous on
-
+# M-B/M-F: skip full shell words
+"\eB": shell-backward-word
+"\eF": shell-forward-word
