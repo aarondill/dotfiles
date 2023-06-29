@@ -38,7 +38,7 @@ aur_install() {
 }
 
 if ! which yay &>/dev/null; then
-  aur_install "yay"
+  aur_install yay-bin
   yay -Y --gendb # Check the cache on first install
 else err "yay is already installed, skipping installation"; fi
 
