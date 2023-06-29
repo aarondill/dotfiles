@@ -23,7 +23,7 @@ aur_install() {
   local YAY="$(which yay 2>/dev/null || printf '')"
   local tmpdir REPO="https://aur.archlinux.org/$1.git"
   if [ -n "$YAY" ]; then
-    "$YAY" -S --needed -- "$1"
+    (export -n SHELLOPTS && "$YAY" -S --needed -- "$1")
     return
   fi
   pacman_install_aur_deps
