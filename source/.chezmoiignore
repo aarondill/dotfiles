@@ -8,16 +8,16 @@ dconf-backup.ini
 
 {{- if contains "arch" .osID }}
 ## Arch System Ignores
-.chezmoiscripts/install/01-native/run_onchange_after_00_apt.sh
-.chezmoiscripts/install/run_onchange_after_00-nala.sh
-.chezmoiscripts/install/run_onchange_after_37-bat.sh
-.chezmoiscripts/install/run_onchange_after_05-ppas.sh
-.chezmoiscripts/install/run_onchange_after_41-grub-editor.sh
-.chezmoiscripts/install/run_onchange_after_40-wezterm.sh
+.chezmoiscripts/install/01-native/00_apt.sh
+.chezmoiscripts/install/00-nala.sh
+.chezmoiscripts/install/37-bat.sh
+.chezmoiscripts/install/05-ppas.sh
+.chezmoiscripts/install/41-grub-editor.sh
+.chezmoiscripts/install/40-wezterm.sh
 {{- end }}
 
 {{- if or ( contains "debian" .osID ) ( contains "ubuntu" .osID ) }}
 ## Debian System Ignores
-.chezmoiscripts/install/01-native/run_onchange_after_00_pacman.sh
-.chezmoiscripts/install/01-native/run_onchange_after_01_arch_aur.sh
+.chezmoiscripts/install/01-native/00_pacman.sh
+.chezmoiscripts/install/01-native/01_arch_aur.sh
 {{- end }}
