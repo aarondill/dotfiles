@@ -138,7 +138,7 @@ fi
 
 # ---------------------------BEGIN CUSTOM CODE---------------------------
 
-will_startx() { [ -z "$DISPLAY" ] && [ "$TERM" = "linux" ] && [ "$(tty)" = /dev/tty1 ] && [ -z "$SKIP_STARTX_LOGIN" ]; }
+will_startx() { command -v startx &>/dev/null && [ -z "$DISPLAY" ] && [ "$TERM" = "linux" ] && [ "$(tty)" = /dev/tty1 ] && [ -z "$SKIP_STARTX_LOGIN" ]; }
 # All code above this point is part of the distrobution.
 # Any code below is part of my personal installation
 #
