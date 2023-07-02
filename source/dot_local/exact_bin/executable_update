@@ -30,11 +30,11 @@ EOF
 }
 
 # COLOR vars to keep from branching to tput repeatedly
-RED_COLOR="$(tput setaf 1 2>/dev/null || printf)"
-YELLOW_COLOR="$(tput setaf 11 2>/dev/null || printf)"
-GREEN_COLOR="$(tput setaf 2 2>/dev/null || printf)"
-BOLD_COLOR="$(tput bold 2>/dev/null || printf)"
-RESET_COLOR="$(tput sgr0 2>/dev/null || printf)"
+RED_COLOR="$(tput setaf 1 2>/dev/null || printf '')"
+YELLOW_COLOR="$(tput setaf 11 2>/dev/null || printf '')"
+GREEN_COLOR="$(tput setaf 2 2>/dev/null || printf '')"
+BOLD_COLOR="$(tput bold 2>/dev/null || printf '')"
+RESET_COLOR="$(tput sgr0 2>/dev/null || printf '')"
 
 log() { printf "$YELLOW_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@"; }
 show_run() {
