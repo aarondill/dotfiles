@@ -87,23 +87,31 @@ if [ "$EUID" -eq 0 ] && [ "$allow_root" -eq 0 ]; then
   exit 2
 fi
 
+all_exclude=1 # If all are exclude, enable all by default
+for arg; do
+  case "$arg" in
+  +*) true ;;         # Nothing
+  *) all_exclude=0 ;; # Not an exlude.
+  esac
+done
+
 native=0 flatpak=0 snap=0 pnpm=0 npm=0
-if [ "$#" -eq 0 ]; then
+if [ "$#" -eq 0 ] || [ "$all_exclude" -eq 1 ]; then
   native=1 flatpak=1 snap=1 pnpm=1 npm=1
-else
-  for arg; do
-    case "${arg,,}" in # Allow `native` to enable or `native-` to disable. ORDER MATTERS!
-    apt | nala | pacman | native) native=1 ;;
-    +apt | +nala | +pacman | +native) native=0 ;;
-    flatpak) flatpak=1 ;; +flatpak) flatpak=0 ;;
-    snap) snap=1 ;; +snap) snap=0 ;;
-    pnpm) pnpm=1 ;; +pnpm) pnpm=0 ;;
-    npm) npm=1 ;; +npm) npm=0 ;;
-    all) native=1 flatpak=1 snap=1 pnpm=1 npm=1 ;;
-    +all) native=0 flatpak=0 snap=0 pnpm=0 npm=0 ;;
-    esac
-  done
 fi
+
+for arg; do          # Doesn't do anything if $# is zero
+  case "${arg,,}" in # Allow `native` to enable or `native-` to disable. ORDER MATTERS!
+  apt | nala | pacman | native) native=1 ;;
+  +apt | +nala | +pacman | +native) native=0 ;;
+  flatpak) flatpak=1 ;; +flatpak) flatpak=0 ;;
+  snap) snap=1 ;; +snap) snap=0 ;;
+  pnpm) pnpm=1 ;; +pnpm) pnpm=0 ;;
+  npm) npm=1 ;; +npm) npm=0 ;;
+  all) native=1 flatpak=1 snap=1 pnpm=1 npm=1 ;;
+  +all) native=0 flatpak=0 snap=0 pnpm=0 npm=0 ;;
+  esac
+done
 
 # Environment variables
 # shellcheck disable=SC2206 # Splitting is intentional.
