@@ -182,11 +182,15 @@ if [ -f ~/.config/tabtab/bash/__tabtab.bash ]; then . ~/.config/tabtab/bash/__ta
 
 # Startx on tty1 -- tty should not return tty* in an emulator or ssh
 if will_startx; then
+  LOG_FILE="$HOME/.cache/visual/log-$(date --iso-8601=ns).log"
+  mkdir -p "$(dirname "$LOG_FILE")"
   if command -v visual &>/dev/null; then
-    exec visual
+    exec visual >|"$LOG_FILE" 2>&1 || true
   else
-    exec startx
+    exec startx >|"$LOG_FILE" 2>&1 || true
   fi
+  unset LOG_FILE
 fi
+unset -f will_startx
 
 # ------------------------------END OF FILE------------------------------
