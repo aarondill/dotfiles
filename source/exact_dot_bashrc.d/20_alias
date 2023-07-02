@@ -34,7 +34,7 @@ elif command -v x-www-browser &>/dev/null; then
 elif command -v firefox &>/dev/null; then
   alias browser="firefox"
 fi
-alias fslite="browser fslite.vercel.app 2>/dev/null"
+alias fslite="browser fslite.vercel.app"
 alias bc="bc --quiet --warn"
 alias lsblk="lsblk -e 7"
 alias la="ls -A"
@@ -49,12 +49,8 @@ if command -v google-chrome-stable &>/dev/null; then
   # Also allows css detection of dark mode
   chrome='google-chrome-stable --enable-features=WebUIDarkMode --force-dark-mode'
   # shellcheck disable=SC2139 # They are intended to expand at definition
-  {
-    alias browser="$chrome"
-    alias google-chrome="$chrome 2>/dev/null"
-    alias chrome="$chrome 2>/dev/null"
-    export BROWSER="$chrome"
-  }
+  alias browser="$chrome 2>/dev/null"
+  export BROWSER="$chrome"
   unset chrome
 fi
 # Show battery information
