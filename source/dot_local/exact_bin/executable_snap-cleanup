@@ -1,5 +1,6 @@
 #!/bin/bash
 set -euC -o pipefail
+shopt -s nullglob # Globs with no match result in NUL string
 
 THIS=snap-cleanup
 # Color settings
@@ -91,8 +92,10 @@ if [ -x "$(command -v snap)" ]; then
     while read -r SNAP_NAME SNAP_REV; do
       "${sudo[@]}" snap remove "${SNAP_NAME}" --revision="${SNAP_REV}"
     done
-  if [ -d /var/lib/snapd/cache ] && [ -n "$("${sudo[@]}" find /var/lib/snapd/cache/ -mindepth 1)" ]; then
-    "${sudo[@]}" rm /var/lib/snapd/cache/*
+  if [ -d /var/lib/snapd/cache ]; then
+    for file in /var/lib/snapd/cache/*; do
+      "${sudo[@]}" rm "$file"
+    done
   fi
   log "Nothing unused to uninstall"
 fi
