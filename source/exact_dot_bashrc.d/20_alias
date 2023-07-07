@@ -62,7 +62,7 @@ alias battery='upower -i $(upower -e | grep BAT)'
 
 if command -v 7z &>/dev/null; then
   # alias for 7z zipping files that should be hidden
-  alias secret-zip='7z a -r -P -mhe=on'
+  alias secret-zip='7z a -P -mhe=on'
   alias secret-unzip='7z x'
 fi
 
