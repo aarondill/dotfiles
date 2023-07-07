@@ -14,7 +14,9 @@ PREHOOK=(sed -i "s/ --verbose\b//g" autogen.sh)
 # Passed to ./configure
 CONFIGURE_ARGS=(--enable-unicode=no --silent)
 # Passed to *all* make invocations
-MAKE_ARGS=(--silent)
+MAKE_ALL_ARGS=(--silent)
+MAKE_ARGS=()
+MAKE_INSTALL_ARGS=()
 # Cloned into tempdir
 REPO_URL='https://github.com/KoffeinFlummi/htop-vim'
 
@@ -52,11 +54,11 @@ install_from_make() {
   "${PREHOOK[@]}"
   (
     export -n SHELLOPTS # Let shells set their own options
-    ./autogen.sh
-    ./configure "${CONFIGURE_ARGS[@]}"
-    make "${MAKE_ARGS[@]}"
+    [ -x ./autogen.sh ] && ./autogen.sh
+    [ -x ./configure ] && ./configure "${CONFIGURE_ARGS[@]}"
+    make "${MAKE_ALL_ARGS[@]}" "${MAKE_ARGS[@]}"
     # Install the updated application
-    sudo make "${MAKE_ARGS[@]}" install
+    sudo make "${MAKE_ALL_ARGS[@]}" "${MAKE_INSTALL_ARGS[@]}" install
   )
 
   # cleanup
