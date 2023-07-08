@@ -150,7 +150,7 @@ if [ "$native" -eq 1 ]; then
     show_run "${sudo[@]}" "$(cmd_path apt)" update "${NATIVE_ARGS[@]}" && "${sudo[@]}" apt upgrade "${NATIVE_ARGS[@]}"
   elif cmd_available yay; then
     log "Using yay"
-    show_run "${sudo[@]}" "$(cmd_path yay)" -Syu "${NATIVE_ARGS[@]}" # READ THIS!
+    show_run "$(cmd_path yay)" -Syu "${NATIVE_ARGS[@]}" # READ THIS!
   elif cmd_available pacman; then
     log "Using pacman"
     show_run "${sudo[@]}" "$(cmd_path pacman)" -Syu "${NATIVE_ARGS[@]}" # READ THIS!
