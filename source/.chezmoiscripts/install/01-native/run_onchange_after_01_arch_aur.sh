@@ -58,3 +58,8 @@ else err "google-chrome is already installed, skipping installation"; fi
 if ! [ -x /opt/grub-editor/grub-editor.py ]; then
   aur_install "grub-editor"
 else err "grub-editor is already installed, skipping installation"; fi
+
+# informant for pacman/yay
+if ! which informant &>/dev/null; then
+  aur_install "informant"
+else err "informant is already installed, skipping installation"; fi
