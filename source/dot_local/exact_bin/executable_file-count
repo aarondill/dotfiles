@@ -20,4 +20,4 @@ done
 # First arg, or current directory
 dir="${1:-.}"
 
-find "$dir" -mindepth 1 -maxdepth 1 -printf '\n' | wc -l
+find "$dir" -mindepth 1 -maxdepth 1 -printf '.' | wc -c
