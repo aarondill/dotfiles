@@ -25,7 +25,6 @@ use 'native' to enable or '+native' to disable. ORDER MATTERS!
 Options:
 --as-root: allow running as root (Discouraged!)
 EOF
-  EOF
   return 0
 }
 
