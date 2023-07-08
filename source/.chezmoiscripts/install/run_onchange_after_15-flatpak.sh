@@ -30,7 +30,7 @@ function install_flatpaks() {
 
 installed_or_log flatpak || exit 0
 
-confirm "Would you like to install flatpak packages? this may take a while."
+confirm "Would you like to install flatpak packages? this may take a while." || exit 0
 
 log_and_run "Installing flatpak packages" install_flatpaks
 log_and_run 'Updating flatpak packages' flatpak_update
