@@ -19,17 +19,18 @@ PACKAGES=(
   xclip xdg-utils zip unzip zoxide speedtest-cli ripgrep hexedit
   luajit python-pip xdotool base-devel wezterm bat
 )
-
-GRAPHICAL_PACKAGES=(
-  dconf-editor flatpak gparted gucharmap
-  # These are setup on ubuntu through a ppa
-  code spotify-launcher
+VIRTUAL_MACHINE_PACKAGES=(
   # VM management. Technically, only virt-manager is graphical, but they are used together
   virt-manager qemu-desktop
   # virsh
   libvirt
   # virt-clone, etc...
   virt-install
+)
+GRAPHICAL_PACKAGES=(
+  dconf-editor flatpak gparted gucharmap
+  # These are setup on ubuntu through a ppa
+  code spotify-launcher
 )
 GNOME_PACKAGES=(gnome-shell-extension-manager gnome-tweaks gnome-software gnome-software-plugin-flatpak)
 
@@ -72,6 +73,9 @@ function install_graphical_packages() {
   if [ -n "$GNOME" ]; then graphical_packages+=("${GNOME_PACKAGES[@]}"); fi
   if ! is_accessible_cmd X && ! is_accessible_cmd Xorg && [ -z "$GNOME" ]; then
     confirm "Xorg is not installed, would you still like to install gui applications?"
+  fi
+  if confirm "Would you like to install qemu-desktop and other virtual machine packages?"; then
+    graphical_packages=("${graphical_packages[@]}" "${VIRTUAL_MACHINE_PACKAGES[@]}")
   fi
   install_if_available "${graphical_packages[@]}"
 }
