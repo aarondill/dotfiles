@@ -11,7 +11,11 @@ alias :q='exit'
 # Alias sudo to call sudo with *my* $HOME/ENV/PATH
 alias sudo="sudo -E env PATH=\"\$PATH\" "
 # Unrestrict fd by default
-alias fd="fd -u"
+if command -v fdfind &>/dev/null; then
+  alias fd="fdfind -u"
+else
+  alias fd="fd -u"
+fi
 alias rg="rg -uui"
 # Show progress pls
 alias dd="dd status=progress"
