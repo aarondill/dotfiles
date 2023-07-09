@@ -12,9 +12,9 @@ alias :q='exit'
 alias sudo="sudo -E env PATH=\"\$PATH\" "
 # Unrestrict fd by default
 if command -v fdfind &>/dev/null; then
-  alias fd="fdfind -u"
+  alias fd="fdfind -uu"
 else
-  alias fd="fd -u"
+  alias fd="fd -uu"
 fi
 alias rg="rg -uui"
 # Show progress pls
