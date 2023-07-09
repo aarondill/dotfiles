@@ -24,7 +24,6 @@
 .profile
 .root
 .vim
-Templates
 vscode/.eslintrc.cjs
 vscode/.prettierrc.cjs
 vscode/.release-it.json
