@@ -26,14 +26,17 @@ else
   PACKAGES+=(shfmt)
 fi
 
-GRAPHICAL_PACKAGES=(
-  dconf-editor flatpak gparted gucharmap luckybackup zeal
-  # VM management. Technically, only virt-manager is graphical, but they are used together
+VIRTUAL_MACHINE_PACKAGES=(
+  # VM management.
   virt-manager
   # virsh
   libvirt-clients
   # virt-clone, etc
   virtinst
+)
+
+GRAPHICAL_PACKAGES=(
+  dconf-editor flatpak gparted gucharmap luckybackup zeal
 )
 
 GNOME_PACKAGES=(
@@ -72,6 +75,9 @@ function install_graphical_packages() {
   if [ -n "$GNOME" ]; then graphical_packages+=("${GNOME_PACKAGES[@]}"); fi
   if ! is_accessible_cmd X && ! is_accessible_cmd Xorg && [ -z "$GNOME" ]; then
     confirm "Xorg is not installed, would you still like to install gui applications?"
+  fi
+  if confirm "Would you like to install qemu-desktop and other virtual machine packages?"; then
+    graphical_packages=("${graphical_packages[@]}" "${VIRTUAL_MACHINE_PACKAGES[@]}")
   fi
   install_if_available "${graphical_packages[@]}"
 }
