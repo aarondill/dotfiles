@@ -50,16 +50,9 @@ if command -v tty-clock &>/dev/null; then alias clock='tty-clock  -sScbtrn'; fi
 
 if command -v google-chrome-stable &>/dev/null; then
   # Alias to remove error messages on opening google-chrome
-  # Also allows css detection of dark mode
-  chrome='google-chrome-stable --enable-features=WebUIDarkMode --force-dark-mode'
-  # shellcheck disable=SC2139 # They are intended to expand at definition
-  {
-    alias browser="$chrome"
-    alias google-chrome="$chrome 2>/dev/null"
-    alias chrome="$chrome 2>/dev/null"
-    export BROWSER="$chrome"
-  }
-  unset chrome
+  alias browser="google-chrome-stable 2>/dev/null"
+  alias google-chrome="google-chrome-stable 2>/dev/null"
+  export BROWSER="google-chrome-stable"
 fi
 # Show battery information
 alias battery='upower -i $(upower -e | grep BAT)'
