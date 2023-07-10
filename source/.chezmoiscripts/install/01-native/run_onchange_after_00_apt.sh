@@ -84,7 +84,7 @@ function install_graphical_packages() {
   if ! is_accessible_cmd X && ! is_accessible_cmd Xorg && [ -z "$GNOME" ]; then
     confirm "Xorg is not installed, would you still like to install gui applications?"
   fi
-  if confirm "Would you like to install qemu-desktop and other virtual machine packages?"; then
+  if is_accessible_cmd virt-manager || confirm "Would you like to install qemu-desktop and other virtual machine packages?"; then
     graphical_packages=("${graphical_packages[@]}" "${VIRTUAL_MACHINE_PACKAGES[@]}")
   fi
   install_if_available "${graphical_packages[@]}"
