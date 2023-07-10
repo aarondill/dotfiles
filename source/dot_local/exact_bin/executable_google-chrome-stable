@@ -14,7 +14,7 @@ esac
 
 # Don't test -x, because this could be invoked `bash foo`
 # Just assume the file doesn't exist. It should work itself out if we call ourselves as a file.
-if ! [ -f "$this" ]; then this=; fi
+if ! [ -f "$this" ]; then this=''; fi
 
 # Find the path of the next google-chrome-stable in the PATH. *not* $this
 
@@ -30,9 +30,13 @@ done
 IFS=$old_ifs
 unset old_ifs
 
+if [ -z "$chrome" ]; then
+  printf '%s\n' "command not found: google-chrome-stable"
+fi
+
 # Detect *optional* chrome-sync.sh script
 chrome_sync="$(command -v chrome-sync.sh 2>/dev/null)" || true
 
-[ -n "$chrome_sync" ] && "$chrome_sync"
+if [ -n "$chrome_sync" ]; then "$chrome_sync"; fi
 "$chrome" "$@" # can't exec, because runs after close
-[ -n "$chrome_sync" ] && "$chrome_sync"
+if [ -n "$chrome_sync" ]; then "$chrome_sync"; fi
