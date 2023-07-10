@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # This starts up gnome-keyring-daemon/ssh-agent if not already running
 
-if [ -z "$DISPLAY" ]; then
+if [ -z "$DISPLAY" ] || [ "$(id -u)" -eq 0 ]; then
   return 0 # Just stop if not running graphically. It won't work right anyways.
 fi
 

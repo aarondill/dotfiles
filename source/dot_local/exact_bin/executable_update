@@ -79,7 +79,7 @@ while true; do
   esac
 done
 
-if [ "$EUID" -eq 0 ] && [ "$allow_root" -eq 0 ]; then
+if [ "$(id -u)" -eq 0 ] && [ "$allow_root" -eq 0 ]; then
   err 'This script should not be run as root (due to flatpak).'
   err 'Use SUDO environment variable to override sudo program.'
   err 'Use update --as-root to force the script to run as root'
