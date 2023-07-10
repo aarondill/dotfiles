@@ -50,7 +50,12 @@ function remove_if_installed() {
 
 is_available_pacman() {
   # DON'T call it like this, but if a list of packages is passed, this will handle them
-  for package in "$@"; do "$PACMAN" -Si "${package}" &>/dev/null || return 1; done
+  for package in "$@"; do
+    case "$PACMAN" in
+    */yay) "$PACMAN" --repo -Si "${package}" &>/dev/null || return 1 ;
+    *) "$PACMAN" -Si "${package}" &>/dev/null || return 1 ;;
+    esac
+  done
 }
 
 function install_if_available() {
