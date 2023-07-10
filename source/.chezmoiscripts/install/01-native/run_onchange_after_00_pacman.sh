@@ -22,6 +22,8 @@ PACKAGES=(
   ttf-nerd-fonts-symbols-mono noto-fonts-cjk noto-fonts-extra
   # icon fonts
   noto-fonts-emoji ttf-font-awesome
+  # Storage tools
+  dosfstools exfatprogs e2fsprogs
 )
 VIRTUAL_MACHINE_PACKAGES=(
   # VM management. Technically, only virt-manager is graphical, but they are used together
