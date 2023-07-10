@@ -37,9 +37,11 @@ sync_shm() {
 }
 
 # PROFILE
-cd ~/.config/
+conf_dir=${CHROME_CONFIG_HOME:-${XDG_CONFIG_HOME:-$HOME/.config}}
+cd "$conf_dir"
 sync_shm "google-chrome"
 
 # CACHE
-cd ~/.cache/
+cache_dir=${XDG_CACHE_HOME:-$HOME/.cache}
+cd "$cache_dir"
 sync_shm "google-chrome"

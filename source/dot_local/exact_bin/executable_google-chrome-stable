@@ -40,10 +40,13 @@ if [ -z "$chrome" ]; then
 fi
 
 # Detect *optional* chrome-sync.sh script
-# chrome_sync="$(command -v chrome-sync.sh 2>/dev/null)" || true
+chrome_sync="$(command -v chrome-sync.sh 2>/dev/null)" || true
 
-# assume this was handled by systemd!
-# if [ -n "$chrome_sync" ]; then "$chrome_sync"; fi
+conf_dir=${CHROME_CONFIG_HOME:-${XDG_CONFIG_HOME:-$HOME/.config}}/google-chrome/
+# if exists, assume this was handled by systemd!
+if ! [ -d "$conf_dir" ]; then
+  if [ -n "$chrome_sync" ]; then "$chrome_sync"; fi
+fi
 
 "$chrome" "${WRAPPER_ARGS[@]}" "$@" # can't exec, because runs after close
 
