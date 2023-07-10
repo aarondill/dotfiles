@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -euf -o pipefail
+
+# Find the absolute path of this script
+
+this=
+# if abs, this=realpath
+# if `command`, this=path of this
+case $0 in
+/*) this=$0 ;;                # Absolute
+./*) this=$PWD/${0%./} ;;     # Relative
+*) this=$(command -v "$0") ;; # Called by name
+esac
+
+# Don't test -x, because this could be invoked `bash foo`
+# Just assume the file doesn't exist. It should work itself out if we call ourselves as a file.
+if ! [ -f "$this" ]; then this=; fi
+
+# Find the path of the next google-chrome-stable in the PATH. *not* $this
+
+old_ifs=$IFS
+IFS=:
+for dir in $PATH; do
+  [ -d "$dir" ] || continue
+  [ -x "$dir/google-chrome-stable" ] || continue
+  [ "$dir/google-chrome-stable" = "$this" ] && continue
+  chrome="$dir/google-chrome-stable"
+  break
+done
+IFS=$old_ifs
+unset old_ifs
+
+# Detect *optional* chrome-sync.sh script
+chrome_sync="$(command -v chrome-sync.sh 2>/dev/null)" || true
+
+[ -n "$chrome_sync" ] && "$chrome_sync"
+"$chrome" # can't exec, because runs after close
+[ -n "$chrome_sync" ] && "$chrome_sync"
