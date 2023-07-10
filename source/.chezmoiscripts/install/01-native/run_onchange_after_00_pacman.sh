@@ -84,7 +84,7 @@ function install_graphical_packages() {
 
 update_system() {
   case "$PACMAN" in
-  yay) "$PACMAN" -Syu ;; # don't run yay as root when AUR packages could be installed
+  */yay) "$PACMAN" -Syu ;; # don't run yay as root when AUR packages could be installed
   *) sudo "$PACMAN" -Syu ;;
   esac
 }
