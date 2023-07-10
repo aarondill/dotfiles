@@ -37,6 +37,9 @@ fi
 # Detect *optional* chrome-sync.sh script
 chrome_sync="$(command -v chrome-sync.sh 2>/dev/null)" || true
 
-if [ -n "$chrome_sync" ]; then "$chrome_sync"; fi
+# assume this was handled by systemd!
+# if [ -n "$chrome_sync" ]; then "$chrome_sync"; fi
+
 "$chrome" "$@" # can't exec, because runs after close
+# Sync back to disk
 if [ -n "$chrome_sync" ]; then "$chrome_sync"; fi
