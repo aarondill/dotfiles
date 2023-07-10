@@ -34,5 +34,5 @@ unset old_ifs
 chrome_sync="$(command -v chrome-sync.sh 2>/dev/null)" || true
 
 [ -n "$chrome_sync" ] && "$chrome_sync"
-"$chrome" # can't exec, because runs after close
+"$chrome" "$@" # can't exec, because runs after close
 [ -n "$chrome_sync" ] && "$chrome_sync"
