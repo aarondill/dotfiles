@@ -82,8 +82,15 @@ function install_graphical_packages() {
   install_if_available "${graphical_packages[@]}"
 }
 
+update_system() {
+  case "$PACMAN" in
+  yay) "$PACMAN" -Syu ;; # don't run yay as root when AUR packages could be installed
+  *) sudo "$PACMAN" -Syu ;;
+  esac
+}
+
 # no install neovim latest, bc should already be
-log_and_run 'Updating sources/packages' sudo "$PACMAN" -Syu
+log_and_run 'Updating sources/packages' update_system
 log_and_run 'Installing packages' install_packages
 log_and_run 'Installing graphical packages' install_graphical_packages
 # Gnome comes with it, but I don't want it.
