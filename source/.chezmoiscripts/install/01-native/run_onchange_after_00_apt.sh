@@ -18,6 +18,13 @@ PACKAGES=(
   neofetch neovim net-tools openvpn p7zip-full rsync tlp
   trash-cli tree util-linux xclip xdg-utils zip zoxide speedtest-cli
   ripgrep libfuse2 hexedit luajit python3-pip xdotool fd-find
+  # fonts
+  fonts-noto-cjk fonts-noto-mono
+  # icon fonts
+  fonts-noto-color-emoji fonts-font-awesome
+  # Storage tools
+  dosfstools exfatprogs e2fsprogs
+
 )
 if [ "$OS" = "Debian" ]; then
   # Different name in debian, also only available in testing
