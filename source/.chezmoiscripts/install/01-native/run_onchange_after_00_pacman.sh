@@ -16,8 +16,8 @@ PACKAGES=(
   age cronie cmake curl dconf-editor duf github-cli git
   grep inotify-tools less make neofetch neovim net-tools
   openvpn p7zip rsync shfmt tlp trash-cli tree util-linux
-  xclip xdg-utils zip unzip zoxide speedtest-cli ripgrep hexedit
-  luajit python-pip xdotool base-devel wezterm bat bash-completion fd
+  zip unzip zoxide speedtest-cli ripgrep hexedit
+  luajit python-pip base-devel wezterm bat bash-completion fd
   # fonts
   ttf-nerd-fonts-symbols-mono noto-fonts-cjk noto-fonts-extra
   # icon fonts
@@ -37,6 +37,7 @@ GRAPHICAL_PACKAGES=(
   dconf-editor flatpak gparted gucharmap
   # These are setup on ubuntu through a ppa
   code spotify-launcher
+  wmctrl xdotool xclip xdg-utils
 )
 GNOME_PACKAGES=(gnome-shell-extension-manager gnome-tweaks gnome-software gnome-software-plugin-flatpak)
 
