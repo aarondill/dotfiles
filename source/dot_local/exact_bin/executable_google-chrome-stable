@@ -35,11 +35,13 @@ if [ -z "$chrome" ]; then
 fi
 
 # Detect *optional* chrome-sync.sh script
-chrome_sync="$(command -v chrome-sync.sh 2>/dev/null)" || true
+# chrome_sync="$(command -v chrome-sync.sh 2>/dev/null)" || true
 
 # assume this was handled by systemd!
 # if [ -n "$chrome_sync" ]; then "$chrome_sync"; fi
 
 "$chrome" "$@" # can't exec, because runs after close
-# Sync back to disk
-if [ -n "$chrome_sync" ]; then "$chrome_sync"; fi
+
+# Sync back to disk - This should be handled by systemd
+# - This is dangerous on force-shutdown, but IDC
+# if [ -n "$chrome_sync" ]; then "$chrome_sync"; fi
