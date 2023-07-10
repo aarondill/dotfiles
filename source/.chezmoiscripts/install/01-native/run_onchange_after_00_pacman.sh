@@ -18,6 +18,8 @@ PACKAGES=(
   openvpn p7zip rsync shfmt tlp trash-cli tree util-linux
   xclip xdg-utils zip unzip zoxide speedtest-cli ripgrep hexedit
   luajit python-pip xdotool base-devel wezterm bat bash-completion fd
+  # fonts
+  ttf-nerd-fonts-symbols-mono noto-fonts-cjk noto-fonts-emoji noto-fonts-extra
 )
 VIRTUAL_MACHINE_PACKAGES=(
   # VM management. Technically, only virt-manager is graphical, but they are used together
