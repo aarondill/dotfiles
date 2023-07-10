@@ -31,7 +31,7 @@ sync_shm() {
   if [ -e "$link/.unpacked" ]; then
     rsync --inplace -au --delete --exclude .unpacked "./$link/" "./$static/"
   else
-    rsync -av "./$static/" "./$link/"
+    rsync -a "./$static/" "./$link/"
     touch -- "$link/.unpacked"
   fi
 }
