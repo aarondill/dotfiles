@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euf -o pipefail
 
+WRAPPER_ARGS=(
+  # allows css detection of dark mode
+  --enable-features=WebUIDarkMode --force-dark-mode
+)
+
 # Find the absolute path of this script
 
 this=
@@ -40,7 +45,7 @@ fi
 # assume this was handled by systemd!
 # if [ -n "$chrome_sync" ]; then "$chrome_sync"; fi
 
-"$chrome" "$@" # can't exec, because runs after close
+"$chrome" "${WRAPPER_ARGS[@]}" "$@" # can't exec, because runs after close
 
 # Sync back to disk - This should be handled by systemd
 # - This is dangerous on force-shutdown, but IDC
