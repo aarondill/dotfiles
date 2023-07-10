@@ -28,6 +28,8 @@ export XDG_CACHE_HOME="$HOME/.cache"
 export LESSHISTFILE=-
 # Make search case insensitive
 export LESS="-I"
+# Make less show icons in PUA areas
+export LESSUTFCHARDEF='E000-F8FF:p,F0000-FFFFD:p,100000-10FFFD:p'
 # Move some files from my $HOME directory
 export LESSKEY="$XDG_CONFIG_HOME/less/lesskey"
 export GNUPGHOME="$XDG_CONFIG_HOME"/gnupg
