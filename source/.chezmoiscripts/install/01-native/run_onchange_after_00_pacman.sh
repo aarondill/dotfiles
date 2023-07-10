@@ -19,7 +19,9 @@ PACKAGES=(
   xclip xdg-utils zip unzip zoxide speedtest-cli ripgrep hexedit
   luajit python-pip xdotool base-devel wezterm bat bash-completion fd
   # fonts
-  ttf-nerd-fonts-symbols-mono noto-fonts-cjk noto-fonts-emoji noto-fonts-extra
+  ttf-nerd-fonts-symbols-mono noto-fonts-cjk noto-fonts-extra
+  # icon fonts
+  noto-fonts-emoji ttf-font-awesome
 )
 VIRTUAL_MACHINE_PACKAGES=(
   # VM management. Technically, only virt-manager is graphical, but they are used together
