@@ -13,7 +13,7 @@ this=
 # if `command`, this=path of this
 case $0 in
 /*) this=$0 ;;                # Absolute
-./*) this=$PWD/${0%./} ;;     # Relative
+./*) this=$PWD/${0#./} ;;     # Relative
 *) this=$(command -v "$0") ;; # Called by name
 esac
 

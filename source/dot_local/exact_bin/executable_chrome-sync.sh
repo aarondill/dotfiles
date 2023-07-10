@@ -9,7 +9,7 @@ fi
 
 sync_shm() {
   static="static-$1/"
-  link="$1"
+  link="${1%/}"
   volatile="/dev/shm/$1-$USER"
 
   IFS=
