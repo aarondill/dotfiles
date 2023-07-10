@@ -1,4 +1,5 @@
 #!/bin/sh
+set -eu
 # Syncs the google-chrome assets to /dev/shm to decrease disk writes and improve speeds
 # This should be run before and after google-chrome if possible
 
