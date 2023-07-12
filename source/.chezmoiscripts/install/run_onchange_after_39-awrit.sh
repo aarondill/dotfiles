@@ -33,7 +33,7 @@ install_dependencies() {
   fi
 }
 
-install_from_make() {
+install_awrit() {
   # Temp directory
   temp=$(mktemp -d)
   trap 'rm -rf "$temp"' EXIT
