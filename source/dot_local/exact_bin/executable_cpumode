@@ -4,7 +4,7 @@ set -euC -o pipefail
 # Globs that don't match expand to empty strings
 shopt -s nullglob
 
-THIS="power-mode"
+THIS="cpumode"
 
 usage() {
   cat <<-EOF
