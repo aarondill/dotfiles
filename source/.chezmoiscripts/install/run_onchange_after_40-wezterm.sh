@@ -13,10 +13,10 @@ if [ -z "$APT" ]; then
   abort 'This script only supports apt. Install from your disto repos' 0
 fi
 
-# Wezterm will inform of updates itself, only run if not already installed
-if is_available_apt wezterm; then
-  abort "wezterm is already installed" 0
-fi
+# # Wezterm will inform of updates itself, only run if not already installed
+# if is_available_apt wezterm; then
+#   abort "wezterm is already installed" 0
+# fi
 
 log 'installing wezterm'
 
