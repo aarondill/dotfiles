@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euC -o pipefail
+shopt -s nullglob # *not-exists* = ""
+shopt -s globstar # **
+
+DIR=$HOME/.config/google-chrome/
+oldsize=$(du -s -- "$DIR" | awk '{ print $1 }')
+
+for file in "$DIR/Safe Browsing" "$DIR/Crash Reports" "$DIR/"**/*Cache "$DIR"/**/Cache* "$DIR"/**/LOG "$DIR"/**/LOG.old "$DIR/Default/IndexedDB/"*; do
+  if [ -e "$file" ]; then
+    rm -rf -- "$file"
+  fi
+done
+newsize=$(du -s -- "$DIR" | awk '{ print $1 }')
+echo "Old size: $oldsize"
+echo "New size: $newsize"
+echo "Total saving: $((oldsize - newsize))"
