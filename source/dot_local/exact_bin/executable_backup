@@ -215,7 +215,8 @@ fi
 # ----------------------------------------------------------------
 
 verbose() {
-  if [ -n "${BACKUP_VERBOSE:-}" ]; then
+  # a dry-run likely wants to be verbose
+  if [ -n "${BACKUP_VERBOSE:-}" ] || [ -n "${BACKUP_DRY_RUN:-}" ]; then
     printf "'%s' " "$@" # print it
     printf '\n'
   fi
