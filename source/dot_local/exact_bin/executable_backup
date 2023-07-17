@@ -103,6 +103,9 @@ fi
 # Currently only 'no' is fully supported.
 ENCRYPTION_TYPE=no
 
+# Perform a full backup if an incremental backup is requested, but the latest full backup in the collection is older than the given time.
+FULL_IF_OLDER=1M
+
 # Use seconds as the socket timeout value if duplicity begins to timeout during network operations. The default is 30 seconds.
 TIMEOUT=120
 # Specify output verbosity level (log level).
@@ -170,9 +173,6 @@ done
 # volsize
 args=("${args[@]}" "--volsize=$VOLSIZE")
 
-# Source/destination
-args=("${args[@]}" "$SOURCE_DIR" "$DESTINATION_URI")
-
 # Encryption
 if [ "$ENCRYPTION_TYPE" = 'no' ]; then
   args=("${args[@]}" "--no-encryption")
@@ -214,17 +214,22 @@ fi
 # ----------------------------------------------------------------
 # ----------------------------------------------------------------
 
+verbose() {
+  if [ -n "${BACKUP_VERBOSE:-}" ]; then
+    printf "'%s' " "$@" # print it
+    printf '\n'
+  fi
+  if [ -z "${BACKUP_DRY_RUN:-}" ]; then
+    "$@" # run it
+  fi
+}
+
 if [ "${#args[@]}" -eq 0 ]; then
   abort "No arguments were specified. Something went wrong" 3
 fi
 
-if [ -n "${BACKUP_VERBOSE:-}" ]; then
-  printf "'%s' " "$DUPLICITY" "${args[@]}"
-  printf '\n'
-fi
+log "Backing up to $DESTINATION_URI"
+verbose "$DUPLICITY" --full-if-older-than="${FULL_IF_OLDER:-1M}" "${args[@]}" -- "$SOURCE_DIR" "$DESTINATION_URI"
 
-if [ -n "${BACKUP_DRY_RUN:-}" ]; then
-  exit 0
-fi
-
-"$DUPLICITY" "${args[@]}"
+log "Verifying $DESTINATION_URI"
+verbose "$DUPLICITY" verify "${args[@]}" -- "$DESTINATION_URI" "$SOURCE_DIR"
