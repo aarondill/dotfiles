@@ -117,7 +117,7 @@ if [ -z "${DUPLICITY:-}" ]; then
   if ! command -v which &>/dev/null; then
     abort "Which is required to find duplicity in PATH. Plese ensure it is installed or set \$DUPLICITY variable." 1
   fi
-  DUPLICITY=$(which duplicity || printf '')
+  DUPLICITY=$(which duplicity 2>/dev/null || printf '')
 fi
 # Ensure duplicity can be accessed
 if [ -z "$DUPLICITY" ]; then
