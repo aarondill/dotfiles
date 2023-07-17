@@ -1,5 +1,5 @@
 # min hour day month weekday exec
-# Run anacron on the hour
+# Run anacron on the hour - anacron will handle timing
 0 * * * * anacron -t ${HOME}/etc/anacrontab -S ${HOME}/var/spool/anacron
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ luckybackup entries ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 0 19 * * *	env DISPLAY=:0 /usr/bin/luckybackup --silent --skip-critical /home/aaron/.luckyBackup/profiles/default.profile > /home/aaron/.luckyBackup/logs/default-LastCronLog.log 2>&1
