@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# TODO: less "/home/aaron" more "$HOME" -- need to investigate interactions with existing backups
+
 # Calls duplicity to run a backup. Passes user arguments to first arguments of duplicity.
 # Requires duplicity to be installed
 
@@ -12,7 +14,9 @@
 # may use "home_daily_s3" for the daily backup of a home directory to Amazon S3. The structure of the name is up to the user, it is only important that
 # the names be distinct. The symbolic name is currently only used to affect the expansion of --archive-dir , but may be used for additional features in
 # the future. Users running more than one distinct backup are encouraged to use this option. If not specified, the default value is a hash of the backend URL.
-NAME='full-system-ubuntu'
+os=$(. /etc/os-release && printf '%s\n' "${ID:-${NAME:-}}" || printf '')
+host=$(uname -n || printf '')
+NAME="full-system-$host-$os"
 
 # use '-path' to exclude
 # use '+path' or just 'path' to include
@@ -77,8 +81,12 @@ VOLSIZE=200
 
 # The source directory *to* backup (usually / or "$HOME")
 SOURCE_DIR=/
-# The deestination directory to backup *to* (usually a remote location or external storage)
-DESTINATION_URI=file:///media/aaron/Backup/UbuntuLaptop/duplicity_backup
+# The destination directory to backup *to* (usually a remote location or external storage)
+if [ "$host" = "aaron-HP-Laptop-15-dy2xxx" ] && [ "$os" = ubuntu ]; then
+  DESTINATION_URI=file:///media/aaron/Backup/UbuntuLaptop/duplicity_backup
+else
+  DESTINATION_URI=file:///media/aaron/Backup/duplicity_backup/$host-$os
+fi
 
 # Currently only 'no' is fully supported.
 ENCRYPTION_TYPE=no
