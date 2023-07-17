@@ -47,3 +47,4 @@ vscode/Java/java-format.xml
 .config/gtk-2.0/gtkfilechooser.ini
 .config/yay
 .config/systemd
+.config/crontab

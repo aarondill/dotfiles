@@ -23,7 +23,7 @@ if [[ "$SHLVL" -eq 1 ]]; then
     # Reset color and bold
     tput sgr0
     # Show error message
-    /usr/bin/cat ~/.backup/BACKUPFAILURE
+    cat ~/.backup/BACKUPFAILURE
 
   # Echo error message if last backup check failed but last backup success
   elif [[ -f ~/.backup/BACKUPCHECKFAILURE ]]; then
@@ -34,14 +34,14 @@ if [[ "$SHLVL" -eq 1 ]]; then
     # Reset color and bold
     tput sgr0
     # Show error message
-    /usr/bin/cat ~/.backup/BACKUPCHECKFAILURE
+    cat ~/.backup/BACKUPCHECKFAILURE
   fi
 
   if [[ -f ~/.backup/backup-time ]]; then
     # Print new line if already printed failure message
     [[ -f ~/.backup/BACKUPFAILURE || -f ~/.backup/BACKUPCHECKFAILURE ]] && echo
     # Echo last backup time
-    /usr/bin/cat ~/.backup/backup-time
+    cat ~/.backup/backup-time
   fi
 
 fi

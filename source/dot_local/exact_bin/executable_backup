@@ -1,0 +1,210 @@
+#!/usr/bin/env bash
+# Calls duplicity to run a backup. Passes user arguments to first arguments of duplicity.
+# Requires duplicity to be installed
+
+# ----------------------------------------------------------------
+# ----------------------------------------------------------------
+# ------------------------ CONFIGURATION -------------------------
+# ----------------------------------------------------------------
+# ----------------------------------------------------------------
+
+# Set the symbolic name of the backup being operated on. The intent is to use a separate name for each logically distinct backup. For example, someone
+# may use "home_daily_s3" for the daily backup of a home directory to Amazon S3. The structure of the name is up to the user, it is only important that
+# the names be distinct. The symbolic name is currently only used to affect the expansion of --archive-dir , but may be used for additional features in
+# the future. Users running more than one distinct backup are encouraged to use this option. If not specified, the default value is a hash of the backend URL.
+NAME='full-system-ubuntu'
+
+# use '-path' to exclude
+# use '+path' or just 'path' to include
+# spaces are also permitted after the '+/-' (ie '+ path')
+# to use a path starting with '-' or '+', simply pass two of them (ie '--path' and '++path')
+# NOTE: order is important. the first matching pattern will be applied. (see man duplicity)
+
+# from man:duplicity:
+# The include and exclude options accept some extended shell globbing patterns. These patterns can contain '*', '**', '?', and '[...]'.
+# As in a normal shell, '*' can be expanded to any string of characters not containing "/", '?' expands to any character except "/",
+# and '[...]' expands to a single character of those characters specified (ranges are acceptable).
+# The new special pattern, '**', expands to any string of characters whether or not it contains "/".
+# Furthermore, if the pattern starts with "ignorecase:" (case insensitive), then this prefix will be removed and
+# any character in the string can be replaced with an upper- or lowercase version of itself.
+files=(
+  '-/home/aaron/.cache'
+  '-/home/aaron/.cache/deja-dup'
+  '-/home/aaron/.config/Code'
+  '-/home/aaron/.config/TabNine'
+  '-/home/aaron/.config/google-chrome'
+  '-/home/aaron/.config/static-google-chrome'
+  '-/home/aaron/.local/share'
+  '-/home/aaron/.local/share/Trash'
+  '-/home/aaron/.local/state'
+  '-/home/aaron/.luckyBackup/logs'
+  '-/home/aaron/.luckyBackup/snaps'
+  '-/home/aaron/.thunderbird'
+  '-/home/aaron/.var'
+  '-/home/aaron/.vscode'
+  '-/home/aaron/.xsession-errors'
+  '-/home/aaron/.Xauthority'
+  '-/home/aaron/Documents/.soh'
+  '-/home/aaron/Downloads'
+  '-/home/aaron/snap/*/*/.cache'
+  '-/home/aaron/vscode/repos'
+
+  '+/home/aaron'
+
+  '-/sys'
+  '-/run'
+  '-/proc'
+  '-/dev'
+  '-/dev/shm/'
+  '-/var/tmp'
+  '-/tmp'
+  '-/media/aaron/Backup/UbuntuLaptop/duplicity_backup' # don't backup the backup :)
+  '-/**/lost+found/'
+  '-**'
+)
+
+# Exclude directories if filename is present. Allows the user to specify folders
+# that they do not wish to backup by adding a specified file (e.g. ".nobackup")
+# instead of maintaining a comprehensive exclude/include list.
+exclude_if_present=(
+  'CACHEDIR.TAG'
+  '.deja-dup-ignore'
+  '.nobackup'
+)
+
+# Change the volume size to number MB. Default is 200MB.
+VOLSIZE=200
+
+# The source directory *to* backup (usually / or "$HOME")
+SOURCE_DIR=/
+# The deestination directory to backup *to* (usually a remote location or external storage)
+DESTINATION_URI=file:///media/aaron/Backup/UbuntuLaptop/duplicity_backup
+
+# Currently only 'no' is fully supported.
+ENCRYPTION_TYPE=no
+
+# Use seconds as the socket timeout value if duplicity begins to timeout during network operations. The default is 30 seconds.
+TIMEOUT=120
+# Specify output verbosity level (log level).
+# Named levels and corresponding values are 0 Error, 2 Warning, 4 Notice (default), 8 Info, 9 Debug (noisiest).
+#          level may also be a character: e, w, n, i, d
+#          or a word: error, warning, notice, info, debug
+VERBOSITY=4
+# Write specially-formatted versions of output messages to the specified file.  The format used is designed to be easily consumable by other programs.
+LOGFILE=
+
+# When backing up or restoring, this option specifies that the local archive directory is to be created in path.
+# If the archive directory is not specified, the default will be to create the archive directory in ~/.cache/duplicity/.
+# ARCHIVE_DIR=~/.cache/duplicity/
+
+# Use this existing directory for duplicity temporary files instead of the system default, which is usually the /tmp directory.
+# TEMP_DIR=/tmp
+
+# ----------------------------------------------------------------
+# ----------------------------------------------------------------
+# -------------------------- PROCESSING --------------------------
+# ----------------------------------------------------------------
+# ----------------------------------------------------------------
+
+log() { printf '%s\n' "$@"; }
+err() { printf '%s\n' "$@" >&2; }
+abort() {
+  err "$1"
+  exit "${2:1}"
+}
+
+if [ -z "${DUPLICITY:-}" ]; then
+  if ! command -v which &>/dev/null; then
+    abort "Which is required to find duplicity in PATH. Plese ensure it is installed or set \$DUPLICITY variable." 1
+  fi
+  DUPLICITY=$(which duplicity || printf '')
+fi
+# Ensure duplicity can be accessed
+if [ -z "$DUPLICITY" ]; then
+  abort "Could not find duplicity. Please ensure it is installed" 1
+elif ! [ -x "$DUPLICITY" ]; then
+  abort "Could not run '$DUPLICITY'. Please ensure it is executable." 3
+fi
+
+# Array of arguments to pass to duplicity - begins with user input, if any
+args=("$@")
+
+# include/exclude
+for pat in "${files[@]}"; do
+  case "$pat" in
+  '- '*) args+=("--exclude=${pat#- }") ;; # '- path' -> '--exclude=path'
+  -*) args+=("--exclude=${pat#-}") ;;     # '-path' -> '--exclude=path'
+
+  '+ '*) args+=("--include=${pat#+ }") ;; # '+ path' -> '--include=path'
+  +*) args+=("--include=${pat#+}") ;;     # '+path' -> '--include=path'
+
+  *) args+=("--include=$pat") ;; # 'path' -> 'include=path'
+  esac
+done
+
+# exclude-if-present
+for file in "${exclude_if_present[@]}"; do
+  args=("${args[@]}" "--exclude-if-present=$file")
+done
+
+# volsize
+args=("${args[@]}" "--volsize=$VOLSIZE")
+
+# Source/destination
+args=("${args[@]}" "$SOURCE_DIR" "$DESTINATION_URI")
+
+# Encryption
+if [ "$ENCRYPTION_TYPE" = 'no' ]; then
+  args=("${args[@]}" "--no-encryption")
+fi
+
+# verbosity
+if [ -n "${VERBOSITY:-}" ]; then
+  args=("${args[@]}" "--verbosity=$VERBOSITY")
+fi
+
+# timeout
+if [ -n "${TIMEOUT:-}" ]; then
+  args=("${args[@]}" "--timeout=$TIMEOUT")
+fi
+
+# archive-dir
+if [ -n "${ARCHIVE_DIR:-}" ]; then
+  args=("${args[@]}" "--archive-dir=$ARCHIVE_DIR")
+fi
+
+# tempdir
+if [ -n "${TEMP_DIR:-}" ]; then
+  args=("${args[@]}" "--tempdir=$TEMP_DIR")
+fi
+
+# log-file
+if [ -n "${LOGFILE:-}" ]; then
+  args=("${args[@]}" "--log-file=$LOGFILE")
+fi
+
+# name
+if [ -n "${NAME:-}" ]; then
+  args=("${args[@]}" "--name=$NAME")
+fi
+
+# ----------------------------------------------------------------
+# ----------------------------------------------------------------
+# -------------------------- EXECUTION ---------------------------
+# ----------------------------------------------------------------
+# ----------------------------------------------------------------
+
+if [ "${#args[@]}" -eq 0 ]; then
+  abort "No arguments were specified. Something went wrong" 3
+fi
+
+if [ -n "${BACKUP_VERBOSE:-}" ]; then
+  printf "'%s' " "$DUPLICITY" "${args[@]}"
+  printf '\n'
+fi
+
+if [ -n "${BACKUP_DRY_RUN:-}" ]; then
+  exit 0
+fi
+
+"$DUPLICITY" "${args[@]}"

@@ -29,8 +29,8 @@ alias reboot="history -a; /sbin/reboot"
 alias halt="history -a; /sbin/halt"
 alias shutdown="history -a; /sbin/shutdown"
 
-alias backup="~/.backup/dobackup"
-alias lastbackup="/usr/bin/cat ~/.backup/backup-time"
+# alias backup="~/.backup/dobackup"
+# alias lastbackup="/usr/bin/cat ~/.backup/backup-time"
 if command -v sensible-browser &>/dev/null; then
   alias browser="sensible-browser"
 elif command -v x-www-browser &>/dev/null; then
