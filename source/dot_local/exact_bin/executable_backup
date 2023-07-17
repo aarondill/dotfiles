@@ -110,7 +110,7 @@ log() { printf '%s\n' "$@"; }
 err() { printf '%s\n' "$@" >&2; }
 abort() {
   err "$1"
-  exit "${2:1}"
+  exit "${2:-1}"
 }
 
 if [ -z "${DUPLICITY:-}" ]; then
