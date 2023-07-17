@@ -81,11 +81,23 @@ VOLSIZE=200
 
 # The source directory *to* backup (usually / or "$HOME")
 SOURCE_DIR=/
+
+# Searching for usb drive
+external=
+usbname=Backup
+for dir in "/media/$USER" "/run/media/$USER"; do
+  if [ -d "$dir" ] && [ -d "$dir/$usbname" ]; then external=file://$dir/$usbname && break; fi
+done
+if [ -z "$external" ]; then
+  printf '%s\n' "Could not find usb drive for backup. Please check it's mounted with the name Backup." >&2
+  exit 1
+fi
+
 # The destination directory to backup *to* (usually a remote location or external storage)
 if [ "$host" = "aaron-HP-Laptop-15-dy2xxx" ] && [ "$os" = ubuntu ]; then
-  DESTINATION_URI=file:///media/aaron/Backup/UbuntuLaptop/duplicity_backup
+  DESTINATION_URI=$external/UbuntuLaptop/duplicity_backup
 else
-  DESTINATION_URI=file:///media/aaron/Backup/duplicity_backup/$host-$os
+  DESTINATION_URI=$external/duplicity_backup/$host-$os
 fi
 
 # Currently only 'no' is fully supported.
