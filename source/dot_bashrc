@@ -138,6 +138,13 @@ fi
 
 # ---------------------------BEGIN CUSTOM CODE---------------------------
 
+# This is set from the .profile - don't source profile if being sourced by the profile
+# .profile takes care of unsetting this
+if [ -z "${IN_PROFILE:-}" ]; then
+  # shellcheck source=./.profile
+  . ~/.profile
+fi
+
 will_startx() { command -v startx &>/dev/null && [ -z "$DISPLAY" ] && [ "$TERM" = "linux" ] && [ "$(tty)" = /dev/tty1 ] && [ -z "$SKIP_STARTX_LOGIN" ]; }
 # All code above this point is part of the distrobution.
 # Any code below is part of my personal installation
