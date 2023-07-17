@@ -1,7 +1,6 @@
 # ~/.bashrc.d/30_functions/_update-config
 # A list of files to backup. The first *three* lines are ignored. Empty lines are counted!
 # Files must be below this line!
-.backup/backup.config
 .bash_logout
 .bashrc
 .bashrc.d
