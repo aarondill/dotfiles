@@ -91,8 +91,6 @@ else
   append_path "$GOPATH/bin"
 fi
 
-IN_PROFILE=1
-export IN_PROFILE # used in the bashrc to avoid recursive sourcing
 # if running bash
 if [ -n "$BASH_VERSION" ]; then
   # include .bashrc if it exists
@@ -101,4 +99,3 @@ if [ -n "$BASH_VERSION" ]; then
     . "$HOME/.bashrc"
   fi
 fi
-unset IN_PROFILE
