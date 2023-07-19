@@ -2,22 +2,23 @@
 set -euC -o pipefail
 # Syncs the google-chrome assets to /dev/shm to decrease disk writes and improve speeds
 # This should be run before and after google-chrome if possible
-if ! command -v rsync >/dev/null 2>&1; then
-  printf '%s\n' "rsync is required to run $0" >&2
-  exit 1
-elif ! command -v dirname >/dev/null 2>&1; then
-  printf '%s\n' "dirname is required to run $0" >&2
-  exit 1
-elif ! command -v basename >/dev/null 2>&1; then
-  printf '%s\n' "basename is required to run $0" >&2
-  exit 1
-elif ! command -v tr >/dev/null 2>&1; then
-  printf '%s\n' "tr is required to run $0" >&2
-  exit 1
-fi
+required() {
+  for cmd in "$@"; do
+    if ! command -v "$cmd" >/dev/null 2>&1; then
+      printf '%s\n' "$cmd is required to run $0" >&2
+      exit 1
+    fi
+  done
+}
+# This is the main third-party dependency, which may not be installed. Many systems include it, but it can't be guarenteed.
+required rsync
+# These are POSIX, so should be present on any posix system
+required dirname basename
+# These are coreutils and expected to always be present
+required mkdir rm mv ln touch tr
 
 # doesn't follow the last symlink. ie, in /sym/sym/sym/sym --> /real/real/real/sym
-function realpath {
+function posix_realpath {
   if ! [ -d "$(dirname -- "$1")" ]; then
     return 1 # fail if not exist
   fi
@@ -30,7 +31,7 @@ function realpath {
 
 sync_shm() {
   local path volatile static link
-  path=$(realpath "$1")
+  path=$(posix_realpath "$1")
 
   link="$path"
   static="$(dirname -- "$path")/static-$(basename -- "$path")"
@@ -53,10 +54,12 @@ sync_shm() {
     ln -s -- "$volatile" "$link"
   fi
 
-  if [ -e "$link/.unpacked" ]; then
-    rsync --inplace -au --delete --exclude .unpacked -- "$link/" "$static/"
-  else
-    rsync -a -- "$static/" "$link/"
+  if [ -e "$link/.unpacked" ]; then # we have alredy unpacked (run once before)
+    # move (inplace) newer files from unpacked to static, removing any that no longer exist and excluding the .unpacked file
+    rsync --inplace --archive --update --delete --exclude .unpacked -- "$link/" "$static/"
+  else # We have not run before (just moved $link to $static or fresh boot)
+    # Move files from static to the unpacked directory
+    rsync --archive -- "$static/" "$link/"
     touch -- "$link/.unpacked"
   fi
 }
