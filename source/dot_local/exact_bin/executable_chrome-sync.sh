@@ -8,7 +8,7 @@ if ! command -v rsync >/dev/null 2>&1; then
 fi
 
 sync_shm() {
-  static="static-$1/"
+  static="static-${1%/}"
   link="${1%/}"
   volatile="/dev/shm/$2-$USER"
 
