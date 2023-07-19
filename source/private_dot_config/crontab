@@ -1,6 +1,8 @@
 # min hour day month weekday exec
 # Run anacron on the hour - anacron will handle timing
-0 * * * * anacron -t ${HOME}/etc/anacrontab -S ${HOME}/var/spool/anacron
+0 * * * * anacron -t ${HOME}/.local/etc/anacrontab -S ${HOME}/.var/spool/anacron
+# run chrome sync every hour (just for safety) -- only when booted already
+0 * * * * ${HOME}/.local/bin/chrome-sync.sh
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ luckybackup entries ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 0 19 * * *	env DISPLAY=:0 /usr/bin/luckybackup --silent --skip-critical ${HOME}/.luckyBackup/profiles/default.profile > ${HOME}/.luckyBackup/logs/default-LastCronLog.log 2>&1
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ end of luckybackup entries ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
