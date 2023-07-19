@@ -7,8 +7,8 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
 DESTINATION="/usr/lib/jvm" # Fixed location
-VERSION=20.0.1
-URL=https://download.java.net/java/GA/jdk20.0.1/b4887098932d415489976708ad6d1a4b/9/GPL/openjdk-20.0.1_linux-x64_bin.tar.gz
+VERSION=20.0.2
+URL=https://download.java.net/java/GA/jdk20.0.2/6e380f22cbe7469fa75fb448bd903d8e/9/GPL/openjdk-20.0.2_linux-x64_bin.tar.gz
 
 if [ -x "$DESTINATION/jdk-$VERSION/bin/java" ]; then
   abort "jdk-$VERSION is already installed." 0
