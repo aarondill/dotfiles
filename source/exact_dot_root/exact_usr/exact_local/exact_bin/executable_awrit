@@ -1,0 +1,13 @@
+#!/bin/sh
+
+SOURCE_DIR="$(dirname -- "$0")"
+AWRIT_LIB_PREFIX="/usr/local/lib/awrit"
+AWRIT_BIN="awrit"
+
+# fix a bug where the terminal attributs are not properly restored after exiting
+# https://github.com/chase/awrit/issues/20
+if command -v tput >/dev/null 2>&1; then
+  trap 'tput reset' EXIT INT TERM QUIT
+fi
+# can't exec, or lose the above handler.
+"${AWRIT_LIB_PREFIX:=$SOURCE_DIR}/$AWRIT_BIN" "$@"
