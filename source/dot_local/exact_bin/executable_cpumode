@@ -1,5 +1,30 @@
 #!/usr/bin/env bash
 
+# An additional factor (on intel chips) which can improve performance/battery life is the EPB.
+# This progam doesn't set it (as it is exclusive to intel), but you may consider setting it
+# if you are looking to squeeze the last bit of performance or battery life from your intel cpu.
+#
+# From the Arch Wiki: https://wiki.archlinux.org/title/CPU_frequency_scaling#Intel_performance_and_energy_bias_hint
+#
+# The Intel performance and energy bias hint (EPB) is an interface provided by Intel CPUs
+# to allow for user space to specify the desired power-performance tradeoff, on a scale
+# of 0 (highest performance) to 15 (highest energy savings). The EPB register is another
+# layer of performance management functioning independently from frequency scaling. It
+# influences how aggressive P-state and C-state selection will be, and informs internal
+# model-specific decision making that affects energy consumption.
+#
+# Common values and their aliases, as recognized by sysfs and x86_energy_perf_policy are:
+#
+# EPB = String
+#
+# 0   = performance
+# 4   = balance-performance
+# 6   = normal, default
+# 8   = balance-power
+# 15  = power
+
+# echo epb | tee /sys/devices/system/cpu/cpu*/power/energy_perf_bias
+
 set -euC -o pipefail
 # Globs that don't match expand to empty strings
 shopt -s nullglob
