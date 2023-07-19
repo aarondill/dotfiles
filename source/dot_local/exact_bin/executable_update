@@ -132,7 +132,8 @@ is_something_to_do=0
 for i in "$native" "$flatpak" "$snap" "$pnpm" "$npm"; do
   [ "$i" -eq 1 ] || continue # only if something is activated
   is_something_to_do=1
-  "${sudo[@]}" true && break # validate sudo - just a quality of life check
+  "${sudo[@]}" true # validate sudo - just a quality of life check
+  break
 done
 
 if [ "$is_something_to_do" -eq 0 ]; then
