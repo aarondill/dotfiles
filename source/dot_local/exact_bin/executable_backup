@@ -59,11 +59,11 @@ files=(
   '-/run'
   '-/proc'
   '-/dev'
-  '-/dev/shm/'
+  '-/dev/shm'
   '-/var/tmp'
   '-/tmp'
   '-/media/aaron/Backup/UbuntuLaptop/duplicity_backup' # don't backup the backup :)
-  '-/**/lost+found/'
+  '-/**/lost+found'
   '-**'
 )
 
