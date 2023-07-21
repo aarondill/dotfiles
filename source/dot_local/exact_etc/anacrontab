@@ -1,6 +1,8 @@
 SHELL=/bin/sh
 HOME=/home/aaron
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
+# Don't look for /usr/sbin/sendmail
+MAILTO=""
 
 # These replace cron's entries
 1	5	cron.daily	run-parts $HOME/.local/etc/cron.daily
