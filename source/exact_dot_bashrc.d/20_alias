@@ -48,6 +48,8 @@ alias cl='clear'
 alias tree='tree -a' # show hidden
 if command -v tty-clock &>/dev/null; then alias clock='tty-clock  -sScbtrn'; fi
 
+if command -v n &>/dev/null; then alias n='sudo n'; fi
+
 if command -v google-chrome-stable &>/dev/null; then
   # Alias to remove error messages on opening google-chrome
   alias browser="google-chrome-stable 2>/dev/null"
