@@ -129,7 +129,7 @@ function link() {
     log_run "${sudo[@]}" update-alternatives --install "$dest_path" "$name" "$from_path" "$priority"
   else
     # use ln because update-alternatives is not available
-    log_run "${sudo[@]}" ln -s -T "$from_path" "$dest_path"
+    log_run "${sudo[@]}" ln -sf -T "$from_path" "$dest_path"
   fi
 }
 
