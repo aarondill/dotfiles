@@ -233,7 +233,7 @@ function download_file() {
       $sudo mkdir -p "$dir" || abort "could not create directory $dir"
     fi
 
-    if ! [ -w "$dest" ]; then sudo=${SUDO:-sudo}; fi
+    if ! [ -w "$dir" ]; then sudo=${SUDO:-sudo}; fi
     $sudo install --no-target-directory -- "$temp" "$dest"
     if [ -n "$mode" ]; then $sudo chmod "$mode" "$temp"; fi
     cleanup "$temp"
