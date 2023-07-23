@@ -38,6 +38,8 @@ export NPM_CONFIG_USERCONFIG="$XDG_CONFIG_HOME"/npm/npmrc
 export INPUTRC="$XDG_CONFIG_HOME"/readline/inputrc
 export W3M_DIR="$XDG_DATA_HOME"/w3m
 export _JAVA_OPTIONS=-Djava.util.prefs.userRoot="$XDG_CONFIG_HOME"/java
+# Allow usage of `has` with non-defined programs
+export HAS_ALLOW_UNSAFE=y
 
 HISTDIR="${XDG_STATE_HOME}/bash"
 [ -d "$HISTDIR" ] || mkdir -p "$HISTDIR"
