@@ -15,7 +15,7 @@ function install_lazygit() (
   if is_accessible_cmd lazygit; then
     local installed_version
     installed_version=$(lazygit --version | tr ',' '\n' | sed 's/^\s*//g' | grep '^version=' | cut -d= -f2-)
-    if [ "$installed_version" = "$version" ]; then
+    if [ "v$installed_version" = "$version" ]; then
       abort 'Already up to date' 0
     fi
   fi
@@ -24,7 +24,7 @@ function install_lazygit() (
   trap 'rm -f "$tmp"' EXIT
   install_from_github "$REPO" "$version" "$file" "$tmp"
   # output to destination
-  sudo tar -xvz -C "$BINDIR" -f "$tmp" lazygit
+  sudo tar -xz -C "$BINDIR" -f "$tmp" lazygit
   sudo chmod +x "$BINDIR/lazygit"
 
   rm -f "$tmp" && trap '' EXIT # Cleanup
