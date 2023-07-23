@@ -69,6 +69,9 @@ for file in "$@"; do
     continue
   fi
 
+  if ! command -v which &>/dev/null; then
+    abort 'Which is required to search PATH for files' 2
+  fi
   # given a name
   whichfile=$(which "$file" 2>/dev/null)
   if [ -f "$whichfile" ]; then

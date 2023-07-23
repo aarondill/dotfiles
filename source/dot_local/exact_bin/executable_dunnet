@@ -50,11 +50,11 @@ function parse_args() {
   exit 2
 }
 
-emacs="$(which emacs 2>/dev/null)"
 LONGOPTS=help,nosave,emacs:,save: SHORTOPTS=h,n,e:,s:
 ARGSTRING="$(parse_args "$@")"
 eval "$ARGSTRING"
 
+emacs=
 while true; do
   case "$1" in
   --help | -h) usage && exit 0 ;;
@@ -65,6 +65,13 @@ while true; do
   *) abort "This is a bug" 3 ;;
   esac
 done
+
+if [ -z "$emacs" ]; then
+  if ! command -v which &>/dev/null; then
+    abort "which is required to search PATH for emacs. Please install which or provide the path via --emacs" 2
+  fi
+  emacs="$(which emacs 2>/dev/null)"
+fi
 
 # I don't know how to control emacs. just open dunnet pls
 if [ -z "$emacs" ] || ! [ -x "$emacs" ]; then

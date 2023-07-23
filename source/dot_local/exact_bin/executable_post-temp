@@ -17,10 +17,11 @@ Usage: $THIS [OPTION...] [--] FILE...
 Hosts a temporary file on the internet for 60 mins and outputs the url.
 
 OPTIONS:
-  -h, --help       display this help message
-  -v, --verbose    display verbose messages
-  -q, --quiet      be quieter
-  -t, --temp=url   use url to upload files (POST) (default: $temp_source)
+  -h, --help         display this help message
+  -v, --verbose      display verbose messages
+  -q, --quiet        be quieter
+  -t, --temp=url     use url to upload files (POST) (default: $temp_source)
+  -p, --python=path  use path as python interpreter to parse json instead of searching PATH.
 EOF
   return 0
 }
@@ -53,11 +54,12 @@ function parse_args() {
 if [ "$#" -eq 0 ]; then usage && exit 0; fi
 
 verbose=false quiet=false
-LONGOPTS=help,verbose,quiet,temp:
-SHORTOPTS=h,v,q,t:
+LONGOPTS=help,verbose,quiet,python:,temp:
+SHORTOPTS=h,v,q,p:,t:
 ARGSTRING="$(parse_args "$@")"
 eval "$ARGSTRING"
 
+python=
 while true; do
   case "$1" in
   --help | -h) usage && exit 0 ;;
@@ -65,6 +67,7 @@ while true; do
   -v | --verbose) verbose=true && shift ;; # Verbose option
   -q | --quiet) quiet=true && shift ;;     # Quiet option
   -t | --temp) temp_source="$2" && shift 2 ;;
+  -p | --python) python="$2" && shift 2 ;;
   *) abort "This is a bug" 3 ;;
   esac
 done
@@ -72,7 +75,12 @@ done
 # Error if args given, but no files given
 if [ "$#" -eq 0 ]; then abort "FILE is required!" 2; fi
 
-python=$(which python3 2>/dev/null || which python 2>/dev/null || printf '')
+if [ -z "$python" ]; then
+  if ! command -v which 2>/dev/null; then
+    abort "Which is required to find python in PATH. Please install which or provide the --python=path option." 2
+  fi
+  python=$(which python3 2>/dev/null || which python 2>/dev/null || printf '')
+fi
 declare -i exitcode=0
 
 for file in "$@"; do

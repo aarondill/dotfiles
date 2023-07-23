@@ -18,6 +18,11 @@ get_nth_line() {
   printf '%s' "$line"
 }
 
+if ! command -v which &>/dev/null; then
+  echo "ERROR: which is required for this script." >&2
+  exit 1
+fi
+
 # Check if the current script is at the top of the PATH
 if [[ "$(realpath -- "$0")" = "$(which steam)" ]]; then
   # Finds all instances of 'steam' in PATH and returns the second line
