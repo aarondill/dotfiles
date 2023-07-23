@@ -32,6 +32,15 @@ function install_delta() {
   # git-delta_VERSION_armhf.deb
   # git-delta_VERSION_i386.deb
   version=$(get_latest_version_github "$REPO") # 0.16.5
+
+  if is_accessible_cmd dpkg-query; then
+    local installed_version
+    installed_version=$(dpkg-query --showformat='${Version}' --show git-delta-musl)
+    if [ "$installed_version" = "$version" ]; then
+      abort 'Already up to date' 0
+    fi
+  fi
+
   asset="${fname}_${version}_${short_arch}.deb"
   tmp=$(mktemp)
   trap 'rm -f "$tmp"' EXIT
@@ -39,7 +48,7 @@ function install_delta() {
   sudo "$APT" install -y -- "$tmp"
   rm -f "$tmp" && trap '' EXIT
 }
-if ! [ "$OS" = "Ubuntu" ]; then
-  abort 'This script only supports Ubuntu. Please install delta through your package manager.' 0
+if [ -z "$APT" ]; then
+  abort 'This script only supports Ubuntu/Debian. Please install delta through your package manager.' 0
 fi
 log_and_run 'installing delta' install_delta
