@@ -26,7 +26,14 @@ if [ "$OS" != "Ubuntu" ] && [ "$OS" != "Debian" ]; then
 fi
 
 REPO=wez/wezterm
-VERSION=$(get_latest_version_github "$REPO") # v1.0.0
+VERSION=$(get_latest_version_github "$REPO") # 20230712-072601-f4abf8fd
+if is_accessible_cmd dpkg-query; then
+  installed_version=$(dpkg-query --showformat='${Version}' --show wezterm)
+  if [ "$installed_version" = "$VERSION" ]; then
+    abort 'Already up to date' 0
+  fi
+fi
+
 # true if $1 lt $2
 is_lt() { awk 'BEGIN{exit !(ARGV[1]<ARGV[2])}' "$1" "$2"; }
 case "$OS" in

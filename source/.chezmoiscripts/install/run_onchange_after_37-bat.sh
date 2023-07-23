@@ -15,6 +15,13 @@ if [ -z "$APT" ]; then
 fi
 
 VERSION=$(get_latest_version_github "$REPO") # v0.23.0
+if is_accessible_cmd dpkg-query; then
+  installed_version=$(dpkg-query --showformat='${Version}' --show bat-musl)
+  if [ "v$installed_version" = "$VERSION" ]; then
+    abort 'Already up to date' 0
+  fi
+fi
+
 arch=
 case "$ARCH" in
 x86_64) arch=amd64 ;;

@@ -14,6 +14,13 @@ function install_grub_editor() (
   fi
 
   version=$(get_latest_version_github "$REPO") # v1.0.0
+  if is_accessible_cmd dpkg-query; then
+    local installed_version
+    installed_version=$(dpkg-query --showformat='${Version}' --show grub-editor) # 1.2-1 # -1 seems to be constant
+    if [ "v$installed_version" = "$version-1" ]; then
+      abort 'Already up to date' 0
+    fi
+  fi
 
   asset=grub-editor_${version#v}-1_amd64.deb # grub-editor_1.0.0-1_amd64.deb - no other files are available.
   # Download the .deb

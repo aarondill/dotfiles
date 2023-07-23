@@ -10,7 +10,7 @@ function install_fzf() {
   local REPO=junegunn/fzf BINLOCATION=${BINLOCATION:-/usr/bin}
   local targetFile="$BINLOCATION/fzf"
   local version
-  version=$(get_latest_version_github "$REPO") || return
+  version=$(get_latest_version_github "$REPO") # 0.42.0
 
   case "$KERNEL $ARCH" in
   "Darwin arm64") asset="fzf-$version-darwin_arm64.zip" ;;
