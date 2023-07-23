@@ -72,9 +72,7 @@ done
 # Error if args given, but no files given
 if [ "$#" -eq 0 ]; then abort "FILE is required!" 2; fi
 
-fx=$(which fx 2>/dev/null || printf '')
-if [ -z "$fx" ] && [ "$quiet" != "true" ]; then err "This script works much better with 'fx' installed."; fi
-
+python=$(which python3 2>/dev/null || which python 2>/dev/null || printf '')
 declare -i exitcode=0
 
 for file in "$@"; do
@@ -89,19 +87,18 @@ for file in "$@"; do
   # {"message": "server error"}
   # {"status":"success","data":{"url":"https://tmpfiles.org/######/file"}}
 
-  # If verbose, or fx not installed, print entire json
-  if [ "$verbose" = true ] || [ -z "$fx" ]; then
+  # If verbose, or python not installed, print entire json
+  if [ "$verbose" = true ] || [ -z "$python" ]; then
     log "$result"
-    [ -z "$fx" ] && continue # Stops loop here because fx is not installed
+    [ -z "$python" ] && continue # Stops loop here because python is not installed
   fi
 
-  # Print the result thru fx to get the data
-  # Already strings, if present, but trying to error
-  status="$("$fx" '.status.toString()' <<<"$result" 2>/dev/null)" || status=
-  url="$("$fx" '.data.url.toString()' <<<"$result" 2>/dev/null)" || url=
+  # Print the result thru python to get the data
+  status=$(python3 -c "import sys, json; j=json.load(sys.stdin); 'status' in j and print(j['status'])" <<<"$result")
+  url=$(python3 -c "import sys, json; j=json.load(sys.stdin); 'data' in j and 'url' in j['data'] and print(j['data']['url'])" <<<"$result")
 
   if [ -z "$status" ] || [ -z "$url" ]; then
-    message="$("$fx" '.message.toString()' <<<"$result" 2>/dev/null)" || message=
+    message=$(python3 -c "import sys, json; j=json.load(sys.stdin); 'message' in j and print(j['message'])" <<<"$result")
     if [ -n "$message" ]; then err "$message"; else err "An unknown error occured"; fi
     exitcode=1
   else
