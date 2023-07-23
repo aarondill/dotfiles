@@ -45,10 +45,19 @@ alias fslite="browser fslite.vercel.app 2>/dev/null"
 alias bc="bc --quiet --warn"
 alias lsblk="lsblk -e 7"
 if has exa; then
-  alias ls='exa --icons'
-  alias la="exa --icons -a"
-  alias ll="exa --icons -lG -h"
-  alias lla="exa --icons -lG -h -a"
+  if [ "${TERM,,}" = "linux" ]; then
+    icons=''
+  else
+    icons="--icons"
+  fi
+  # shellcheck disable=SC2139 # Yes, expand when defined.
+  {
+    alias ls="exa $icons"
+    alias la="exa $icons -a"
+    alias ll="exa $icons -lG -h"
+    alias lla="exa $icons -lG -h -a"
+  }
+  unset icons
 else
   alias la="ls -A"
   alias ll="ls -hl"
