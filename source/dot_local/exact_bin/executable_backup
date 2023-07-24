@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # TODO: less "/home/aaron" more "$HOME" -- need to investigate interactions with existing backups
+set -euC -o pipefail
 
 # Calls duplicity to run a backup. Passes user arguments to first arguments of duplicity.
 # Requires duplicity to be installed
@@ -84,20 +85,27 @@ SOURCE_DIR=/
 
 # Searching for usb drive
 external=
-usbname=Backup
-for dir in "/media/$USER" "/run/media/$USER"; do
-  if [ -d "$dir" ] && [ -d "$dir/$usbname" ]; then external=file://$dir/$usbname && break; fi
-done
+
+# Search for a mountpoint - uuid
+dev=UUID=86eb0e3c-c03a-4414-9bfc-f20bef42f2ba
+external=$(findmnt -nr -o target -S "$dev") || true
+
+# Search by name - automounted (label)
+# usbname=Backup
+# for dir in "/media/$USER" "/run/media/$USER"; do
+#   if [ -d "$dir" ] && [ -d "$dir/$usbname" ]; then external=file://$dir/$usbname && break; fi
+# done
+
 if [ -z "$external" ]; then
-  printf '%s\n' "Could not find usb drive for backup. Please check it's mounted with the name Backup." >&2
+  printf '%s\n' "Could not find usb drive for backup. Please check that it's mounted." >&2
   exit 1
 fi
 
 # The destination directory to backup *to* (usually a remote location or external storage)
 if [ "$host" = "aaron-HP-Laptop-15-dy2xxx" ] && [ "$os" = ubuntu ]; then
-  DESTINATION_URI=$external/UbuntuLaptop/duplicity_backup
+  DESTINATION_URI=file://$external/UbuntuLaptop/duplicity_backup
 else
-  DESTINATION_URI=$external/duplicity_backup/$host-$os
+  DESTINATION_URI=file://$external/duplicity_backup/$host-$os
 fi
 
 # Currently only 'no' is fully supported.
@@ -135,6 +143,10 @@ abort() {
   err "$1"
   exit "${2:-1}"
 }
+
+log ''
+log "--- Backup at $(date) ---"
+log ''
 
 if [ -z "${DUPLICITY:-}" ]; then
   if ! command -v which &>/dev/null; then
