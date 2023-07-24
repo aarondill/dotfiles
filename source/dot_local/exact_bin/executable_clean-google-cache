@@ -3,7 +3,9 @@ set -euC -o pipefail
 shopt -s nullglob # *not-exists* = ""
 shopt -s globstar # **
 
-DIR=$HOME/.config/google-chrome/
+log() { printf '%s\n' "$@"; }
+
+DIR="${XDG_CONFIG_HOME:-$HOME/.config}/google-chrome/"
 oldsize=$(du -s -- "$DIR" | awk '{ print $1 }')
 
 for file in "$DIR/Safe Browsing" "$DIR/Crash Reports" "$DIR/"**/*Cache "$DIR"/**/Cache* "$DIR"/**/LOG "$DIR"/**/LOG.old "$DIR/Default/IndexedDB/"*; do
@@ -12,6 +14,18 @@ for file in "$DIR/Safe Browsing" "$DIR/Crash Reports" "$DIR/"**/*Cache "$DIR"/**
   fi
 done
 newsize=$(du -s -- "$DIR" | awk '{ print $1 }')
-echo "Old size: $oldsize"
-echo "New size: $newsize"
-echo "Total saving: $((oldsize - newsize))"
+saving=$((oldsize - newsize))
+
+#
+# After this point, don't use any of these variables for math!!
+#
+
+if command -v numfmt &>/dev/null; then
+  oldsize=$(numfmt --to=si -- "$oldsize")
+  newsize=$(numfmt --to=si -- "$newsize")
+  saving=$(numfmt --to=si -- "$saving")
+fi
+
+log "Old size: $oldsize"
+log "New size: $newsize"
+log "Total saving: $saving"
