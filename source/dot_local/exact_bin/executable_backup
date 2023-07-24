@@ -144,6 +144,18 @@ abort() {
   exit "${2:-1}"
 }
 
+# Array of arguments to pass to duplicity
+args=()
+
+for arg in "$@"; do
+  case "$arg" in
+  --full | --incr) args=("${args[@]}" "${arg#--}") ;;
+  --*) abort "Unknown option: '$arg'" ;;
+  -*) abort "Unknown option: '$arg'" ;;
+  *) abort "this script does not support positional arguments" ;;
+  esac
+done
+
 log ''
 log "--- Backup at $(date) ---"
 log ''
@@ -160,9 +172,6 @@ if [ -z "$DUPLICITY" ]; then
 elif ! [ -x "$DUPLICITY" ]; then
   abort "Could not run '$DUPLICITY'. Please ensure it is executable." 3
 fi
-
-# Array of arguments to pass to duplicity - begins with user input, if any
-args=("$@")
 
 # include/exclude
 for pat in "${files[@]}"; do
