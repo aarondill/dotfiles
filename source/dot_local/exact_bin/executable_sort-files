@@ -35,8 +35,9 @@ for arg; do
   esac
 done
 
+dir=${1:-.}
 # shellcheck disable=SC2016 # it's awk, you just don't know
-"${sudo[@]}" du -h --max-depth=1 -a --one-file-system "$@" |
+"${sudo[@]}" du -h --max-depth=1 -a --one-file-system "${dir%/}" "${@:2}" |
   sort -hs |
   "${sudo[@]}" awk '{
     printf("%4s ", $1);
