@@ -4,7 +4,7 @@
 Name=Fslite
 Comment=Open fslite in chrome
 TryExec=google-chrome-stable
-Exec=google-chrome-stable --new-window --password-store=basic --enable-features=WebUIDarkMode --force-dark-mode fslite.vercel.app
+Exec=google-chrome-stable --new-window fslite.vercel.app
 Icon=/home/aaron/.local/share/icons/fslite.ico
 Terminal=false
 Type=Application
