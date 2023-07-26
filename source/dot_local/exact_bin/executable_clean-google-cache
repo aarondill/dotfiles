@@ -5,27 +5,50 @@ shopt -s globstar # **
 
 log() { printf '%s\n' "$@"; }
 
-DIR="${XDG_CONFIG_HOME:-$HOME/.config}/google-chrome/"
-oldsize=$(du -s -- "$DIR" | awk '{ print $1 }')
+# Check the size of `dir` before and after running `cmd`
+# Usage: size_diff dir cmd [args...]
+size_diff() {
+  local dir oldsize newsize saving
+  dir=$1
+  oldsize=$(du -s -- "$dir" | awk '{ print $1 }')
 
-for file in "$DIR/Safe Browsing" "$DIR/Crash Reports" "$DIR/"**/*Cache "$DIR"/**/Cache* "$DIR"/**/LOG "$DIR"/**/LOG.old "$DIR/Default/IndexedDB/"*; do
-  if [ -e "$file" ]; then
-    rm -rf -- "$file"
+  shift  # remove dir
+  "${@}" # run $2 $3 $4 ...
+
+  newsize=$(du -s -- "$dir" | awk '{ print $1 }')
+  saving=$((oldsize - newsize))
+
+  # After this point, don't use any of these variables for math!!
+  if command -v numfmt &>/dev/null; then
+    oldsize=$(numfmt --to=si -- "$oldsize")
+    newsize=$(numfmt --to=si -- "$newsize")
+    saving=$(numfmt --to=si -- "$saving")
   fi
-done
-newsize=$(du -s -- "$DIR" | awk '{ print $1 }')
-saving=$((oldsize - newsize))
 
-#
-# After this point, don't use any of these variables for math!!
-#
+  log "Old size: $oldsize"
+  log "New size: $newsize"
+  log "Total saving: $saving"
+}
 
-if command -v numfmt &>/dev/null; then
-  oldsize=$(numfmt --to=si -- "$oldsize")
-  newsize=$(numfmt --to=si -- "$newsize")
-  saving=$(numfmt --to=si -- "$saving")
-fi
+clean_config_dir() {
+  local dir=$1 file
+  for file in "$dir/Safe Browsing" "$dir/Crash Reports" "$dir/"**/*Cache "$dir"/**/Cache* "$dir"/**/LOG "$dir"/**/LOG.old "$dir/Default/IndexedDB/"*; do
+    if [ -e "$file" ]; then rm -rf -- "$file"; fi
+  done
+}
 
-log "Old size: $oldsize"
-log "New size: $newsize"
-log "Total saving: $saving"
+clean_cache_dir() {
+  local dir=$1
+  local file="$dir/Default"
+  if [ -e "$file" ]; then rm -rf -- "$file"; fi
+}
+
+config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/google-chrome/"
+log "Cleaning config directory $config_dir"
+size_diff "$config_dir" clean_config_dir "$config_dir"
+
+log ''
+
+cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/google-chrome"
+log "Cleaning cache directory $cache_dir"
+size_diff "$cache_dir" clean_cache_dir "$cache_dir"
