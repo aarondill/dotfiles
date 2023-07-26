@@ -28,6 +28,7 @@
 # END DELTA SETUP
 [init]
   defaultBranch = main # not master
+  # Disable the templatedir to save storage (this is copied into *every* .git directory)
 	templatedir = 
 [fetch]
   prune = true
