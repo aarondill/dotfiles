@@ -34,34 +34,33 @@ alias shutdown="history -a; /sbin/shutdown"
 
 # alias backup="~/.backup/dobackup"
 # alias lastbackup="/usr/bin/cat ~/.backup/backup-time"
-if has sensible-browser; then
-  alias browser="sensible-browser"
-elif has x-www-browser; then
-  alias browser="x-www-browser"
-elif has firefox; then
-  alias browser="firefox"
+
+# Alias to remove error messages on opening google-chrome
+# Should always be present, bc is local program
+if has google-chrome-stable; then
+  alias browser="google-chrome-stable"
+  alias google-chrome="google-chrome-stable"
+  export BROWSER="google-chrome-stable"
 fi
-alias fslite="browser fslite.vercel.app 2>/dev/null"
-alias bc="bc --quiet --warn"
+
+alias fslite='browser fslite.vercel.app'
 alias lsblk="lsblk -e 7"
 if has exa; then
+  alias ls="exa --color=auto --icons -Gh"
   if [ "${TERM,,}" = "linux" ]; then
-    icons=''
-  else
-    icons="--icons"
+    alias ls="exa --color=auto -Gh" # overwrite above no-icons
   fi
-  # shellcheck disable=SC2139 # Yes, expand when defined.
-  {
-    alias ls="exa $icons"
-    alias la="exa $icons -a"
-    alias ll="exa $icons -lG -h"
-    alias lla="exa $icons -lG -h -a"
-  }
-  unset icons
+
+  alias la="ls -a"
+  alias ll="ls -l"
+  alias lla="ls -la"
+  alias llaa="ls -laa"
 else
+  alias ls='ls --color=auto -h'
   alias la="ls -A"
-  alias ll="ls -hl"
-  alias lla="ls -Ahl"
+  alias ll="ls -l"
+  alias lla="ls -lA"
+  alias llaa="ls -la"
 fi
 
 alias cl='clear'
@@ -70,12 +69,6 @@ if has tty-clock; then alias clock='tty-clock  -sScbtrn'; fi
 
 if has n; then alias n='sudo n'; fi
 
-if has google-chrome-stable; then
-  # Alias to remove error messages on opening google-chrome
-  alias browser="google-chrome-stable 2>/dev/null"
-  alias google-chrome="google-chrome-stable 2>/dev/null"
-  export BROWSER="google-chrome-stable"
-fi
 # Show battery information
 alias battery='upower -i $(upower -e | grep BAT)'
 
@@ -85,27 +78,30 @@ if has zip; then
 fi
 
 # Replace `cat` with `bat`, if installed
-bat=$(which bat 2>/dev/null || which batcat 2>/dev/null)
-# shellcheck disable=SC2139 # It's intended to expand at definition
-if [ -n "$bat" ]; then
-  alias cat="$bat"
-  export MANPAGER="sh -c 'col -bx | $bat -l man -p'"
+
+# The path to the bat executable
+bat=
+if has bat; then bat=$(command -v bat); elif has batcat; then bat=$(command -v batcat); fi
+
+if has bat || has batcat; then
+  if ! has bat; then
+    alias bat="batcat"
+  elif ! has batcat; then
+    alias batcat="bat"
+  fi
+  alias cat="bat"
+
+  export MANPAGER="sh -c 'col -bx | \"$bat\" -l man -p'"
   # Tests bat version and exits 0 if version is high enough
   # subshell to avoid leaving behind variables
   (
     # 0.21.0 is the latest version where PAGER=bat will cause
     # recursive forks, thus require greater than this before setting PAGER
     ExpecV="0.21.0"
-    versions="$(printf '%s\n' "$(bat --version | cut -d' ' -f 2)" "$ExpecV")"
+    versions="$(printf '%s\n' "$("$bat" --version | cut -d' ' -f 2)" "$ExpecV")"
     # shellcheck disable=SC2319 # $? *should* refer to the condition, not the sort command
     test "$versions" != "$(sort -V <<<"$versions")" || exit "$?"
   ) && export PAGER="$bat"
-
-  if ! has bat; then
-    alias bat="$bat"
-  elif ! has batcat; then
-    alias batcat="bat"
-  fi
 
 fi
 unset bat
@@ -124,11 +120,9 @@ if zoxide -V &>/dev/null; then
   export _ZO_ECHO=0
 fi
 
+alias bc="bc --quiet --warn -l"
 # if `bc` is installed set aliases for it
-if has bc; then
-  alias bc='bc -l'
-  alias calc='bc -l'
-fi
+if has bc; then alias calc="bc"; fi
 
 # if `pnpm` is installed set alias for pnpx
 if has pnpm; then alias pnpx='pnpm dlx'; fi
@@ -165,12 +159,10 @@ fi
 unset IBus
 
 # Don't you DARE open a window
-if has emacs; then alias emacs='emacs -nw'; fi
+alias emacs='emacs -nw'
 
-if has awesome-client; then
-  # Save history to ~/.cache/awesome
-  alias awesome-client='RLWRAP_HOME="$HOME/.cache/awesome" awesome-client'
-fi
+# Save history to ~/.cache/awesome
+alias awesome-client='RLWRAP_HOME="$HOME/.cache/awesome" awesome-client'
 
 if has 'ffplay'; then
   alias aplay='ffplay -nodisp -hide_banner -autoexit'
