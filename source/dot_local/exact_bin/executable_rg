@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+set -euC -o pipefail
+# Sets up rg function for paging rg output, if rg and delta are both available
+has_cmd() { command -v -- "$@" &>/dev/null; }
+err() { printf '%s\n' "$@" >&2; }
+abort() {
+  err "$1"
+  exit "${2:-1}"
+}
+
+find_next_command() {
+  local script_dir=${1%/*}
+  local command_name=${1##*/}
+  local real_command=
+
+  local paths=()
+  readarray -d: -t paths < <(printf '%s' "$PATH") # split PATH in to array
+
+  for d in "${paths[@]}"; do
+    d=${d:-.} # if empty, use current directory
+    d=${d%/}  # remove trailing slash, if present
+    if [ "$d" = "$script_dir" ]; then continue; fi
+    if [ -x "$d/$command_name" ]; then
+      real_command="$d/$command_name"
+      break
+    fi
+  done
+
+  if [ -z "$real_command" ]; then
+    return 1
+  fi
+  printf '%s' "$real_command"
+}
+
+rg=$(find_next_command "$0") || abort "${0##*/}: command not found" 127
+
+if [ -t 1 ] && has_cmd delta; then
+  "$rg" --json "$@" | delta
+else
+  "$rg" "$@"
+fi
