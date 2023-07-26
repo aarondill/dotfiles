@@ -19,7 +19,7 @@ if has fdfind; then
 else
   alias fd="fd -uu"
 fi
-alias rg="rg -uui"
+alias rg="rg -uu -i"
 # Show progress pls
 alias dd="dd status=progress"
 # Ask before overwriting
