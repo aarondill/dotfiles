@@ -28,6 +28,7 @@
 # END DELTA SETUP
 [init]
   defaultBranch = main # not master
+	templatedir = 
 [fetch]
   prune = true
 [push]
