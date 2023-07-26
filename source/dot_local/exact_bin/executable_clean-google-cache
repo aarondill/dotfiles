@@ -49,6 +49,6 @@ size_diff "$config_dir" clean_config_dir "$config_dir"
 
 log ''
 
-cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/google-chrome"
+cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/google-chrome/"
 log "Cleaning cache directory $cache_dir"
 size_diff "$cache_dir" clean_cache_dir "$cache_dir"
