@@ -44,11 +44,11 @@ chrome_sync="$(command -v chrome-sync.sh 2>/dev/null)" || true
 
 conf_dir=${CHROME_CONFIG_HOME:-${XDG_CONFIG_HOME:-$HOME/.config}}/google-chrome/
 # if exists, assume this was handled by systemd!
-if ! [ -d "$conf_dir" ]; then
+if ! [ -d "$conf_dir" ] || [ -e "$conf_dir/.unpacked" ]; then
   if [ -n "$chrome_sync" ]; then "$chrome_sync"; fi
 fi
 
-"$chrome" "${WRAPPER_ARGS[@]}" "$@" # can't exec, because runs after close
+exec "$chrome" "${WRAPPER_ARGS[@]}" "$@"
 
 # Sync back to disk - This should be handled by systemd
 # - This is dangerous on force-shutdown, but IDC

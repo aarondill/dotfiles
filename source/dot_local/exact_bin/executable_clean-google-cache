@@ -43,7 +43,7 @@ clean_cache_dir() {
   if [ -e "$file" ]; then rm -rf -- "$file"; fi
 }
 
-config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/google-chrome/"
+config_dir="${CHROME_CONFIG_HOME:-${XDG_CONFIG_HOME:-$HOME/.config}}/google-chrome/"
 log "Cleaning config directory $config_dir"
 size_diff "$config_dir" clean_config_dir "$config_dir"
 
