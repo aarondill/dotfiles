@@ -48,3 +48,5 @@ vscode/Java/java-format.xml
 .config/systemd
 .config/crontab
 .config/htop/htoprc
+.config/lazygit/config.yml
+.config/lazygit/tty-config.yml
