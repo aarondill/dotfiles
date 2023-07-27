@@ -138,7 +138,7 @@ if has lazygit; then
   lg() {
     local new_dir_file new_dir TMPDIR=${TMPDIR:-}
     if [ -w /dev/shm/ ]; then TMPDIR=/dev/shm; fi # Store in memory if possible
-    new_dir_file=$(mktemp -- "${TMPDIR:-/tmp}/lazygit_dir.XXXXXXXX")
+    new_dir_file=$(TMPDIR=${TMPDIR:-/tmp} mktemp)
     LAZYGIT_NEW_DIR_FILE="$new_dir_file" lazygit "$@"
     if [ -f "$new_dir_file" ]; then
       new_dir=$(cat -- "$new_dir_file")
