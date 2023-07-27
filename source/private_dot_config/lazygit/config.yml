@@ -15,5 +15,3 @@ git:
   parseEmoji: true
   diffContextSize: 3 # how many lines of context are shown around a change in diffs
 notARepository: "skip" # one of: 'prompt' | 'create' | 'skip' | 'quit'
-# os:
-#   editPreset: 'nvim' # Should be detected from git's core.editor
