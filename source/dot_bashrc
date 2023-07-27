@@ -151,7 +151,7 @@ fi
 
 # HACK: Stop neofetch from starting on tty when starting WM. This decreases initial login time.
 # This doesn't leak bc it's not exported and if will_startx then this bash instance is replaced with startx
-if will_startx; then NONEOFETCH=1; fi
+if will_startx; then export NONEOFETCH=1; fi
 
 # Initialize `~/.bashrc.d`
 if [ -d "$HOME/.bashrc.d/" ]; then
