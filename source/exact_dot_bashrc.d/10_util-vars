@@ -28,4 +28,4 @@ EDITOR='vim'
 while IFS= read -r line; do
   eval "$line"
 done < <(printf '%s' "$OLDOPTS")
-unset OLDOPTS
+unset OLDOPTS line

@@ -34,6 +34,7 @@ function update-config() (
       printf '%s\n' "$file is not a file!!" >&2
     fi
   done
+  unset lines
 
   # Output a detail of which files are changing
   changed_files=$(chezmoi status -- "${files[@]}" | awk '{ print $2 }')
