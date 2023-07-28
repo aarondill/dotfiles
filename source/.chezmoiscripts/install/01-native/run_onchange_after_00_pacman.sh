@@ -75,7 +75,10 @@ function install_if_available() {
   done
   if [ ${#packages[@]} -eq 0 ]; then return 0; fi
   # The user still has to confirm, but that's good here
-  sudo "$PACMAN" -S --needed -- "${packages[@]}"
+  (
+    export -n SHELLOPTS # makepkg doesn't play nice with this
+    sudo "$PACMAN" -S --needed -- "${packages[@]}"
+  )
 }
 
 function install_packages() { install_if_available "${PACKAGES[@]}"; }
@@ -93,12 +96,13 @@ function install_graphical_packages() {
   install_if_available "${graphical_packages[@]}"
 }
 
-update_system() {
+update_system() (
+  export -n SHELLOPTS # makepkg doesn't play nice with this
   case "$PACMAN" in
   */yay) "$PACMAN" -Syu ;; # don't run yay as root when AUR packages could be installed
   *) sudo "$PACMAN" -Syu ;;
   esac
-}
+)
 
 # no install neovim latest, bc should already be
 log_and_run 'Updating sources/packages' update_system
