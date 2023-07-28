@@ -92,6 +92,7 @@ if has bat || has batcat; then
   alias cat="bat"
 
   export MANPAGER="sh -c 'col -bx | \"$bat\" -l man -p'"
+  export MANROFFOPT="${MANROFFOPT:-}-c" # disable color output in man pages
   # Tests bat version and exits 0 if version is high enough
   # subshell to avoid leaving behind variables
   (
