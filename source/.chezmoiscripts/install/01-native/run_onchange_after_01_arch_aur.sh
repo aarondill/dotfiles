@@ -63,3 +63,8 @@ else err "grub-editor is already installed, skipping installation"; fi
 if ! which informant &>/dev/null; then
   aur_install "informant"
 else err "informant is already installed, skipping installation"; fi
+
+# consolation for a cursor in the tty!
+if ! which consolation &>/dev/null; then
+  aur_install "consolation"
+else err "consolation is already installed, skipping installation"; fi
