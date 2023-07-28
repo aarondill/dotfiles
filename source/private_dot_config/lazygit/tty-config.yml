@@ -1,2 +1,4 @@
 gui:
   nerdFontsVersion: ""
+git:
+  parseEmoji: false
