@@ -67,4 +67,5 @@ else err "informant is already installed, skipping installation"; fi
 # consolation for a cursor in the tty!
 if ! which consolation &>/dev/null; then
   aur_install "consolation"
+  sudo systemctl enable consolation.service # This is not enabled by default
 else err "consolation is already installed, skipping installation"; fi
