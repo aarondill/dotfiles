@@ -133,20 +133,7 @@ if has tldr; then
 fi
 
 # Shorter lazygit
-if has lazygit; then
-  # alias lg='lazygit'
-  lg() {
-    local new_dir_file new_dir TMPDIR=${TMPDIR:-}
-    if [ -w /dev/shm/ ]; then TMPDIR=/dev/shm; fi # Store in memory if possible
-    new_dir_file=$(TMPDIR=${TMPDIR:-/tmp} mktemp)
-    LAZYGIT_NEW_DIR_FILE="$new_dir_file" lazygit "$@"
-    if [ -f "$new_dir_file" ]; then
-      new_dir=$(cat -- "$new_dir_file")
-      rm -f -- "$new_dir_file" &>/dev/null
-      if [ -n "$new_dir" ]; then \cd -- "$new_dir" || return; fi
-    fi
-  }
-fi
+if has lazygit; then alias lg='lazygit'; fi
 
 # Shorter git
 if has git; then
