@@ -113,7 +113,7 @@
         # Commit a fixup
   fixup = commit --fixup
   merge-remote = "!git fetch --all && git merge"
-  shallowify = "!__shallowify() { d=\"${1:-1}\"; shift 1; git pull --depth \"$d\" \"$@\" && git gc --prune=all }; __shallowify"
+  shallowify = "!__shallowify() { d=\"${1:-1}\"; shift 1; git pull --depth \"$d\" \"$@\" && git gc --prune=all; }; __shallowify"
   blobless = clone --filter=blob:none
   treeless = clone --filter=tree:0
   rh = reset --hard
