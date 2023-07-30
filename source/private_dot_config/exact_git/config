@@ -56,7 +56,8 @@
 
 [alias]
         # Create new aliases with git alias 'name' 'cmd'
-  alias = "!_no_user_made_f(){ if [ \"$1\" = \"--unset\" ]; then git config --global --unset \"alias.$2\" ;else local a=$1; shift ; git config --global \"alias.$a\" \"$@\" ; fi ; unset _no_user_made_f ; } ; _no_user_made_f"
+  alias = "!__alias(){ [ -z \"$1\" ] || [ -z \"$2\" ] && { echo 'alias and definition must both be provided' >&2; return 2; }; git config --global \"alias.$1\" \"$2\"; }; __alias"
+  unalias = "!__unalias(){ [ -n \"$2\" ] && git config --global --unset \"alias.$2\"; }; __unalias"
         # Last commit
   last = log -1 HEAD
 
@@ -69,21 +70,22 @@
         # Abbreviations
   sw = switch
   res = restore
-  ci = commit -v
-  co = commit -v
+  ci = commit
+  co = commit
   st = status
   br = branch
-  p = !git push origin $(git rev-parse --abbrev-ref HEAD) -u
+  p = !git push origin \"$(git rev-parse --abbrev-ref HEAD)\" -u
   new = switch -c
 
         # Less destructive pushing
-  fpush = push --force-with-lease
   pushf = push --force-with-lease
+  fpush = pushf
+  pf = pushf
 
         # Fix my typos
   branches = branch
   amend = commit --amend
-  ammend = commit --amend
+  ammend = amend
 
         # Pretty log
   hist = log --graph '--pretty=format:%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
@@ -91,7 +93,7 @@
 
         # Things I forget
   rmremotebranch = push --delete 
-  mvbranch = "!__moveit() { git branch -m \"$1\" \"$2\"; git push origin :\"$1\"; git push --set-upstream origin \"$2\"; }; __moveit"
+  mvbranch = "!__moveit() { [ -n \"$1\" ] && [ -n \"$2\" ] && git branch -m \"$1\" \"$2\" && git push origin :\"$1\" && git push --set-upstream origin \"$2\"; }; __moveit"
 
         # Show branches
   local-branches = "!git branch --format \"%(color:red)%(HEAD) \
@@ -107,12 +109,12 @@
         # Get to a detached HEAD state on purpose! Usage: `git detach [REF]`
   detach = switch -d
         # Print short sha1; usage: `git sha1 [REF]`
-  sha1 = !sh -c 'git rev-parse --short ${1:-HEAD}' --
+  sha1 = !__sha1() { git rev-parse --short \"${1:-HEAD}\"; }; __sha1'
         # Commit a fixup
   fixup = commit --fixup
   merge-remote = "!git fetch --all && git merge"
-  pf = push --force-with-lease
-  shallowify = "!bash -c 'git pull --depth \"${1:-1}\" \"${@:2}\" && git gc --prune=all' -- "
+  shallowify = "!__shallowify() { d=\"${1:-1}\"; shift 1; git pull --depth \"$d\" \"$@\" && git gc --prune=all }; __shallowify"
   blobless = clone --filter=blob:none
   treeless = clone --filter=tree:0
   rh = reset --hard
+	hdiff = "!__hdiff() { git diff \"HEAD~$1\"; }; __hdiff"
