@@ -46,9 +46,9 @@ fi
 alias fslite='browser fslite.vercel.app'
 alias lsblk="lsblk -e 7"
 if has exa; then
-  alias ls="exa --color=auto --icons -Gh"
+  alias ls="exa --color=auto --icons -Gh --group"
   if [ "${TERM,,}" = "linux" ]; then
-    alias ls="exa --color=auto -Gh" # overwrite above no-icons
+    alias ls="exa --color=auto -Gh --group" # overwrite above no-icons
   fi
 
   alias la="ls -a"
