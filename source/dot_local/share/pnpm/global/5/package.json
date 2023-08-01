@@ -19,7 +19,7 @@
     "ts-node": "^10.9.1",
     "typescript": "^5.1.6",
     "uglify-js": "^3.17.4",
-    "vercel": "31.2.0",
+    "vercel": "31.2.1",
     "vite": "^4.4.7",
     "wipe-modules": "^1.2.0"
   }
