@@ -31,7 +31,7 @@ function install_fx() {
 
   asset="fx_${KERNEL,,}_${short_arch}${ext}"
   version=$(get_latest_version_github antonmedv/fx) # 24.1.0
-  if is_accessible_cmd fx && [ "$(fx --version)" == "$version" ]; then
+  if has_cmd fx && [ "$(fx --version)" == "$version" ]; then
     abort "Already up to date" 0
   fi
   install_from_github antonmedv/fx latest "$asset" "$BINDIR/fx"

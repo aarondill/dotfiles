@@ -14,7 +14,7 @@ if [ "$OS" != "Ubuntu" ]; then
   abort "This script is only available for Ubuntu" 0
 fi
 
-if ! is_accessible_cmd gdm3 && ! is_accessible_cmd gdm; then
+if ! has_cmd gdm3 && ! has_cmd gdm; then
   abort "This script requires gdm to be installed" 0
 fi
 

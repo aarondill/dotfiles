@@ -39,7 +39,7 @@ function install_nala() {
 if [ "$OS" != "Ubuntu" ]; then abort "Nala is only supported on Ubuntu" 0; fi
 
 if [ -z "$APT" ]; then exit 0; fi
-if ! is_accessible_cmd nala; then
+if ! has_cmd nala; then
   log_and_run "Installing nala" install_nala
 fi
 

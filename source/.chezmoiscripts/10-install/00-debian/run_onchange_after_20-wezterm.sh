@@ -27,7 +27,7 @@ fi
 
 REPO=wez/wezterm
 version=$(get_latest_version_github "$REPO") # 20230712-072601-f4abf8fd
-if is_accessible_cmd dpkg-query; then
+if has_cmd dpkg-query; then
   installed_version=$(dpkg-query --showformat='${Version}' --show wezterm)
   if [ "$installed_version" = "$version" ]; then
     abort 'Already up to date' 0

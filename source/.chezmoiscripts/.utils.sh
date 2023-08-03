@@ -86,7 +86,7 @@ function log_and_run() {
 }
 # installed_or_log snap
 function installed_or_log() {
-  if ! is_accessible_cmd "$1"; then
+  if ! has_cmd "$1"; then
     err "${1^} is not installed, skipping ${1^} installation"
     return 1
   fi
@@ -99,11 +99,6 @@ function has_cmd() {
   declare -i failed=0 # declare=local
   for cmd; do command -v "$cmd" &>/dev/null || failed=1; done
   return "$failed"
-}
-# depreciated. Use has_cmd.
-function is_accessible_cmd() {
-  err "Use has_cmd instead of is_accessible_cmd"
-  has_cmd "$@"
 }
 
 ## --------------------------------------------------------------------------------------------------

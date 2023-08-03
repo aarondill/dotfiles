@@ -33,7 +33,7 @@ function install_delta() {
   # git-delta_VERSION_i386.deb
   version=$(get_latest_version_github "$REPO") # 0.16.5
 
-  if is_accessible_cmd dpkg-query; then
+  if has_cmd dpkg-query; then
     local installed_version
     installed_version=$(dpkg-query --showformat='${Version}' --show git-delta-musl)
     if [ "$installed_version" = "$version" ]; then

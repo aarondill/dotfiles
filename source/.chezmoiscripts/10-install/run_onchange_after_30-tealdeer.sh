@@ -12,7 +12,7 @@ DESTINATION=/usr/local/bin/tldr
 REPO='dbrgn/tealdeer'
 
 version=$(get_latest_version_github "$REPO") # v1.6.1
-if is_accessible_cmd tldr && [ "$(tldr --version)" = "tealdeer ${version#v}" ]; then
+if has_cmd tldr && [ "$(tldr --version)" = "tealdeer ${version#v}" ]; then
   abort 'already up to date.' 0
 fi
 

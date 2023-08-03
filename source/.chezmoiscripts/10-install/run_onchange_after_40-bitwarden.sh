@@ -25,11 +25,11 @@ function install_bitwarden_cli() (
 )
 
 # Ignore if already installed, updates itself
-if ! is_accessible_cmd bitwarden; then
+if ! has_cmd bitwarden; then
   log_and_run "Installing bitwarden desktop" install_bitwarden_desktop
 fi
 
-if ! is_accessible_cmd unzip; then
+if ! has_cmd unzip; then
   abort "unzip is required to install bitwarden cli" 2
 fi
 

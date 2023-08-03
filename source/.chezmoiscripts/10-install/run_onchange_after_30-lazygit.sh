@@ -12,7 +12,7 @@ function install_lazygit() (
   local REPO='jesseduffield/lazygit'
   version=$(get_latest_version_github "$REPO") # v0.39.3
   file="lazygit_${version#v}_Linux_x86_64.tar.gz"
-  if is_accessible_cmd lazygit; then
+  if has_cmd lazygit; then
     local installed_version
     installed_version=$(lazygit --version | tr ',' '\n' | sed 's/^\s*//g' | grep '^version=' | cut -d= -f2-)
     if [ "v$installed_version" = "$version" ]; then

@@ -43,7 +43,7 @@ function install_proprietary_software() {
 }
 
 # Should already be installed, sanity check
-is_accessible_cmd gpg curl
+has_cmd gpg curl
 log_and_run 'installing spotify ppa' setup_ppa_spotify
 log_and_run 'installing vscode ppa' setup_ppa_vscode
 log_and_run 'installing google chrome ppa' setup_ppa_google-chrome

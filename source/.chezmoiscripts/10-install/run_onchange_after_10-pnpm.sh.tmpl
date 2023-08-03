@@ -52,7 +52,7 @@ install_pnpm_global_packages() {
   pnpm i -g n
 }
 
-# if ! is_accessible_cmd wget; then
+# if ! has_cmd wget; then
 #   err "wget is not present, attempting to install."
 #   if [ -n "$APT" ]; then
 #     apt_install wget
@@ -63,5 +63,5 @@ install_pnpm_global_packages() {
 #   fi
 # fi
 
-is_accessible_cmd pnpm || log_and_run 'Installing NodeJS and pnpm' install_pnpm_and_node
-is_accessible_cmd pnpm && log_and_run 'Installing pnpm global packages' install_pnpm_global_packages
+has_cmd pnpm || log_and_run 'Installing NodeJS and pnpm' install_pnpm_and_node
+has_cmd pnpm && log_and_run 'Installing pnpm global packages' install_pnpm_global_packages
