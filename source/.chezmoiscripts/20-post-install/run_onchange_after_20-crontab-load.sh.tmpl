@@ -11,7 +11,7 @@ if ! has_cmd crontab; then
   abort 'crontab is not installed. Please install crontab to use this backup' 0
 fi
 
-if confirm "load crontab from source? (yes) "; then
+if confirm "load crontab from source?"; then
   log 'Updating crontab'
   file=
   # find the crontab file

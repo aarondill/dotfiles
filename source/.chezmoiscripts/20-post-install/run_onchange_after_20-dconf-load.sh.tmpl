@@ -11,7 +11,7 @@ if ! has_cmd dconf; then
   abort 'dconf is not installed. Please install dconf to use this backup' 0
 fi
 
-if confirm "load dconf settings from source? (yes) "; then
+if confirm "load dconf settings from source?"; then
   log 'Updating dconf'
   "${CHEZMOI_EXECUTABLE:-chezmoi}" decrypt "$SOURCE_DIR/encrypted_dconf-backup.ini" | dconf load -f /
 fi
