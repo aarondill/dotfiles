@@ -1,0 +1,59 @@
+## --------------------------------------------------------------------------------------------------
+## --------------------------------------------- GitHub ---------------------------------------------
+## --------------------------------------------------------------------------------------------------
+
+# get_latest_version_github "someone/something" -> v1.2.3 (tagname)
+function get_latest_version_github() (
+  set -e                              # in subshell
+  local version_url version REPO="$1" # combined $OWNER/$REPO
+  version_url=$(get_url_headers "https://github.com/$REPO/releases/latest" | grep -m1 -iF "location:" | tr -d '\r')
+  version="${version_url##*/}" # remove everything up to last slash
+  if [ -z "$version" ]; then
+    err "Failed while attempting to install $REPO. Please manually install at https://github.com/$REPO/releases"
+    return 2
+  fi
+  printf '%s' "$version"
+)
+
+# get_latest_version_github "someone/something" -> v1.2.3 (tagname)
+function get_latest_version_gitlab() (
+  set -e                              # in subshell
+  local version version_url REPO="$1" # combined $OWNER/$REPO
+  version_url=$(get_url_headers "https://gitlab.com/$REPO/-/releases/permalink/latest" | grep -m1 -iF "location:" | tr -d '\r')
+  version="${version_url##*/}" # remove everything up to last slash
+  if [ -z "$version" ]; then
+    err "Failed while attempting to install $REPO. Please manually install at https://gitlab.com/$REPO/releases"
+    return 2
+  fi
+  printf '%s' "$version"
+)
+
+# install_from_github aaron/example latest example.sh /usr/local/bin/example
+function install_from_github() (
+  set -e # runs in subshell, so doesn't affect outside
+  local github_repo=$1 version=$2 asset=$3 destination=$4
+  if [[ -z "$github_repo" ]]; then
+    err "GitHub repo can not be an empty string"
+    return 2
+  elif [[ -z "$asset" ]]; then
+    err "asset can not be an empty string"
+    return 2
+  elif [[ -z "$destination" ]]; then
+    err "destination can not be an empty string"
+    return 2
+  fi
+
+  if [ "$version" = "latest" ]; then version=$(get_latest_version_github "$github_repo"); fi
+
+  log_github_install "$github_repo" "$version" "$asset" "$destination"
+  download_file "https://github.com/$github_repo/releases/download/$version/$asset" "$destination" +x
+)
+# usage: log_github_install <repo> <version> [asset] [dest]
+# example: log_github_install aaron/example latest example.sh /usr/local/bin/
+function log_github_install() {
+  local github_repo=$1 version=$2 asset=${3:-} destination=${4:-}
+  local msg="Installing $github_repo version $version"
+  if [ -n "$asset" ]; then msg+=" ($asset)"; fi
+  if [ -n "$destination" ]; then msg+=" to $destination"; fi
+  log "$msg"
+}
