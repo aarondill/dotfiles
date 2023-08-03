@@ -3,6 +3,9 @@ set -euC -o pipefail
 shopt -s nullglob # *not-exists* = ""
 shopt -s globstar # **
 
+# causes issues?
+# for d in ./OnDeviceHeadSuggestModel ./Default/optimization_guide_prediction_model_downloads ./Default/optimization_guide_model_metadata_store ./Default/optimization_guide_hint_cache_store ./pnacl ./BrowserMetrics; do rm -r "$d" && touch "$d"; done
+
 log() { printf '%s\n' "$@"; }
 
 # Check the size of `dir` before and after running `cmd`
