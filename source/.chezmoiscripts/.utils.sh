@@ -42,6 +42,7 @@ function abort() { err "$1" && exit "${2:-2}"; }
 # confirm "do you really want to do %s?" "that" --> ...do that? (Y/n)
 # Strings are evaluated using printf
 function confirm() {
+  local PROMPT confirmation
   # shellcheck disable=SC2059 # I know this is *generally* wrong, but this is intentional.
   PROMPT="$(printf "$1" "${@:2}")"
   read -rep "$PROMPT (Y/n) " confirmation </dev/tty
@@ -95,9 +96,9 @@ function installed_or_log() {
 # returns 0 if all cmds are available, 1 otherwise
 # is_accessible_cmd apt ls git
 function is_accessible_cmd() {
-  declare -i failed=0
+  declare -i failed=0 # declare=local
   for cmd; do command -v "$cmd" &>/dev/null || failed=1; done
-  return $failed
+  return "$failed"
 }
 
 ## --------------------------------------------------------------------------------------------------
@@ -126,8 +127,8 @@ function version_gt() {
 
 # get_latest_version_github "someone/something" -> v1.2.3 (tagname)
 function get_latest_version_github() (
-  set -e            # in subshell
-  declare REPO="$1" # combined $OWNER/$REPO
+  set -e                  # in subshell
+  local version REPO="$1" # combined $OWNER/$REPO
   version=$(curl -sfI "https://github.com/$REPO/releases/latest" | grep -i "location:" | awk -F"/" '{ printf "%s", $NF }' | tr -d '\r')
   if [ -z "$version" ]; then
     err "Failed while attempting to install $REPO. Please manually install at https://github.com/$REPO/releases"
@@ -138,8 +139,8 @@ function get_latest_version_github() (
 
 # get_latest_version_github "someone/something" -> v1.2.3 (tagname)
 function get_latest_version_gitlab() (
-  set -e            # in subshell
-  declare REPO="$1" # combined $OWNER/$REPO
+  set -e                  # in subshell
+  local version REPO="$1" # combined $OWNER/$REPO
   version=$(curl -sfI "https://gitlab.com/$REPO/-/releases/permalink/latest" | grep -i "location:" | awk -F"/" '{ printf "%s", $NF }' | tr -d '\r')
   if [ -z "$version" ]; then
     err "Failed while attempting to install $REPO. Please manually install at https://gitlab.com/$REPO/releases"
@@ -207,12 +208,19 @@ function download() {
   fi
 }
 
-# This function deletes the file in the first argument, then returns the previous code
+# traps to remove the given file on exit
+function rm_exit() {
+  local file=$1
+  # shellcheck disable=SC2064 # it's intended to expand now
+  trap "rm -rf \"$file\"" EXIT
+}
+function rm_exit_cleanup() {
+  rm -fr -- "${1:-}"
+  trap '' EXIT
+}
+# This function deletes the file in the first argument
 function cleanup() {
-  local last_exit=$?
-  local file=${1:-}
-  rm -fr -- "$file"
-  return "${last_exit}"
+  rm -fr -- "$1"
 }
 
 # download_file <URL> <destination> [mode]
@@ -269,7 +277,7 @@ export ARCH KERNEL OS APT GNOME PACMAN
 # Code to source *this* file. DON'T MOVE THIS FILE!
 # (re)source this file
 source_utils() {
-  SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
+  local SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
   ## uncomment this if copying this code. It's commented to stop recursive checking:
   ## shellcheck source=./.utils.sh
   . "$SOURCE_DIR/.chezmoiscripts/utils.sh"
