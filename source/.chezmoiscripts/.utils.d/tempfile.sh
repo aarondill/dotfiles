@@ -10,15 +10,22 @@ _cleanup_tempfiles() {
     rm -rf -- "${_TEMPFILES[@]}"
   fi
 }
+# An internal function. Don't call this.
+_add_tempfiles() {
+  for file; do
+    for temp in "${_TEMPFILES[@]}"; do
+      if [ "$file" = "$temp" ]; then continue 2; fi # continue `for file;` loop
+    done
+    _TEMPFILES=("${_TEMPFILES[@]}" "$file")
+  done
+}
 
 # traps to remove the given file on exit
 # This can be called mutltiple times.
 # Do *NOT* trap EXIT after calling!
 # Note: THIS will override any other exit traps!
 function rm_exit() {
-  for file; do
-    _TEMPFILES=("${_TEMPFILES[@]}" "$file")
-  done
+  _add_tempfiles "$@"
   trap "_cleanup_tempfiles" EXIT
 }
 
