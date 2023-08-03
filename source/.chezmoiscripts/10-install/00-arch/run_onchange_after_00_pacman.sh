@@ -42,32 +42,10 @@ GRAPHICAL_PACKAGES=(
 )
 GNOME_PACKAGES=(gnome-shell-extension-manager gnome-tweaks gnome-software gnome-software-plugin-flatpak)
 
-function remove_if_installed() {
-  local package packages=()
-  for package; do
-    if "$PACMAN" -Qi "$package" &>/dev/null; then
-      packages+=("$package")
-    fi
-  done
-  if [ ${#packages[@]} -eq 0 ]; then return 0; fi
-  # The user still has to confirm, but that's good here
-  sudo "$PACMAN" -Rsn -- "${packages[@]}"
-}
-
-is_available_pacman() {
-  # DON'T call it like this, but if a list of packages is passed, this will handle them
-  for package in "$@"; do
-    case "$PACMAN" in
-    */yay) "$PACMAN" --repo -Si "${package}" &>/dev/null || return 1 ;;
-    *) "$PACMAN" -Si "${package}" &>/dev/null || return 1 ;;
-    esac
-  done
-}
-
 function install_if_available() {
   local packages=() package
   for package; do
-    if is_available_pacman "$package"; then
+    if pacman_is_available "$package"; then
       packages+=("$package")
     else
       err "Could not find '$package'"
@@ -75,10 +53,7 @@ function install_if_available() {
   done
   if [ ${#packages[@]} -eq 0 ]; then return 0; fi
   # The user still has to confirm, but that's good here
-  (
-    export -n SHELLOPTS # makepkg doesn't play nice with this
-    sudo "$PACMAN" -S --needed -- "${packages[@]}"
-  )
+  pacman_install "${packages[@]}"
 }
 
 function install_packages() { install_if_available "${PACKAGES[@]}"; }
@@ -96,19 +71,11 @@ function install_graphical_packages() {
   install_if_available "${graphical_packages[@]}"
 }
 
-update_system() (
-  export -n SHELLOPTS # makepkg doesn't play nice with this
-  case "$PACMAN" in
-  */yay) "$PACMAN" -Syu ;; # don't run yay as root when AUR packages could be installed
-  *) sudo "$PACMAN" -Syu ;;
-  esac
-)
-
 # no install neovim latest, bc should already be
-log_and_run 'Updating sources/packages' update_system
+log_and_run 'Updating sources/packages' pacman_update
 log_and_run 'Installing packages' install_packages
 log_and_run 'Installing graphical packages' install_graphical_packages
 # Gnome comes with it, but I don't want it.
-remove_if_installed gnome-characters
+if pacman_is_installed gnome-characters; then pacman_remove gnome-characters; fi
 # Install vim symlink to nvim - throws is /usr/bin/vim is defined.
 if ! [ -f /usr/bin/vim ] && which nvim &>/dev/null; then sudo ln -s -T "$(which nvim)" /usr/bin/vim; fi

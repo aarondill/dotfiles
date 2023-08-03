@@ -13,23 +13,22 @@ fi
 
 pacman_install_aur_deps() {
   # check first to avoid message every time
-  if ! pacman -Q 'git' || ! pacman -Q 'base-devel'; then
-    pacman -S --needed git base-devel
-  fi
+  if ! pacman_is_installed git base-devl; then pacman_install git base-devel; fi
 }
 
 aur_install() {
-  # shellcheck disable=SC2155 # assign and declare seperately
-  local YAY="$(which yay 2>/dev/null || printf '')"
-  local tmpdir REPO="https://aur.archlinux.org/$1.git"
-  if [ -n "$YAY" ]; then
-    (export -n SHELLOPTS && "$YAY" -S --needed -- "$1")
-    return
+  if has_cmd yay; then
+    yay_install "$1"
+  else
+    pacman_install_aur_deps # should already be installed if yay is.
+    aur_install_makepkg "$1"
   fi
-  pacman_install_aur_deps
+}
+
+aur_install_makepkg() {
+  local tmpdir REPO="https://aur.archlinux.org/$1.git"
   tmpdir="$(mktemp -d)"
   rm_exit "$tmpdir"
-
   git clone "$REPO" "$tmpdir"
   pushd "$tmpdir" >/dev/null
   (export -n SHELLOPTS && makepkg -sirc)
@@ -37,20 +36,20 @@ aur_install() {
   rm_exit_cleanup "$tmpdir"
 }
 
-if ! which yay &>/dev/null; then
+if ! has_cmd yay; then
   aur_install yay-bin
   yay -Y --gendb # Check the cache on first install
 else err "yay is already installed, skipping installation"; fi
 
 ## Zeal -- I don't like the qt5-webkit package. It's too big.
-# if ! which zeal &>/dev/null; then
+# if ! has_cmd zeal; then
 #   # Dependancy that's no longer supplied by pacman
 #   sudo pacman -U https://archive.archlinux.org/packages/q/qt5-webkit/qt5-webkit-5.212.0alpha4-18-x86_64.pkg.tar.zst
 #   aur_install "zeal"
 # else err "Zeal is already installed, skipping installation"; fi
 
 # Google chrome
-if ! which google-chrome-stable &>/dev/null; then
+if ! has_cmd google-chrome-stable; then
   aur_install "google-chrome"
 else err "google-chrome is already installed, skipping installation"; fi
 
@@ -60,12 +59,12 @@ if ! [ -x /opt/grub-editor/grub-editor.py ]; then
 else err "grub-editor is already installed, skipping installation"; fi
 
 # informant for pacman/yay
-if ! which informant &>/dev/null; then
+if ! has_cmd informant; then
   aur_install "informant"
 else err "informant is already installed, skipping installation"; fi
 
 # consolation for a cursor in the tty!
-if ! which consolation &>/dev/null; then
+if ! has_cmd consolation; then
   aur_install "consolation"
   sudo systemctl enable consolation.service # This is not enabled by default
 else err "consolation is already installed, skipping installation"; fi
