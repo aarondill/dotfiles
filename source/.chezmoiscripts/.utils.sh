@@ -237,45 +237,6 @@ function rm_exit_cleanup() {
   done
 }
 
-# Creates a tempfile that will be removed on exit.
-# Don't trap EXIT after calling this.
-# Note: THIS will override any other exit traps!
-# call rm_exit_cleanup when you are done with this file.
-# uses mktemp or tempfile if present, else guesses.
-# makes a directory with -d flag
-# Usage: mktempfile [-d]
-function mktempfile() {
-  local dir=0 file=''
-  case "${1:-}" in
-  '') ;;
-  -d) dir=1 ;;
-  *) abort "unknown flag/option to mktempfile: $1" ;;
-  esac
-
-  if has_cmd mktemp; then
-    local dir_arg=''
-    [ "$dir" -eq 1 ] && dir_arg=-d
-    file=$(command mktemp $dir_arg)
-  elif [ "$dir" -eq 0 ] && has_cmd tempfile; then
-    file=$(command tempfile)
-  else
-    local epoch_seconds
-    epoch_seconds=$(printf '%(%s)T' -1)
-    file="${TMPDIR:-/tmp}/tmp.install-mktemp-or-else.$epoch_seconds"
-    case "$dir" in
-    0) touch "$file" ;;
-    1) mkdir "$file" ;;
-    esac
-  fi
-
-  case "$dir" in
-  0) [ -d "$dir" ] || abort "Something went wrong making tempdir" 1 ;;
-  1) [ -f "$dir" ] || abort "Something went wrong making tempfile" 1 ;;
-  esac
-  rm_exit "$file"
-  printf '%s' "$file"
-}
-
 ## --------------------------------------------------------------------------------------------------
 ## --------------------------------------------- GitHub ---------------------------------------------
 ## --------------------------------------------------------------------------------------------------
