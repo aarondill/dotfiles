@@ -6,6 +6,9 @@ These are setup to allow me to move to a new device and very quickly set it up t
 I have not tested without decrypting the files, but it _should_ be theoretically possible. I'm happy to help if anyone actually cares.
 Obviously, I'm not willing to share the decryption password, but the encrypted files should have little-to-no impact on the final product anyways.
 
+These have been tested on Ubuntu and Arch Linux. They should work on either platform. They have also been _lightly_ tested for Debian and should work.
+They would _probably_ work on other platforms, but no promises :wink:.
+
 ### Script ordering:
 
 Distro dependent scripts run first, this is to ensure native packages which will likely be needed later are included.
