@@ -94,11 +94,16 @@ function installed_or_log() {
 }
 
 # returns 0 if all cmds are available, 1 otherwise
-# is_accessible_cmd apt ls git
-function is_accessible_cmd() {
+# has_cmd apt ls git
+function has_cmd() {
   declare -i failed=0 # declare=local
   for cmd; do command -v "$cmd" &>/dev/null || failed=1; done
   return "$failed"
+}
+# depreciated. Use has_cmd.
+function is_accessible_cmd() {
+  err "Use has_cmd instead of is_accessible_cmd"
+  has_cmd "$@"
 }
 
 ## --------------------------------------------------------------------------------------------------
