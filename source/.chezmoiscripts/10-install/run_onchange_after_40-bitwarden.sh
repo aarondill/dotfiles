@@ -15,7 +15,7 @@ function install_bitwarden_cli() (
   local DESTINATION=/usr/local/bin/bw temp_dir
   local sudo=${SUDO:-sudo}
   temp_dir=$(mktemp -d)
-  trap 'cleanup "$temp_dir"' EXIT
+  trap 'rm -rf "$temp_dir"' EXIT
   download 'https://vault.bitwarden.com/download/?app=cli&platform=linux' >|"$temp_dir/bw.zip"
   unzip -qq "$temp_dir/bw.zip" -d "$temp_dir"
   $sudo mkdir -p "$(dirname "$DESTINATION")"

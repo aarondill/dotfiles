@@ -170,10 +170,6 @@ function rm_exit_cleanup() {
   rm -fr -- "${1:-}"
   trap '' EXIT
 }
-# This function deletes the file in the first argument
-function cleanup() {
-  rm -fr -- "$1"
-}
 
 # download_file <URL> [destination] [mode]
 # destination should be the *final* filename, not a directory.
