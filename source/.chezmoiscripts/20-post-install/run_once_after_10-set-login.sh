@@ -14,42 +14,37 @@ if [ "$OS" != "Ubuntu" ]; then
   abort "This script is only available for Ubuntu" 0
 fi
 
-if ! command -v gdm3 &>/dev/null && ! command -v gdm &>/dev/null; then
+if ! is_accessible_cmd gdm3 && ! is_accessible_cmd gdm; then
   abort "This script requires gdm to be installed" 0
 fi
 
-OWNER="PRATAP-KUMAR"
+REPO="PRATAP-KUMAR/ubuntu-gdm-set-background"
 
-codename="$(grep UBUNTU_CODENAME /etc/os-release | cut -d = -f 2)"
-if [ "$codename" = "lunar" ]; then
-  FILE="ubuntu-gdm-set-background-23.04"
-else
-  FILE="ubuntu-gdm-set-background"
-fi
+codename="$(grep -F "UBUNTU_CODENAME" /etc/os-release | cut -d = -f 2)"
+case "$codename" in
+lunar) file="ubuntu-gdm-set-background-23.04" ;;
+*) file="ubuntu-gdm-set-background" ;;
+esac
 
 # dependencies
 if ! dpkg -l libglib2.0-dev-bin &>/dev/null; then
   log 'Attemping to install dependencies'
   if [ -z "$APT" ]; then abort "Can't install libglib2.0-dev-bin using apt. Please make sure it's installed"; fi
-  sudo "$APT" install -y libglib2.0-dev-bin
+  apt_install libglib2.0-dev-bin
 fi
 
-DESTINATION="/usr/local/bin/$FILE"
-sudo curl -SsfL "https://raw.githubusercontent.com/$OWNER/ubuntu-gdm-set-background/main/$FILE" -o "$DESTINATION"
-sudo chmod +x "$DESTINATION"
+destination="/usr/local/bin/ubuntu-gdm-set-background"
+download_file "https://raw.githubusercontent.com/$REPO/main/$file" "$destination" +x
 success
 
 log "Downloading background image"
 # Download image file
-TEMP_FILE="$(mktemp)"
-trap 'rm -f "$TEMP_FILE"' EXIT
-curl -SsfL "$IMAGE" -o "$TEMP_FILE"
-success
+temp_file="$(download_file "$IMAGE")"
+rm_exit "$temp_file"
 
 log 'Setting image as current lock screen image'
-sudo "$DESTINATION" --image "$TEMP_FILE" || abort 'Something went wrong setting the lock screen' 0
-success
+sudo "$destination" --image "$temp_file" || abort 'Something went wrong setting the lock screen' 0
 
 log 'Cleaning up temporary files'
-rm -f "$TEMP_FILE" && trap '' EXIT # Clean up and remove trap
+rm_exit_cleanup "$temp_file"
 success
