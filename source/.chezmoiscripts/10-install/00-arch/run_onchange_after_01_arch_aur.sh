@@ -7,7 +7,7 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
 # Defined in utils.sh
-if [ -z "$PACMAN" ]; then
+if ! has_pacman; then
   exit 0 # Assume already knows
 fi
 
