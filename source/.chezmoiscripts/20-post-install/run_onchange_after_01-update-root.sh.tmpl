@@ -86,6 +86,8 @@ done
 # --no-same-owner to ensure owned by root (sudo)
 sudo tar --no-same-owner -xf "$TARDESTFILE" -C /
 
+rm_exit_cleanup "$TARDESTFILE"
+
 log "NOTE: Please consider running"
 log "    update-grub"
 log "    update-initramfs -u   ||   mkinitcpio -P"
