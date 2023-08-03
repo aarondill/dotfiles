@@ -2,18 +2,18 @@
 
 # THIS FILE IS SOURCED! preserve the old options
 # https://unix.stackexchange.com/a/383581
-OLDOPTS=$(set +o)
+_OLDOPTS=$(set +o)
 case $- in
-*e*) OLDOPTS="$OLDOPTS; set -e" ;;
-*) OLDOPTS="$OLDOPTS; set +e" ;;
+*e*) _OLDOPTS="$_OLDOPTS; set -e" ;;
+*) _OLDOPTS="$_OLDOPTS; set +e" ;;
 esac
 # for this file's safety, won't affect the functions defined here!
 set -euC -o pipefail
 
 # This is run repeatedly, should
 # Source this file to get utilities
-(return 0 2>/dev/null) && sourced=1 || sourced=0
-if [ "$sourced" -eq 0 ]; then err "You should source this file. not run it."; fi
+(return 0 2>/dev/null) && _SOURCED=1 || _SOURCED=0
+if [ "$_SOURCED" -eq 0 ]; then printf '%s\n' "You should source this file. not run it." >&2; fi
 
 ## --------------------------------------------------------------------------------------------------
 ## --------------------------------------------- Output ---------------------------------------------
@@ -285,4 +285,4 @@ source_utils() {
 
 # Should be the last thing.
 # Restore the old options. VERY important because this is sourced, not run.
-eval "$OLDOPTS"
+eval "$_OLDOPTS"
