@@ -164,6 +164,7 @@ function download() {
 # this function handles escalation to root when possible.
 # if destination is not present, outputs the temp file on stdout.
 # You are expected to cleanup this file after use. It will not be cleaned up on exit.
+# The easiest way is to call rm_exit with the file!
 function download_file() {
   local cmd=() sudo='' dir=''
   local file_url=$1 dest=${2:-} mode=${3:-}
@@ -214,6 +215,7 @@ _cleanup_tempfiles() {
 # traps to remove the given file on exit
 # This can be called mutltiple times.
 # Do *NOT* trap EXIT after calling!
+# Note: THIS will override any other exit traps!
 function rm_exit() {
   for file; do
     _TEMPFILES=("${_TEMPFILES[@]}" "$file")
@@ -237,6 +239,7 @@ function rm_exit_cleanup() {
 
 # Creates a tempfile that will be removed on exit.
 # Don't trap EXIT after calling this.
+# Note: THIS will override any other exit traps!
 # call rm_exit_cleanup when you are done with this file.
 # uses mktemp or tempfile if present, else guesses.
 # makes a directory with -d flag
