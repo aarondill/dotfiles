@@ -3,43 +3,36 @@ set -euC -o pipefail
 export SHELLOPTS
 # Source utils
 SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
-# shellcheck source=../.utils.sh
+# shellcheck source=../../.utils.sh
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
-function install_nala() {
-  local TMP_DIR
-
-  TMP_DIR=$(mktemp -d)
-  trap 'rm -rf "$TMP_DIR"' EXIT
-
-  read -r -d '' PYTHON_CODE <<-'EOF' || true
+read -r -d '' PYTHON_CODE <<-'EOF' || true
 import sys, json
-for ln in json.load(sys.stdin)["assets"]["links"]: print(ln["direct_asset_url"], end="\0")
+for ln in json.load(sys.stdin)["assets"]["links"]: print(ln["direct_asset_url"], end="\n")
 EOF
 
-  # move to tmpdir to save files
-  pushd "$TMP_DIR" >/dev/null
+function install_nala() {
+  local tmp_dir keyring_url scar_url
 
-  curl -sSfL 'https://gitlab.com/api/v4/projects/39215670/releases/permalink/latest/' |
-    # null seperated
-    python3 -c "$PYTHON_CODE" |
-    # Save to CWD
-    xargs -0 -I{} -- curl -sSfL "{}" -O
+  # https://gitlab.com/volian/volian-archive/uploads/b20bd8237a9b20f5a82f461ed0704ad4/volian-archive-keyring_0.1.0_all.deb
+  # https://gitlab.com/volian/volian-archive/uploads/d6b3a118de5384a0be2462905f7e4301/volian-archive-nala_0.1.0_all.deb
+  # https://gitlab.com/volian/volian-archive/uploads/4ba4a75e391aa36f0cbe7fb59685eda9/volian-archive-scar_0.1.0_all.deb
+  while read -r; do
+    case "$REPLY" in
+    */volian-archive-keyring_*_all.deb) keyring_url=$REPLY ;;
+    */volian-archive-scar_*_all.deb) scar_url=$REPLY ;;
+    esac
+  done < <(download 'https://gitlab.com/api/v4/projects/39215670/releases/permalink/latest' | python3 -c "$PYTHON_CODE")
 
-  # Get back to where we started
-  popd >/dev/null
+  tmp_dir=$(mktemp -d) # needed to cleanly remove all files later
+  rm_exit "$tmp_dir"
+  download_file "$keyring_url" "$tmp_dir/keyring.deb"
+  download_file "$scar_url" "$tmp_dir/scar.deb"
+  apt_install "$tmp_dir/keyring.deb" "$tmp_dir/scar.deb"
+  rm_exit_cleanup "$tmp_dir"
 
-  keyring=$(find "$TMP_DIR" -name "volian-archive-keyring_*_all.deb")
-  scar=$(find "$TMP_DIR" -name 'volian-archive-scar_*_all.deb')
-  sudo apt-get install --assume-yes "$keyring" "$scar"
-
-  rm -rf "$TMP_DIR" && trap '' EXIT # cleanup
-
-  sudo apt-get update --quiet --assume-yes >/dev/null
-  sudo apt-get install --assume-yes nala
-
-  # only changes in this file, but should be reevaluated each file
-  APT=$(which nala 2>/dev/null)
+  apt_update
+  apt_install nala
 }
 
 # Shouldn't be, but I got an issue about python-markup-it
