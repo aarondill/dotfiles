@@ -13,7 +13,7 @@ function flatpak_install() { sudo flatpak install -y -- "$@"; }
 function flatpak_update() { sudo flatpak update -y -- "$@"; }
 
 function install_flatpaks() {
-  trap 'err Aborting; exit 1' SIGINT
+  trap 'err Aborting; exit 1' INT TERM QUIT
   flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
   flatpak_apps=(
     com.github.johnfactotum.Foliate com.github.tchx84.Flatseal

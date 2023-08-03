@@ -48,11 +48,11 @@ NPM=$(which yarn 2>/dev/null) || abort "yarn is required to install extensions s
 ## Install extensions sync
 
 TEMP=$(mktemp -d)
-trap 'rm -rf ${TEMP}' EXIT
+rm_exit "$TEMP"
 
 git clone https://github.com/oae/gnome-shell-extensions-sync.git "$TEMP"
 
-cd "$TEMP"
+pushd "$TEMP" >/dev/null
 "$NPM" install
 # "$NPM" run build # This doesn't work because clean:schema exits 1 if not present
 # HACK: run build doesn't work. Here's the steps it took when I wrote this.
@@ -63,7 +63,7 @@ glib-compile-schemas ./resources/schemas --targetdir=./dist/schemas/ # from buil
 mkdir -p -- "$(dirname -- "$DESTINATION")"
 mv -T -- "$TEMP/dist" "$DESTINATION" # keep the dist directory as the final result
 
-# Clean up and remove trap
-rm -rf "$TEMP" && trap '' EXIT && cd -
+popd >/dev/null
+rm_exit_cleanup "$TEMP"
 
 sync_extensions

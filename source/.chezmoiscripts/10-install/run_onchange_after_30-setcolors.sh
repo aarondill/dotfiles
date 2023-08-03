@@ -15,17 +15,18 @@ install_from_make() {
 
   # Temp directory
   temp=$(mktemp -d)
-  trap 'rm -rf "$temp"' EXIT
+  rm_exit "$temp"
 
   # Clone to tempdir
   git clone --quiet -- "$REPO_URL" "$temp" >/dev/null
 
   # build from source
-  cd "$temp"
+  pushd "$temp" >/dev/null
   sudo make install
+  popd >/dev/null
 
   # cleanup
-  rm -rf "$temp" && trap '' EXIT
+  rm_exit_cleanup "$temp"
 }
 
 log_and_run "Installing $REPO_URL" install_from_make

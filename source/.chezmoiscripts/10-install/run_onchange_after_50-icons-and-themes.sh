@@ -10,27 +10,27 @@ function install_humanity_icons() {
   local TMP_DIR
 
   TMP_DIR=$(mktemp -d)
-  trap 'rm -rf "$TMP_DIR"' EXIT
+  rm_exit "$TMP_DIR"
 
   git clone --single-branch --branch=ubuntu/devel 'https://git.launchpad.net/ubuntu/+source/humanity-icon-theme' "$TMP_DIR"
   sudo mv -vi "$TMP_DIR/Humanity" "$TMP_DIR/Humanity-Dark" "/usr/share/icons"
 
-  rm -rf "$TMP_DIR" && trap '' EXIT # cleanup
+  rm_exit_cleanup "$TMP_DIR"
 }
 
-function install_yaru() (
+function install_yaru() {
   local TMP_DIR
 
-  TMP_DIR=$(mktemp -d)
-  trap 'rm -rf "$TMP_DIR"' EXIT
   if [ -n "$APT" ]; then
-    sudo "$APT" install libgtk-3-dev git meson sassc
+    apt_install libgtk-3-dev git meson sassc
   elif [ -n "$PACMAN" ]; then
     sudo "$PACMAN" -S --needed gtk3 git meson sassc
   else
     abort "Could not install dependencies for yaru theme. Please install it yourself manually" 0
   fi
 
+  TMP_DIR=$(mktemp -d)
+  rm_exit "$TMP_DIR"
   git clone --filter=tree:0 --single-branch https://github.com/ubuntu/yaru.git "$TMP_DIR"
 
   local meson=meson
@@ -40,21 +40,22 @@ function install_yaru() (
     log "Installing meson $meson_version"
     tmp_file="$TMP_DIR/meson-$meson_version.tar.gz"
     install_from_github "mesonbuild/meson" "$meson_version" "meson-$meson_version.tar.gz" "$tmp_file"
-    cd "$TMP_DIR"
     log "Unpacking $tmp_file"
-    tar xf "$tmp_file"
+    tar xf "$tmp_file" -C "$TMP_DIR"
     meson="$TMP_DIR/meson-$meson_version/meson.py"
   fi
 
-  cd "$TMP_DIR"
+  pushd "$TMP_DIR" >/dev/null
   "$meson" build # requires meson >=0.59!
 
-  cd build
+  popd >/dev/null
+  pushd "$TMP_DIR/build" >/dev/null
   ninja
   sudo ninja install
 
-  rm -rf "$TMP_DIR" && trap '' EXIT # cleanup
-)
+  rm_exit_cleanup "$TMP_DIR"
+  popd >/dev/null
+}
 
 if ! [ -d /usr/share/icons/Humanity/ ] || ! [ -d /usr/share/icons/Humanity-Dark/ ]; then
   log_and_run "Installing Humanity icon theme" install_humanity_icons

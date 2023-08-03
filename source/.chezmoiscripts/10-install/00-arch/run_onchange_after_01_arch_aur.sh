@@ -28,13 +28,13 @@ aur_install() {
   fi
   pacman_install_aur_deps
   tmpdir="$(mktemp -d)"
-  trap 'rm -rf "$tmpdir"' EXIT
+  rm_exit "$tmpdir"
 
   git clone "$REPO" "$tmpdir"
-  cd "$tmpdir"
+  pushd "$tmpdir" >/dev/null
   (export -n SHELLOPTS && makepkg -sirc)
-  cd -
-  rm -rf "$tmpdir" && trap '' EXIT
+  popd >/dev/null
+  rm_exit_cleanup "$tmpdir"
 }
 
 if ! which yay &>/dev/null; then

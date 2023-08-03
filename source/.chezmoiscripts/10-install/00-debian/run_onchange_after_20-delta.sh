@@ -3,7 +3,7 @@ set -euC -o pipefail
 export SHELLOPTS
 # Source utils
 SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
-# shellcheck source=../.utils.sh
+# shellcheck source=../../.utils.sh
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
 function install_delta() {
@@ -43,10 +43,10 @@ function install_delta() {
 
   asset="${fname}_${version}_${short_arch}.deb"
   tmp=$(mktemp)
-  trap 'rm -f "$tmp"' EXIT
+  rm_exit "$tmp"
   install_from_github "$REPO" "$version" "$asset" "$tmp"
-  sudo "$APT" install -y -- "$tmp"
-  rm -f "$tmp" && trap '' EXIT
+  apt_install "$tmp"
+  rm_exit_cleanup "$tmp"
 }
 if [ -z "$APT" ]; then
   abort 'This script only supports Ubuntu/Debian. Please install delta through your package manager.' 0

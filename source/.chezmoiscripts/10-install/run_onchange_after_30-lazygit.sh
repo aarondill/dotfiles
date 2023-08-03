@@ -21,13 +21,13 @@ function install_lazygit() (
   fi
 
   tmp=$(mktemp)
-  trap 'rm -f "$tmp"' EXIT
+  rm "$tmp"
   install_from_github "$REPO" "$version" "$file" "$tmp"
   # output to destination
   sudo tar -xz -C "$BINDIR" -f "$tmp" lazygit
   sudo chmod +x "$BINDIR/lazygit"
 
-  rm -f "$tmp" && trap '' EXIT # Cleanup
+  rm_exit_cleanup "$tmp"
 )
 
 log_and_run 'installing lazygit' install_lazygit
