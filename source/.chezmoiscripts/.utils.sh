@@ -218,6 +218,7 @@ function rm_exit() {
   # shellcheck disable=SC2064 # it's intended to expand now
   trap "rm -rf \"$file\"" EXIT
 }
+# deletes the file given and removes the exit trap (!)
 function rm_exit_cleanup() {
   rm -fr -- "${1:-}"
   trap '' EXIT
