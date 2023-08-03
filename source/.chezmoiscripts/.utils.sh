@@ -365,6 +365,7 @@ source_utils() {
   local SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
   ## uncomment this if copying this code. It's commented to stop recursive checking:
   ## shellcheck source=./.utils.sh
+  # shellcheck disable=SC1091
   . "$SOURCE_DIR/.chezmoiscripts/utils.sh"
 }
 
