@@ -270,7 +270,10 @@ function download_file() {
 function is_installed_apt() { dpkg -s "$@" &>/dev/null; }
 function is_available_apt() { test -n "$(apt-cache show -- "$1" 2>/dev/null)"; }
 # usage: apt_install file_or_package
-function apt_install() { sudo "$APT" install -y -- "$1"; }
+function apt_install() { sudo "$APT" install -y -- "$@"; }
+# Just updates, not upgrade - upgrade shouldn't be necessary, leave that to the user.
+function apt_update() { sudo "$APT" update; }
+function apt_is_held() { [ -n "$(apt-mark showhold -- "$1")" ]; }
 
 ## --------------------------------------------------------------------------------------------------
 ## ------------------------------------------- Variables --------------------------------------------
