@@ -45,11 +45,20 @@ fi
 
 alias fslite='browser fslite.vercel.app'
 alias lsblk="lsblk -e 7"
-if has exa; then
-  alias ls="exa --color=auto --icons -Gh --group"
-  if [ "${TERM,,}" = "linux" ]; then
-    alias ls="exa --color=auto -Gh --group" # overwrite above no-icons
+if has exa || has eza; then
+  exa=exa
+  has eza && exa=eza
+  ls="$exa --color=auto -Gh --group"
+  if "$exa" --version | grep -qF '[+git]'; then
+    ls="$ls --git"
   fi
+  # shellcheck disable=SC2139 # I expect it to expand on definition
+  if [ "${TERM,,}" = "linux" ]; then
+    alias ls="$ls"
+  else
+    alias ls="$ls --icons"
+  fi
+  unset ls exa
 
   alias la="ls -a"
   alias ll="ls -l"
