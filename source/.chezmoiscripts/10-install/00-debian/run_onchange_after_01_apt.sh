@@ -66,7 +66,7 @@ function remove_if_installed() {
 function install_if_available() {
   local packages=() package
   for package; do
-    if is_available_apt "$package"; then
+    if apt_is_available "$package"; then
       packages+=("$package")
     else
       err "Could not find '$package'"

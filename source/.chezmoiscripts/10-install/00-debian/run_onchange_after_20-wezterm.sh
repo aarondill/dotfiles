@@ -14,7 +14,7 @@ if [ -z "$APT" ]; then
 fi
 
 # # Wezterm will inform of updates itself, only run if not already installed
-# if is_available_apt wezterm; then
+# if apt_is_available wezterm; then
 #   abort "wezterm is already installed" 0
 # fi
 

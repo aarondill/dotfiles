@@ -300,8 +300,8 @@ function log_github_install() {
 ## --------------------------------------------------------------------------------------------------
 ## ------------------------------------------- APT utils --------------------------------------------
 ## --------------------------------------------------------------------------------------------------
-function is_installed_apt() { dpkg -s "$@" &>/dev/null; }
-function is_available_apt() { test -n "$(apt-cache show -- "$1" 2>/dev/null)"; }
+function apt_is_installed() { dpkg -s "$@" &>/dev/null; }
+function apt_is_available() { test -n "$(apt-cache show -- "$1" 2>/dev/null)"; }
 # usage: apt_install file_or_package
 function apt_install() { sudo "$APT" install -y -- "$@"; }
 # Just updates, not upgrade - upgrade shouldn't be necessary, leave that to the user.
