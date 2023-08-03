@@ -53,16 +53,6 @@ GNOME_PACKAGES=(
   gnome-software gnome-software-plugin-flatpak
 )
 
-function remove_if_installed() {
-  local package packages=()
-  for package; do
-    if dpkg -s "$package" &>/dev/null; then
-      packages+=("$package")
-    fi
-  done
-  if [ ${#packages[@]} -eq 0 ]; then return 0; fi
-  sudo "$APT" remove -y -- "${packages[@]}"
-}
 function install_if_available() {
   local packages=() package
   for package; do
@@ -73,7 +63,7 @@ function install_if_available() {
     fi
   done
   if [ ${#packages[@]} -eq 0 ]; then return 0; fi
-  sudo "$APT" install -y -- "${packages[@]}"
+  apt_install "${packages[@]}"
 }
 
 function install_packages() { install_if_available "${PACKAGES[@]}"; }
@@ -94,14 +84,12 @@ function install_graphical_packages() {
 if [ "$OS" = "Ubuntu" ] && ! [ -f /etc/apt/sources.list.d/neovim-ppa-ubuntu-unstable-jammy.list ]; then
   log_and_run 'installing neovim nightly ppa' sudo add-apt-repository -y ppa:neovim-ppa/unstable
 fi
-log_and_run 'Updating sources' sudo "$APT" update
+log_and_run 'Updating sources' apt_update
 log_and_run 'Installing packages' install_packages
 log_and_run 'Installing graphical packages' install_graphical_packages
 # Gnome comes with it, but I don't want it.
-remove_if_installed gnome-characters
+if apt_is_installed gnome-characters; then apt_remove gnome-characters; fi
 # Install vim symlink to nvim
-if command -v nvim &>/dev/null; then
-  if ! [ "$(basename -- "$(update-alternatives --query vim | grep 'Value: /.\+' | cut -d' ' -f2-)")" = nvim ]; then
-    sudo update-alternatives --install /usr/bin/vim vim "$(which nvim)" 100 || true
-  fi
+if has_cmd update-alternatives && has_cmd nvim && ! [ "$(readlink -e /usr/bin/vim)" = "$(which nvim)" ]; then
+  sudo update-alternatives --install /usr/bin/vim vim "$(which nvim)" 100 || true
 fi
