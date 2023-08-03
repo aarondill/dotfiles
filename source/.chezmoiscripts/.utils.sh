@@ -159,18 +159,6 @@ function download() {
   fi
 }
 
-# traps to remove the given file on exit
-function rm_exit() {
-  local file=$1
-  # shellcheck disable=SC2064 # it's intended to expand now
-  trap "rm -rf \"$file\"" EXIT
-}
-# deletes the file given and removes the exit trap (!)
-function rm_exit_cleanup() {
-  rm -fr -- "${1:-}"
-  trap '' EXIT
-}
-
 # download_file <URL> [destination] [mode]
 # destination should be the *final* filename, not a directory.
 # this function handles escalation to root when possible.
@@ -208,6 +196,81 @@ function download_file() {
     if [ -n "$mode" ]; then $sudo chmod "$mode" "$dest"; fi
     rm -rf -- "$temp"
   } || rm -rf -- "$temp"
+}
+
+## --------------------------------------------------------------------------------------------------
+## -------------------------------------------- Tempfile --------------------------------------------
+## --------------------------------------------------------------------------------------------------
+
+# An internal array. DON'T overwrite this!
+_TEMPFILES=()
+# An internal function. Don't call this.
+_cleanup_tempfiles() {
+  if [ ${#_TEMPFILES[@]} -gt 0 ]; then
+    rm -rf -- "${_TEMPFILES[@]}"
+  fi
+}
+
+# traps to remove the given file on exit
+# This can be called mutltiple times.
+# Do *NOT* trap EXIT after calling!
+function rm_exit() {
+  for file; do
+    _TEMPFILES=("${_TEMPFILES[@]}" "$file")
+  done
+  trap "_cleanup_tempfiles" EXIT
+}
+
+# deletes the file given and removes it from the exit trap
+function rm_exit_cleanup() {
+  rm -fr -- "$@" || true
+  for file_to_rm; do
+
+    for i in "${!_TEMPFILES[@]}"; do
+      if [[ "${_TEMPFILES[$i]}" = "$file_to_rm" ]]; then
+        unset "_TEMPFILES[$i]" # remove from array (won't expand into empty, so okay)
+      fi
+    done
+
+  done
+}
+
+# Creates a tempfile that will be removed on exit.
+# Don't trap EXIT after calling this.
+# call rm_exit_cleanup when you are done with this file.
+# uses mktemp or tempfile if present, else guesses.
+# makes a directory with -d flag
+# Usage: mktempfile [-d]
+function mktempfile() {
+  local dir=0 file=''
+  case "${1:-}" in
+  '') ;;
+  -d) dir=1 ;;
+  *) abort "unknown flag/option to mktempfile: $1" ;;
+  esac
+
+  if has_cmd mktemp; then
+    local dir_arg=''
+    [ "$dir" -eq 1 ] && dir_arg=-d
+    file=$(command mktemp $dir_arg)
+  elif [ "$dir" -eq 0 ] && has_cmd tempfile; then
+    file=$(command tempfile)
+  else
+    local epoch_seconds
+    epoch_seconds=$(printf '%(%s)T' -1)
+    file="${TMPDIR:-/tmp}/tmp.install-mktemp-or-else.$epoch_seconds"
+    case "$dir" in
+    0) touch "$file" ;;
+    1) mkdir "$file" ;;
+    esac
+  fi
+
+  case "$dir" in
+  0) [ -d "$dir" ] || abort "Something went wrong making tempdir" 1 ;;
+  1) [ -f "$dir" ] || abort "Something went wrong making tempfile" 1 ;;
+  esac
+  rm_exit "$file"
+  printf '%s' "$file"
 }
 
 ## --------------------------------------------------------------------------------------------------
