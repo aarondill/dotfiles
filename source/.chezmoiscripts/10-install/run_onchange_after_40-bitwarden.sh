@@ -21,7 +21,7 @@ function install_bitwarden_cli() (
   $sudo mkdir -p "$(dirname "$DESTINATION")"
   $sudo install "$temp_dir/bw" "$DESTINATION"
   $sudo chmod +x "$DESTINATION"
-  cleanup "$temp_dir" && trap '' EXIT # cleanup
+  rm -rf -- "$temp_dir" && trap '' EXIT # cleanup
 )
 
 # Ignore if already installed, updates itself
