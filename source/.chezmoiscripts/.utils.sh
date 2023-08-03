@@ -309,6 +309,25 @@ function apt_update() { sudo "$APT" update; }
 function apt_is_held() { [ -n "$(apt-mark showhold -- "$1")" ]; }
 
 ## --------------------------------------------------------------------------------------------------
+## ----------------------------------------- Pacman utils -------------------------------------------
+## --------------------------------------------------------------------------------------------------
+
+# treat yay like pacman (no sudo/--repo)
+function pacyay() {
+  args=("$@")
+  case "$PACMAN" in
+  */yay) args=("$PACMAN" --repo "${args[@]}") ;;
+  *) args=(sudo "$PACMAN" "${args[@]}") ;;
+  esac
+  "${args[@]}"
+}
+function pacman_is_installed() { pacyay -Qi "$@" &>/dev/null || return 1; }
+function pacman_is_available() { pacyay -Si "$1" &>/dev/null || return 1; }
+# usage: pacman_install package
+function pacman_install() { pacyay -S --needed -- "$@"; }
+function pacman_update() { pacyay -Syu; }
+
+## --------------------------------------------------------------------------------------------------
 ## ------------------------------------------- Variables --------------------------------------------
 ## --------------------------------------------------------------------------------------------------
 
