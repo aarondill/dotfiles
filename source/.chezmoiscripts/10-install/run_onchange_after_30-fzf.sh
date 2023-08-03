@@ -7,9 +7,8 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
 function install_fzf() {
-  local REPO=junegunn/fzf BINLOCATION=${BINLOCATION:-/usr/bin}
-  local targetFile="$BINLOCATION/fzf"
-  local version
+  local REPO=junegunn/fzf targetFile="/usr/local/bin/fzf"
+  local version url
   version=$(get_latest_version_github "$REPO") # 0.42.0
   if is_accessible_cmd fzf; then
     if [ "$(fzf --version | cut -d' ' -f1)" = "$version" ]; then
@@ -18,8 +17,6 @@ function install_fzf() {
   fi
 
   case "$KERNEL $ARCH" in
-  "Darwin arm64") asset="fzf-$version-darwin_arm64.zip" ;;
-  "Darwin x86_64") asset="fzf-$version-darwin_amd64.zip" ;;
   "Linux armv5"*) asset="fzf-$version-linux_armv5.tar.gz" ;;
   "Linux armv6"*) asset="fzf-$version-linux_armv6.tar.gz" ;;
   "Linux armv7"*) asset="fzf-$version-linux_armv7.tar.gz" ;;
@@ -31,10 +28,12 @@ function install_fzf() {
   "Linux s390x") asset="fzf-$version-linux_s390x.tar.gz" ;;
   "FreeBSD "*64) asset="fzf-$version-freebsd_amd64.tar.gz" ;;
   "OpenBSD "*64) asset="fzf-$version-openbsd_amd64.tar.gz" ;;
-  "CYGWIN"*" "*64) asset="fzf-$version-windows_amd64.zip" ;;
-  "MINGW"*" "*64) asset="fzf-$version-windows_amd64.zip" ;;
-  "MSYS"*" "*64) asset="fzf-$version-windows_amd64.zip" ;;
-  "Windows"*" "*64) asset="fzf-$version-windows_amd64.zip" ;;
+  # "Darwin arm64") asset="fzf-$version-darwin_arm64.zip" ;;
+  # "Darwin x86_64") asset="fzf-$version-darwin_amd64.zip" ;;
+  # "CYGWIN"*" "*64) asset="fzf-$version-windows_amd64.zip" ;;
+  # "MINGW"*" "*64) asset="fzf-$version-windows_amd64.zip" ;;
+  # "MSYS"*" "*64) asset="fzf-$version-windows_amd64.zip" ;;
+  # "Windows"*" "*64) asset="fzf-$version-windows_amd64.zip" ;;
   esac
 
   if [ -z "$asset" ]; then
@@ -46,18 +45,10 @@ function install_fzf() {
 
   log_github_install "$REPO" "$version" "$asset" "$targetFile"
 
-  if [[ "$asset" =~ tar.gz$ ]]; then
-    curl -sSfL "$url" | tar -xzf - -O | sudo tee "$targetFile" >/dev/null
-  else
-    temp_dir=$(mktemp -d)
-    trap 'rm -rf "$temp_dir"' EXIT
-    local temp="$temp_dir/fzf.zip"
-    curl -sSfL "$url" -o "$temp"
-    unzip -o "$temp"
-    sudo mv "$temp" "$targetFile"
-    # cleanup
-    rm -rf "$temp_dir" && trap '' EXIT
-  fi
+  case "$asset" in
+  *.tar.gz) download "$url" | tar -xzf - -O | sudo tee "$targetFile" >/dev/null ;;
+  *) abort "You shouldn't be here." 3 ;;
+  esac
   sudo chmod +x "$targetFile"
 }
 
