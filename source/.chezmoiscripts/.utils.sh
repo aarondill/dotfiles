@@ -300,6 +300,8 @@ function log_github_install() {
 ## --------------------------------------------------------------------------------------------------
 ## ------------------------------------------- APT utils --------------------------------------------
 ## --------------------------------------------------------------------------------------------------
+# Path to apt (or nala) for installation/removal of packages
+APT=$(which nala 2>/dev/null || which apt 2>/dev/null || printf '')
 function apt_is_installed() { dpkg -s "$@" &>/dev/null; }
 function apt_is_available() { for pac; do test -n "$(apt-cache show -- "$pac" 2>/dev/null)" || return 1; done; }
 # usage: apt_install file_or_package
@@ -314,6 +316,8 @@ function has_apt() { [ -n "$APT" ]; }
 ## ----------------------------------------- Pacman utils -------------------------------------------
 ## --------------------------------------------------------------------------------------------------
 
+# Path to pacman for installation/removal of packages
+PACMAN=$(which yay 2>/dev/null || which pacman 2>/dev/null || printf '')
 # Internal function. don't call.
 _pacman_exec() (
   export -n SHELLOPTS # makepkg/yay doesn't play nice with this
@@ -353,11 +357,6 @@ ARCH=$(uname -m)
 OS="$(source /etc/os-release && lower <<<"${ID:-${NAME:-}}" | first_upper)"
 # eg: /usr/bin/gnome-shell, if empty, gnome not installed
 GNOME=$(which gnome-shell 2>/dev/null || printf '')
-
-# Path to apt (or nala) for installation/removal of packages
-APT=$(which nala 2>/dev/null || which apt 2>/dev/null || printf '')
-# Path to pacman for installation/removal of packages
-PACMAN=$(which yay 2>/dev/null || which pacman 2>/dev/null || printf '')
 
 export ARCH KERNEL OS APT GNOME PACMAN
 # Code to source *this* file. DON'T MOVE THIS FILE!
