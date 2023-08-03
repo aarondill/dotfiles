@@ -29,7 +29,7 @@ install_from_make() {
   # Try install deps *first*
   if [ -n "$APT" ]; then
     if [ "${#DEBIAN_DEPS[@]}" -gt 0 ]; then
-      sudo "$APT" install -y "${DEBIAN_DEPS[@]}"
+      apt_install "${DEBIAN_DEPS[@]}"
     fi
   elif [ -n "$PACMAN" ]; then
     if [ "${#ARCH_DEPS[@]}" -gt 0 ]; then

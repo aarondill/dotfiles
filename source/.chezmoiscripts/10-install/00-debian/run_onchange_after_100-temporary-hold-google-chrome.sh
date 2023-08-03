@@ -12,10 +12,9 @@ fi
 
 url=http://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_114.0.5735.198-1_amd64.deb
 
-temp=$(mktemp)
+temp=$(download_file "$url")
 rm_exit "$temp"
-download_file "$url" "$temp"
-sudo "$APT" install -y -- "$temp"
+apt_install "$temp"
 sudo apt-mark hold google-chrome-stable
 # cleanup
 rm_exit_cleanup "$temp"
