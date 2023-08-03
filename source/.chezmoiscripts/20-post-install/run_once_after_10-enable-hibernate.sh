@@ -42,9 +42,7 @@ if [ -z "$BIG_SWAP_UUID" ]; then
   abort "failed to get UUID for $BIG_SWAP_PATH" 1
 fi
 
-use=1
-confirm "Would you like to use $BIG_SWAP_PATH ($BIG_SWAP_LABEL) as your swap to resume from? $WARNING" || use=0
-if [ "$use" -eq 0 ]; then
+if ! confirm "Would you like to use $BIG_SWAP_PATH ($BIG_SWAP_LABEL) as your swap to resume from? $WARNING"; then
   if confirm "Would you like to disable resuming from swap? $WARNING"; then
     BIG_SWAP_UUID=none # This should disable resuming from swap
   else

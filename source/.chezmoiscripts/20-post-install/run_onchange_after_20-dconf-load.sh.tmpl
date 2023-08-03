@@ -7,13 +7,12 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
 # dconf.ini hash: {{ include "encrypted_dconf-backup.ini" | sha256sum }}
-if ! command -v dconf &>/dev/null; then
+if ! has_cmd dconf; then
   abort 'dconf is not installed. Please install dconf to use this backup' 0
 fi
 
-read -rep "load dconf settings from source? (yes) " confirmation </dev/tty
-if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
-  printf 'Updating dconf\n'
+if confirm "load dconf settings from source? (yes) "; then
+  log 'Updating dconf'
   "${CHEZMOI_EXECUTABLE:-chezmoi}" decrypt "$SOURCE_DIR/encrypted_dconf-backup.ini" | dconf load -f /
 fi
 

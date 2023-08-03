@@ -46,7 +46,7 @@ function confirm() {
   # shellcheck disable=SC2059 # I know this is *generally* wrong, but this is intentional.
   PROMPT="$(printf "$1" "${@:2}")"
   read -rep "$PROMPT (Y/n) " confirmation </dev/tty
-  if [[ -z "$confirmation" ]] || [[ "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
+  if [ -z "$confirmation" ] || [[ "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
     return 0
   fi
   return 1

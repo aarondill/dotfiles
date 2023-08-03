@@ -31,12 +31,12 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 
 ROOTBACKUP="$HOME/.root"
 TARDESTFILE="$(mktemp)"
-trap 'rm -f "$TARDESTFILE"' EXIT
+rm_exit "$TARDESTFILE"
 
 confirm_message="yes, I would"
 printf "%s" "Would you like to update / with the contents of $ROOTBACKUP? (type '$confirm_message' to confirm) "
-read -re confirmation </dev/tty
-if ! [ "$confirmation" = "$confirm_message" ]; then abort "Aborting" 0; fi
+read -re </dev/tty
+if ! [ "$REPLY" = "$confirm_message" ]; then abort "Aborting" 0; fi
 
 # Find safe backup directory
 BACKUPDIR_ROOT="/backup"
@@ -48,11 +48,11 @@ while [ -d "$BACKUPDIR" ]; do
 done
 
 declare -i BACKUP=0
-confirm 'Would you like to keep backups of overwritten files in / in %s?' "$BACKUPDIR" && BACKUP=1
+if confirm 'Would you like to keep backups of overwritten files in / in %s?' "$BACKUPDIR"; then BACKUP=1; fi
 
 # Don't record /home/$USER/.root/, instead start at subdirs
-find "$ROOTBACKUP"/ -maxdepth 1 -mindepth 1 -type d -printf '%f\0' |
-  tar -cf "$TARDESTFILE" -C "$ROOTBACKUP"/ --null -T -
+find "$ROOTBACKUP/" -maxdepth 1 -mindepth 1 -type d -printf '%f\0' |
+  tar -cf "$TARDESTFILE" -C "$ROOTBACKUP/" --null -T -
 
 if [ $BACKUP -ne 0 ]; then
   # List files
