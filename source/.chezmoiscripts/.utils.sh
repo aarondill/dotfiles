@@ -122,75 +122,22 @@ function version_gt() {
 }
 
 ## --------------------------------------------------------------------------------------------------
-## --------------------------------------------- GitHub ---------------------------------------------
-## --------------------------------------------------------------------------------------------------
-
-# get_latest_version_github "someone/something" -> v1.2.3 (tagname)
-function get_latest_version_github() (
-  set -e                  # in subshell
-  local version REPO="$1" # combined $OWNER/$REPO
-  version=$(curl -sfI "https://github.com/$REPO/releases/latest" | grep -i "location:" | awk -F"/" '{ printf "%s", $NF }' | tr -d '\r')
-  if [ -z "$version" ]; then
-    err "Failed while attempting to install $REPO. Please manually install at https://github.com/$REPO/releases"
-    return 2
-  fi
-  echo "$version"
-)
-
-# get_latest_version_github "someone/something" -> v1.2.3 (tagname)
-function get_latest_version_gitlab() (
-  set -e                  # in subshell
-  local version REPO="$1" # combined $OWNER/$REPO
-  version=$(curl -sfI "https://gitlab.com/$REPO/-/releases/permalink/latest" | grep -i "location:" | awk -F"/" '{ printf "%s", $NF }' | tr -d '\r')
-  if [ -z "$version" ]; then
-    err "Failed while attempting to install $REPO. Please manually install at https://gitlab.com/$REPO/releases"
-    return 2
-  fi
-  echo "$version"
-)
-
-# install_from_github aaron/example latest example.sh /usr/local/bin/example
-function install_from_github() (
-  set -e # runs in subshell, so doesn't affect outside
-  local github_repo=$1 version=$2 asset=$3 destination=$4 TMP
-  if [[ -z "$github_repo" ]]; then
-    err "GitHub repo can not be an empty string"
-    return 2
-  elif [[ -z "$asset" ]]; then
-    err "asset can not be an empty string"
-    return 2
-  elif [[ -z "$destination" ]]; then
-    err "destination can not be an empty string"
-    return 2
-  fi
-
-  if [ "$version" = "latest" ]; then version=$(get_latest_version_github "$github_repo"); fi
-
-  log_github_install "$github_repo" "$version" "$asset" "$destination"
-
-  TMP=$(mktemp)
-  trap 'rm -f "$TMP"' EXIT
-
-  curl -SsLf "https://github.com/$github_repo/releases/download/$version/$asset" -o "$TMP"
-  sudo mv "$TMP" "$destination" >/dev/null
-  sudo chmod +x "$destination"
-
-  rm -f "$TMP" && trap '' EXIT # Cleanup
-)
-# usage: log_github_install <repo> <version> [asset] [dest]
-# example: log_github_install aaron/example latest example.sh /usr/local/bin/
-function log_github_install() {
-  local github_repo=$1 version=$2 asset=${3:-} destination=${4:-}
-  local msg="Installing $github_repo version $version"
-  if [ -n "$asset" ]; then msg+=" ($asset)"; fi
-  if [ -n "$destination" ]; then msg+=" to $destination"; fi
-  log "$msg"
-}
-
-## --------------------------------------------------------------------------------------------------
 ## -------------------------------------------- Download --------------------------------------------
 ## --------------------------------------------------------------------------------------------------
 
+# get_url_headers <URL> - outputs to stdout. Pipe it where you need.
+# this should output *only* the headers and should follow redirects.
+# Note, this output may differ depending on whether curl or wget is installed. Be cautious.
+function get_url_headers() {
+  if [ -z "${1:-}" ]; then
+    abort "'get_url_headers' requires a URL argument." 3
+  fi
+  if command -v curl &>/dev/null; then
+    curl -sSfLI "$1" || return
+  elif command -v wget &>/dev/null; then
+    wget -qS "$1" -O /dev/null 2>&1 || return
+  fi
+}
 # download <URL> ['progress']- outputs to stdout. Pipe it where you need.
 # if the exact string 'progress' is passed as the second argument,
 # the command will output progress information to stderr. This is for the user, not to parse.
@@ -242,7 +189,9 @@ function download_file() {
     dir=$(dirname "$dest")
   fi
   # might still exist if the user cancels with SIGINT - can't be avoided without overwriting global trap states
-  temp=$(mktemp)
+  if ! temp=$(mktemp); then
+    abort "Could not create temporary directory" 1
+  fi
   {
     download "$file_url" >|"$temp"
 
@@ -261,8 +210,68 @@ function download_file() {
     if ! [ -w "$dir" ]; then sudo=${SUDO:-sudo}; fi
     $sudo install --no-target-directory -- "$temp" "$dest" # resets permissions
     if [ -n "$mode" ]; then $sudo chmod "$mode" "$dest"; fi
-    cleanup "$temp"
-  } || cleanup "$temp"
+    rm -rf -- "$temp"
+  } || rm -rf -- "$temp"
+}
+
+## --------------------------------------------------------------------------------------------------
+## --------------------------------------------- GitHub ---------------------------------------------
+## --------------------------------------------------------------------------------------------------
+
+# get_latest_version_github "someone/something" -> v1.2.3 (tagname)
+function get_latest_version_github() (
+  set -e                              # in subshell
+  local version_url version REPO="$1" # combined $OWNER/$REPO
+  version_url=$(get_url_headers "https://github.com/$REPO/releases/latest" | grep -m1 -iF "location:" | tr -d '\r')
+  version="${version_url##*/}" # remove everything up to last slash
+  if [ -z "$version" ]; then
+    err "Failed while attempting to install $REPO. Please manually install at https://github.com/$REPO/releases"
+    return 2
+  fi
+  printf '%s' "$version"
+)
+
+# get_latest_version_github "someone/something" -> v1.2.3 (tagname)
+function get_latest_version_gitlab() (
+  set -e                              # in subshell
+  local version version_url REPO="$1" # combined $OWNER/$REPO
+  version_url=$(get_url_headers "https://gitlab.com/$REPO/-/releases/permalink/latest" | grep -m1 -iF "location:" | tr -d '\r')
+  version="${version_url##*/}" # remove everything up to last slash
+  if [ -z "$version" ]; then
+    err "Failed while attempting to install $REPO. Please manually install at https://gitlab.com/$REPO/releases"
+    return 2
+  fi
+  printf '%s' "$version"
+)
+
+# install_from_github aaron/example latest example.sh /usr/local/bin/example
+function install_from_github() (
+  set -e # runs in subshell, so doesn't affect outside
+  local github_repo=$1 version=$2 asset=$3 destination=$4
+  if [[ -z "$github_repo" ]]; then
+    err "GitHub repo can not be an empty string"
+    return 2
+  elif [[ -z "$asset" ]]; then
+    err "asset can not be an empty string"
+    return 2
+  elif [[ -z "$destination" ]]; then
+    err "destination can not be an empty string"
+    return 2
+  fi
+
+  if [ "$version" = "latest" ]; then version=$(get_latest_version_github "$github_repo"); fi
+
+  log_github_install "$github_repo" "$version" "$asset" "$destination"
+  download_file "https://github.com/$github_repo/releases/download/$version/$asset" "$destination" +x
+)
+# usage: log_github_install <repo> <version> [asset] [dest]
+# example: log_github_install aaron/example latest example.sh /usr/local/bin/
+function log_github_install() {
+  local github_repo=$1 version=$2 asset=${3:-} destination=${4:-}
+  local msg="Installing $github_repo version $version"
+  if [ -n "$asset" ]; then msg+=" ($asset)"; fi
+  if [ -n "$destination" ]; then msg+=" to $destination"; fi
+  log "$msg"
 }
 
 ## --------------------------------------------------------------------------------------------------
