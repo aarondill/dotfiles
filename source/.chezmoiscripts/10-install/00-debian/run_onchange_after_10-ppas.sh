@@ -3,7 +3,7 @@ set -euC -o pipefail
 export SHELLOPTS
 # Source utils
 SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
-# shellcheck source=../.utils.sh
+# shellcheck source=../../.utils.sh
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
 if [ -z "$APT" ]; then
@@ -13,36 +13,33 @@ fi
 function setup_ppa_spotify() {
   sudo -v
   sudo mkdir -p /etc/apt/trusted.gpg.d/
-  curl -sS https://download.spotify.com/debian/pubkey_7A3A762FAFD4A51F.gpg | sudo gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/spotify.gpg
+  download https://download.spotify.com/debian/pubkey_7A3A762FAFD4A51F.gpg | sudo gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/spotify.gpg
   sudo mkdir -p /etc/apt/sources.list.d
-  echo "deb http://repository.spotify.com stable non-free" | sudo tee /etc/apt/sources.list.d/spotify.list >/dev/null
+  printf '%s\n' "deb http://repository.spotify.com stable non-free" | sudo tee /etc/apt/sources.list.d/spotify.list >/dev/null
 }
 function setup_ppa_vscode() {
   sudo -v
   sudo mkdir -p /etc/apt/keyrings
-  curl -sS https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor --yes -o /etc/apt/keyrings/packages.microsoft.gpg
+  download https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor --yes -o /etc/apt/keyrings/packages.microsoft.gpg
   sudo mkdir -p /etc/apt/sources.list.d
-  echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | sudo tee /etc/apt/sources.list.d/vscode.list >/dev/null
+  printf '%s\n' "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | sudo tee /etc/apt/sources.list.d/vscode.list >/dev/null
 }
 function setup_ppa_google-chrome() {
   sudo -v
   sudo mkdir -p /etc/apt/trusted.gpg.d/
-  curl -sS https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/google-chrome.gpg
+  download https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/google-chrome.gpg
   sudo mkdir -p /etc/apt/sources.list.d
-  echo "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list >/dev/null
+  printf '%s\n' "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list >/dev/null
 }
 
 # Run setup_ppa_* first!
 function install_proprietary_software() {
-  sudo "$APT" update >/dev/null
+  apt_update
   local update=()
-  for package; do
-    if [ -z "$(apt-mark showhold -- "$package")" ]; then
-      update+=("$package")
-    fi
-  done
-  sudo "$APT" install -y -- "${update[@]}"
-  sudo "$APT" install -f
+  for package; do if ! apt_is_held "$package"; then update+=("$package"); fi; done
+  if [ "${#update[@]}" -gt 0 ]; then
+    apt_install "${update[@]}"
+  fi
 }
 
 # Should already be installed, sanity check
