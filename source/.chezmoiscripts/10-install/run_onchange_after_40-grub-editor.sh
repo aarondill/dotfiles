@@ -8,7 +8,7 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
 function install_grub_editor() (
-  declare temp_dir version REPO="Thenujan-0/grub-editor"
+  local temp version REPO="Thenujan-0/grub-editor"
   if ! [ "$ARCH" = "x86_64" ] && ! [ "$ARCH" = "amd64" ]; then
     abort 'Only amd64 and x86_64 are supported at this time.'
   fi
@@ -22,17 +22,13 @@ function install_grub_editor() (
     fi
   fi
 
-  asset=grub-editor_${version#v}-1_amd64.deb # grub-editor_1.0.0-1_amd64.deb - no other files are available.
+  local asset=grub-editor_${version#v}-1_amd64.deb # grub-editor_1.0.0-1_amd64.deb - no other files are available.
+  log_github_install "$REPO" "$version" "$asset"
   # Download the .deb
-  temp_dir=$(mktemp -d)
-
-  trap 'rm -rf "$temp_dir"' EXIT
-  local destination=$temp_dir/grub-editor.deb
-  log_github_install "$REPO" "$version" "$asset" "$destination"
-  curl -sSL "https://github.com/$REPO/releases/download/$version/$asset" -o "$destination"
-  sudo "$APT" install -y "$destination"
-  # cleanup
-  rm -rf "$temp_dir" && trap '' EXIT
+  temp=$(download_file "https://github.com/$REPO/releases/download/$version/$asset")
+  rm_exit "$temp"
+  apt_install "$temp"
+  rm_exit_cleanup "$temp" # cleanup
 )
 
 if [ -n "$APT" ] && ! is_available_apt grub-editor; then
