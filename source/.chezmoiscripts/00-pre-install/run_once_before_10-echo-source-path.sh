@@ -5,7 +5,7 @@ err() { printf '%s\n' "$@" >&2; }
 chezmoi="${CHEZMOI_EXECUTABLE:-$(which chezmoi 2>/dev/null || printf '')}"
 
 source_path='Could not find chezmoi in PATH'
-[ -x "$chezmoi" ] && source_path="$("$chezmoi" source-path)"
+if [ -x "$chezmoi" ]; then source_path="$("$chezmoi" source-path)"; fi
 
 printf "%s = %s\n" "CHEZMOI_SOURCE_DIR" "${CHEZMOI_SOURCE_DIR:-Not Defined}"
 printf "%s = %s\n" "chezmoi source-path" "$source_path"
