@@ -308,6 +308,7 @@ function apt_install() { sudo "$APT" install -- "$@"; }
 function apt_update() { sudo "$APT" update; }
 function apt_is_held() { for pac; do [ -n "$(apt-mark showhold -- "$pac")" ] || return 1; done; }
 function apt_remove() { sudo "$APT" purge -- "$@"; } # purge for symmetry with pacman. Be careful!
+function has_apt() { [ -n "$APT" ]; }
 
 ## --------------------------------------------------------------------------------------------------
 ## ----------------------------------------- Pacman utils -------------------------------------------
@@ -338,6 +339,7 @@ function yay_install() {
   has_cmd yay || abort "Make sure yay is installed before using yay_install." 127
   _pacman_exec yay --aur -S --needed -- "$@"
 }
+function has_pacman() { [ -n "$PACMAN" ]; }
 
 ## --------------------------------------------------------------------------------------------------
 ## ------------------------------------------- Variables --------------------------------------------
