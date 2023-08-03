@@ -31,6 +31,6 @@ function install_grub_editor() (
   rm_exit_cleanup "$temp" # cleanup
 )
 
-if [ -n "$APT" ] && ! apt_is_available grub-editor; then
+if has_apt && ! apt_is_available grub-editor; then
   log_and_run "Installing grub-editor" install_grub_editor
 fi

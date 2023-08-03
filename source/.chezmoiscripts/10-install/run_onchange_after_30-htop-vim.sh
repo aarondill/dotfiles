@@ -27,13 +27,13 @@ install_from_make() {
   THIS="Make"
 
   # Try install deps *first*
-  if [ -n "$APT" ]; then
+  if has_apt; then
     if [ "${#DEBIAN_DEPS[@]}" -gt 0 ]; then
       apt_install "${DEBIAN_DEPS[@]}"
     fi
-  elif [ -n "$PACMAN" ]; then
+  elif has_pacman; then
     if [ "${#ARCH_DEPS[@]}" -gt 0 ]; then
-      sudo "$PACMAN" -S --needed -- "${ARCH_DEPS[@]}"
+      pacman_install "${ARCH_DEPS[@]}"
     fi
   else
     err "Unable to install dependencies to build '$REPO_URL'"

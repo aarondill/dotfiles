@@ -10,10 +10,10 @@ log "Decrypting age key for encrypted files"
 if ! command -v age &>/dev/null; then
   err "Age is not present, attempting to install."
   # Exits on failure
-  if [ -n "$APT" ]; then
+  if has_apt; then
     apt_install age
-  elif [ -n "$PACMAN" ]; then
-    sudo "$PACMAN" -S --needed age
+  elif has_pacman; then
+    pacman_install age
   else
     abort "age is required to decrypt files. Please install it and try again." 1
   fi

@@ -21,10 +21,10 @@ function install_humanity_icons() {
 function install_yaru() {
   local TMP_DIR
 
-  if [ -n "$APT" ]; then
+  if has_apt; then
     apt_install libgtk-3-dev git meson sassc
-  elif [ -n "$PACMAN" ]; then
-    sudo "$PACMAN" -S --needed gtk3 git meson sassc
+  elif has_pacman; then
+    pacman_install gtk3 git meson sassc
   else
     abort "Could not install dependencies for yaru theme. Please install it yourself manually" 0
   fi

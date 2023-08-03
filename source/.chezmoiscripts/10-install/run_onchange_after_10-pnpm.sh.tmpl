@@ -54,10 +54,10 @@ install_pnpm_global_packages() {
 
 # if ! has_cmd wget; then
 #   err "wget is not present, attempting to install."
-#   if [ -n "$APT" ]; then
+#   if has_apt; then
 #     apt_install wget
-#   elif [ -n "$PACMAN" ]; then
-#     sudo "$PACMAN" -S --needed -- wget
+#   elif has_pacman; then
+#     pacman_install wget
 #   else
 #     abort "wget is required to install n. Please install it and try again." 1
 #   fi
