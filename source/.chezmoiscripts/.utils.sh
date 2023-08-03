@@ -177,10 +177,14 @@ function install_from_github() (
 
   rm -f "$TMP" && trap '' EXIT # Cleanup
 )
-# usage: log_github_install aaron/example latest example.sh /usr/local/bin/
+# usage: log_github_install <repo> <version> [asset] [dest]
+# example: log_github_install aaron/example latest example.sh /usr/local/bin/
 function log_github_install() {
-  local github_repo=$1 version=$2 asset=$3 destination=$4
-  log "Installing $github_repo version $version ($asset) to $destination"
+  local github_repo=$1 version=$2 asset=${3:-} destination=${4:-}
+  local msg="Installing $github_repo version $version"
+  if [ -n "$asset" ]; then msg+=" ($asset)"; fi
+  if [ -n "$destination" ]; then msg+=" to $destination"; fi
+  log "$msg"
 }
 
 ## --------------------------------------------------------------------------------------------------
@@ -223,19 +227,30 @@ function cleanup() {
   rm -fr -- "$1"
 }
 
-# download_file <URL> <destination> [mode]
+# download_file <URL> [destination] [mode]
 # destination should be the *final* filename, not a directory.
 # this function handles escalation to root when possible.
+# if destination is not present, outputs the temp file on stdout.
+# You are expected to cleanup this file after use. It will not be cleaned up on exit.
 function download_file() {
   local cmd=() sudo='' dir=''
-  local file_url=$1 dest=$2 mode=${3:-}
+  local file_url=$1 dest=${2:-} mode=${3:-}
   local temp
 
-  dir=$(dirname "$dest")
+  if [ -n "$dest" ]; then
+    dir=$(dirname "$dest")
+  fi
   # might still exist if the user cancels with SIGINT - can't be avoided without overwriting global trap states
   temp=$(mktemp)
   {
     download "$file_url" >|"$temp"
+
+    if [ -z "$dest" ]; then # Stop if no dest
+      if [ -n "$mode" ]; then chmod "$mode" "$temp"; fi
+      printf '%s' "$temp"
+      return 0
+    fi
+
     if ! mkdir -p "$dir"; then
       sudo=${SUDO:-sudo}
       log "Creating directory failed, trying again with sudo"
@@ -243,8 +258,8 @@ function download_file() {
     fi
 
     if ! [ -w "$dir" ]; then sudo=${SUDO:-sudo}; fi
-    $sudo install --no-target-directory -- "$temp" "$dest"
-    if [ -n "$mode" ]; then $sudo chmod "$mode" "$temp"; fi
+    $sudo install --no-target-directory -- "$temp" "$dest" # resets permissions
+    if [ -n "$mode" ]; then $sudo chmod "$mode" "$dest"; fi
     cleanup "$temp"
   } || cleanup "$temp"
 }
