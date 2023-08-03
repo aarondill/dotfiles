@@ -221,6 +221,7 @@ function cleanup() {
 function download_file() {
   local cmd=() sudo='' dir=''
   local file_url=$1 dest=$2 mode=${3:-}
+  local temp
 
   dir=$(dirname "$dest")
   # might still exist if the user cancels with SIGINT - can't be avoided without overwriting global trap states
