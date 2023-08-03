@@ -9,14 +9,24 @@ function abort() { err "$1" && exit "${2:-2}"; }
 # confirm "do you really want to do %s?" "that" --> ...do that? (Y/n)
 # Strings are evaluated using printf
 function confirm() {
-  local PROMPT confirmation
+  local prompt confirmation
   # shellcheck disable=SC2059 # I know this is *generally* wrong, but this is intentional.
-  PROMPT="$(printf "$1" "${@:2}")"
-  read -rep "$PROMPT (Y/n) " confirmation </dev/tty
+  prompt="$(printf "$1" "${@:2}")"
+  read -rep "$prompt (Y/n) " confirmation </dev/tty
   if [ -z "$confirmation" ] || [[ "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
     return 0
   fi
   return 1
+}
+# confirm_exact "Type '%s' to confirm?" "exact confirmation"
+# Strings are evaluated using printf
+function confirm_exact() {
+  local prompt confirmation
+  local confirm_string=$2
+  # shellcheck disable=SC2059 # I know this is *generally* wrong, but this is intentional.
+  prompt="$(printf "$1" "$2")"
+  read -rep "$prompt " confirmation </dev/tty
+  [ "$confirmation" = "$confirm_string" ]
 }
 # Usage: log_and_run "Installing something" apt install -y something
 function log_and_run() {

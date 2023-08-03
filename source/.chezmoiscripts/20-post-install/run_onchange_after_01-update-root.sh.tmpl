@@ -34,9 +34,9 @@ TARDESTFILE="$(mktemp)"
 rm_exit "$TARDESTFILE"
 
 confirm_message="yes, I would"
-printf "%s" "Would you like to update / with the contents of $ROOTBACKUP? (type '$confirm_message' to confirm) "
-read -re </dev/tty
-if ! [ "$REPLY" = "$confirm_message" ]; then abort "Aborting" 0; fi
+if ! confirm_exact "Would you like to update / with the contents of $ROOTBACKUP? (type '%s' to confirm)" "$confirm_message"; then
+  abort "Aborting" 0
+fi
 
 # Find safe backup directory
 BACKUPDIR_ROOT="/backup"
