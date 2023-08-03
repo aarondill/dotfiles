@@ -6,7 +6,7 @@ set -euC -o pipefail
 export SHELLOPTS
 # Source utils
 SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
-# shellcheck source=../.utils.sh
+# shellcheck source=../../.utils.sh
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
 if [ -z "$APT" ]; then
@@ -26,10 +26,10 @@ if [ "$OS" != "Ubuntu" ] && [ "$OS" != "Debian" ]; then
 fi
 
 REPO=wez/wezterm
-VERSION=$(get_latest_version_github "$REPO") # 20230712-072601-f4abf8fd
+version=$(get_latest_version_github "$REPO") # 20230712-072601-f4abf8fd
 if is_accessible_cmd dpkg-query; then
   installed_version=$(dpkg-query --showformat='${Version}' --show wezterm)
-  if [ "$installed_version" = "$VERSION" ]; then
+  if [ "$installed_version" = "$version" ]; then
     abort 'Already up to date' 0
   fi
 fi
@@ -40,19 +40,19 @@ case "$OS" in
 Ubuntu)
   ubuntu_version=$(lsb_release -sr)
   if is_lt "$ubuntu_version" "20.04"; then
-    ASSET=wezterm-${VERSION}.Ubuntu20.04.deb
+    asset=wezterm-${version}.Ubuntu20.04.deb
   else
     # latest as of writing. may need to be updated
-    ASSET=wezterm-${VERSION}.Ubuntu22.04.deb
+    asset=wezterm-${version}.Ubuntu22.04.deb
   fi
   ;;
 Debian)
   deb_version=$(lsb_release -sr)
   if is_lt "$deb_version" 11; then
-    ASSET=wezterm-${VERSION}.Debian10.deb
+    asset=wezterm-${version}.Debian10.deb
   else
     # latest as of writing. may need to be updated
-    ASSET=wezterm-${VERSION}.Debian11.deb
+    asset=wezterm-${version}.Debian11.deb
   fi
   ;;
 *)
@@ -60,15 +60,11 @@ Debian)
   ;;
 esac
 
-TMP_DIR=$(mktemp -d)
-trap 'rm -rf "$TMP_DIR"' EXIT
-DESTINATION=$TMP_DIR/wezterm.deb
-
-log_github_install "$REPO" "$VERSION" "$ASSET" "$DESTINATION"
-curl -sSL "https://github.com/$REPO/releases/download/$VERSION/$ASSET" -o "$DESTINATION"
-sudo "$APT" install -y "$DESTINATION"
-
-rm -rf "$TMP_DIR" && trap '' EXIT # cleanup
+log_github_install "$REPO" "$version" "$asset"
+tmp=$(download_file "https://github.com/$REPO/releases/download/$version/$asset")
+rm_exit "$tmp"
+apt_install "$tmp"
+rm_exit_cleanup "$tmp"
 
 # set wezterm as default term
 # sudo update-alternatives --set x-terminal-emulator /usr/bin/open-wezterm-here
@@ -78,3 +74,5 @@ if [ -z "$wez" ]; then abort "Something went wrong setting wezterm as default te
 
 sudo update-alternatives --install "$x_term" x-terminal-emulator "$wez" 50
 sudo update-alternatives --set x-terminal-emulator "$wez"
+
+success
