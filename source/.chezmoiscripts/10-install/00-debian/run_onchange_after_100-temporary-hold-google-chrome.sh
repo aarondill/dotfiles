@@ -14,7 +14,6 @@ url=http://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/googl
 
 temp=$(mktemp)
 rm_exit "$temp"
-trap 'rm -f "$temp"' EXIT
 download_file "$url" "$temp"
 sudo "$APT" install -y -- "$temp"
 sudo apt-mark hold google-chrome-stable
