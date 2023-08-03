@@ -1,5 +1,6 @@
 # requires ./flow.sh -- abort
 # requires ./output.sh -- log
+# requires ./tempfile.sh -- _add_tempfiles, rm_exit_cleanup
 
 ## --------------------------------------------------------------------------------------------------
 ## -------------------------------------------- Download --------------------------------------------
@@ -54,28 +55,31 @@ function download_file() {
     dir=$(dirname "$dest")
   fi
   # might still exist if the user cancels with SIGINT - can't be avoided without overwriting global trap states
-  if ! temp=$(mktemp); then
+  if temp=$(mktemp); then :; else # highlighting :)
     abort "Could not create temporary directory" 1
   fi
-  {
-    download "$file_url" >|"$temp"
+  _add_tempfiles "$temp" || true # just incase the user defines the trap, slight safety without overwriting their trap
 
-    # Stop if no dest
-    if [ -z "$dest" ]; then
-      if [ -n "$mode" ]; then chmod "$mode" "$temp"; fi
-      printf '%s' "$temp"
-      return 0
-    fi
+  download "$file_url" >|"$temp" || rm_exit_cleanup "$temp" # this will clean up and remove from the trap. Whether it's set or not.
 
-    if ! mkdir -p "$dir"; then
-      sudo=${SUDO:-sudo}
-      log "Creating directory failed, trying again with sudo"
-      $sudo mkdir -p "$dir" || abort "could not create directory $dir"
-    fi
+  # Stop if no dest
+  if [ -z "$dest" ]; then
+    if [ -n "$mode" ]; then chmod "$mode" "$temp" || true; fi
+    printf '%s' "$temp"
+    return 0
+  fi
 
-    if ! [ -w "$dir" ]; then sudo=${SUDO:-sudo}; fi
-    $sudo install --no-target-directory -- "$temp" "$dest" # resets permissions
-    if [ -n "$mode" ]; then $sudo chmod "$mode" "$dest"; fi
-    rm -rf -- "$temp"
-  } || rm -rf -- "$temp"
+  if ! mkdir -p "$dir"; then
+    sudo=${SUDO:-sudo}
+    log "Creating directory failed, trying again with sudo"
+    $sudo mkdir -p "$dir" || {
+      rm_exit_cleanup "$temp"
+      abort "could not create directory $dir"
+    }
+  fi
+
+  if ! [ -w "$dir" ]; then sudo=${SUDO:-sudo}; fi
+  # resets permissions
+  $sudo install --no-target-directory -- "$temp" "$dest" || rm_exit_cleanup "$temp"
+  if [ -n "$mode" ]; then $sudo chmod "$mode" "$dest" || true; fi
 }
