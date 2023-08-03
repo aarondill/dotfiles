@@ -8,7 +8,7 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 INSTALL_URL=https://starship.rs/install.sh
 
 # Use the install script! We love this! :)
-install_script="$(curl -sSfL "$INSTALL_URL")"
+install_script="$(download "$INSTALL_URL")"
 # If ends in print_install, remove it. It's annoying. Be as safe as possible.
 if [ "print_install" = "$(tail -n1 <<<"$install_script")" ]; then
   install_script=$(head -n-1 <<<"$install_script")
