@@ -10,7 +10,7 @@ if ! has_apt; then
   abort "This script is only for Ubuntu/Debian" 0
 fi
 
-url=http://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_114.0.5735.198-1_amd64.deb
+url=http://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_112.0.5615.165-1_amd64.deb
 
 temp=$(download_file "$url")
 rm_exit "$temp"
