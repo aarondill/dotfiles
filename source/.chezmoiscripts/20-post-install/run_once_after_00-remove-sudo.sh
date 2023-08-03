@@ -10,3 +10,7 @@ EOF
 fi
 
 sudo sed '/sudo hint/,/To run a command/s/cat <<-EOF/true <<-EOF/' /etc/bash.bashrc -i
+
+if [ -f ~/.sudo_as_admin_successful ]; then
+  rm ~/.sudo_as_admin_successful
+fi
