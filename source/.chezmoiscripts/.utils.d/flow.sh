@@ -67,3 +67,6 @@ function has_cmd() {
   for cmd; do command -v "$cmd" &>/dev/null || failed=1; done
   return "$failed"
 }
+# usage: wait_key [prompt]
+# default prompt: 'Press enter to continue'
+wait_key() { read -r -p "${1:-Press enter to continue}"; }

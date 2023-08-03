@@ -69,4 +69,4 @@ EOF
 success
 log "Run these commands to use the changes:" "'update-initramfs -u -k all'" "'update-grub'" "Press enter to continue."
 # Make sure the user reads this!
-read -r || true
+wait_key
