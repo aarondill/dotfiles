@@ -6,7 +6,7 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 # shellcheck source=../../.utils.sh
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
-if [ -z "$APT" ]; then
+if ! has_apt; then
   abort "This script is only for Ubuntu/Debian" 0
 fi
 

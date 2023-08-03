@@ -38,7 +38,7 @@ function install_nala() {
 # Shouldn't be, but I got an issue about python-markup-it
 if [ "$OS" != "Ubuntu" ]; then abort "Nala is only supported on Ubuntu" 0; fi
 
-if [ -z "$APT" ]; then exit 0; fi
+if ! has_apt; then exit 0; fi
 if ! has_cmd nala; then
   log_and_run "Installing nala" install_nala
 fi

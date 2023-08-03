@@ -48,7 +48,7 @@ function install_delta() {
   apt_install "$tmp"
   rm_exit_cleanup "$tmp"
 }
-if [ -z "$APT" ]; then
+if ! has_apt; then
   abort 'This script only supports Ubuntu/Debian. Please install delta through your package manager.' 0
 fi
 log_and_run 'installing delta' install_delta

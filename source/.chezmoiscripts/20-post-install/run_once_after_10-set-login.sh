@@ -27,9 +27,9 @@ lunar) file="ubuntu-gdm-set-background-23.04" ;;
 esac
 
 # dependencies
-if ! dpkg -l libglib2.0-dev-bin &>/dev/null; then
+if ! apt_is_installed libglib2.0-dev-bin; then
   log 'Attemping to install dependencies'
-  if [ -z "$APT" ]; then abort "Can't install libglib2.0-dev-bin using apt. Please make sure it's installed"; fi
+  if ! has_apt; then abort "Can't install libglib2.0-dev-bin using apt. Please make sure it's installed"; fi
   apt_install libglib2.0-dev-bin
 fi
 

@@ -7,7 +7,7 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
 # Defined in utils.sh
-if [ -z "$APT" ]; then
+if ! has_apt; then
   # STOP! if dependencies aren't installed, other things will fail, but can't use apt.
   abort "Apt is not installed, skipping apt install script" 0
 fi
