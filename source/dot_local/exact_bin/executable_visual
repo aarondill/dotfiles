@@ -64,5 +64,5 @@ if command -v dbus-launch &>/dev/null; then # Handle user dbus if command is ava
 fi
 
 printf '%s ' exec "${cmd[@]}"
-export XDG_SESSION_TYPE=x11
+# export XDG_SESSION_TYPE=x11
 exec "${cmd[@]}"
