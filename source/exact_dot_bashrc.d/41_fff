@@ -2,8 +2,16 @@
 if ! command -v fff &>/dev/null; then return; fi
 fff() {
   command fff "$@"
-  cd "$(cat "${XDG_CACHE_HOME:=${HOME}/.cache}/fff/.fff_d")" || return
+  local fff_cache="${XDG_CACHE_HOME:-${HOME}/.cache}/fff"
+  local file="${FFF_CD_FILE:-"$cache/.fff_d"}"
+  if [ -f "$file" ]; then
+    cd "$(cat -- "$file")" || return
+    rm -f -- "$file" 2>/dev/null
+    rmdir -- "$fff_cache" 2>/dev/null
+  fi
 }
+# move the cd file
+export FFF_CD_FILE="${XDG_CACHE_HOME:-$HOME/.cache}/fff_cd"
 # Show/Hide hidden files on open.
 export FFF_HIDDEN=1
 # File Opener
