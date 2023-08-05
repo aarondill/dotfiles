@@ -10,7 +10,7 @@
   helper = !/usr/bin/gh auth git-credential
 [core]
   editor = vim
-  excludesFile = ~/vscode/js/.gitignore
+  excludesFile = ~/.config/git/ignore
 # DELTA SETUP
 [core]
     pager = delta
