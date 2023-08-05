@@ -32,7 +32,7 @@ unalias)
   ;;
 cleanup)
   err "Warning: this is a destructive operation."
-  sleep 2 # give chance to stop
+  sleep 1 # give chance to stop
   git reflog expire --expire=now
   git repack -d
   git gc --prune=now --aggressive
