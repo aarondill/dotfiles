@@ -85,14 +85,16 @@ for repo in "$@"; do
     exit=1 && continue
   fi
 
-  if [ "$YES" -ne 1 ]; then
-    read -rep "$THIS: remove git repository '$repo'? " confirmation
-    if ! [[ "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then exit 1; fi
-  fi
-
   if ! check_status "$repo"; then
     err "Refusing to remove dirty repo $repo"
     exit=1 && continue
+  fi
+
+  if [ "$YES" -ne 1 ]; then
+    read -rep "$THIS: remove git repository '$repo'? " confirmation
+    if ! [[ "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
+      exit=1 && continue
+    fi
   fi
 
   base_args=(--recursive)
