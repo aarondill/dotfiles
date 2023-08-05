@@ -22,5 +22,10 @@
     "vercel": "31.2.2",
     "vite": "^4.4.8",
     "wipe-modules": "^1.2.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "core-js": "latest"
+    }
   }
 }
