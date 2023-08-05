@@ -64,20 +64,35 @@ done
 
 if [ "$#" -eq 0 ]; then abort "missing operand" 2; fi
 
-for REPO in "$@"; do
-  if [ -z "$REPO" ]; then
-    err "Refusing to remove empty string. (REPO is required)"
-    exit 2
+# usage: check_status repo
+# returns success if the repo is clean
+function check_status() (
+  if [ -n "$(git -C "$1" status --porcelain)" ]; then
+    return 1
+  fi
+  return 0
+)
+
+exit=0
+for repo in "$@"; do
+  if [ -z "$repo" ]; then
+    err "Refusing to remove empty string. (repo is required)"
+    exit=2 && continue
   fi
 
-  if ! [ -d "$REPO" ] || ! [ -d "$REPO"/.git ]; then
-    err "$REPO is not a git repository"
-    exit 2
+  if ! [ -d "$repo" ] || ! [ -d "$repo"/.git ]; then
+    err "$repo is not a git repository"
+    exit=1 && continue
   fi
 
   if [ "$YES" -ne 1 ]; then
-    read -rep "$THIS: remove git repository '$REPO'? " confirmation
+    read -rep "$THIS: remove git repository '$repo'? " confirmation
     if ! [[ "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then exit 1; fi
+  fi
+
+  if ! check_status "$repo"; then
+    err "Refusing to remove dirty repo $repo"
+    exit=1 && continue
   fi
 
   base_args=(--recursive)
@@ -85,11 +100,13 @@ for REPO in "$@"; do
   if [ "$VERBOSE" -eq 1 ]; then base_args+=(--verbose); fi
 
   # Force rm .git
-  args=(--force "${base_args[@]}" -- "$REPO/.git")
+  args=(--force "${base_args[@]}" -- "$repo/.git")
   if [ "$VERBOSE" -eq 1 ]; then log "rm ${args[*]}"; fi
   rm "${args[@]}"
 
-  args=("${base_args[@]}" -- "$REPO/")
+  args=("${base_args[@]}" -- "$repo/")
   if [ "$VERBOSE" -eq 1 ]; then log "rm ${args[*]}"; fi
   rm "${args[@]}"
 done
+
+exit "$exit"
