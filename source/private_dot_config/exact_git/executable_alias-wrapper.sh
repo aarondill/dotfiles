@@ -30,6 +30,13 @@ unalias)
   if [ -z "${1:-}" ]; then abort "usage: unalias <alias>" 2; fi
   git config --global --unset "alias.$1"
   ;;
+cleanup)
+  err "Warning: this is a destructive operation."
+  sleep 2 # give chance to stop
+  git reflog expire --expire-now
+  git repack -d
+  git gc --prune=now --aggressive
+  ;;
 '') abort "usage: alias-wrapper.sh <command> [args]..." 2 ;;
 *) THIS=alias-wrapper.sh abort "Unknown command '$command'" 2 ;;
 esac

@@ -120,3 +120,4 @@
   treeless = clone --filter=tree:0
   rh = reset --hard
   hdiff = alias-wrapper hdiff
+	cleanup = alias-wrapper cleanup
