@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -euC -o pipefail
 # usage: visual awesome :2 || visual :3 || visual || visual awesome args -- :3
-
 THIS=visual
 usage() {
   cat <<EOF || return 0
@@ -46,23 +45,43 @@ if [ -z "$wm" ]; then
   fi
 fi
 
-if ! wmpath=$(which "$wm" 2>/dev/null); then
+if wmpath=$(which "$wm" 2>/dev/null); then :; else
   printf '%s\n' "Unable to find $wm in \$PATH" >&2
   exit 2
 fi
 
-cmd=(startx "$wmpath")
+# HACK: startx on ubuntu still unsets DBUS_SESSION_BUS_ADDRESS (even though it's fixed in upstream)
+# IF this is the case, call it again with *this* script as the wm.
+if [ -n "${__IN_VISUAL_SPAWN:-}" ]; then
+  cmd=("$wmpath")
+elif grep -q 'unset DBUS_SESSION_BUS_ADDRESS' "$(which startx)"; then
+  export __IN_VISUAL_SPAWN=1
+  cmd=(startx "$0" "$wmpath")
+else
+  cmd=(startx "$wmpath")
+fi
+
 # if server is defined
 if [[ "$server" =~ $disp_regex ]]; then
   cmd=("${cmd[@]}" --)
 fi
-# $"" # <-- fix highlighting
 cmd=("${cmd[@]}" "$server" "${rest[@]}")
 
-if command -v dbus-launch &>/dev/null; then # Handle user dbus if command is available
-  cmd=(dbus-launch --exit-with-session -- "${cmd[@]}")
+# from /etc/X11/Xsession.d/20dbus_xdg-runtime
+if [ -z "${DBUS_SESSION_BUS_ADDRESS:-}" ] && [ -n "${XDG_RUNTIME_DIR:-}" ] &&
+  [ "$XDG_RUNTIME_DIR" = "/run/user/$(id -u)" ] && [ -S "$XDG_RUNTIME_DIR/bus" ]; then
+  # We are under systemd-logind or something remarkably similar, and
+  # a user-session socket has already been set up.
+  #
+  # Be nice to non-libdbus, non-sd-bus implementations by using
+  # that as the session bus address in the environment. The check for
+  # XDG_RUNTIME_DIR = "/run/user/`id -u`" is because we know that
+  # form of the address, from systemd-logind, doesn't need escaping,
+  # whereas arbitrary addresses might.
+  DBUS_SESSION_BUS_ADDRESS="unix:path=$XDG_RUNTIME_DIR/bus"
+  export DBUS_SESSION_BUS_ADDRESS
 fi
 
-printf '%s ' exec "${cmd[@]}"
+printf '%s ' exec "${cmd[@]}" && echo
 # export XDG_SESSION_TYPE=x11
 exec "${cmd[@]}"
