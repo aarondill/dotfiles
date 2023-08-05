@@ -13,7 +13,14 @@
 .config/wgetrc
 .local/bin
 .local/etc
-.local/share/applications
+.local/share/applications/bitwarden.desktop
+.local/share/applications/dunnet.desktop
+.local/share/applications/fslite.desktop
+.local/share/applications/gnome-boxes.desktop
+.local/share/applications/google-chrome.desktop
+.local/share/applications/mimeapps.list
+.local/share/applications/org.gnome.gedit.desktop
+.local/share/applications/snap-store_ubuntu-software.desktop
 .local/share/bash-completion
 .local/share/icons/bitwarden.png
 .local/share/icons/fslite.ico
