@@ -23,6 +23,7 @@
     "vite": "^4.4.8",
     "wipe-modules": "^1.2.0"
   },
+  "//": "force core-js to be on latest. It shouldn't cause any issues.",
   "pnpm": {
     "overrides": {
       "core-js": "latest"
