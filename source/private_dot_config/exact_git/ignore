@@ -199,8 +199,6 @@ dist
 # Serverless Webpack directories
 .webpack/
 
-# Optional stylelint cache
-
 # SvelteKit build / generate output
 .svelte-kit
 
@@ -239,7 +237,98 @@ dist
 # comment the following lines
 !.yarn/cache
 
-# and uncomment the following lines
-# .pnp.*
-
 # End of https://www.toptal.com/developers/gitignore/api/backup,firebase,git,vercel,visualstudiocode,dotenv,nextjs,yarn,node
+
+# Windows
+Thumbs.db
+# vi 
+*~
+# general
+log/
+# archives
+# It's better to unpack these files and commit the raw source because
+# git has its own built in compression methods.
+*.7z
+*.jar
+*.rar
+*.zip
+*.gz
+*.gzip
+*.bzip
+*.bzip2
+*.bz2
+*.xz
+*.lzma
+*.cab
+*.xar
+
+# Packing-only formats
+*.iso
+*.tar
+
+# Package management formats
+*.dmg
+*.xpi
+*.gem
+*.egg
+*.deb
+*.rpm
+*.msi
+*.msm
+*.msp
+*.txz
+
+# backups
+# diff files
+*.patch
+*.diff
+# patch files
+*.rej
+# gpg secret key
+secring.*
+# temporary files which can be created if a process still has a handle open of a deleted file
+.fuse_hidden*
+# KDE directory preferences
+.directory
+# Linux trash folder which might appear on any partition or disk
+.Trash-*
+# .nfs files are created when an open file is removed but is still being accessed
+.nfs*
+# LibreOffice locks
+.~lock.*#
+# PuTTY Private key
+*.ppk
+# Ignore tags created by etags, ctags, gtags (GNU global) and cscope
+TAGS
+.TAGS
+!TAGS/
+tags
+.tags
+!tags/
+gtags.files
+GTAGS
+GRTAGS
+GPATH
+GSYMS
+cscope.files
+cscope.out
+cscope.in.out
+cscope.po.out
+
+# vim
+# Swap
+[._]*.s[a-v][a-z]
+!*.svg  # comment out if you don't need vector files
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+
+# Session
+Session.vim
+Sessionx.vim
+
+# Temporary
+.netrwhist
+# Persistent undo
+[._]*.un~
