@@ -111,6 +111,7 @@
         # Print short sha1; usage: `git sha1 [REF]`
   sha1 = !__sha1() { git rev-parse --short \"${1:-HEAD}\"; }; __sha1'
         # Commit a fixup
+  added-in = log --follow --diff-filter=A --find-renames=40% --
   fixup = commit --fixup
   merge-remote = "!git fetch --all && git merge"
   shallowify = "!__shallowify() { d=\"${1:-1}\"; shift 1; git pull --depth \"$d\" \"$@\" && git gc --prune=all; }; __shallowify"
