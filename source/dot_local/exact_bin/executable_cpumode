@@ -113,6 +113,8 @@ EOF
     abort "Available modes are: $avail_options" 2
     ;;
   esac
+
+  if [ "$current" = "$mode" ]; then abort "Mode '$mode' already selected" 0; fi
   printf '%s' "$mode" | "${sudo[@]}" tee "${PATHS[@]}" >/dev/null
   ;;
 *) abort 'Too many arguments.' 2 ;;
