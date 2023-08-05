@@ -15,6 +15,7 @@ outputs the contents of a file using \$PAGER, calls which if file is not found
 options:
 -P, --no-pager      Don't attempt to open the files using a pager (\$PAGER)
 -p, --pager=PAGER   Use <PAGER> instead of \$PAGER
+-e, --edit          Open the file in \$EDITOR instead of outputting the contents
 EOF
   return 0
 }
@@ -43,8 +44,8 @@ function parse_args() {
   exit 2
 }
 
-pager=true
-LONGOPTS=help,no-pager,pager: SHORTOPTS=h,P,p:
+pager=true edit=0
+LONGOPTS=help,no-pager,pager:,edit SHORTOPTS=h,P,p:,e
 ARGSTRING="$(parse_args "$@")"
 eval "$ARGSTRING"
 while true; do
@@ -52,6 +53,7 @@ while true; do
   --help | -h) usage && exit 0 ;;
   --no-pager | -P) pager=false && shift ;;
   -p | --pager) pager=$2 && shift 2 ;;
+  -e | --edit) edit=1 && shift ;;
   --) shift && break ;;
   *) abort "This is a bug" 3 ;;
   esac
@@ -84,13 +86,31 @@ for file in "$@"; do
   continue
 done
 
-# Use pager if can, else use cat
-if [ "$pager" = true ] && [ -t 1 ]; then
-  PAGER=${PAGER:-$(which pager 2>/dev/null || which cat 2>/dev/null || printf '/bin/cat')}
-elif [ "$pager" = false ]; then
-  PAGER=$(which cat 2>/dev/null || printf '/bin/cat')
-elif [ "$pager" != true ]; then
-  PAGER="$pager"
-fi
-# output them all -- PAGER is expanded to allow flags
-exec ${PAGER:-cat} -- "${files[@]}"
+find_prog() {
+  for p in "$@"; do
+    if { [ -f "$p" ] && [ -x "$p" ]; } || [ -x "$(which -- "$1" 2>/dev/null)" ]; then
+      printf '%s' "$p"
+      return 0
+    fi
+  done
+  return 1
+}
+
+open=
+case "$edit" in
+0)
+  # Use pager if can, else use cat
+  if [ "$pager" = true ] && [ -t 1 ]; then
+    PAGER=${PAGER:-$(find_prog pager cat /bin/cat)}
+  elif [ "$pager" = false ]; then
+    PAGER=$(find_prog cat /bin/cat)
+  elif [ "$pager" != true ]; then
+    PAGER="$pager"
+  fi
+  open="${PAGER:-cat}"
+  ;;
+1) open=${EDITOR:-$(find_prog editor sensible-editor vim emacs /bin/cat)} ;;
+esac
+
+# output them all -- open is expanded to allow flags
+exec $open -- "${files[@]}"
