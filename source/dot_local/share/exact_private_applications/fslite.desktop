@@ -2,9 +2,9 @@
 
 [Desktop Entry]
 Name=Fslite
-Comment=Open fslite in chrome
-TryExec=google-chrome-stable
-Exec=google-chrome-stable --new-window fslite.vercel.app
+Comment=Open fslite in browser
+TryExec=xdg-open
+Exec=xdg-open https://fslite.vercel.app
 Icon=/home/aaron/.local/share/icons/fslite.ico
 Terminal=false
 Type=Application

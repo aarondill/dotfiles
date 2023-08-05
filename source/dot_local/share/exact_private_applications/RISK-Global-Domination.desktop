@@ -1,9 +1,0 @@
-[Desktop Entry]
-Name=RISK: Global Domination
-Comment=Play this game on Steam
-TryExec=steam
-Exec=steam steam://rungameid/1128810
-Icon=steam_icon_1128810
-Terminal=false
-Type=Application
-Categories=Game;
