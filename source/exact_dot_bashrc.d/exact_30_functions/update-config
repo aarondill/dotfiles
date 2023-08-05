@@ -26,7 +26,7 @@ function update-config() (
   files=()
   dirs=()
   for file in "${lines[@]}"; do
-    if [ -f "$file" ]; then
+    if [ -f "$file" ] || [ -L "$file" ]; then # -L tests for dangling symlink / directory link which should be added as a file
       files+=("$file")
     elif [ -d "$file" ]; then
       dirs+=("$file")
