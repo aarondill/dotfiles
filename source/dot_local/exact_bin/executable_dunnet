@@ -70,7 +70,7 @@ if [ -z "$emacs" ]; then
   if ! command -v which &>/dev/null; then
     abort "which is required to search PATH for emacs. Please install which or provide the path via --emacs" 2
   fi
-  emacs="$(which emacs 2>/dev/null)"
+  emacs="$(which emacs 2>/dev/null)" || true
 fi
 
 # I don't know how to control emacs. just open dunnet pls
