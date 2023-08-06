@@ -35,7 +35,7 @@ VIRTUAL_MACHINE_PACKAGES=(
   virt-install
 )
 GRAPHICAL_PACKAGES=(
-  dconf-editor flatpak gparted gucharmap
+  dconf-editor gparted gucharmap
   # These are setup on ubuntu through a ppa
   code spotify-launcher
   wmctrl xdotool xclip xdg-utils
@@ -67,6 +67,9 @@ function install_graphical_packages() {
   fi
   if has_cmd virt-manager || confirm "Would you like to install qemu-desktop and other virtual machine packages?"; then
     graphical_packages=("${graphical_packages[@]}" "${VIRTUAL_MACHINE_PACKAGES[@]}")
+  fi
+  if has_cmd flatpak || confirm "Would you like to install flatpak?"; then
+    graphical_packages=("${graphical_packages[@]}" flatpak)
   fi
   install_if_available "${graphical_packages[@]}"
 }
