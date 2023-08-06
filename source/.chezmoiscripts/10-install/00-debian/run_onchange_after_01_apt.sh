@@ -44,7 +44,7 @@ VIRTUAL_MACHINE_PACKAGES=(
 )
 
 GRAPHICAL_PACKAGES=(
-  dconf-editor flatpak gparted gucharmap luckybackup zeal
+  dconf-editor gparted gucharmap luckybackup zeal
   wmctrl xdotool xclip xdg-utils
 )
 
@@ -77,6 +77,9 @@ function install_graphical_packages() {
   fi
   if has_cmd virt-manager || confirm "Would you like to install qemu-desktop and other virtual machine packages?"; then
     graphical_packages=("${graphical_packages[@]}" "${VIRTUAL_MACHINE_PACKAGES[@]}")
+  fi
+  if has_cmd flatpak || confirm "Would you like to install flatpak?"; then
+    graphical_packages=("${graphical_packages[@]}" flatpak)
   fi
   install_if_available "${graphical_packages[@]}"
 }
