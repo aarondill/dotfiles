@@ -137,6 +137,15 @@ LOGFILE=
 # ----------------------------------------------------------------
 # ----------------------------------------------------------------
 
+usage() {
+  cat <<-EOF
+backup [--full|--incr]
+
+Run a system backup using duplicity.
+Pass --full to specify full backup or --incr to specify incremental backup
+If neither argument is passed, a full will be made if the most recent full backup is FULL_IF_OLDER old
+EOF
+}
 log() { printf '%s\n' "$@"; }
 err() { printf '%s\n' "$@" >&2; }
 abort() {
@@ -150,6 +159,7 @@ args=()
 for arg in "$@"; do
   case "$arg" in
   --full | --incr) args=("${args[@]}" "${arg#--}") ;;
+  --help | -h) usage && exit 0 ;;
   --*) abort "Unknown option: '$arg'" ;;
   -*) abort "Unknown option: '$arg'" ;;
   *) abort "this script does not support positional arguments" ;;
