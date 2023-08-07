@@ -19,6 +19,21 @@ path_contains() {
 append_path() { p="${1:-}" && ! path_contains "$p" && PATH="${PATH:+$PATH:}$p"; }
 prepend_path() { p="${1:-}" && ! path_contains "$p" && PATH="$p${PATH:+:$PATH}"; }
 
+if [ -z "${USER:-}" ]; then USER="$(id -nu)"; fi
+if [ -n "${USER:-}" ]; then export USER; fi
+
+if [ -z "${HOME:-}" ]; then
+  home=~ # bash will expand this
+  case "$home" in
+  /*) HOME=$home ;; # test for expanded dir
+  esac
+  unset home # don't leak to shell
+fi
+if [ -z "${HOME:-}" ] && command -v getent >/dev/null 2>&1; then
+  HOME="$(getent passwd "$USER" | cut -d: -f6)" # use getent
+fi
+if [ -n "${HOME:-}" ]; then export HOME; fi
+
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_STATE_HOME="$HOME/.local/state"
