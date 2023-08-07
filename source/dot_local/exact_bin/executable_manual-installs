@@ -3,10 +3,10 @@ set -euC -o pipefail
 
 THIS=manual-installs
 
-release=$(lsb_release -ds | awk '{printf tolower($1) "-" $2}')
-codename=$(lsb_release -cs)
-desktop=$(dpkg -l ubuntu-desktop &>/dev/null && echo "desktop" || echo "live-server")
-manifestURL="http://releases.ubuntu.com/$codename/$release-$desktop-amd64.manifest"
+release=$(. /etc/os-release && printf '%s' "$VERSION" | awk '{print $1}')
+codename=$(. /etc/os-release && printf '%s' "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+desktop=$(dpkg -l ubuntu-desktop &>/dev/null && printf "desktop" || printf "live-server")
+manifestURL="http://releases.ubuntu.com/$codename/ubuntu-$release-$desktop-amd64.manifest"
 
 usage() {
   cat <<EOF
