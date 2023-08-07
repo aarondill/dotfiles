@@ -1,5 +1,18 @@
 #!/usr/bin/env bash
 set -euC
+
+err() { printf '%s\n' "$@" >&2; }
+abort() {
+  err "$1"
+  exit "${2:-1}"
+}
+
+if [ "$#" -gt 0 ]; then
+  abort "This script does not accept any arguments" 2
+elif [ -z "${DISPLAY:-}" ]; then
+  abort "Please run this script in a Xorg session" 2
+fi
+
 optional() { "$@" || true; }
 revert() {
   optional xset dpms force on
