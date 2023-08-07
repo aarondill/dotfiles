@@ -7,3 +7,8 @@ refreshPeriod = "12h"
 type = "git-repo"
 url = "https://github.com/aarondill/LazyVim.git"
 refreshPeriod = "12h"
+
+[".config/wezterm"]
+type = "git-repo"
+url = "https://github.com/aarondill/wezterm.git"
+refreshPeriod = "12h"
