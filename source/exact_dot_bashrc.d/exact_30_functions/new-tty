@@ -13,11 +13,10 @@ function new-tty() {
   local terminal="wezterm"
   local args=(start --cwd .)
 
-  if command -v "$terminal" &>/dev/null; then
-    "$terminal" "${args[@]}" &
-    disown
-    exit
-  else
-    printf "%s\n" "could not find $terminal"
+  if ! command -v "$terminal" &>/dev/null; then
+    printf "%s\n" "could not find $terminal" >&2
   fi
+  "$terminal" "${args[@]}" &
+  disown
+  exit
 }
