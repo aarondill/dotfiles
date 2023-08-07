@@ -93,7 +93,7 @@ emacs_args+=("$@")
 
 if [ -n "$save_file" ] && [ -f "$save_file" ]; then
   # save file exists, auto restore
-  cat <(echo "restore $(basename "$save_file")") - | exec emacs "${emacs_args[@]}"
+  cat <(printf '%s\n' "restore $(basename "$save_file")") - | exec emacs "${emacs_args[@]}"
 else
   # No save file exists, just run it
   exec emacs "${emacs_args[@]}"

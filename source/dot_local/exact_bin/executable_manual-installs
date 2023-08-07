@@ -7,6 +7,7 @@ release=$(. /etc/os-release && printf '%s' "$VERSION" | awk '{print $1}')
 codename=$(. /etc/os-release && printf '%s' "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
 desktop=$(dpkg -l ubuntu-desktop &>/dev/null && printf "desktop" || printf "live-server")
 manifestURL="http://releases.ubuntu.com/$codename/ubuntu-$release-$desktop-amd64.manifest"
+backupURL="http://releases.ubuntu.com/jammy/ubuntu-22.04.2-desktop-amd64.manifest"
 
 usage() {
   cat <<EOF
@@ -67,11 +68,11 @@ if [ -z "$manifestURL" ]; then abort "No manifest URL was provided" 2; fi
 
 showmanual=$(apt-mark showmanual | sort)
 
-declare -i curl_exit=0
-manifest_content=$(curl -SsLf "$manifestURL" | cut -f1 | sort) || curl_exit="${PIPESTATUS[0]}"
+for url in "$manifestURL" "$backupURL"; do
+  manifest_content=$(curl -SsLf -- "$url" | cut -f1 | sort) || true
+  if [ -n "$manifest_content" ]; then break; fi
+  err "downloading the manifest from '$manifestURL' failed"
+done
+if [ -z "$manifest_content" ]; then abort "downloading the manifest failed. Aborting." 1; fi
 
-if [ "$curl_exit" -eq 0 ]; then
-  comm -23 <(printf "%s" "$showmanual") <(printf "%s" "$manifest_content")
-else
-  abort "downloading the manifest from '$manifestURL' failed" 1
-fi
+comm -23 <(printf "%s" "$showmanual") <(printf "%s" "$manifest_content")

@@ -82,6 +82,6 @@ if [ -z "${DBUS_SESSION_BUS_ADDRESS:-}" ] && [ -n "${XDG_RUNTIME_DIR:-}" ] &&
   export DBUS_SESSION_BUS_ADDRESS
 fi
 
-printf '%s ' exec "${cmd[@]}" && echo
+printf '%s ' exec "${cmd[@]}" && printf '\n'
 # export XDG_SESSION_TYPE=x11
 exec "${cmd[@]}"

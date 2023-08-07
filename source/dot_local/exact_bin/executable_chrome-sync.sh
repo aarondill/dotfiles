@@ -65,7 +65,7 @@ sync_shm() {
 }
 
 if [ "$#" -gt 0 ]; then
-  echo "This script accepts no arguments." >&2
+  printf '%s\n' "This script accepts no arguments." >&2
   exit 2
 fi
 

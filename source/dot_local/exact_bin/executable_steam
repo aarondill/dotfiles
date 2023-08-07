@@ -19,7 +19,7 @@ get_nth_line() {
 }
 
 if ! command -v which &>/dev/null; then
-  echo "ERROR: which is required for this script." >&2
+  printf '%s\n' "ERROR: which is required for this script." >&2
   exit 1
 fi
 
