@@ -1,2 +1,0 @@
-chezmoi apply
-PATH="$PATH:$HOME/bin:$HOME/.local/bin" sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply aarondill
