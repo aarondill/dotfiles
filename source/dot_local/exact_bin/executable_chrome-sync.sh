@@ -64,6 +64,11 @@ sync_shm() {
   fi
 }
 
+if [ "$#" -gt 0 ]; then
+  echo "This script accepts no arguments." >&2
+  exit 2
+fi
+
 # PROFILE
 conf_dir=${CHROME_CONFIG_HOME:-${XDG_CONFIG_HOME:-$HOME/.config}}
 sync_shm "$conf_dir/google-chrome"
