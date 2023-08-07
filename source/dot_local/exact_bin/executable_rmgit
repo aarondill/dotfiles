@@ -10,16 +10,16 @@ declare -i VERBOSE=0 YES=0 FORCE=0
 
 function usage() {
   cat <<-EOF
-	Usage: $THIS [OPTS] REPO...
+Usage: $THIS [OPTS] REPO...
 
-	Options:
-		-v, --verbose  verbose output
-		-h, --help     show this help message
-		-y, --yes      don't confirm deletion of REPO
-		-f, --force    force deletion of REPO. REPO/.git is always force deleted.
-  The following options are ignored for rm compatibility:
-    -r, --recursive
-    -i, --interactive
+Options:
+  -v, --verbose  verbose output
+  -h, --help     show this help message
+  -y, --yes      don't confirm deletion of REPO
+  -f, --force    force deletion of REPO. REPO/.git is always force deleted.
+The following options are ignored for rm compatibility:
+  -r, --recursive
+  -i, --interactive
 EOF
   return 0
 }
