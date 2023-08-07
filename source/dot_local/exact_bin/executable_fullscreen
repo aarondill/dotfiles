@@ -19,7 +19,7 @@ windowsize command. Use {id} to mean the specified window id.
 
 Options:
 -h, --help              Show this help message
--d, --display=display   Set the display to use (default $DISPLAY)
+-d, --display=display   Set the display to use (default \$DISPLAY)
 EOF
   return 0
 }
