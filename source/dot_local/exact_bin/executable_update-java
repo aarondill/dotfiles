@@ -23,7 +23,6 @@ Options:
 -y, --yes     don't prompt for confirmation
 -q, --quiet   don't output debug info
 EOF
-  EOF
   return 0
 }
 
