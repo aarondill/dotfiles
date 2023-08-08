@@ -6,7 +6,6 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 # shellcheck source=../.utils.sh
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
-# Cloned into tempdir
 REPO_URL='https://github.com/eza-community/eza'
 
 install_eza() {
