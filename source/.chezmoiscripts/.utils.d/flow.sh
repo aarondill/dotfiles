@@ -79,4 +79,11 @@ function has_cmd() {
 }
 # usage: wait_key [prompt]
 # default prompt: 'Press enter to continue'
-wait_key() { read -r -p "${1:-Press enter to continue}"; }
+function wait_key() { read -r -p "${1:-Press enter to continue}"; }
+
+# usage: run_own_shell <command>
+# unset SHELLOPTS and call the command
+function run_own_shell() {
+  export -n SHELLOPTS
+  "$@"
+}
