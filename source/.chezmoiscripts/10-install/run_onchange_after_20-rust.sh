@@ -11,7 +11,9 @@ install_cargo() {
   tmp="$(mktemp)"
   rm_exit "$tmp"
   curl --proto '=https' --tlsv1.2 -sSfL https://sh.rustup.rs -o "$tmp"
-  run_own_shell sh "$tmp" --profile minimal --no-modify-path
+  local args=("$tmp" --profile minimal --no-modify-path)
+  if ! chmod +x "$tmp"; then args=(sh "${args[@]}"); fi # Force it in sh if can't execute it
+  run_own_shell "${args[@]}"
   rm_exit_cleanup "$tmp"
 }
 
