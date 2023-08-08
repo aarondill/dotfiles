@@ -16,8 +16,9 @@ set -euC -o pipefail
 if [ "$_SOURCED" -eq 0 ]; then printf '%s\n' "You should source this file. not run it." >&2; fi
 
 # Use already calculated source_dir if present (from parent script)
-SCRIPT_DIR="${SOURCE_DIR:-CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}/.chezmoiscripts"
+SCRIPT_DIR="${SOURCE_DIR:-${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}}/.chezmoiscripts"
 
+export SHELLOPTS
 # shellcheck source=./.utils.d/output.sh
 . "$SCRIPT_DIR"/.utils.d/output.sh # output functions
 # shellcheck source=./.utils.d/flow.sh
