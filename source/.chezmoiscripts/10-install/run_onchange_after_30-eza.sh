@@ -13,5 +13,5 @@ install_eza() {
 }
 
 if has_cmd cargo; then # only with cargo installed
-  log_and_run "Installing cargo using rustup" install_cargo
+  log_and_run "Installing cargo using rustup" install_eza
 fi
