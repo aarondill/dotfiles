@@ -15,4 +15,8 @@ install_cargo() {
   rm_exit_cleanup "$tmp"
 }
 
-log_and_run "Installing cargo using rustup" install_cargo
+if has_cmd rustup; then
+  log_and_run "Updating rustup/cargo" rustup update
+else
+  log_and_run "Installing cargo using rustup" install_cargo
+fi
