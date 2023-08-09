@@ -89,14 +89,14 @@ function run_own_shell() {
 }
 
 # shellcheck disable=SC2206
-[ "$(id -u)" -eq 0 ] && SUDO=(${SUDO:-sudo}) || SUDO=()
+[ "$(id -u)" -ne 0 ] && SUDO=(${SUDO:-sudo}) || SUDO=()
 # Use instead of sudo. This will handle the case where the user is root.
 # the variable no_sudo will stop this command from executing sudo if no_sudo is not empty
 # note, the sudo command can be user specified, so don't pass any flag
 function sudo_cmd() {
-  if [ -n "$no_sudo" ]; then
-    "$@"
-  else
-    "${SUDO[@]}" "$@"
+  local cmd=("$@")
+  if [ -z "${no_sudo:-}" ]; then
+    cmd=("${SUDO[@]}" "${cmd[@]}")
   fi
+  "${cmd[@]}"
 }
