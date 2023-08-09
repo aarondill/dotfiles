@@ -81,4 +81,4 @@ log_and_run 'Installing graphical packages' install_graphical_packages
 # Gnome comes with it, but I don't want it.
 if pacman_is_installed gnome-characters; then pacman_remove gnome-characters; fi
 # Install vim symlink to nvim - throws is /usr/bin/vim is defined.
-if ! [ -f /usr/bin/vim ] && which nvim &>/dev/null; then sudo ln -s -T "$(which nvim)" /usr/bin/vim; fi
+if ! [ -f /usr/bin/vim ] && which nvim &>/dev/null; then sudo_cmd ln -s -T "$(which nvim)" /usr/bin/vim; fi

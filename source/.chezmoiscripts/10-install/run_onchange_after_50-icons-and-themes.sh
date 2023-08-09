@@ -13,7 +13,7 @@ function install_humanity_icons() {
   rm_exit "$TMP_DIR"
 
   git clone --single-branch --branch=ubuntu/devel 'https://git.launchpad.net/ubuntu/+source/humanity-icon-theme' "$TMP_DIR"
-  sudo mv -vi "$TMP_DIR/Humanity" "$TMP_DIR/Humanity-Dark" "/usr/share/icons"
+  sudo_cmd mv -vi "$TMP_DIR/Humanity" "$TMP_DIR/Humanity-Dark" "/usr/share/icons"
 
   rm_exit_cleanup "$TMP_DIR"
 }
@@ -51,7 +51,7 @@ function install_yaru() {
   popd >/dev/null
   pushd "$TMP_DIR/build" >/dev/null
   ninja
-  sudo ninja install
+  sudo_cmd ninja install
 
   rm_exit_cleanup "$TMP_DIR"
   popd >/dev/null

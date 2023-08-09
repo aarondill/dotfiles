@@ -43,4 +43,4 @@ if ! has_cmd nala; then
   log_and_run "Installing nala" install_nala
 fi
 
-# log_and_run 'Setting up nala sources' sudo nala fetch --auto -y
+# log_and_run 'Setting up nala sources' sudo_cmd nala fetch --auto -y

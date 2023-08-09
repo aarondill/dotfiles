@@ -17,6 +17,6 @@ log 'disconnecting firefox:hunspell'
 CONNECTON=$(snap connections firefox | awk '/firefox:host-hunspell/{print $3}')
 # If still connected, disconnect
 if [ -n "$CONNECTON" ] && [ "$CONNECTON" != '-' ]; then
-  sudo snap disconnect firefox:host-hunspell
+  sudo_cmd snap disconnect firefox:host-hunspell
 fi
 success

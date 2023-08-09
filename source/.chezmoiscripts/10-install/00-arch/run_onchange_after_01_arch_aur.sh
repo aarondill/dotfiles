@@ -44,7 +44,7 @@ else err "yay is already installed, skipping installation"; fi
 ## Zeal -- I don't like the qt5-webkit package. It's too big.
 # if ! has_cmd zeal; then
 #   # Dependancy that's no longer supplied by pacman
-#   sudo pacman -U https://archive.archlinux.org/packages/q/qt5-webkit/qt5-webkit-5.212.0alpha4-18-x86_64.pkg.tar.zst
+#   sudo_cmd pacman -U https://archive.archlinux.org/packages/q/qt5-webkit/qt5-webkit-5.212.0alpha4-18-x86_64.pkg.tar.zst
 #   aur_install "zeal"
 # else err "Zeal is already installed, skipping installation"; fi
 
@@ -66,5 +66,5 @@ else err "informant is already installed, skipping installation"; fi
 # consolation for a cursor in the tty!
 if ! has_cmd consolation; then
   aur_install "consolation"
-  sudo systemctl enable consolation.service # This is not enabled by default
+  sudo_cmd systemctl enable consolation.service # This is not enabled by default
 else err "consolation is already installed, skipping installation"; fi

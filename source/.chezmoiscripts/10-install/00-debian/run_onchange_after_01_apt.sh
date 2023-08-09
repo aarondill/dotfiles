@@ -85,7 +85,7 @@ function install_graphical_packages() {
 }
 
 if [ "$OS" = "Ubuntu" ] && ! [ -f /etc/apt/sources.list.d/neovim-ppa-ubuntu-unstable-jammy.list ]; then
-  log_and_run 'installing neovim nightly ppa' sudo add-apt-repository -y ppa:neovim-ppa/unstable
+  log_and_run 'installing neovim nightly ppa' sudo_cmd add-apt-repository -y ppa:neovim-ppa/unstable
 fi
 log_and_run 'Updating sources' apt_update
 log_and_run 'Installing packages' install_packages
@@ -94,5 +94,5 @@ log_and_run 'Installing graphical packages' install_graphical_packages
 if apt_is_installed gnome-characters; then apt_remove gnome-characters; fi
 # Install vim symlink to nvim
 if has_cmd update-alternatives && has_cmd nvim && ! [ "$(readlink -e /usr/bin/vim)" = "$(which nvim)" ]; then
-  sudo update-alternatives --install /usr/bin/vim vim "$(which nvim)" 100 || true
+  sudo_cmd update-alternatives --install /usr/bin/vim vim "$(which nvim)" 100 || true
 fi

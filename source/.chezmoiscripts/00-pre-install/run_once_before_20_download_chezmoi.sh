@@ -10,14 +10,13 @@ URL=https://get.chezmoi.io
 bin_dir="/usr/local/bin" # Fixed location
 
 log "Installing chezmoi to '${bin_dir}/chezmoi'"
-sudo=()
+no_sudo=y
 if ! [ -w "${bin_dir}/chezmoi" ]; then
-  # shellcheck disable=SC2206 # Intentional splitting
-  sudo=(${SUDO:-sudo}) # not writeable
+  no_sudo=
 fi
 
 file=$(download_file "$URL")
 rm_exit "$file"
-"${sudo[@]}" sh "$file" -b "$bin_dir"
+sudo_cmd sh "$file" -b "$bin_dir"
 rm_exit_cleanup "$file"
 success

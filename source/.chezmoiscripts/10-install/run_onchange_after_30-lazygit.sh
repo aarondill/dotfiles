@@ -24,8 +24,8 @@ function install_lazygit() (
   rm "$tmp"
   install_from_github "$REPO" "$version" "$file" "$tmp"
   # output to destination
-  sudo tar -xz -C "$BINDIR" -f "$tmp" lazygit
-  sudo chmod +x "$BINDIR/lazygit"
+  sudo_cmd tar -xz -C "$BINDIR" -f "$tmp" lazygit
+  sudo_cmd chmod +x "$BINDIR/lazygit"
 
   rm_exit_cleanup "$tmp"
 )

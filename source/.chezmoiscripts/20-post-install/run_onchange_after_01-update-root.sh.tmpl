@@ -58,16 +58,16 @@ if [ $BACKUP -ne 0 ]; then
   # List files
   FILES=$(tar -tf "$TARDESTFILE" | sed 's/^/\//')
   for file in $FILES; do
-    sudo -v
+    sudo_cmd true
     # Ensure unreadable files are still copied
-    if sudo test -f "$file" && ! sudo cmp -s -- "$file" "$ROOTBACKUP/$file"; then
+    if sudo_cmd test -f "$file" && ! sudo_cmd cmp -s -- "$file" "$ROOTBACKUP/$file"; then
       # Ensure destination directory exists -- sudo so can be located at root
-      sudo mkdir -p "$BACKUPDIR/$(dirname -- "$file")"
+      sudo_cmd mkdir -p "$BACKUPDIR/$(dirname -- "$file")"
       # copy the file to the destination
-      sudo cp -T -- "$file" "$BACKUPDIR/$file"
+      sudo_cmd cp -T -- "$file" "$BACKUPDIR/$file"
     fi
   done
-  if ! sudo test -d "$BACKUPDIR"; then # Didn't even create the directory
+  if ! sudo_cmd test -d "$BACKUPDIR"; then # Didn't even create the directory
     log "No files will be overwritten! :)"
   fi
 fi
@@ -86,7 +86,7 @@ trap '' INT
 
 # Important! Overwrites files in ROOT!
 # --no-same-owner to ensure owned by root (sudo)
-sudo tar --no-same-owner -xf "$TARDESTFILE" -C /
+sudo_cmd tar --no-same-owner -xf "$TARDESTFILE" -C /
 
 rm_exit_cleanup "$TARDESTFILE"
 

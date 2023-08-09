@@ -31,7 +31,7 @@ function install_pnpm_and_node() {
   (
     export -n SHELLOPTS
     # NOTE: latest is needed on my machine to avoid EHOSTUNREACH from npm repos
-    sudo bash "$tmp" latest
+    sudo_cmd bash "$tmp" latest
   )
   rm_exit_cleanup "$tmp"
 

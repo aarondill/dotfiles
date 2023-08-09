@@ -22,7 +22,7 @@ install_from_make() {
 
   # build from source
   pushd "$temp" >/dev/null
-  sudo make install
+  sudo_cmd make install
   popd >/dev/null
 
   # cleanup

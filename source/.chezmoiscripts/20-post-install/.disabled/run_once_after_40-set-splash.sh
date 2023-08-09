@@ -21,7 +21,7 @@ if [ -f /etc/initramfs-tools/conf.d/splash ]; then
   log 'Overriding /etc/initramfs-tools/conf.d/splash'
   sleep 3 # Allow user to halt
 fi
-printf '%s\n' 'FRAMEBUFFER=y' | sudo tee /etc/initramfs-tools/conf.d/splash >/dev/null
+printf '%s\n' 'FRAMEBUFFER=y' | sudo_cmd tee /etc/initramfs-tools/conf.d/splash >/dev/null
 # Runing update is not necessary because the install script will do it
 
 # Clone repo
@@ -29,5 +29,5 @@ git clone 'https://github.com/emanuele-scarsella/vortex-ubuntu-plymouth-theme' "
 
 # Run install script
 chmod +x "$tempdir/install"
-sudo "$tempdir/install"
+sudo_cmd "$tempdir/install"
 rm_exit_cleanup "$tempdir"

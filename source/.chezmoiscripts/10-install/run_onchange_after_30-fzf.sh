@@ -46,10 +46,10 @@ function install_fzf() {
   log_github_install "$REPO" "$version" "$asset" "$targetFile"
 
   case "$asset" in
-  *.tar.gz) download "$url" | tar -xzf - -O | sudo tee "$targetFile" >/dev/null ;;
+  *.tar.gz) download "$url" | tar -xzf - -O | sudo_cmd tee "$targetFile" >/dev/null ;;
   *) abort "You shouldn't be here." 3 ;;
   esac
-  sudo chmod +x "$targetFile"
+  sudo_cmd chmod +x "$targetFile"
 }
 
 log_and_run 'Installing fzf' install_fzf

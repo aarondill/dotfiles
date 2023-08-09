@@ -14,15 +14,15 @@ function install_bitwarden_desktop() {
 function install_bitwarden_cli() (
   local DESTINATION=/usr/local/bin/bw temp_dir
   # shellcheck disable=SC2206 # ik it splits. that's the point
-  local sudo=(${SUDO:-sudo}) zip_file
+  local zip_file
   zip_file=$(download_file 'https://vault.bitwarden.com/download/?app=cli&platform=linux')
   rm_exit "$zip_file"
   temp_dir=$(mktemp -d)
   rm_exit "$temp_dir"
   unzip -qq "$zip_file" -d "$temp_dir"
-  "${sudo[@]}" mkdir -p "$(dirname "$DESTINATION")"
-  "${sudo[@]}" install "$temp_dir/bw" "$DESTINATION"
-  "${sudo[@]}" chmod +x "$DESTINATION"
+  sudo_cmd mkdir -p "$(dirname "$DESTINATION")"
+  sudo_cmd install "$temp_dir/bw" "$DESTINATION"
+  sudo_cmd chmod +x "$DESTINATION"
   rm_exit_cleanup "$temp_dir"
 )
 

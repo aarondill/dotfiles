@@ -67,12 +67,12 @@ apt_install "$tmp"
 rm_exit_cleanup "$tmp"
 
 # set wezterm as default term
-# sudo update-alternatives --set x-terminal-emulator /usr/bin/open-wezterm-here
+# sudo_cmd update-alternatives --set x-terminal-emulator /usr/bin/open-wezterm-here
 x_term="$(which x-terminal-emulator || printf '/usr/bin/x-terminal-emulator')"
 wez="$(which wezterm-gui)"
 if [ -z "$wez" ]; then abort "Something went wrong setting wezterm as default term" 0; fi
 
-sudo update-alternatives --install "$x_term" x-terminal-emulator "$wez" 50
-sudo update-alternatives --set x-terminal-emulator "$wez"
+sudo_cmd update-alternatives --install "$x_term" x-terminal-emulator "$wez" 50
+sudo_cmd update-alternatives --set x-terminal-emulator "$wez"
 
 success

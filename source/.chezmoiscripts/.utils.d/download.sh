@@ -47,9 +47,9 @@ function download() {
 # You are expected to cleanup this file after use. It will not be cleaned up on exit.
 # The easiest way is to call rm_exit with the file!
 function download_file() {
-  local sudo='' dir=''
+  local dir='' temp
   local file_url=$1 dest=${2:-} mode=${3:-}
-  local temp
+  export no_sudo=y
 
   if [ -n "$dest" ]; then
     dir=$(dirname "$dest")
@@ -70,16 +70,16 @@ function download_file() {
   fi
 
   if ! mkdir -p "$dir"; then
-    sudo=${SUDO:-sudo}
+    no_sudo=''
     log "Creating directory failed, trying again with sudo"
-    $sudo mkdir -p "$dir" || {
+    sudo_cmd mkdir -p "$dir" || {
       rm_exit_cleanup "$temp"
       abort "could not create directory $dir"
     }
   fi
 
-  if ! [ -w "$dir" ]; then sudo=${SUDO:-sudo}; fi
+  if ! [ -w "$dir" ]; then no_sudo=''; fi
   # resets permissions
-  $sudo install --no-target-directory -- "$temp" "$dest" || rm_exit_cleanup "$temp"
-  if [ -n "$mode" ]; then $sudo chmod "$mode" "$dest" || true; fi
+  sudo_cmd install --no-target-directory -- "$temp" "$dest" || rm_exit_cleanup "$temp"
+  if [ -n "$mode" ]; then sudo_cmd chmod "$mode" "$dest" || true; fi
 }

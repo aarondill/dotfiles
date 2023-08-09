@@ -7,11 +7,11 @@ APT=$(which nala 2>/dev/null || which apt 2>/dev/null || printf '')
 function apt_is_installed() { dpkg -s "$@" &>/dev/null; }
 function apt_is_available() { for pac; do test -n "$(apt-cache show -- "$pac" 2>/dev/null)" || return 1; done; }
 # usage: apt_install file_or_package
-function apt_install() { sudo "$APT" install -- "$@"; }
+function apt_install() { sudo_cmd "$APT" install -- "$@"; }
 # Just updates, not upgrade - upgrade shouldn't be necessary, leave that to the user.
-function apt_update() { sudo "$APT" update; }
+function apt_update() { sudo_cmd "$APT" update; }
 function apt_is_held() { for pac; do [ -n "$(apt-mark showhold -- "$pac")" ] || return 1; done; }
-function apt_remove() { sudo "$APT" purge -- "$@"; } # purge for symmetry with pacman. Be careful!
+function apt_remove() { sudo_cmd "$APT" purge -- "$@"; } # purge for symmetry with pacman. Be careful!
 function has_apt() { [ -n "$APT" ]; }
 
 ## --------------------------------------------------------------------------------------------------
@@ -30,7 +30,7 @@ function pacyay() {
   args=("$@")
   case "$PACMAN" in
   */yay) args=("$PACMAN" --repo "${args[@]}") ;;
-  *) args=(sudo "$PACMAN" "${args[@]}") ;;
+  *) args=(sudo_cmd "$PACMAN" "${args[@]}") ;;
   esac
   _pacman_exec "${args[@]}"
 }
