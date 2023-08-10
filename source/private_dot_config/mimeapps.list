@@ -1,9 +1,9 @@
 [Default Applications]
-text/html=google-chrome.desktop;
-x-scheme-handler/http=google-chrome.desktop;
-x-scheme-handler/https=google-chrome.desktop;
-x-scheme-handler/about=google-chrome.desktop;
-x-scheme-handler/unknown=google-chrome.desktop;
+text/html=vivaldi-stable.desktop
+x-scheme-handler/http=vivaldi-stable.desktop
+x-scheme-handler/https=vivaldi-stable.desktop
+x-scheme-handler/about=vivaldi-stable.desktop
+x-scheme-handler/unknown=vivaldi-stable.desktop
 # Use neovim for everything
 text/plain=nvim.desktop;
 text/css=nvim.desktop;
