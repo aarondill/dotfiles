@@ -39,7 +39,6 @@ application/xml=nvim.desktop;
 application/xml-dtd=nvim.desktop;
 
 [Added Associations]
-application/octet-stream=google-chrome.desktop;
 image/webp=gimp.desktop;
 image/heif=gimp.desktop;
 application/pdf=libreoffice-draw.desktop;
