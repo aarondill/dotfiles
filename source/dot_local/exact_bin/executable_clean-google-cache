@@ -56,12 +56,13 @@ clean_cache_dir() {
   if [ -e "$file" ]; then rm -rf -- "$file"; fi
 }
 
-config_dir="${CHROME_CONFIG_HOME:-${XDG_CONFIG_HOME:-$HOME/.config}}/google-chrome/"
+# config_dir="${CHROME_CONFIG_HOME:-${XDG_CONFIG_HOME:-$HOME/.config}}/google-chrome/"
+config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/vivaldi/"
 log "Cleaning config directory $config_dir"
 size_diff "$config_dir" clean_config_dir "$config_dir"
 
 log ''
 
-cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/google-chrome/"
+cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/vivaldi/"
 log "Cleaning cache directory $cache_dir"
 size_diff "$cache_dir" clean_cache_dir "$cache_dir"

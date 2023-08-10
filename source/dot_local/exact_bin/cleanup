@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+set -euC -o pipefail
+log() { printf '%s\n' "$@"; }
+err() { printf '%s\n' "$@" 1>&2; }
+abort() {
+  err "$1"
+  exit "${2:-1}"
+}
+has() { command -v -- "$1" &>/dev/null; }
+# shellcheck disable=SC2206 # split intentionally
+SUDO=(${SUDO:-sudo})
+sudo_cmd() { "${SUDO[@]}" "$@"; }
+
+log "Cleaning pnpm store"
+pnpm store prune
+
+log "Cleaning browser cache"
+clean-google-cache
+
+log "Cleaning up snap packages"
+snap-cleanup
+
+log "Cleaning apt cache"
+if has nala; then
+  sudo_cmd nala clean
+elif has apt; then
+  sudo_cmd apt-get clean
+  sudo_cmd apt-get autoclean
+elif has yay; then
+  yay -Sc
+elif has pacman; then
+  sudo_cmd pacman -Sc
+fi
+
+log "Repairing flatpak repo"
+sudo_cmd flatpak repair
+
+log "Cleaning up cache files"
+rm -rf -- ~/.cache/node/corepack/
+rmdir --ignore-fail-on-non-empty -- ~/.cache/node/
+rm -rf -- ~/.cache/npm/
+rm -rf -- ~/.cache/yarn
+rm -rf -- ~/.cache/gnome-desktop-thumbnailer/
+rm -rf -- ~/.cache/mesa_shader_cache/
+
+log "Cleaning the trash"
+if has trash-empty; then
+  trash-empty
+elif has gio; then
+  gio trash --empty
+else
+  abort "Could not find a command to clean the trash"
+fi

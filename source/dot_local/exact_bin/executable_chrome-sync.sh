@@ -33,9 +33,9 @@ sync_shm() {
   local path volatile static link
   path=$(posix_realpath "$1")
 
-  link="$path"
-  static="$(dirname -- "$path")/static-$(basename -- "$path")"
-  volatile="/dev/shm/$(printf '%s' "$path" | tr '/' '_')-$USER"
+  link="${path%/}"
+  static="${path%/}-static"
+  volatile="/dev/shm/$(printf '%s' "${path%/}" | tr '/' '_')-$USER"
 
   if [ ! -r "$volatile" ]; then
     mkdir -m0700 -- "$volatile"
@@ -70,9 +70,9 @@ if [ "$#" -gt 0 ]; then
 fi
 
 # PROFILE
-conf_dir=${CHROME_CONFIG_HOME:-${XDG_CONFIG_HOME:-$HOME/.config}}
-sync_shm "$conf_dir/google-chrome"
+conf_dir=${XDG_CONFIG_HOME:-$HOME/.config}
+sync_shm "$conf_dir/vivaldi"
 
 # CACHE
 cache_dir=${XDG_CACHE_HOME:-$HOME/.cache}
-sync_shm "$cache_dir/google-chrome"
+sync_shm "$cache_dir/vivaldi"
