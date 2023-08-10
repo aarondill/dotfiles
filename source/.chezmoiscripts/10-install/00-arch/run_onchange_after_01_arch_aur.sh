@@ -48,10 +48,10 @@ else err "yay is already installed, skipping installation"; fi
 #   aur_install "zeal"
 # else err "Zeal is already installed, skipping installation"; fi
 
-# Google chrome
-if ! has_cmd google-chrome-stable; then
-  aur_install "google-chrome"
-else err "google-chrome is already installed, skipping installation"; fi
+## Google chrome -- Replaced with vivaldi
+# if ! has_cmd google-chrome-stable; then
+#   aur_install "google-chrome"
+# else err "google-chrome is already installed, skipping installation"; fi
 
 # grub-editor
 if ! [ -x /opt/grub-editor/grub-editor.py ]; then
