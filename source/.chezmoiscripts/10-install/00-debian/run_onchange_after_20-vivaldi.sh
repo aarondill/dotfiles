@@ -10,7 +10,7 @@ if ! has_apt; then
   abort "Apt not installed, skipping vivaldi install. Please install through your package manager" 0
 fi
 
-VIVALDI_STEAM=stable VIVALDI_STEAM_SHORT_ALT=stable
+VIVALDI_STEAM=vivaldi-stable VIVALDI_STEAM_SHORT_ALT=stable
 DEBARCH=
 case "$ARCH" in
 x86_64) DEBARCH="amd64" ;;
@@ -31,7 +31,7 @@ function install_vivaldi() {
 function get_vivaldi_version() {
   local vivaldi_version
   # Work out the latest stable Vivaldi if VIVALDI_VERSION is unset
-  vivaldi_version=${VIVALDI_VERSION:-$(download "http://repo.vivaldi.com/archive/deb/dists/stable/main/binary-$DEBARCH/Packages.gz" | gzip -d | grep -A6 -x "Package: vivaldi-$VIVALDI_STEAM" | sed -n "/Version/s/.* //p" | sort -t. -k 1,1n -k 2,2n -k 3,3n -k 4,4n | tail -n 1)}
+  vivaldi_version=${VIVALDI_VERSION:-$(download "http://repo.vivaldi.com/archive/deb/dists/stable/main/binary-$DEBARCH/Packages.gz" | gzip -d | grep -A6 -x "Package: $VIVALDI_STEAM" | sed -n "/Version/s/.* //p" | sort -t. -k 1,1n -k 2,2n -k 3,3n -k 4,4n | tail -n 1)}
   printf '%s' "$vivaldi_version"
 }
 
