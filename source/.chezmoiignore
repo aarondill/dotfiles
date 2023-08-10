@@ -8,10 +8,10 @@ dconf-backup.ini
 
 {{- if contains "arch" .osID }}
 ## Arch System Ignores
-.chezmoiscripts/install/00-debian/**
+.chezmoiscripts/10-install/00-debian/**
 {{- end }}
 
 {{- if or ( contains "debian" .osID ) ( contains "ubuntu" .osID ) }}
 ## Debian System Ignores
-.chezmoiscripts/install/00-arch/**
+.chezmoiscripts/10-install/00-arch/**
 {{- end }}
