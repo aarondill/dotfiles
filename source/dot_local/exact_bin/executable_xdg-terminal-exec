@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+# just a wrapper to force gio to open the right terminal
+if [ "$#" -gt 0 ]; then
+  exec x-terminal-emulator -e "$@"
+fi
+exec x-terminal-emulator
