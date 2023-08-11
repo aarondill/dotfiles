@@ -54,7 +54,9 @@ if confirm 'Would you like to keep backups of overwritten files in / in %s?' "$B
 find "$ROOTBACKUP/" -maxdepth 1 -mindepth 1 -type d -printf '%f\0' |
   tar -cf "$TARDESTFILE" -C "$ROOTBACKUP/" --null -T -
 
-if [ $BACKUP -ne 0 ]; then
+declare -i count=-1
+if [ "$BACKUP" -ne 0 ]; then
+  count=0
   # List files
   FILES=$(tar -tf "$TARDESTFILE" | sed 's/^/\//')
   for file in $FILES; do
@@ -65,6 +67,7 @@ if [ $BACKUP -ne 0 ]; then
       sudo_cmd mkdir -p "$BACKUPDIR/$(dirname -- "$file")"
       # copy the file to the destination
       sudo_cmd cp -T -- "$file" "$BACKUPDIR/$file"
+      count=$((count + 1))
     fi
   done
   if ! sudo_cmd test -d "$BACKUPDIR"; then # Didn't even create the directory
@@ -72,7 +75,10 @@ if [ $BACKUP -ne 0 ]; then
   fi
 fi
 
-log "Last chance to safely stop overwrite of root. Press ctrl-c to cancel."
+msg="Last chance to safely stop overwrite of root"
+if [ "${count}" -gt "-1" ]; then msg+=" ($count files)"; fi
+msg+=". Press ctrl-c to cancel."
+log "$msg"
 
 # On ctrl-c, previous trap will occur, removing temporary file. backup will remain, but not a problem.
 trap 'exit' INT
