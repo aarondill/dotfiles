@@ -1,0 +1,9 @@
+# Allow members of the power group to manage the system power state
+# Also allows sudo and wheel groups - without password
+%power, %sudo, %wheel	ALL=NOPASSWD:SETENV: /usr/bin/systemctl poweroff
+%power, %sudo, %wheel	ALL=NOPASSWD:SETENV: /usr/bin/systemctl halt
+%power, %sudo, %wheel	ALL=NOPASSWD:SETENV: /usr/bin/systemctl reboot
+%power, %sudo, %wheel	ALL=NOPASSWD:SETENV: /usr/bin/systemctl hibernate
+%power, %sudo, %wheel	ALL=NOPASSWD:SETENV: /usr/bin/systemctl suspend-then-hibernate
+
+
