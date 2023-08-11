@@ -11,16 +11,32 @@ has() { command -v -- "$1" &>/dev/null; }
 SUDO=(${SUDO:-sudo})
 sudo_cmd() { "${SUDO[@]}" "$@"; }
 
-log "Cleaning pnpm store"
-pnpm store prune
+# Get size before starting
+
+oldsize_root=$(df / | tail -n +2 | awk '{print $3}')
+if [ "$(findmnt /)" = "$(findmnt ~)" ]; then
+  oldsize="$oldsize_root"
+else
+  oldsize_home=$(df ~ | tail -n +2 | awk '{print $3}')
+  oldsize=$((oldsize_root + oldsize_home))
+fi
+
+# Start doing things
+
+if has pnpm; then
+  log "Cleaning pnpm store"
+  pnpm store prune
+fi
 
 log "Cleaning browser cache"
 clean-google-cache
 
-log "Cleaning up snap packages"
-snap-cleanup
+if has snap; then
+  log "Cleaning up snap packages"
+  snap-cleanup
+fi
 
-log "Cleaning apt cache"
+log "Cleaning package manager cache"
 if has nala; then
   sudo_cmd nala clean
 elif has apt; then
@@ -30,10 +46,14 @@ elif has yay; then
   yay -Sc
 elif has pacman; then
   sudo_cmd pacman -Sc
+else
+  err "Could not find a package manager to clean up"
 fi
 
-log "Repairing flatpak repo"
-sudo_cmd flatpak repair
+if has flatpak; then
+  log "Repairing flatpak repo"
+  sudo_cmd flatpak repair
+fi
 
 log "Cleaning up cache files"
 rm -rf -- ~/.cache/node/corepack/
@@ -51,3 +71,24 @@ elif has gio; then
 else
   abort "Could not find a command to clean the trash"
 fi
+
+# Size stats
+
+newsize_root=$(df / | tail -n +2 | awk '{print $3}')
+if [ "$(findmnt /)" = "$(findmnt ~)" ]; then
+  newsize="$newsize_root"
+else
+  newsize_home=$(df ~ | tail -n +2 | awk '{print $3}')
+  newsize=$((newsize_root + newsize_home))
+fi
+
+saving=$((oldsize - newsize))
+if command -v numfmt &>/dev/null; then # After this point, don't use any of these variables for math!!
+  oldsize=$(numfmt --to=si -- "$oldsize")
+  newsize=$(numfmt --to=si -- "$newsize")
+  saving=$(numfmt --to=si -- "$saving")
+fi
+
+log "Old size: $oldsize"
+log "New size: $newsize"
+log "Total saving: $saving"
