@@ -12,7 +12,8 @@ function has() { command -v -- "$1" &>/dev/null; }
 alias quit='exit'
 alias :q='exit'
 # Alias sudo to call sudo with *my* $HOME/ENV/PATH
-alias sudo="sudo -E env PATH=\"\$PATH\" "
+# alias sudo="sudo -E env PATH=\"\$PATH\" "
+alias sudo="sudo -E " # don't use env so permitted commands work
 # Unrestrict fd by default
 if has fdfind; then
   alias fd="fdfind -uu"
