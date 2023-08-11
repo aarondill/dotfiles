@@ -10,7 +10,7 @@ function install_mcfly() {
   local bindir='/usr/local/bin'
   local repo="cantino/mcfly"
   sudo_cmd true
-  args=(sh -s -- --git "$repo" --to "$bindir")
+  args=(sh -s -- --git "$repo" --to "$bindir" --force)
   if [ -w "$bindir" ]; then
     args=(sudo_cmd "${args[@]}")
   fi
