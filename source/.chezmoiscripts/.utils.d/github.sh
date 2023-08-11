@@ -9,11 +9,12 @@
 # get_latest_version_github "someone/something" -> v1.2.3 (tagname)
 function get_latest_version_github() (
   set -e                              # in subshell
-  local version_url version REPO="$1" # combined $OWNER/$REPO
-  version_url=$(get_url_headers "https://github.com/$REPO/releases/latest" | grep -m1 -iF "location:" | tr -d '\r')
-  version="${version_url##*/}" # remove everything up to last slash
+  local version_url version repo="$1" # combined $OWNER/$REPO
+  # version_url=$(get_url_headers "https://github.com/$repo/releases/latest" | grep -m1 -iF "location:" | tr -d '\r')
+  # version="${version_url##*/}" # remove everything up to last slash
+  version=$(curl "https://api.github.com/repos/$repo/releases/latest" | grep "tag_name" | cut -d'"' -f4) # parsing JSON...
   if [ -z "$version" ]; then
-    err "Failed while attempting to install $REPO. Please manually install at https://github.com/$REPO/releases"
+    err "Failed while attempting to install $repo. Please manually install at https://github.com/$repo/releases"
     return 2
   fi
   printf '%s' "$version"
@@ -22,11 +23,11 @@ function get_latest_version_github() (
 # get_latest_version_github "someone/something" -> v1.2.3 (tagname)
 function get_latest_version_gitlab() (
   set -e                              # in subshell
-  local version version_url REPO="$1" # combined $OWNER/$REPO
-  version_url=$(get_url_headers "https://gitlab.com/$REPO/-/releases/permalink/latest" | grep -m1 -iF "location:" | tr -d '\r')
+  local version version_url repo="$1" # combined $OWNER/$REPO
+  version_url=$(get_url_headers "https://gitlab.com/$repo/-/releases/permalink/latest" | grep -m1 -iF "location:" | tr -d '\r')
   version="${version_url##*/}" # remove everything up to last slash
   if [ -z "$version" ]; then
-    err "Failed while attempting to install $REPO. Please manually install at https://gitlab.com/$REPO/releases"
+    err "Failed while attempting to install $repo. Please manually install at https://gitlab.com/$repo/releases"
     return 2
   fi
   printf '%s' "$version"
