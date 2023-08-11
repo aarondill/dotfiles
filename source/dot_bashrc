@@ -200,4 +200,3 @@ fi
 unset -f will_startx
 
 # ------------------------------END OF FILE------------------------------
-eval "$(mcfly init bash)"
