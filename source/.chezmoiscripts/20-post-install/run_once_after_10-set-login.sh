@@ -43,7 +43,7 @@ temp_file="$(download_file "$IMAGE")"
 rm_exit "$temp_file"
 
 log 'Setting image as current lock screen image'
-sudo "$destination" --image "$temp_file" || abort 'Something went wrong setting the lock screen' 0
+sudo_cmd "$destination" --image "$temp_file" || abort 'Something went wrong setting the lock screen' 0
 
 log 'Cleaning up temporary files'
 rm_exit_cleanup "$temp_file"

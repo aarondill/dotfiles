@@ -19,8 +19,8 @@ log "downloading jdk-$version (fixed version)"
 tmp=$(download_file "$url")
 rm_exit "$tmp"
 # output to destination
-sudo mkdir -p "$destination"
-sudo tar -xz -C "$destination" -f "$tmp"
+sudo_cmd mkdir -p "$destination"
+sudo_cmd tar -xz -C "$destination" -f "$tmp"
 rm_exit_cleanup "$tmp"
 # This is my own script! should be in ~/.local/bin/update-java!
-sudo ~/.local/bin/update-java --quiet --yes "$destination/jdk-$version"
+sudo_cmd ~/.local/bin/update-java --quiet --yes "$destination/jdk-$version"
