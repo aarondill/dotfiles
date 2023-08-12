@@ -72,6 +72,9 @@ else
   abort "Could not find a command to clean the trash"
 fi
 
+log "Running TRIM on mounted partitions"
+sudo_cmd fstrim -av
+
 # Size stats
 
 newsize_root=$(df / | tail -n +2 | awk '{print $3}')
