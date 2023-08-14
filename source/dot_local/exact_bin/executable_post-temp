@@ -76,7 +76,7 @@ done
 if [ "$#" -eq 0 ]; then abort "FILE is required!" 2; fi
 
 if [ -z "$python" ]; then
-  if ! command -v which 2>/dev/null; then
+  if ! command -v which >/dev/null 2>/dev/null; then
     abort "Which is required to find python in PATH. Please install which or provide the --python=path option." 2
   fi
   python=$(which python3 2>/dev/null || which python 2>/dev/null || printf '')
