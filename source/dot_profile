@@ -59,6 +59,7 @@ export _JAVA_OPTIONS=-Djava.util.prefs.userRoot="$XDG_CONFIG_HOME"/java
 # Allow usage of `has` with non-defined programs
 export HAS_ALLOW_UNSAFE=y
 export HISTFILE="$XDG_STATE_HOME/bash_history"
+export GTK_USE_PORTAL=1
 
 export WGETRC="$XDG_CONFIG_HOME/wgetrc"
 export ASPELL_CONF="per-conf $XDG_CONFIG_HOME/aspell/aspell.conf; personal $XDG_CONFIG_HOME/aspell/en.pws; repl $XDG_CONFIG_HOME/aspell/en.prepl"
