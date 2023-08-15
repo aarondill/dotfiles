@@ -3,11 +3,8 @@
 [Desktop Entry]
 Name=Fslite
 Comment=Open fslite in browser
-TryExec=xdg-open
-Exec=xdg-open https://fslite.vercel.app
+URL=https://fslite.vercel.app
 Icon=/home/aaron/.local/share/icons/fslite.ico
-Terminal=false
-Type=Application
-StartupNotify=true
+Type=Link
 Name[en_US]=Fslite
 Name[es]=Fslite
