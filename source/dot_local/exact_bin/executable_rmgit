@@ -66,13 +66,12 @@ if [ "$#" -eq 0 ]; then abort "missing operand" 2; fi
 
 # usage: check_status repo
 # returns success if the repo is clean
-function check_status() (
-  cd "$1"
-  if [ -n "$(git status --porcelain)" ]; then
+function check_status() {
+  if [ -n "$(git -C "$1" status --porcelain)" ]; then
     return 1
   fi
   return 0
-)
+}
 
 exit=0
 for repo in "$@"; do
