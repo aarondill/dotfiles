@@ -31,3 +31,5 @@ rm -rf ~/.java 2>/dev/null
 # RM the snap warnings file
 rm -rf ~/.snap/warnings.json 2>/dev/null
 rmdir ~/.snap 2>/dev/null
+rmdir ~/.sane/xsane/ 2>/dev/null
+rmdir ~/.sane/ 2>/dev/null
