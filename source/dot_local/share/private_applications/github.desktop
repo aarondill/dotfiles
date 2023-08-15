@@ -3,5 +3,3 @@ Name=github
 Comment=Open github in browser
 URL=https://github.com
 Type=Link
-Name[en_US]=github
-Name[es]=github
