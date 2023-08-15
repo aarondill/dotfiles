@@ -20,7 +20,7 @@ program for root elevation. It will be split by the shell, so
 spaces in the program name will likely be mutilited.
 
 METHOD_ARGS to pass additional options to each command. (IE, NATIVE_ARGS)
-Currently supported methods are: native, snap, flatpak, pnpm, npm
+Currently supported methods are: native, snap, flatpak, pnpm, npm, cargo
 use 'native' to enable or '+native' to disable. ORDER MATTERS!
 Options:
 --as-root: allow running as root (Discouraged!)
@@ -94,9 +94,9 @@ for arg; do
   esac
 done
 
-native=0 flatpak=0 snap=0 pnpm=0 npm=0
+native=0 flatpak=0 snap=0 pnpm=0 npm=0 cargo=0
 if [ "$#" -eq 0 ] || [ "$all_exclude" -eq 1 ]; then
-  native=1 flatpak=1 snap=1 pnpm=1 npm=1
+  native=1 flatpak=1 snap=1 pnpm=1 npm=1 cargo=1
 fi
 
 for arg; do          # Doesn't do anything if $# is zero
@@ -107,6 +107,7 @@ for arg; do          # Doesn't do anything if $# is zero
   snap) snap=1 ;; +snap) snap=0 ;;
   pnpm) pnpm=1 ;; +pnpm) pnpm=0 ;;
   npm) npm=1 ;; +npm) npm=0 ;;
+  cargo) cargo=1 ;; +cargo) cargo=0 ;;
   all) native=1 flatpak=1 snap=1 pnpm=1 npm=1 ;;
   +all) native=0 flatpak=0 snap=0 pnpm=0 npm=0 ;;
   esac
@@ -123,6 +124,7 @@ sudo=(${SUDO:-sudo})
   SNAP_ARGS=(${SNAP_ARGS:-})
   PNPM_ARGS=(${PNPM_ARGS:-})
   NPM_ARGS=(${NPM_ARGS:-})
+  CARGO_ARGS=(${CARGO_ARGS:-})
 }
 
 cmd_available() { command -v "$@" &>/dev/null; }
@@ -225,5 +227,19 @@ if [ "$pnpm" -eq 1 ] && cmd_available pnpm; then
     if [ -f "$f" ]; then pnpm_root=true && break; fi
   done
   [ "$pnpm_root" -eq 1 ] && show_run "${sudo[@]}" "$(cmd_path pnpm)" update -g --latest "${PNPM_ARGS[@]}"
+  success
+fi
+
+if [ "$cargo" -eq 1 ] && cmd_available rustup; then
+  log "Updating cargo and rustc!"
+  log
+  show_run "$(cmd_path rustup)" update
+  success
+fi
+
+if [ "$cargo" -eq 1 ] && cmd_available cargo && cmd_available cargo-install-update; then
+  log "Updating cargo installed packages!"
+  log
+  show_run "$(cmd_path cargo)" install-update --all --git --allow-no-update "${CARGO_ARGS[@]}"
   success
 fi
