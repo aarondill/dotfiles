@@ -131,7 +131,7 @@ cmd_available() { command -v "$@" &>/dev/null; }
 cmd_path() { command -v "$@"; }
 
 is_something_to_do=0
-for i in "$native" "$flatpak" "$snap" "$pnpm" "$npm"; do
+for i in "$native" "$flatpak" "$snap" "$pnpm" "$npm" "$cargo"; do
   [ "$i" -eq 1 ] || continue # only if something is activated
   is_something_to_do=1
   break
