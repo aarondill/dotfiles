@@ -59,3 +59,5 @@ vscode/Java/java-format.xml
 .config/gamemode.ini
 .config/flameshot
 .local/share/applications/github.desktop
+.local/share/applications/sso.desktop
+.local/share/applications/canvas.desktop
