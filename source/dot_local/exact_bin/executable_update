@@ -41,7 +41,7 @@ show_run() {
   "$@"
 }
 err() { printf "${THIS:+$THIS:}$RED_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@" >&2; }
-success() { printf "$GREEN_COLOR$BOLD_COLOR%s$RESET_COLOR\n" "Success!"; }
+success() { printf "$GREEN_COLOR$BOLD_COLOR%s$RESET_COLOR\n" "Success!" && printf '\n'; }
 abort() { err "$1" && exit "${2:-1}"; }
 
 # Returns a string that should be 'eval'ed to set the positional arguments
