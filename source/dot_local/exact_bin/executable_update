@@ -240,6 +240,6 @@ fi
 if [ "$cargo" -eq 1 ] && cmd_available cargo && cmd_available cargo-install-update; then
   log "Updating cargo installed packages!"
   log
-  show_run "$(cmd_path cargo)" install-update --all --git --allow-no-update "${CARGO_ARGS[@]}"
+  show_run "$(cmd_path cargo)" install-update --all --git "${CARGO_ARGS[@]}"
   success
 fi
