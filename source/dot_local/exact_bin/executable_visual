@@ -33,6 +33,13 @@ rest=("${@:3}")
 
 disp_regex="^:[[:digit:]]+$"
 
+# visual -- [:3] --server-args
+if [ "$wm" == '--' ]; then
+  wm=
+  server=--
+  rest=("${@:2}") # [:3] --server-args
+fi
+
 # visual :3
 if [ -z "$server" ] && [[ "$wm" =~ $disp_regex ]]; then server="$wm" wm=''; fi
 
