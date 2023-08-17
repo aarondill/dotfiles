@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+set -euC -o pipefail
+# Runs the java file specified with the given stdin and arguments
+
+# BEGIN CONFIGURATION
+
+# stdin. Tabs will be maintained
+IFS='' read -r -d '' stdin <<'EOF' || true
+EOF
+stdin_file=    # This will override stdin. Relative to output_dir (use input_files if needed)
+cargs=()       # javac
+jargs=()       # java
+classpath=     # output_dir will be automatically included
+output_dir=    # or "dist". Relative to this_dir
+input_files=() # a list of files to copy (symlink) to the output_dir. Releative to this_dir
+
+# END CONFIGURATION
+
+# COLOR vars to keep from branching to tput repeatedly
+RED_COLOR="$(tput setaf 1 2>/dev/null || printf '')"
+YELLOW_COLOR="$(tput setaf 11 2>/dev/null || printf '')"
+# GREEN_COLOR="$(tput setaf 2 2>/dev/null || printf '')"
+BOLD_COLOR="$(tput bold 2>/dev/null || printf '')"
+RESET_COLOR="$(tput sgr0 2>/dev/null || printf '')"
+
+log() { printf "$YELLOW_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@"; }
+show_run() {
+  log "running: $*"
+  "$@"
+}
+err() { printf "${THIS:+$THIS:}$RED_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@" >&2; }
+abort() { err "$1" && exit "${2:-1}"; }
+# make a relative path absolute, according to $2 or $this_dir
+resolve() {
+  local path="${1:-}"
+  local relto="${2:-$this_dir}"
+  local ret=''
+  case "$path" in
+  '') ret='' ;; # if passed an empty string, return the empty string
+  /*) ret="$path" ;;
+  ./*) ret="$relto/${path#./}" ;;
+  .) ret="$relto" ;;
+  *) ret="$relto/$path" ;;
+  esac
+  ret=${ret%/} # strip trailing slash
+  if [ -t 1 ]; then
+    printf '%s\n' "$ret" # newline for output
+  else                   #
+    printf '%s' "$ret"   # no newline
+  fi
+}
+
+this_dir="$(readlink -f -- "$(dirname "$0")")" # might break if cwd is a symlink
+this="$(basename "$0")"
+
+java_class=${this%.test.sh}                             # ClassName.test.sh -> ClassName
+java_class=${java_class%.sh}                            # ClassName.sh -> ClassName
+output_dir="$(resolve "${output_dir:-.}")"              # relative to $this_dir -- default is $this_dir
+java_file="$(resolve "$java_class.java")"               # relative to $this_dir
+class_file=$(resolve "$java_class.class" "$output_dir") # relative to $output_dir
+stdin_file=$(resolve "${stdin_file:-}" "$output_dir")   # relative to $output_dir
+
+if ! [ -f "$java_file" ]; then abort "could not find '$java_file'. Please double check the names of both files." 1; fi
+if [ -n "$stdin_file" ] && ! [ -f "$stdin_file" ]; then abort "could not find '$stdin_file'. Please double check the name of the file, or remove it from the stdin_file." 1; fi
+if [ -f "$class_file" ]; then
+  log "cleaning up old class file"
+  show_run rm -f "$class_file"
+fi
+
+# setup stdin_file if it exists -- override the stdin variable above
+if [ -f "$stdin_file" ]; then IFS='' read -r -d '' stdin <"$stdin_file" || true; fi
+
+cd "$this_dir"
+if ! [ -d "$output_dir" ]; then
+  log "creating output directory"
+  show_run mkdir -p "$output_dir"
+fi
+
+log "Setting up input files"
+for f in "${input_files[@]}"; do
+  link_dest=$(resolve "$(basename "$f")" "$output_dir")
+  link_src="$(resolve "$f")"
+  if ! [ -e "$link_src" ]; then continue; fi   # source file doesn't exist
+  if [ -e "$link_dest" ]; then continue; fi    # destination file already exists
+  show_run ln -Tsi -- "$link_src" "$link_dest" # dead links will be interactively replaced
+done
+
+_classpath="$output_dir"
+[ -n "$classpath" ] && _classpath="$_classpath:$classpath"
+
+show_run javac --class-path "$_classpath" -d "$output_dir" "${cargs[@]}" "$java_file"
+
+code=0
+printf '%s' "${stdin:-}" |
+  show_run java --class-path "$_classpath" "$java_class" "${jargs[@]}" "$@" || code=$?
+
+if [ "$code" != 0 ]; then
+  err "Command failed with exit code: $code"
+fi
+
+exit "$code"
