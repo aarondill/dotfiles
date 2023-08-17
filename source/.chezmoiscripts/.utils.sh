@@ -23,6 +23,8 @@ export SHELLOPTS
 . "$SCRIPT_DIR"/.utils.d/output.sh # output functions
 # shellcheck source=./.utils.d/flow.sh
 . "$SCRIPT_DIR"/.utils.d/flow.sh # control flow functions
+# shellcheck source=./.utils.d/files.sh
+. "$SCRIPT_DIR"/.utils.d/files.sh # File Utils
 # shellcheck source=./.utils.d/text.sh
 . "$SCRIPT_DIR"/.utils.d/text.sh # text functions
 # shellcheck source=./.utils.d/download.sh
