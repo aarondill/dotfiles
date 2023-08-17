@@ -15,8 +15,8 @@ function new-java() {
       fdn=$(dirname "$f")
       mv "$f" "$fdn/${fbn/ClassName/$classname}"
     done
-    # okish since $classname and $date can't contain any slashes
+    # okish since $classname can't contain any slashes
     sed -i "s/ClassName/$classname/g" "$dir/$classname.java"
-    sed -i "s/\$DATE/$date/g" "$dir/$classname.java"
+    sed -i "s|\$DATE|$date|g" "$dir/$classname.java"
   done
 }
