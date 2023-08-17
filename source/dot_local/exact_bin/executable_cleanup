@@ -76,6 +76,8 @@ log "Running TRIM on mounted partitions"
 sudo_cmd fstrim -av
 
 # Size stats
+log "Cleaning old logs >1G"
+sudo journalctl --vacuum-size=1G
 
 newsize_root=$(df / | tail -n +2 | awk '{print $3}')
 if [ "$(findmnt /)" = "$(findmnt ~)" ]; then
