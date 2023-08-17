@@ -33,7 +33,7 @@ clean-google-cache
 
 if has snap; then
   log "Cleaning up snap packages"
-  snap-cleanup
+  snap-cleanup -y
 fi
 
 log "Cleaning package manager cache"
