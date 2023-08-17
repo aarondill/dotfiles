@@ -1,11 +1,11 @@
 /**
- * Class ClassName
+ * public class ClassName
  *
  * <pre>
- * Author:	Aaron Dill
- * Date:	$DATE
- * Course:	Computer Science I AP
- * Period:	3rd
+ * Author:  Aaron Dill
+ * Date:    $DATE
+ * Course:  Computer Science I AP
+ * Period:  3rd
  * </pre>
  *
  * Summary of file:

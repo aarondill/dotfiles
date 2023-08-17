@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 function new-java() {
   local classname fbn fdn date
-  date=$(date '+%m-%d-%Y')
+  date=$(date '+%m/%d/%Y')
   for dir in "$@"; do
     dir=${dir%/} # strip trailing slash
     if [ -e "$dir" ] || [ -L "$dir" ]; then
