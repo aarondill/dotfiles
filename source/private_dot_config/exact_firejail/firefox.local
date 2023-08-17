@@ -1,0 +1,9 @@
+# This file is made so the firefox-common-addons is not sourced multiple times.
+
+# shellcheck disable=SC2086 # This is not actually shell, so the "variables" SHOULD NOT be quoted
+# vim: ft=sh
+
+# include the firefox-common-addons.profile
+include firefox-common-addons.profile
+
+include firefox-common.local # this is used for both files

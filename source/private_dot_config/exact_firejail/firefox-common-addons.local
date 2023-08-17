@@ -1,0 +1,6 @@
+# ff2mpv
+ignore noexec ${HOME}
+include allow-lua.inc
+
+# This is needed by gnome-shell-integration, but it causes issues due to not being able to access libs
+ignore include allow-python3.inc

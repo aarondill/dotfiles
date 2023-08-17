@@ -1,0 +1,46 @@
+# Firejail profile for firefox
+# Description: Safe and easy web browser from Mozilla
+
+# shellcheck disable=SC2086 # This is not actually shell, so the "variables" SHOULD NOT be quoted
+# vim: ft=sh
+
+# Enable KeePassXC Plugin support.
+# NOTE: start KeePassXC before Firefox and keep it open to allow communication between them.
+whitelist ${RUNUSER}/kpxc_server
+whitelist ${RUNUSER}/org.keepassxc.KeePassXC.BrowserServer
+
+# No home files.
+ignore mkdir ${HOME}/.mozilla
+ignore mkdir ${HOME}/.pki
+ignore mkdir ${HOME}/.local/share/pki
+ignore mkdir ${HOME}/.cache/mozilla/firefox
+ignore mkdir ${HOME}/.mozilla
+nowhitelist ${HOME}/.mozilla
+nowhitelist ${HOME}/.cache/mozilla/firefox
+nowhitelist ${HOME}/.pki
+nowhitelist ${HOME}/.local/share/pki
+
+whitelist ${DOWNLOADS}
+
+# Sandbox HOME to $HOME/.local/share/firefox/
+noblacklist ${HOME}/.local/share/firefox
+mkdir ${HOME}/.local/share/firefox
+private ${HOME}/.local/share/firefox
+# Don't restrict dbus
+ignore dbus-user none
+ignore dbus-system none
+ignore dbus-user filter
+ignore dbus-system filter
+# Start new sessions in the same sandbox (allows to open another tab)
+join-or-start firefox
+# QOE
+deterministic-exit-code
+# deterministic-shutdown # Needs update
+apparmor
+
+# fix system calls
+seccomp !chroot,!sched_setattr
+ignore seccomp !chroot
+
+# for the love of god. Please be quieter.
+quiet
