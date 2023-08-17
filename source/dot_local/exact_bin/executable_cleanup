@@ -59,7 +59,7 @@ log "Cleaning up cache files"
 rm -rf -- ~/.cache/node/corepack/
 rmdir --ignore-fail-on-non-empty -- ~/.cache/node/
 rm -rf -- ~/.cache/npm/
-rm -rf -- ~/.cache/yarn
+rm -rf -- ~/.cache/yarn/
 rm -rf -- ~/.cache/gnome-desktop-thumbnailer/
 rm -rf -- ~/.cache/mesa_shader_cache/
 
