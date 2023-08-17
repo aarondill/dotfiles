@@ -26,6 +26,7 @@ RESET_COLOR="$(tput sgr0 2>/dev/null || printf '')"
 log() { printf "$YELLOW_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@"; }
 show_run() {
   log "running: $*"
+  printf '\n'
   "$@"
 }
 err() { printf "${THIS:+$THIS:}$RED_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@" >&2; }
