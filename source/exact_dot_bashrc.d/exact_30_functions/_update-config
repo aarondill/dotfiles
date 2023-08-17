@@ -62,3 +62,4 @@ vscode/Java/java-format.xml
 .local/share/applications/sso.desktop
 .local/share/applications/canvas.desktop
 vscode/Java/template
+.config/firejail
