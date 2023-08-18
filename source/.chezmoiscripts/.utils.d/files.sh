@@ -20,7 +20,7 @@ function relpath() {
   if has_cmd realpath; then
     realpath --canonicalize-missing --no-symlinks --relative-to="$relto" "$path"
   elif has_cmd perl; then
-    perl -le 'use File::Spec; print File::Spec->abs2rel(@ARGV)' FILE BASE
+    perl -le 'use File::Spec; print File::Spec->abs2rel(@ARGV)' "$path" "$relto"
   else
     err "Could not find a command to resolve relative paths"
     # no output -- should we output the full path?
@@ -40,9 +40,22 @@ function sudo_mkdir() {
   cmd_or_sudo mkdir "$@"
 }
 
-# usage: mklink linkto linkname
+# usage: mklink_abs linkto [linkname]
+# makes a symbolic link to the specified file using ln -s.
+# forces ln with -f. So files *will* be overwritten.
+function mklink_abs() {
+  local source="$1" dest="${2:-}"
+  args=(-sf -- "$source")
+  [ -n "$dest" ] && args+=("$dest")
+  sudo_writable "$dest" ln "${args[@]}"
+}
+
+# usage: mklink linkto [linkname]
+# makes relative links.
+# see mklink_abs for more information
 function mklink() {
-  local relpath source=$1 dest=$2
-  relpath=$(relpath "$(dirname -- "$source")" "$dest")
-  sudo_writable "$dest" ln -sf "$relpath" "$dest"
+  local relpath
+  local source=$1 dest=${2:-}
+  relpath=$(relpath "$(dirname -- "$source")" "${dest:-.}") # Allow empty dest (use cwd) -- How ln works
+  mklink_abs "$relpath" "$dest"
 }
