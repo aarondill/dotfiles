@@ -30,8 +30,9 @@ function relpath() {
 # usage: sudo_writable file cmd...
 # Will call the command with sudo if the file is not writable, else calls normally
 function sudo_writable() {
+  local dest="${1:-}"
   sudo=(sudo_cmd)
-  [ -w "$dest" ] && sudo=()
+  [ -n "$dest" ] && [ -w "$dest" ] && sudo=()
   "${sudo[@]}" "$@"
 }
 
