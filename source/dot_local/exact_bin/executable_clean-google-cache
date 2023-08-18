@@ -33,17 +33,17 @@ size_diff() {
 clean_config_dir() {
   local dir=$1 file
 
-  # # causes issues?
-  # for d in "$dir/OnDeviceHeadSuggestModel" \
-  #   "$dir/Default/optimization_guide_prediction_model_downloads" \
-  #   "$dir/Default/optimization_guide_model_metadata_store" \
-  #   "$dir/Default/optimization_guide_hint_cache_store" \
-  #   "$dir/pnacl" "$dir/BrowserMetrics"; do
-  #   if [ -d "$d" ]; then
-  #     rm -rf -- "$d"
-  #     touch -- "$d"
-  #   fi
-  # done
+  # causes issues?
+  for d in "$dir/OnDeviceHeadSuggestModel" \
+    "$dir/Default/optimization_guide_prediction_model_downloads" \
+    "$dir/Default/optimization_guide_model_metadata_store" \
+    "$dir/Default/optimization_guide_hint_cache_store" \
+    "$dir/pnacl" "$dir/BrowserMetrics"; do
+    if [ -d "$d" ]; then
+      rm -rf -- "$d"
+      touch -- "$d"
+    fi
+  done
 
   for file in "$dir/Safe Browsing" "$dir/Crash Reports" "$dir/"**/*Cache "$dir"/**/Cache* "$dir"/**/LOG "$dir"/**/LOG.old "$dir/Default/IndexedDB/"*; do
     if [ -e "$file" ]; then rm -rf -- "$file"; fi
@@ -56,13 +56,24 @@ clean_cache_dir() {
   if [ -e "$file" ]; then rm -rf -- "$file"; fi
 }
 
-# config_dir="${CHROME_CONFIG_HOME:-${XDG_CONFIG_HOME:-$HOME/.config}}/google-chrome/"
-config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/vivaldi/"
-log "Cleaning config directory $config_dir"
-size_diff "$config_dir" clean_config_dir "$config_dir"
+clean_browser_conf_and_cache() {
+  local config_dir=$1 cache_dir=$2
+  log "Cleaning config directory $config_dir"
+  size_diff "$config_dir" clean_config_dir "$config_dir"
+  log "Cleaning cache directory $cache_dir"
+  size_diff "$cache_dir" clean_cache_dir "$cache_dir"
+}
 
-log ''
-
-cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/vivaldi/"
-log "Cleaning cache directory $cache_dir"
-size_diff "$cache_dir" clean_cache_dir "$cache_dir"
+config_dir="${XDG_CONFIG_HOME:-$HOME/.config}"
+cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}"
+case "$BROWSER" in
+"" | vivaldi*)
+  log "Cleaning browser configuration for vivaldi"
+  clean_browser_conf_and_cache "$config_dir/vivaldi" "$cache_dir/vivaldi"
+  ;;
+google-chrome*)
+  log "Cleaning browser configuration for google-chrome"
+  config_dir="${CHROME_CONFIG_HOME:-${XDG_CONFIG_HOME:-$HOME/.config}}"
+  clean_browser_conf_and_cache "$config_dir/google-chrome" "$cache_dir/google-chrome"
+  ;;
+esac
