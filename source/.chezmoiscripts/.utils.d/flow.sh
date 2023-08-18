@@ -100,3 +100,20 @@ function sudo_cmd() {
   fi
   "${cmd[@]}"
 }
+
+# usage: cmd_or_sudo CMD...
+# runs cmd, then if it fails, tries again with sudo.
+function cmd_or_sudo() {
+  local code=0 cmd
+  cmd=("$@")
+  "${cmd[@]}" || code=$?
+  if [ "$code" -ne 0 ]; then
+    code=1
+    err "Running '${cmd[*]}' failed, trying again with sudo"
+    sudo_cmd "${cmd[@]}" || code=$?
+  fi
+  if [ "$code" -ne 0 ]; then
+    err "Could not run command '${cmd[*]}'"
+  fi
+  return "$code"
+}

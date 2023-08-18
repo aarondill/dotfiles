@@ -49,7 +49,6 @@ function download() {
 function download_file() {
   local dir='' temp
   local file_url=$1 dest=${2:-} mode=${3:-}
-  export no_sudo=y
 
   if [ -n "$dest" ]; then
     dir=$(dirname "$dest")
@@ -69,17 +68,8 @@ function download_file() {
     return 0
   fi
 
-  if ! mkdir -p "$dir"; then
-    no_sudo=''
-    log "Creating directory failed, trying again with sudo"
-    sudo_cmd mkdir -p "$dir" || {
-      rm_exit_cleanup "$temp"
-      abort "could not create directory $dir"
-    }
-  fi
-
-  if ! [ -w "$dir" ]; then no_sudo=''; fi
+  sudo_mkdir -p "$dir" || rm_exit_cleanup "$temp"
   # resets permissions
-  sudo_cmd install --no-target-directory -- "$temp" "$dest" || rm_exit_cleanup "$temp"
+  sudo_writable "$dir" sudo_cmd install --no-target-directory -- "$temp" "$dest" || rm_exit_cleanup "$temp"
   if [ -n "$mode" ]; then sudo_cmd chmod "$mode" "$dest" || true; fi
 }
