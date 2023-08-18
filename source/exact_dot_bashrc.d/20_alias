@@ -36,13 +36,17 @@ alias shutdown="history -a; /sbin/shutdown"
 # alias backup="~/.backup/dobackup"
 # alias lastbackup="/usr/bin/cat ~/.backup/backup-time"
 
+browsers=(firefox firefox-esr vivaldi vivaldi-stable google-chrome google-chrome-stable)
 # Alias to remove error messages on opening google-chrome
-# Should always be present, bc is local program
-if has google-chrome-stable; then
-  alias browser="google-chrome-stable"
-  alias google-chrome="google-chrome-stable"
-  export BROWSER="google-chrome-stable"
-fi
+for b in "${browsers[@]}"; do
+  # shellcheck disable=SC2139 # These aliases should expand at definition
+  if has "$b"; then
+    alias "${b%-*}=$b" # remove everything after the last dash. browser-version --> browser
+    alias browser="$b"
+    export BROWSER="$b"
+  fi
+done
+unset browsers b
 
 alias fslite='browser fslite.vercel.app'
 # Don't show loopback, and show more useful columns
