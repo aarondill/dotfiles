@@ -36,7 +36,7 @@ alias shutdown="history -a; /sbin/shutdown"
 # alias backup="~/.backup/dobackup"
 # alias lastbackup="/usr/bin/cat ~/.backup/backup-time"
 
-browsers=(firefox firefox-esr vivaldi vivaldi-stable google-chrome google-chrome-stable)
+browsers=(vivaldi vivaldi-stable firefox firefox-esr google-chrome google-chrome-stable)
 # Alias to remove error messages on opening google-chrome
 for b in "${browsers[@]}"; do
   # shellcheck disable=SC2139 # These aliases should expand at definition
