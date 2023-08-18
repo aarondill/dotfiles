@@ -18,7 +18,7 @@ PACKAGES=(
   openvpn p7zip rsync shfmt tlp trash-cli tree util-linux
   zip unzip zoxide speedtest-cli ripgrep hexedit fuse2
   luajit python-pip base-devel wezterm bat bash-completion
-  exa git-delta firefox
+  exa git-delta vivaldi
   # fonts
   ttf-nerd-fonts-symbols-mono noto-fonts-cjk noto-fonts-extra
   # icon fonts

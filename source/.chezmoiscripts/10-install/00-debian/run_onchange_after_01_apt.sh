@@ -47,7 +47,7 @@ VIRTUAL_MACHINE_PACKAGES=(
 GRAPHICAL_PACKAGES=(
   dconf-editor gparted gucharmap luckybackup zeal
   wmctrl xdotool xclip xdg-utils
-  firefox-esr firejail # not really graphical, but I only use it for firefox, so I don't need it otherwise
+  # firefox-esr firejail # not really graphical, but I only use it for firefox, so I don't need it otherwise
 )
 
 GNOME_PACKAGES=(
@@ -90,9 +90,9 @@ if [ "$OS" = "Ubuntu" ]; then
   if ! file_exists /etc/apt/sources.list.d/neovim-ppa-ubuntu-unstable-*.list; then
     log_and_run 'installing neovim nightly ppa' sudo_cmd add-apt-repository --no-update -y ppa:neovim-ppa/unstable
   fi
-  if ! file_exists /etc/apt/sources.list.d/deki-ubuntu-firejail-*.list; then
-    log_and_run 'installing firejail ppa' sudo_cmd add-apt-repository --no-update -y ppa:deki/firejail
-  fi
+  # if ! file_exists /etc/apt/sources.list.d/deki-ubuntu-firejail-*.list; then
+  #   log_and_run 'installing firejail ppa' sudo_cmd add-apt-repository --no-update -y ppa:deki/firejail
+  # fi
 fi
 
 log_and_run 'Updating sources' apt_update
