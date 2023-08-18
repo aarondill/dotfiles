@@ -16,6 +16,7 @@ firejail_links=("/usr/local/bin/firefox-esr" "/usr/local/bin/firefox")
 if ! [ -e "$firefox" ] && [ -x "$firefox_esr" ]; then
   log "linking $firefox_esr to $firefox"
   mklink "$firefox_esr" "$firefox"
+  success
 else
   err "$firefox already linked to esr. Skipping linking."
 fi
@@ -38,3 +39,4 @@ for c in "${firejail_links[@]}"; do
     fi
   fi
 done
+success
