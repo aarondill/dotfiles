@@ -59,3 +59,28 @@ function mklink() {
   relpath=$(relpath "$(dirname -- "$source")" "${dest:-.}") # Allow empty dest (use cwd) -- How ln works
   mklink_abs "$relpath" "$dest"
 }
+
+# usage: _test_all OP files...
+# returns 0 if 'test OP' passes for all arguments, 1 otherwise.
+# Returns 2 if no arguments are passed. Useful with globs
+# OP must start with a dash '-', or the script will abort
+_test_all() {
+  local op="${1:-}"
+  case "$op" in
+  -*) ;;
+  *) abort "Invalid argument to _test_all: $op" 2 ;;
+  esac
+  if [ "$#" -eq 0 ]; then return 2; fi
+  for f in "$@"; do
+    test "$op" "$f" || return 1
+  done
+  return 0
+}
+# returns 0 if all arguments are files that exist, 1 otherwise. Returns 2 if no arguments are passed. Useful with globs
+function is_file() { _test_all -f "$@"; }
+# returns 0 if all arguments are dirs that exist, 1 otherwise. Returns 2 if no arguments are passed. Useful with globs
+function is_dir() { _test_all -d "$@"; }
+# returns 0 if all arguments are links that exist, 1 otherwise. Returns 2 if no arguments are passed. Useful with globs
+function is_link() { _test_all -L "$@"; }
+# returns 0 if all arguments exist (file or dir), 1 otherwise. Returns 2 if no arguments are passed. Useful with globs
+function file_exists() { _test_all -e "$@"; }
