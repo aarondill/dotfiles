@@ -18,9 +18,9 @@ function relpath() {
   local relto=$1
   local path=$2
   if has_cmd realpath; then
-    realpath --canonicalize-missing --no-symlinks --relative-to="$relto" "$path"
+    realpath --canonicalize-missing --no-symlinks --relative-to="$relto" -- "$path"
   elif has_cmd perl; then
-    perl -le 'use File::Spec; print File::Spec->abs2rel(@ARGV)' "$path" "$relto"
+    perl -le 'use File::Spec; print File::Spec->abs2rel(@ARGV)' -- "$path" "$relto"
   else
     err "Could not find a command to resolve relative paths"
     # no output -- should we output the full path?
