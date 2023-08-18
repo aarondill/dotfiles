@@ -20,19 +20,21 @@ else
   err "$firefox already linked to esr. Skipping linking."
 fi
 
-if has_cmd firejail; then
-  firejail=$(command -v firejail)
-  for c in "${firejail_links[@]}"; do
-    name=$(basename -- "$c")
-    if has_cmd "$name"; then
-      if ! [ -L "$c" ]; then
-        sudo_mkdir -p -- "$(basename -- "$c")"
-        mklink "$firejail" "$c"
-      else
-        err "Skipping link $c. Link already exists."
-      fi
-    fi
-  done
-else
+if ! has_cmd firejail; then
   abort 'firejail not found. Skipping firejail links.' 0
 fi
+
+firejail=$(command -v firejail)
+log "Setting up firefox with firejail at $firejail"
+for c in "${firejail_links[@]}"; do
+  name=$(basename -- "$c")
+  if has_cmd "$name"; then
+    if ! [ -L "$c" ]; then
+      log "Linking $firejail to $c"
+      sudo_mkdir -p -- "$(basename -- "$c")"
+      mklink "$firejail" "$c"
+    else
+      err "Skipping link $c. Link already exists."
+    fi
+  fi
+done
