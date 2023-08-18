@@ -1,5 +1,6 @@
 #! /usr/bin/env bash
 set -euC -o pipefail
+shopt -s nullglob
 export SHELLOPTS
 # Source utils
 SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
@@ -46,6 +47,7 @@ VIRTUAL_MACHINE_PACKAGES=(
 GRAPHICAL_PACKAGES=(
   dconf-editor gparted gucharmap luckybackup zeal
   wmctrl xdotool xclip xdg-utils
+  firefox-esr firejail # not really graphical, but I only use it for firefox, so I don't need it otherwise
 )
 
 GNOME_PACKAGES=(
@@ -84,9 +86,15 @@ function install_graphical_packages() {
   install_if_available "${graphical_packages[@]}"
 }
 
-if [ "$OS" = "Ubuntu" ] && ! [ -f /etc/apt/sources.list.d/neovim-ppa-ubuntu-unstable-jammy.list ]; then
-  log_and_run 'installing neovim nightly ppa' sudo_cmd add-apt-repository -y ppa:neovim-ppa/unstable
+if [ "$OS" = "Ubuntu" ]; then
+  if ! file_exists /etc/apt/sources.list.d/neovim-ppa-ubuntu-unstable-*.list; then
+    log_and_run 'installing neovim nightly ppa' sudo_cmd add-apt-repository -y ppa:neovim-ppa/unstable
+  fi
+  if ! file_exists /etc/apt/sources.list.d/deki-ubuntu-firejail-*.list; then
+    log_and_run 'installing firejail ppa' sudo_cmd add-apt-repository -y ppa:deki/firejail
+  fi
 fi
+
 log_and_run 'Updating sources' apt_update
 log_and_run 'Installing packages' install_packages
 log_and_run 'Installing graphical packages' install_graphical_packages
