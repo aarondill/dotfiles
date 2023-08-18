@@ -1,18 +1,11 @@
 #!/usr/bin/env bash
 # ==> download.sh <==
-SCRIPT_DIR="${SOURCE_DIR:-${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}}/.chezmoiscripts" # defined in parent script
-_script_dir="$SCRIPT_DIR/.utils.d"
-if [ -z "$__FROM_UTILS_SH" ]; then
-  # shellcheck source=./flow.sh
-  . "$_script_dir/flow.sh" # abort
-  # shellcheck source=./output.sh
-  . "$_script_dir/output.sh" # log
-  # shellcheck source=./tempfile.sh
-  . "$_script_dir/tempfile.sh" # _add_tempfiles, rm_exit_cleanup
-  # shellcheck source=./files.sh
-  . "$_script_dir/files.sh" # sudo_mkdir
+if false; then
+  . ./flow.sh     # abort
+  . ./output.sh   # log
+  . ./tempfile.sh # _add_tempfiles, rm_exit_cleanup
+  . ./files.sh    # sudo_mkdir
 fi
-unset _script_dir
 
 ## --------------------------------------------------------------------------------------------------
 ## -------------------------------------------- Download --------------------------------------------

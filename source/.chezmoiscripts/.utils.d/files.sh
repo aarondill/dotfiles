@@ -1,12 +1,8 @@
 #!/usr/bin/env bash
 # ==> files.sh <==
-SCRIPT_DIR="${SOURCE_DIR:-${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}}/.chezmoiscripts" # defined in parent script
-_script_dir="$SCRIPT_DIR/.utils.d"
-if [ -z "$__FROM_UTILS_SH" ]; then
-  # shellcheck source=./flow.sh
-  . "$_script_dir/flow.sh" # has_cmd sudo_cmd cmd_or_sudo
+if false; then
+  . ./flow.sh # has_cmd sudo_cmd cmd_or_sudo
 fi
-unset _script_dir
 
 ## --------------------------------------------------------------------------------------------------
 ## --------------------------------------------- Files ----------------------------------------------

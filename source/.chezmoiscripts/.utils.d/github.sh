@@ -1,17 +1,10 @@
 #!/usr/bin/env bash
 # ==> github.sh <==
-SCRIPT_DIR="${SOURCE_DIR:-${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}}/.chezmoiscripts" # defined in parent script
-_script_dir="$SCRIPT_DIR/.utils.d"
-if [ -z "$__FROM_UTILS_SH" ]; then
-  # shellcheck source=./output.sh
-  . "$_script_dir/output.sh" # err log
-  # shellcheck source=./flow.sh
-  . "$_script_dir/flow.sh" # abort
-  # shellcheck source=./download.sh
-  . "$_script_dir/download.sh" # get_url_headers download_file
+if false; then
+  . ./output.sh   # err log
+  . ./flow.sh     # abort
+  . ./download.sh # get_url_headers download_file
 fi
-unset _script_dir
-
 ## --------------------------------------------------------------------------------------------------
 ## --------------------------------------------- GitHub ---------------------------------------------
 ## --------------------------------------------------------------------------------------------------

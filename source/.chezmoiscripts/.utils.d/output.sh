@@ -1,12 +1,5 @@
 #!/usr/bin/env bash
 # ==> output.sh <==
-SCRIPT_DIR="${SOURCE_DIR:-${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}}/.chezmoiscripts" # defined in parent script
-_script_dir="$SCRIPT_DIR/.utils.d"
-if [ -z "$__FROM_UTILS_SH" ]; then
-  true # source here if needed
-fi
-unset _script_dir
-
 ## --------------------------------------------------------------------------------------------------
 ## --------------------------------------------- Output ---------------------------------------------
 ## --------------------------------------------------------------------------------------------------

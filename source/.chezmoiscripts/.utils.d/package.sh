@@ -1,12 +1,8 @@
 #!/usr/bin/env bash
 # ==> package.sh <==
-SCRIPT_DIR="${SOURCE_DIR:-${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}}/.chezmoiscripts" # defined in parent script
-_script_dir="$SCRIPT_DIR/.utils.d"
-if [ -z "$__FROM_UTILS_SH" ]; then
-  # shellcheck source=./flow.sh
-  . "$_script_dir/flow.sh" # abort
+if false; then
+  . ./flow.sh # abort
 fi
-unset _script_dir
 
 ## --------------------------------------------------------------------------------------------------
 ## ------------------------------------------- APT utils --------------------------------------------

@@ -1,12 +1,8 @@
 #!/usr/bin/env bash
 # ==> flow.sh <==
-SCRIPT_DIR="${SOURCE_DIR:-${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}}/.chezmoiscripts" # defined in parent script
-_script_dir="$SCRIPT_DIR/.utils.d"
-if [ -z "$__FROM_UTILS_SH" ]; then
-  # shellcheck source=./output.sh
-  . "$_script_dir/output.sh" # err, log, success
+if false; then
+  . ./output.sh # err, log, success
 fi
-unset _script_dir
 
 ## --------------------------------------------------------------------------------------------------
 ## ------------------------------------------ Control Flow ------------------------------------------
