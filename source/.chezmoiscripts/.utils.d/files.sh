@@ -52,14 +52,18 @@ function mklink_abs() {
   sudo_writable "$dest" ln "${args[@]}"
 }
 
-# usage: mklink linkto [linkname]
+# usage: mklink linkcontent [linkname]
 # makes relative links.
 # see mklink_abs for more information
 function mklink() {
-  local relpath
-  local source=$1 dest=${2:-}
-  relpath=$(relpath "$(dirname -- "$source")" "${dest:-.}") # Allow empty dest (use cwd) -- How ln works
-  mklink_abs "$relpath" "$dest"
+  local relative_content=''
+  local linkcontent=$1 linkname=${2:-}
+  if [ -n "$linkname" ]; then # Allow empty linkname (use cwd) -- How ln works
+    relative_content="$(relpath "$(dirname -- "$linkname")" "$linkcontent")"
+  else
+    relative_content="$(relpath "./$(basename -- "$linkcontent")" "$linkcontent")"
+  fi
+  mklink_abs "$relative_content" "$linkname"
 }
 
 # usage: _test_all OP files...
