@@ -69,14 +69,20 @@ if [ "$#" -gt 0 ]; then
   exit 2
 fi
 
-# PROFILE
 conf_dir=${XDG_CONFIG_HOME:-$HOME/.config}
-sync_shm "$conf_dir/vivaldi"
-
-# CACHE
 cache_dir=${XDG_CACHE_HOME:-$HOME/.cache}
-sync_shm "$cache_dir/vivaldi"
+local_dir=$HOME/.local/share # other setups are not supported with firefox
 
-# Firefox
-local_dir=$HOME/.local/share # other setups are not supported
-sync_shm "$local_dir/firefox"
+case "${BROWSER:-}" in # Sync active browser (or vivaldi as default)
+'' | vivaldi*)
+  sync_shm "$conf_dir/vivaldi"  # PROFILE
+  sync_shm "$cache_dir/vivaldi" # CACHE
+  ;;
+firefox*)
+  sync_shm "$local_dir/firefox" # Everything is firejailed into this directory
+  ;;
+google-chrome*)
+  sync_shm "$conf_dir/google-chrome"  # PROFILE
+  sync_shm "$cache_dir/google-chrome" # CACHE
+  ;;
+esac
