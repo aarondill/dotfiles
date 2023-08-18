@@ -32,7 +32,7 @@ for c in "${firejail_links[@]}"; do
   if has_cmd "$name"; then
     if ! [ -L "$c" ]; then
       log "Linking $firejail to $c"
-      sudo_mkdir -p -- "$(basename -- "$c")"
+      sudo_mkdir -p -- "$(dirname -- "$c")"
       mklink "$firejail" "$c"
     else
       err "Skipping link $c. Link already exists."
