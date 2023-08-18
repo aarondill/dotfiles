@@ -2,9 +2,13 @@
 # ==> files.sh <==
 (return 0 2>/dev/null) && _SOURCED=1 || _SOURCED=0
 if [ "$_SOURCED" -eq 0 ]; then # for shellcheck
-  . ./flow.sh                  # has_cmd sudo_cmd cmd_or_sudo
+  case "${BASH_SOURCE[0]}" in  # newline to fix bash-lsp syntax error
+  */*) _script_dir=${BASH_SOURCE%/*} ;; *) _script_dir=./ ;; esac
+  _script_dir=$(cd -P -- "$_script_dir" &>/dev/null && pwd -P) # eval symlinks (dirs, not the script itself)
+  # shellcheck source=./flow.sh
+  . "$_script_dir/flow.sh" # has_cmd sudo_cmd cmd_or_sudo
 fi
-unset _SOURCED
+unset _SOURCED _script_dir
 
 ## --------------------------------------------------------------------------------------------------
 ## --------------------------------------------- Files ----------------------------------------------

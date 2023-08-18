@@ -2,9 +2,13 @@
 # ==> flow.sh <==
 (return 0 2>/dev/null) && _SOURCED=1 || _SOURCED=0
 if [ "$_SOURCED" -eq 0 ]; then # for shellcheck
-  . ./output.sh                # err, log, success
+  case "${BASH_SOURCE[0]}" in  # newline to fix bash-lsp syntax error
+  */*) _script_dir=${BASH_SOURCE%/*} ;; *) _script_dir=./ ;; esac
+  _script_dir=$(cd -P -- "$_script_dir" &>/dev/null && pwd -P) # eval symlinks (dirs, not the script itself)
+  # shellcheck source=./output.sh
+  . "$_script_dir/output.sh" # err, log, success
 fi
-unset _SOURCED
+unset _SOURCED _script_dir
 
 ## --------------------------------------------------------------------------------------------------
 ## ------------------------------------------ Control Flow ------------------------------------------
