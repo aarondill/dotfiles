@@ -20,6 +20,7 @@ if [ "$_SOURCED" -eq 0 ]; then printf '%s\n' "You should source this file. not r
 SCRIPT_DIR="${SOURCE_DIR:-${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}}/.chezmoiscripts"
 
 export SHELLOPTS
+export __FROM_UTILS_SH=1 # used in the .utils.d/* to determine if called from here.
 # shellcheck source=./.utils.d/output.sh
 . "$SCRIPT_DIR"/.utils.d/output.sh # output functions
 # shellcheck source=./.utils.d/flow.sh
@@ -36,6 +37,7 @@ export SHELLOPTS
 . "$SCRIPT_DIR"/.utils.d/github.sh # github functions
 # shellcheck source=./.utils.d/package.sh
 . "$SCRIPT_DIR"/.utils.d/package.sh # Pacman/APT functions
+unset __FROM_UTILS_SH
 
 ## --------------------------------------------------------------------------------------------------
 ## ------------------------------------------- Variables --------------------------------------------

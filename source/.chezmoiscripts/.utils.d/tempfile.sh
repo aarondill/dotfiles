@@ -1,13 +1,11 @@
 #!/usr/bin/env bash
 # ==> tempfile.sh <==
-(return 0 2>/dev/null) && _SOURCED=1 || _SOURCED=0
-if [ "$_SOURCED" -eq 0 ]; then # for shellcheck
-  case "${BASH_SOURCE[0]}" in  # newline to fix bash-lsp syntax error
-  */*) _script_dir=${BASH_SOURCE%/*} ;; *) _script_dir=./ ;; esac
-  _script_dir=$(cd -P -- "$_script_dir" &>/dev/null && pwd -P) # eval symlinks (dirs, not the script itself)
-  true                                                         # source here if needed
+SCRIPT_DIR="${SOURCE_DIR:-${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}}/.chezmoiscripts" # defined in parent script
+_script_dir="$SCRIPT_DIR/.utils.d"
+if [ -z "$__FROM_UTILS_SH" ]; then
+  true # source here if needed
 fi
-unset _SOURCED _script_dir
+unset _script_dir
 
 ## --------------------------------------------------------------------------------------------------
 ## -------------------------------------------- Tempfile --------------------------------------------
