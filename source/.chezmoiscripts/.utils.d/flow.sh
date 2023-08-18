@@ -97,9 +97,10 @@ function run_own_shell() {
 # Use instead of sudo. This will handle the case where the user is root.
 # note: the sudo command can be user specified, so don't pass any flag
 function sudo_cmd() {
+  local _sudo
   # shellcheck disable=SC2206 # quoting is intentional
   [ "$(id -u)" -ne 0 ] && _sudo=(${SUDO:-sudo}) || _sudo=()
-  "${_sudo[@]}" "${cmd[@]}"
+  "${_sudo[@]}" "$@"
 }
 
 # usage: cmd_or_sudo CMD...
