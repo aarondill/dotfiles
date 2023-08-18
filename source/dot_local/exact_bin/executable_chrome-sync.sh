@@ -76,3 +76,7 @@ sync_shm "$conf_dir/vivaldi"
 # CACHE
 cache_dir=${XDG_CACHE_HOME:-$HOME/.cache}
 sync_shm "$cache_dir/vivaldi"
+
+# Firefox
+local_dir=$HOME/.local/share # other setups are not supported
+sync_shm "$local_dir/firefox"

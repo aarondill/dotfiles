@@ -20,12 +20,15 @@ nowhitelist ${HOME}/.cache/mozilla/firefox
 nowhitelist ${HOME}/.pki
 nowhitelist ${HOME}/.local/share/pki
 
+whitelist ${HOME}/.local/share/applications
+whitelist ${HOME}/.local/share/icons
 whitelist ${DOWNLOADS}
 
 # Sandbox HOME to $HOME/.local/share/firefox/
 noblacklist ${HOME}/.local/share/firefox
 mkdir ${HOME}/.local/share/firefox
 private ${HOME}/.local/share/firefox
+
 # Don't restrict dbus
 ignore dbus-user none
 ignore dbus-system none
@@ -41,6 +44,8 @@ apparmor
 # fix system calls
 seccomp !chroot,!sched_setattr
 ignore seccomp !chroot
+
+keep-dev-shm # allow for /dev/shm to be accessed (used to load conf into memory)
 
 # for the love of god. Please be quieter.
 quiet
