@@ -1,6 +1,11 @@
-# requires ./output.sh -- err log
-# requires ./flow.sh -- abort
-# requires ./download.sh -- get_url_headers download_file
+#!/usr/bin/env bash
+(return 0 2>/dev/null) && _SOURCED=1 || _SOURCED=0
+if [ "$_SOURCED" -eq 0 ]; then # for shellcheck
+  . ./output.sh                # err log
+  . ./flow.sh                  # abort
+  . ./download.sh              # get_url_headers download_file
+fi
+unset _SOURCED
 
 ## --------------------------------------------------------------------------------------------------
 ## --------------------------------------------- GitHub ---------------------------------------------

@@ -1,6 +1,12 @@
-# requires ./flow.sh -- abort
-# requires ./output.sh -- log
-# requires ./tempfile.sh -- _add_tempfiles, rm_exit_cleanup
+#!/usr/bin/env bash
+(return 0 2>/dev/null) && _SOURCED=1 || _SOURCED=0
+if [ "$_SOURCED" -eq 0 ]; then # for shellcheck
+  . ./flow.sh                  # abort
+  . ./output.sh                # log
+  . ./tempfile.sh              # _add_tempfiles, rm_exit_cleanup
+  . ./files.sh                 # sudo_mkdir
+fi
+unset _SOURCED
 
 ## --------------------------------------------------------------------------------------------------
 ## -------------------------------------------- Download --------------------------------------------

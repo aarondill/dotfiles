@@ -1,4 +1,9 @@
-# requires ./output.sh -- err, log, success
+#!/usr/bin/env bash
+(return 0 2>/dev/null) && _SOURCED=1 || _SOURCED=0
+if [ "$_SOURCED" -eq 0 ]; then # for shellcheck
+  . ./output.sh                # err, log, success
+fi
+unset _SOURCED
 
 ## --------------------------------------------------------------------------------------------------
 ## ------------------------------------------ Control Flow ------------------------------------------
