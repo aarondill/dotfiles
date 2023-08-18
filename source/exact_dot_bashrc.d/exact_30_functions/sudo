@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+# ~/.bashrc.d/30_functions/sudo
+#
+# set up sudo override for QOE
+
+# only do these if sudo exists
+if ! command -v sudo &>/dev/null; then
+  return
+fi
+
+# could break if passed `sudo -o option_arg`
+# Can't fix that without parsing all of sudo's arguments correctly
+function sudo() {
+  local path cmd
+  local old_args=()
+  while [ -n "${1+defined}" ]; do
+    case "$1" in
+    --) break ;;
+    -*) old_args+=("$1") && shift ;;
+    *) break ;;
+    esac
+  done
+  cmd=$1
+  path="$(which -- "$cmd" 2>/dev/null)"
+  [ -f "$path" ] && cmd="$path" # use -f instead of -x because root may be able to execute it
+  # remove cmd, then replace with new value
+  shift && set "${old_args[@]}" "$cmd" "$@"
+  command sudo "$@"
+}

@@ -13,7 +13,7 @@ alias quit='exit'
 alias :q='exit'
 # Alias sudo to call sudo with *my* $HOME/ENV/PATH
 # alias sudo="sudo -E env PATH=\"\$PATH\" "
-alias sudo="sudo -E " # don't use env so permitted commands work
+alias sudo='sudo -E ' # dont use env so permitted commands still work
 # Unrestrict fd by default
 if has fdfind; then
   alias fd="fdfind -uu"
@@ -44,6 +44,7 @@ for b in "${browsers[@]}"; do
     alias "${b%-*}=$b" # remove everything after the last dash. browser-version --> browser
     alias browser="$b"
     export BROWSER="$b"
+    break
   fi
 done
 unset browsers b
@@ -82,7 +83,7 @@ alias cl='clear'
 alias tree='tree -a' # show hidden
 if has tty-clock; then alias clock='tty-clock  -sScbtrn'; fi
 
-if has n; then alias n='sudo n'; fi
+if has n; then alias n='sudo "$(which n)"'; fi
 
 # Show battery information
 alias battery='upower -i $(upower -e | grep BAT)'
