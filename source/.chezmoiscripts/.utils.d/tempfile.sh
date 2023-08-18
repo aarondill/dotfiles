@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# ==> tempfile.sh <==
 (return 0 2>/dev/null) && _SOURCED=1 || _SOURCED=0
 if [ "$_SOURCED" -eq 0 ]; then # for shellcheck
   true                         # source here if needed

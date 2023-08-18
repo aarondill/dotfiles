@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# ==> .utils.sh <==
 
 # THIS FILE IS SOURCED! preserve the old options
 # https://unix.stackexchange.com/a/383581

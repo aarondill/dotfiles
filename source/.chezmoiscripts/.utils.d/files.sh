@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# ==> files.sh <==
 (return 0 2>/dev/null) && _SOURCED=1 || _SOURCED=0
 if [ "$_SOURCED" -eq 0 ]; then # for shellcheck
   . ./flow.sh                  # has_cmd sudo_cmd cmd_or_sudo
