@@ -74,14 +74,14 @@ cache_dir=${XDG_CACHE_HOME:-$HOME/.cache}
 local_dir=$HOME/.local/share # other setups are not supported with firefox
 
 case "${BROWSER:-}" in # Sync active browser (or vivaldi as default)
-'' | vivaldi*)
+'' | *vivaldi*)
   sync_shm "$conf_dir/vivaldi"  # PROFILE
   sync_shm "$cache_dir/vivaldi" # CACHE
   ;;
-firefox*)
+*firefox*)
   sync_shm "$local_dir/firefox" # Everything is firejailed into this directory
   ;;
-google-chrome*)
+*google-chrome*)
   sync_shm "$conf_dir/google-chrome"  # PROFILE
   sync_shm "$cache_dir/google-chrome" # CACHE
   ;;

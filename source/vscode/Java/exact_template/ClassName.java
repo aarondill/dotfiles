@@ -1,3 +1,5 @@
+import java.util.Scanner;
+
 /**
  * public class ClassName
  *
@@ -13,6 +15,9 @@
  */
 public class ClassName {
   public static void main(String... args) {
+    Scanner scan = new Scanner(System.in);
+    System.out.println(scan.nextLine());
     System.out.println("Hello World!");
+    scan.close();
   }
 }

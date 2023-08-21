@@ -5,9 +5,10 @@ set -euC -o pipefail
 # BEGIN CONFIGURATION
 
 # stdin. Tabs will be maintained
+stdin=
 IFS='' read -r -d '' stdin <<'EOF' || true
 EOF
-stdin_file=    # This will override stdin. Relative to output_dir (use input_files if needed)
+stdin_file=-   # This will override stdin. Relative to output_dir (use input_files if needed)
 cargs=()       # javac
 jargs=()       # java
 classpath=     # output_dir will be automatically included
@@ -37,6 +38,7 @@ resolve() {
   local relto="${2:-$this_dir}"
   local ret=''
   case "$path" in
+  -) ret=- ;;
   '') ret='' ;; # if passed an empty string, return the empty string
   /*) ret="$path" ;;
   ./*) ret="$relto/${path#./}" ;;
@@ -62,14 +64,24 @@ class_file=$(resolve "$java_class.class" "$output_dir") # relative to $output_di
 stdin_file=$(resolve "${stdin_file:-}" "$output_dir")   # relative to $output_dir
 
 if ! [ -f "$java_file" ]; then abort "could not find '$java_file'. Please double check the names of both files." 1; fi
-if [ -n "$stdin_file" ] && ! [ -f "$stdin_file" ]; then abort "could not find '$stdin_file'. Please double check the name of the file, or remove it from the stdin_file." 1; fi
 if [ -f "$class_file" ]; then
   log "cleaning up old class file"
   show_run rm -f "$class_file"
 fi
 
-# setup stdin_file if it exists -- override the stdin variable above
-if [ -f "$stdin_file" ]; then IFS='' read -r -d '' stdin <"$stdin_file" || true; fi
+if [ -n "$stdin_file" ] && ! [ "$stdin_file" = - ] && ! [ -e "$stdin_file" ]; then
+  abort "could not find '$stdin_file'. Please double check the name of the file, or remove it from the stdin_file." 1
+fi
+stdin() {
+  # setup stdin_file if it exists -- override the stdin variable above
+  if [ "${stdin_file:-}" = - ]; then
+    "$@"
+  elif [ -e "${stdin_file:-}" ]; then
+    cat "$stdin_file" | "$@"
+  elif [ -n "${stdin:-}" ]; then
+    printf '%s' "$stdin" | "$@"
+  fi
+}
 
 cd "$this_dir"
 if ! [ -d "$output_dir" ]; then
@@ -92,8 +104,7 @@ _classpath="$output_dir"
 show_run javac --class-path "$_classpath" -d "$output_dir" "${cargs[@]}" "$java_file"
 
 code=0
-printf '%s' "${stdin:-}" |
-  show_run java --class-path "$_classpath" "$java_class" "${jargs[@]}" "$@" || code=$?
+stdin show_run java --class-path "$_classpath" "$java_class" "${jargs[@]}" "$@" || code=$?
 
 if [ "$code" != 0 ]; then
   err "Command failed with exit code: $code"
