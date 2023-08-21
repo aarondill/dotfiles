@@ -126,6 +126,13 @@ VERBOSITY=4
 # Write specially-formatted versions of output messages to the specified file.  The format used is designed to be easily consumable by other programs.
 LOGFILE=
 
+# Delete incremental sets of all backups sets that are older than the count:th last full backup (in other words, keep only old full backups and not their increments).
+# count must be larger than zero. A value of 1 means that only the single most recent backup chain will be kept intact.
+REMOVE_ALL_INC_OF_BUT_N_FULL=3
+# Delete all backup sets older than the given time.  Old backup sets will not be deleted if backup sets newer than time depend on them.
+# See the TIME FORMATS section for more information.
+REMOVE_OLDER_THAN=3M
+
 # When backing up or restoring, this option specifies that the local archive directory is to be created in path.
 # If the archive directory is not specified, the default will be to create the archive directory in ~/.cache/duplicity/.
 # ARCHIVE_DIR=~/.cache/duplicity/
@@ -141,11 +148,18 @@ LOGFILE=
 
 usage() {
   cat <<-EOF
-backup [--full|--incr]
+backup [opts]...
 
 Run a system backup using duplicity.
 Pass --full to specify full backup or --incr to specify incremental backup
 If neither argument is passed, a full will be made if the most recent full backup is FULL_IF_OLDER old
+
+Flags:
+--full,--incr   passed to duplicity to force a full or incremental backup
+--help          show this message
+--cleanup,-c    Cleanup old backups
+--dry-run,-n    Do not run any duplicity commands, just show them (set BACKUP_DRY_RUN to set this)
+--verbose,-v    Show all duplicity commands before running them (set BACKUP_VERBOSE to set this)
 EOF
 }
 log() { printf '%s\n' "$@"; }
@@ -158,10 +172,15 @@ abort() {
 # Array of arguments to pass to duplicity
 args=()
 
+cleanup=0
+command=() # an array for the sake of empty strings (allows to skip the command and dynamically create full backups)
 for arg in "$@"; do
   case "$arg" in
-  --full | --incr) args=("${args[@]}" "${arg#--}") ;;
+  --full | --incr) command=("${arg#--}") ;;
   --help | -h) usage && exit 0 ;;
+  --cleanup | -c) cleanup=1 ;;
+  --dry-run | -n) BACKUP_DRY_RUN=1 ;; # overrides environment variables
+  --verbose | -v) BACKUP_VERBOSE=1 ;; # overrides environment variables
   --*) abort "Unknown option: '$arg'" ;;
   -*) abort "Unknown option: '$arg'" ;;
   *) abort "this script does not support positional arguments" ;;
@@ -262,8 +281,28 @@ if [ "${#args[@]}" -eq 0 ]; then
   abort "No arguments were specified. Something went wrong" 3
 fi
 
-log "Backing up to $DESTINATION_URI"
-verbose "$DUPLICITY" --full-if-older-than="${FULL_IF_OLDER:-1M}" "${args[@]}" -- "$SOURCE_DIR" "$DESTINATION_URI"
+if [ "$cleanup" -eq 0 ]; then
+  log "Backing up to $DESTINATION_URI"
+  verbose "$DUPLICITY" --full-if-older-than="${FULL_IF_OLDER:-1M}" "${command[@]}" "${args[@]}" -- "$SOURCE_DIR" "$DESTINATION_URI"
+else
+  log "Cleaning up $DESTINATION_URI"
+  did_something=0
+  if [ -n "${REMOVE_OLDER_THAN:-}" ]; then # only if defined
+    log "Removing backups older than $REMOVE_OLDER_THAN"
+    did_something=1
+    command=(remove-older-than "$REMOVE_OLDER_THAN" --force)
+    verbose "$DUPLICITY" "${command[@]}" "${args[@]}" -- "$DESTINATION_URI"
+  fi
+  if [ -n "$REMOVE_ALL_INC_OF_BUT_N_FULL" ]; then # only if defined
+    log
+    log "Removing all incremental backups except for $REMOVE_ALL_INC_OF_BUT_N_FULL of full at $DESTINATION_URI"
+    did_something=1
+    command=(remove-all-inc-of-but-n-full "$REMOVE_ALL_INC_OF_BUT_N_FULL" --force)
+    verbose "$DUPLICITY" "${command[@]}" "${args[@]}" -- "$DESTINATION_URI"
+  fi
+  if [ "$did_something" -eq 0 ]; then abort "Didn't do anything. Please check your configuration and try again." 2; fi
+fi
 
+log
 log "Verifying $DESTINATION_URI"
 verbose "$DUPLICITY" verify "${args[@]}" -- "$DESTINATION_URI" "$SOURCE_DIR"
