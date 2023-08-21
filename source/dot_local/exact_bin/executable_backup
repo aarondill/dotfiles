@@ -38,7 +38,9 @@ files=(
   '-/home/aaron/.config/Code'
   '-/home/aaron/.config/TabNine'
   '-/home/aaron/.config/google-chrome'
-  '-/home/aaron/.config/static-google-chrome'
+  '-/home/aaron/.config/google-chrome-static'
+  '-/home/aaron/.config/vivaldi'
+  '-/home/aaron/.config/vivaldi-static'
   '-/home/aaron/.local/share'
   '-/home/aaron/.local/share/Trash'
   '-/home/aaron/.local/state'
@@ -112,7 +114,7 @@ fi
 ENCRYPTION_TYPE=no
 
 # Perform a full backup if an incremental backup is requested, but the latest full backup in the collection is older than the given time.
-FULL_IF_OLDER=1M
+FULL_IF_OLDER=15D
 
 # Use seconds as the socket timeout value if duplicity begins to timeout during network operations. The default is 30 seconds.
 TIMEOUT=120
