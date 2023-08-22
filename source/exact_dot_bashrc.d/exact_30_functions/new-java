@@ -9,7 +9,7 @@ function new-java() {
       return 1
     fi
     classname=$(basename "$dir")
-    cp -T -ri ~/vscode/Java/template/ "$dir"
+    cp -T -ri ~/code/Java/template/ "$dir"
     for f in "$dir"/*; do
       fbn=$(basename "$f")
       fdn=$(dirname "$f")

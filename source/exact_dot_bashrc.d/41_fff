@@ -23,5 +23,5 @@ export FFF_TRASH=~/.local/share/Trash/files
 if command -v trash &>/dev/null; then
   export FFF_TRASH_CMD="trash"
 fi
-export FFF_FAV1=~/vscode
+export FFF_FAV1=~/code
 export FFF_FAV2=~/.bashrc.d

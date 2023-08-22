@@ -8,14 +8,14 @@
 #
 
 # File locations
-vscode=~/vscode
-bash=$vscode/bashScripts
-js=$vscode/js
+code=~/code
+bash=$code/bashScripts
+js=$code/js
 javascript=$js
-java=$vscode/Java
-python=$vscode/Python
-chromeext=$vscode/chromeExtensions
-config=$vscode/config
+java=$code/Java
+python=$code/Python
+chromeext=$code/chromeExtensions
+config=$code/config
 backup=/media/aaron/Backup/
 
 # Override editor variable
