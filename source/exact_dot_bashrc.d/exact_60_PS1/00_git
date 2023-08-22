@@ -17,7 +17,7 @@
 # Example short:
 #    'aaron:~/.cache/ts-template(main)$ '
 # Example long:
-#     '0|09:49|aaron@hostname:~/vscode/.git(GIT_DIR!)$ '
+#     '0|09:49|aaron@hostname:~/code/.git(GIT_DIR!)$ '
 #      jobs|time|user@host:PWD(git)$
 # Git Status:
 #   GIT_DIR! : you are inside the .git directory
