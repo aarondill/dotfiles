@@ -75,11 +75,11 @@ local_dir=$HOME/.local/share # other setups are not supported with firefox
 
 case "${BROWSER:-}" in # Sync active browser (or vivaldi as default)
 '' | *vivaldi*)
-  msg="Vivaldi chrome sync is disabled to test stability! Don't forget to reenable this."
-  printf '%s\n' "$msg" >&2
-  if [ -n "${DISPLAY:-}" ]; then notify-send "Warning" "$msg"; fi
-  # sync_shm "$conf_dir/vivaldi"  # PROFILE
-  # sync_shm "$cache_dir/vivaldi" # CACHE
+  # msg="Vivaldi chrome sync is disabled to test stability! Don't forget to reenable this."
+  # printf '%s\n' "$msg" >&2
+  # DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u aaron)/bus" DISPLAY=:0 notify-send "Warning" "$msg" 2>/dev/null || true
+  sync_shm "$conf_dir/vivaldi"  # PROFILE
+  sync_shm "$cache_dir/vivaldi" # CACHE
   ;;
 *firefox*)
   sync_shm "$local_dir/firefox" # Everything is firejailed into this directory

@@ -97,6 +97,7 @@ function cproot() (
 
 function update-root-config() {
   local files rootpath homepath dotroot encrypted_files add_files
+  local dotroot_source perms dir
   # shellcheck disable=SC2206 # Splitting is intentional.
   local sudo=(${SUDO:-sudo})
   [ "$(id -u)" -eq 0 ] && sudo=()
@@ -104,34 +105,57 @@ function update-root-config() {
   dotroot="$HOME/.root"
   encrypted_files=()
   add_files=()
+  add_dirs=()
+  add_exact_dirs=()
   while IFS= read -r -d $'\0' file; do
     rootpath="/$file"
     homepath="$dotroot/$file"
-    if ! [ -f "$rootpath" ]; then
-      # Hasn't yet been copied to root (or deleted, but that's up to the user), so ignore it.
-      continue
-    fi
-    if "${sudo[@]}" cmp --quiet "$rootpath" "$homepath"; then
-      # if same, move on
-      continue
+    # Hasn't yet been copied to root (or deleted, but that's up to the user), so ignore it.
+    if ! [ -f "$rootpath" ]; then continue; fi
+    # Change permissions to match the root
+    perms=$("${sudo[@]}" chmod --changes --reference="$rootpath" "$homepath")
+    if [ -z "$perms" ] && "${sudo[@]}" cmp --quiet "$rootpath" "$homepath"; then
+      continue # if permissions are same and the contents are same
     fi
     # Doesn't need to be recursive bc is only files, not dirs.
     "${sudo[@]}" "cp" -f -T -- "$rootpath" "$homepath"
     "${sudo[@]}" chown --preserve-root -h -- "$(whoami)" "$homepath"
 
     #  Fails if not encrypted
-    if [[ -n "$(chezmoi list --include=encrypted -- "$homepath")" ]]; then
+    if [ -n "$(chezmoi list --include=encrypted -- "$homepath")" ]; then
       encrypted_files+=("$homepath")
     else
       add_files+=("$homepath")
     fi
   done < <(find "$dotroot" -type f -printf '%P\0')
 
-  test ${#add_files[@]} -gt 0 && chezmoi add -- "${add_files[@]}"
-  test ${#encrypted_files[@]} -gt 0 && chezmoi add --encrypt -- "${encrypted_files[@]}"
-  if test ${#add_files[@]} -eq 0 && test ${#encrypted_files[@]} -eq 0; then
-    printf '%s\n' "No files have changed (dirs not recursive)"
-  fi
+  dotroot_source=$(chezmoi source-path -- "$dotroot")
+  while IFS= read -r -d $'\0' dir; do
+    rootpath="/$dir"
+    homepath="$dotroot/$dir"
+    # Hasn't yet been copied to root (or deleted, but that's up to the user), so ignore it.
+    if ! [ -d "$rootpath" ]; then continue; fi
+    # Change permissions to match the root
+    perms=$("${sudo[@]}" chmod --changes --reference="$rootpath" "$homepath")
+    if [ -z "$perms" ]; then continue; fi # if permissions are same
+    case "$(chezmoi source-path "$dir")" in
+    "$dotroot_source/exact_$dir") add_exact_dirs+=("$homepath") ;;
+    "$dotroot_source/$dir") add_dirs+=("$homepath") ;;
+    *) echo "Something went wrong processing $dir" >&2 ;;
+    esac
+  done < <(find "$dotroot" -type d -printf '%P\0')
+
+  did_something=0
+  function __chezmoi_add() {
+    did_something=1
+    chezmoi add "$@"
+  }
+  test "${#add_files[@]}" -gt 0 && __chezmoi_add -- "${add_files[@]}"
+  test "${#encrypted_files[@]}" -gt 0 && __chezmoi_add --encrypt -- "${encrypted_files[@]}"
+  test "${#add_dirs[@]}" -gt 0 && __chezmoi_add -i dirs --recursive=false -- "${add_dirs[@]}"
+  test "${#add_exact_dirs[@]}" -gt 0 && __chezmoi_add -i dirs --recursive=false --exact -- "${add_exact_dirs[@]}"
+  if [ "$did_something" -eq 0 ]; then printf '%s\n' "No files have changed (dirs aren't recursive)"; fi
+  unset -f __chezmoi_add # remove from env
   return 0
 }
 
