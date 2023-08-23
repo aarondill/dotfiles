@@ -52,20 +52,17 @@ unset browsers b
 alias fslite='browser fslite.vercel.app'
 # Don't show loopback, and show more useful columns
 alias lsblk="lsblk -e 7 -o NAME,MAJ:MIN,SIZE,FSTYPE,LABEL,MOUNTPOINTS"
-if has exa || has eza; then
-  exa=exa
-  has eza && exa=eza
+exa= && if has eza; then exa=eza; elif has exa; then exa=exa; fi
+if [ -n "$exa" ]; then
   ls="$exa --color=auto -Gh --group"
   if "$exa" --version | grep -qF '[+git]'; then
     ls="$ls --git"
   fi
   # shellcheck disable=SC2139 # I expect it to expand on definition
-  if [ "${TERM,,}" = "linux" ]; then
-    alias ls="$ls"
-  else
-    alias ls="$ls --icons"
-  fi
-  unset ls exa
+  case "${TERM,,}" in
+  linux | dumb) alias ls="$ls" ;;
+  *) alias ls="$ls --icons" ;;
+  esac
 
   alias la="ls -a"
   alias ll="ls -l"
@@ -78,6 +75,7 @@ else
   alias lla="ls -lA"
   alias llaa="ls -la"
 fi
+unset ls exa
 
 alias cl='clear'
 alias tree='tree -a' # show hidden
