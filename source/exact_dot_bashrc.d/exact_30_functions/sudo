@@ -25,6 +25,6 @@ function sudo() {
   path="$(which -- "$cmd" 2>/dev/null)"
   [ -f "$path" ] && cmd="$path" # use -f instead of -x because root may be able to execute it
   # remove cmd, then replace with new value
-  shift && set "${old_args[@]}" "$cmd" "$@"
-  command sudo "$@"
+  args=("${old_args[@]}" "$cmd" "${@:2}")
+  command sudo "${args[@]}"
 }
