@@ -200,3 +200,19 @@ fi
 unset -f will_startx
 
 # ------------------------------END OF FILE------------------------------
+
+function nvim() {
+  local NEOVIM_PATH NEOVIM
+  NEOVIM_PATH=~/code/repos/neovim/
+  NEOVIM="$NEOVIM_PATH/build/bin/nvim"
+  printf '%s\n' "Using $NEOVIM temporarily because nightly is broken" >&2
+  printf '%s\n' "Remove this when it's been fixed" >&2
+  if [ -x "$NEOVIM" ]; then
+    git -C "$NEOVIM_PATH" fetch origin && git -C "$NEOVIM_PATH" hist HEAD..origin/master
+    VIMRUNTIME="$NEOVIM_PATH/runtime/" "$NEOVIM" "$@"
+  else
+    printf '%s\n' "File not found. Trying system installation" >&2
+    command nvim "$@"
+  fi
+}
+alias vim='nvim'
