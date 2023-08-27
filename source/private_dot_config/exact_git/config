@@ -1,4 +1,4 @@
-# ~/.gitconfig
+# ~/.config/git/config
 [user]
   name = aarondill
   email = aaronsacks2006@gmail.com
@@ -91,6 +91,7 @@
   # Pretty log
   hist = log --graph '--pretty=format:%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
   history = hist
+  yesterday = alias-wrapper yesterday
 
   # Things I forget
   rmremotebranch = push --delete 

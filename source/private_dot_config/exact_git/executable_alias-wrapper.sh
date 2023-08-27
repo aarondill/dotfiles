@@ -37,6 +37,7 @@ cleanup)
   git repack -d
   git gc --prune=now --aggressive
   ;;
+yesterday) git hist --since yesterday '--branches=*' --author="$(git config user.name)" ;;
 '') abort "usage: alias-wrapper.sh <command> [args]..." 2 ;;
 *) THIS=alias-wrapper.sh abort "Unknown command '$command'" 2 ;;
 esac
