@@ -141,7 +141,7 @@ function update-root-config() {
     case "$(chezmoi source-path "$dir")" in
     "$dotroot_source/exact_$dir") add_exact_dirs+=("$homepath") ;;
     "$dotroot_source/$dir") add_dirs+=("$homepath") ;;
-    *) echo "Something went wrong processing $dir" >&2 ;;
+    *) echo "Something went wrong processing '$dir'" >&2 ;;
     esac
   done < <(find "$dotroot" -type d -printf '%P\0')
 
