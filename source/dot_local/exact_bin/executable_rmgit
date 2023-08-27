@@ -95,7 +95,7 @@ for repo in "$@"; do
     _exit 1 && continue
   fi
   # Only run it if the repo still is not corrupted (from previous rm -r)
-  if git -C "$dir" rev-parse &>/dev/null; then
+  if git -C "$repo" rev-parse &>/dev/null; then
     if ! check_status "$repo"; then
       err "Refusing to remove dirty repo $repo"
       _exit 1 && continue
