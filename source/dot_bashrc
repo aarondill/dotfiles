@@ -203,7 +203,7 @@ unset -f will_startx
 
 function nvim() {
   local NEOVIM_PATH NEOVIM
-  NEOVIM_PATH=~/code/repos/neovim/
+  NEOVIM_PATH=~/code/repos/neovim
   NEOVIM="$NEOVIM_PATH/build/bin/nvim"
   printf '%s\n' "Using $NEOVIM temporarily because nightly is broken" >&2
   printf '%s\n' "Remove this when it's been fixed" >&2
