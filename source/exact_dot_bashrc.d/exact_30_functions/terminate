@@ -7,7 +7,7 @@
 # first, then more aggressively
 #
 
-terminate() {
+function terminate() {
   local wait_time=1 # seconds
   local signals=(TERM INT QUIT HUP KILL)
   local signal_qty=${#signals[@]}

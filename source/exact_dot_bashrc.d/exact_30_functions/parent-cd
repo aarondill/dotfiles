@@ -6,7 +6,7 @@
 # *Follows Symlinks*
 #
 
-parent-cd() {
+function parent-cd() {
   local dir truepath filein
 
   if [ "$1" = "--help" ]; then

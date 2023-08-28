@@ -7,7 +7,7 @@ fi
 
 # Incase XDG_RUNTIME_DIR is not set, use ~/.cache
 ENV_FILE="${XDG_RUNTIME_DIR:-$HOME/.cache}/keyring.env"
-quiet() { "$@" &>/dev/null; }
+function quiet() { "$@" &>/dev/null; }
 
 if quiet command -v gnome-keyring-daemon; then
   if ! quiet pgrep -u "$USER" gnome-keyring-d; then

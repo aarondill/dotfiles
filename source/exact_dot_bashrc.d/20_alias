@@ -147,6 +147,12 @@ if zoxide -V &>/dev/null; then
   export _ZO_ECHO=0
 fi
 
+if has chezmoi; then
+  alias config='chezmoi'
+  # shellcheck source=../.local/share/bash-completion/completions/config
+  [ -f ~/.local/share/bash-completion/completions/config ] && source ~/.local/share/bash-completion/completions/config
+fi
+
 alias bc="bc --quiet --warn -l"
 # if `bc` is installed set aliases for it
 if has bc; then alias calc="bc"; fi

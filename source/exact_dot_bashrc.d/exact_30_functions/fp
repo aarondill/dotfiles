@@ -23,43 +23,43 @@ export FZF_DEFAULT_OPTS='--ansi'
 # Use better find if installed
 if command -v fd &>/dev/null; then
   # Echo if FZF_USE_COLOR is set
-  FZF_BASE_COMMAND() { fd --follow --hidden --exclude .git "$@"; }
-  FZF_FIND_DIR() {
+  function FZF_BASE_COMMAND() { fd --follow --hidden --exclude .git "$@"; }
+  function FZF_FIND_DIR() {
     FZF_BASE_COMMAND "$(test "$FZF_USE_COLOR" && printf -- "--color=always")" --type d . "$@"
   }
-  FZF_FIND_FILE() {
+  function FZF_FIND_FILE() {
     FZF_BASE_COMMAND "$(test "$FZF_USE_COLOR" && printf -- "--color=always")" --type f . "$@"
   }
 else
-  FZF_BASE_COMMAND() { find "$@"; }
-  FZF_FIND_DIR() { FZF_BASE_COMMAND "$@" --type d; }
-  FZF_FIND_FILE() { FZF_BASE_COMMAND "$@" --type f; }
+  function FZF_BASE_COMMAND() { find "$@"; }
+  function FZF_FIND_DIR() { FZF_BASE_COMMAND "$@" --type d; }
+  function FZF_FIND_FILE() { FZF_BASE_COMMAND "$@" --type f; }
 fi
 
 # Use better cat if installed
 if command -v bat &>/dev/null; then
-  FZF_CAT_CMD() {
+  function FZF_CAT_CMD() {
     local use_color
     use_color=$(test "$FZF_USE_COLOR" && printf -- "--color=always")
     # shellcheck disable=SC2086
     bat --style=numbers $use_color "$@" | head -n 500
   }
-  FZF_CAT_CMD_JSON() { cat - | FZF_CAT_CMD "--language" "JSON" "-"; }
+  function FZF_CAT_CMD_JSON() { cat - | FZF_CAT_CMD "--language" "JSON" "-"; }
 
 else
-  FZF_CAT_CMD() { cat -; }
-  FZF_CAT_CMD_JSON() { cat - | FZF_CAT_CMD; }
+  function FZF_CAT_CMD() { cat -; }
+  function FZF_CAT_CMD_JSON() { cat - | FZF_CAT_CMD; }
 fi
 
 if command -v tree &>/dev/null; then
-  FZF_DIR_PREVIEW() {
+  function FZF_DIR_PREVIEW() {
     local use_color
     use_color=$(test "$FZF_USE_COLOR" && printf -- "-C")
     # shellcheck disable=SC2086
     tree $use_color "$@"
   }
 else
-  FZF_DIR_PREVIEW() {
+  function FZF_DIR_PREVIEW() {
     local use_color
     use_color=$(test "$FZF_USE_COLOR" && printf -- "--color=always")
     # shellcheck disable=SC2086
@@ -67,7 +67,7 @@ else
   }
 fi
 
-FZF_FILE_PREVIEW() {
+function FZF_FILE_PREVIEW() {
   local json
   # Attempt to prettify json before display
   # will return false if prettier isn't installed

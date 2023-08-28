@@ -9,7 +9,7 @@
 # git push to sync to the remote
 #
 
-compush() { # Commit and push to git
+function compush() { # Commit and push to git
 
   if [ "$1" = "--help" ]; then
     printf '%s\n\n%s' "compush [mesasge]" "Commits with message given, and pushes to origin"

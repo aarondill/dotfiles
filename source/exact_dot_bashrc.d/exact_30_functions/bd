@@ -6,8 +6,8 @@
 # taken from https://github.com/vigneshwaranr/bd and
 # modified to work better
 #
-bd() {
-  help_msg() {
+function bd() {
+  function help_msg() {
     printf "Usage: bd [OPTION]... [PATTERN]\n"
     printf "Quickly go back to a specific parent directory in bash.\n\n"
 
@@ -99,7 +99,7 @@ bd() {
 }
 
 # Add autocomplete support for bd for bash.
-_bd() {
+function _bd() {
   local IFS cur completions
   # Handle spaces in filenames by setting the delimeter to be a newline.
   IFS=$'\n'

@@ -46,7 +46,7 @@ export GIT_PS1_DESCRIBE_STYLE="describe" # detached HEAD style:
 export GIT_PS1_LONG_LENGTH=90
 
 # Check if we support colors
-__color_enabled() {
+function __color_enabled() {
   local -i colors
   colors=$(tput colors 2>/dev/null)
   # shellcheck disable=SC2181
@@ -54,7 +54,7 @@ __color_enabled() {
 }
 unset __colorize_prompt && __color_enabled && __colorize_prompt=1
 
-__set_bash_prompt() {
+function __set_bash_prompt() {
   # Desired result:
   #  Color: ${yellow}jobs${none}|${red}HH:MM|${bGre}USERNAME@HOST${none}:${blue}SHORTPATH${none}(GIT)${red}ERROR${none}$
   #  White: \j|\D{%I:%M%P}|\u@\h:\w(GIT)\$

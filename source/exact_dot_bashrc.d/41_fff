@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 if ! command -v fff &>/dev/null; then return; fi
-fff() {
+function fff() {
   command fff "$@"
   local fff_cache="${XDG_CACHE_HOME:-${HOME}/.cache}/fff"
   local file="${FFF_CD_FILE:-"$cache/.fff_d"}"
