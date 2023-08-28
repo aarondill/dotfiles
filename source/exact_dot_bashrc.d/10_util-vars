@@ -17,6 +17,3 @@ python=$code/Python
 chromeext=$code/chromeExtensions
 config=$code/config
 backup=/media/aaron/Backup/
-
-# Override editor variable
-export EDITOR='vim'

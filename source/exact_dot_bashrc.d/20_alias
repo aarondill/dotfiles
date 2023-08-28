@@ -50,6 +50,15 @@ for b in "${browsers[@]}"; do
 done
 unset browsers b
 
+export EDITOR
+if has nvim; then
+  EDITOR=nvim
+elif has vim; then
+  EDITOR=vim
+elif has code; then
+  EDITOR=code
+fi
+
 alias fslite='browser fslite.vercel.app'
 # Don't show loopback, and show more useful columns
 alias lsblk="lsblk -e 7 -o NAME,MAJ:MIN,SIZE,FSTYPE,LABEL,MOUNTPOINTS"
