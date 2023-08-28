@@ -9,7 +9,7 @@
   helper = 
   helper = !/usr/bin/gh auth git-credential
 [core]
-  editor = vim
+	editor = nvim
   excludesFile = ~/.config/git/ignore
 # DELTA SETUP
 [core]

@@ -38,7 +38,6 @@ alias shutdown="history -a; /sbin/shutdown"
 # alias lastbackup="/usr/bin/cat ~/.backup/backup-time"
 
 browsers=(vivaldi vivaldi-stable firefox firefox-esr google-chrome google-chrome-stable)
-# Alias to remove error messages on opening google-chrome
 for b in "${browsers[@]}"; do
   # shellcheck disable=SC2139 # These aliases should expand at definition
   if has "$b"; then
@@ -50,14 +49,17 @@ for b in "${browsers[@]}"; do
 done
 unset browsers b
 
-export EDITOR
-if has nvim; then
-  EDITOR=nvim
-elif has vim; then
-  EDITOR=vim
-elif has code; then
-  EDITOR=code
-fi
+editors=(nvim vim code)
+for e in "${editors[@]}"; do
+  # shellcheck disable=SC2139 # These aliases should expand at definition
+  if has "$e"; then
+    alias editor="$e"
+    export EDITOR="$e"
+    break
+  fi
+done
+unset editors e
+if [ -n "${EDITOR:-}" ]; then export VISUAL="$EDITOR"; fi
 
 alias fslite='browser fslite.vercel.app'
 # Don't show loopback, and show more useful columns
