@@ -92,6 +92,7 @@
   hist = log --graph '--pretty=format:%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
   history = hist
   yesterday = alias-wrapper yesterday
+  diff-origin = alias-wrapper diff-origin
 
   # Things I forget
   rmremotebranch = push --delete 

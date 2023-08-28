@@ -38,6 +38,20 @@ cleanup)
   git gc --prune=now --aggressive
   ;;
 yesterday) git hist --since yesterday '--branches=*' --author="$(git config user.name)" ;;
+diff-origin)
+  origin="$(git for-each-ref --format='%(upstream:short)' "$(git symbolic-ref -q HEAD)")"
+  if [ -z "$origin" ]; then abort "No upstream branch found." 1; fi
+  only_up=$(git hist --color=always "HEAD..$origin")
+  only_local=$(git hist --color=always "$origin..HEAD")
+  if [ -n "$only_up" ]; then
+    log "Only Upstream:"
+    log "$only_up"
+  fi
+  if [ -n "$only_local" ]; then
+    log "Only Local:"
+    log "$only_local"
+  fi
+  ;;
 '') abort "usage: alias-wrapper.sh <command> [args]..." 2 ;;
 *) THIS=alias-wrapper.sh abort "Unknown command '$command'" 2 ;;
 esac
