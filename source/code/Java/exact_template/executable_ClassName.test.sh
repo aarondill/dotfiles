@@ -24,13 +24,15 @@ YELLOW_COLOR="$(tput setaf 11 2>/dev/null || printf '')"
 BOLD_COLOR="$(tput bold 2>/dev/null || printf '')"
 RESET_COLOR="$(tput sgr0 2>/dev/null || printf '')"
 
-log() { printf "$YELLOW_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@"; }
+THIS="${0-test.sh}" # Used in err.
+THIS="${THIS##*/}"
+log() { [ -t 1 ] && printf "$YELLOW_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@"; }
 show_run() {
-  log "running: $*"
-  printf '\n'
+  log "Running: $*"
+  log ''
   "$@"
 }
-err() { printf "${THIS:+$THIS:}$RED_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@" >&2; }
+err() { [ -t 2 ] && printf "${THIS:+$THIS: }$RED_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@" >&2; }
 abort() { err "$1" && exit "${2:-1}"; }
 # make a relative path absolute, according to $2 or $this_dir
 resolve() {
@@ -38,8 +40,7 @@ resolve() {
   local relto="${2:-$this_dir}"
   local ret=''
   case "$path" in
-  -) ret=- ;;
-  '') ret='' ;; # if passed an empty string, return the empty string
+  '' | -) ret="$path" ;; # if passed an empty string, return the empty string
   /*) ret="$path" ;;
   ./*) ret="$relto/${path#./}" ;;
   .) ret="$relto" ;;
@@ -63,29 +64,33 @@ java_file="$(resolve "$java_class.java")"               # relative to $this_dir
 class_file=$(resolve "$java_class.class" "$output_dir") # relative to $output_dir
 stdin_file=$(resolve "${stdin_file:-}" "$output_dir")   # relative to $output_dir
 
-if ! [ -f "$java_file" ]; then abort "could not find '$java_file'. Please double check the names of both files." 1; fi
+if ! [ -f "$java_file" ]; then abort "Could not find '$java_file'. Please double check the names of both files." 1; fi
 if [ -f "$class_file" ]; then
-  log "cleaning up old class file"
+  log "Cleaning up old class file"
   show_run rm -f "$class_file"
 fi
 
-if [ -n "$stdin_file" ] && ! [ "$stdin_file" = - ] && ! [ -e "$stdin_file" ]; then
-  abort "could not find '$stdin_file'. Please double check the name of the file, or remove it from the stdin_file." 1
+if [ -n "$stdin_file" ] && ! [ "$stdin_file" = - ]; then
+  if ! [ -e "$stdin_file" ]; then
+    abort "Could not find '$stdin_file'. Please double check the name of the file, or remove it from the stdin_file." 1
+  fi
 fi
 stdin() {
   # setup stdin_file if it exists -- override the stdin variable above
   if [ "${stdin_file:-}" = - ]; then
     "$@"
   elif [ -e "${stdin_file:-}" ]; then
-    cat "$stdin_file" | "$@"
+    "$@" <"$stdin_file"
   elif [ -n "${stdin:-}" ]; then
-    printf '%s' "$stdin" | "$@"
+    "$@" <<<"$stdin"
+  else
+    "$@"
   fi
 }
 
 cd "$this_dir"
 if ! [ -d "$output_dir" ]; then
-  log "creating output directory"
+  log "Creating output directory"
   show_run mkdir -p "$output_dir"
 fi
 
@@ -107,6 +112,7 @@ code=0
 stdin show_run java --class-path "$_classpath" "$java_class" "${jargs[@]}" "$@" || code=$?
 
 if [ "$code" != 0 ]; then
+  log
   err "Command failed with exit code: $code"
 fi
 
