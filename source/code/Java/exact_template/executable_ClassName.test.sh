@@ -8,7 +8,7 @@ set -euC -o pipefail
 stdin=
 IFS='' read -r -d '' stdin <<'EOF' || true
 EOF
-stdin_file=-   # This will override stdin. Relative to output_dir (use input_files if needed)
+stdin_file=    # This will override stdin. Relative to output_dir (use input_files if needed), use - to specify stdin
 cargs=()       # javac
 jargs=()       # java
 classpath=     # output_dir will be automatically included
