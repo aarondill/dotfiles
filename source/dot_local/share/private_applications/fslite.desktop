@@ -1,8 +1,6 @@
-# This file is a custom link that opens fslite in chrome
-
 [Desktop Entry]
 Name=Fslite
-Comment=Open fslite in browser
+Comment=Open fslite
 URL=https://fslite.vercel.app
 Icon=/home/aaron/.local/share/icons/fslite.ico
 Type=Link
