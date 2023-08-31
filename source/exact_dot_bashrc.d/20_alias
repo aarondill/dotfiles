@@ -133,20 +133,6 @@ if has bat || has batcat; then
 fi
 unset bat
 
-# if `z` is installed, initiate it and set `cd` to `z`
-if zoxide -V &>/dev/null; then
-  eval "$(zoxide init bash)"
-  # Reuse cd completion if present (overwritten already), else default to directories
-  complete=$(complete -p cd 2>/dev/null || printf '%s ' complete -d cd)
-  # remove ' cd' and replace with ' z'. Lack of quotes is intentional!
-  if [ -n "$complete" ]; then
-    eval "${complete% cd} z"
-  fi
-  alias cd='z'
-  # Fixes warning if set -u
-  export _ZO_ECHO=0
-fi
-
 if has chezmoi; then
   alias config='chezmoi'
   # shellcheck source=../.local/share/bash-completion/completions/config

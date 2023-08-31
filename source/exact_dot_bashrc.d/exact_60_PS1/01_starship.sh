@@ -40,8 +40,14 @@ export starship_precmd_user_func="set_win_title"
 # For compat. Starship will set this
 unset PS1
 
-# Init starship
-eval "$(starship init bash)"
+# HACK: Starship overwrites the PROMPT_COMMAND, so we must move it out of it's view, and restore it afterwards
+OLD_PROMPT_COMMAND=("${PROMPT_COMMAND[@]}")
+PROMPT_COMMAND="" # only overwrites PROMPT_COMMAND[0], but it doesn't matter
+
+eval "$(starship init bash)" # Init starship
+
+PROMPT_COMMAND=("$PROMPT_COMMAND" "${OLD_PROMPT_COMMAND[@]}") # prepend, since it's trying to prepend anyways
+unset OLD_PROMPT_COMMAND
 
 # Force first load to ensure that PS1 gets set
 true

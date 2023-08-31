@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+export HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/${SHELL##*/}_history" # bash_history
+# Empty = unlimited
+export HISTSIZE=
+export HISTFILESIZE=
+# don't put duplicate lines or lines starting with space in the history.
+export HISTCONTROL="ignorespace:ignoredups"
+# append to the history file, don't overwrite it
+shopt -s histappend
+PROMPT_COMMAND+=("history -a")
