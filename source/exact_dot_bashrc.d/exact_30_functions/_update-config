@@ -63,3 +63,5 @@ code/Java/java-format.xml
 .local/share/applications/canvas.desktop
 code/Java/template
 .config/firejail
+code/.alexrc.mjs
+code/config
