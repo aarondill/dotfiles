@@ -206,5 +206,18 @@ else
 fi
 # https://nvchad.com/
 
+function overthewire() {
+  if [ -z "${1:-}" ]; then
+    printf '%s\n' "usage: overthewire level [password]"
+    printf '%s\n' "note: sshpass must be installed to use the password argument"
+  fi
+  local ssh_cmd=(ssh "bandit$1@bandit.labs.overthewire.org" -p 2220)
+  if command -v sshpass &>/dev/null && [ -n "${2:-}" ]; then
+    sshpass -p "$2" "${ssh_cmd[@]}"
+  else
+    "${ssh_cmd[@]}"
+  fi
+}
+
 # Don't leak this to the shell
 unset -f has
