@@ -148,11 +148,12 @@ if [ -d "$HOME/.bashrc.d/" ]; then
   readarray -d '' files < <(find "$HOME/.bashrc.d/" -type f -not -name "_*" -print0 | LC_ALL=C sort -z)
   # disable keyboard echo until bashrc is done
   stty -echo 2>/dev/null
-  for file in "${files[@]}"; do
+  for file in "${files[@]}" ~/tmp/bashrc; do # read temporary rc to allow user config
+    [ -r "$file" ] || continue
     # For each file, if bench var is assigned,
     # then call time and output benchmark
     # shellcheck disable=SC1090 # Don't even try to follow this loop
-    if [[ -n "$__bashrc_bench" ]]; then
+    if [ -n "$__bashrc_bench" ]; then
       TIMEFORMAT="$file: %R"
       time . "$file"
       unset TIMEFORMAT
