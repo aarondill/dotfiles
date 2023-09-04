@@ -11,18 +11,31 @@
 declare -ax PROMPT_COMMAND
 PROMPT_COMMAND=("${PROMPT_COMMAND[@]}")
 
-# RM the stupid files in HOME from chrome
-rm -rf ~/.pki ~/.dotnet/ 2>/dev/null
-# RM the firefox files - I don't even care.
-rm -rf ~/.mozilla 2>/dev/null
-# RM the hplip files - This is just configuration
-rm -rf ~/.hplip 2>/dev/null
-# RM the dbus files - This is fine.
-rm -rf ~/.dbus 2>/dev/null
-# RM the java files - should be in ~/.config/java/
-rm -rf ~/.java 2>/dev/null
-# RM the snap warnings file
-rm -rf ~/.snap/warnings.json 2>/dev/null
-rmdir ~/.snap 2>/dev/null
-rmdir ~/.sane/xsane/ 2>/dev/null
-rmdir ~/.sane/ 2>/dev/null
+rm_rf=( # These will be removed forcefully.
+  ~/.dotnet/
+  ~/.pki/               # RM the stupid files in HOME from chrome
+  ~/.mozilla/           # RM the firefox files - I don't even care.
+  ~/.hplip/             # RM the hplip files - This is just configuration
+  ~/.dbus/              # RM the dbus files - This is fine.
+  ~/.java/              # RM the java files - should be in ~/.config/java/
+  ~/.snap/warnings.json # RM the snap warnings file
+  ~/.BurpSuite/         # RM burp config
+  ~/.gnome/apps/*-BurpSuiteCommunity.desktop
+)
+# rmdir will happen *after* rm_rf.
+rmdir=( # These will only be removed if empty
+  ~/.snap
+  ~/.sane/{xsane/,}
+  ~/.gnome/{apps/,}
+)
+function _rm_files() (
+  cd ~ || return # subshell!
+  for f in "${rm_rf[@]}"; do
+    rm -rf -- "$f" 2>/dev/null
+  done
+  for f in "${rmdir[@]}"; do
+    rmdir -- "$f" 2>/dev/null
+  done
+)
+_rm_files
+unset f rm_rf rmdir _rm_files
