@@ -4,12 +4,9 @@
 #
 # Unsets histfile and opens a shell
 function private() {
-  if [ "$#" -eq 0 ]; then
-    HISTFILE='' bash -i
-  else
-    # run the input
-    HISTFILE='' "$@"
-  fi
+  cmd=(bash -i)
+  [ "$#" -gt 0 ] && cmd=("$@") # run the input
+  HISTFILE='' "${cmd[@]}"
   # If is in history - could false positive, but better than false negative
   if history 1 | grep -q 'private'; then
     history -d "$HISTCMD"
