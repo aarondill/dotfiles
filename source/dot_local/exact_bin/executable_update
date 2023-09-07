@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-# ~/.local/bin/update-java
+# ~/.local/bin/update
 #
-# Updates java symlinks to the path specified using update-alternatives
+# Updates the system, including as many possible sources as possible
 #
 set -euC -o pipefail
 
