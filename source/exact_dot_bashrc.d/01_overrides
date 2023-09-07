@@ -21,6 +21,7 @@ rm_rf=( # These will be removed forcefully.
   ~/.snap/warnings.json # RM the snap warnings file
   ~/.BurpSuite/         # RM burp config
   ~/.gnome/apps/*-BurpSuiteCommunity.desktop
+  ~/.python_history
 )
 # rmdir will happen *after* rm_rf.
 rmdir=( # These will only be removed if empty
