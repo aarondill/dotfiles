@@ -35,7 +35,6 @@ function sudo() {
   done
 
   if [ "$#" -eq 0 ] || [ -z "${1:-}" ]; then
-    "old_args \$@"
     _sudo "${old_args[@]}" "$@" # options have been shifted off.
     return "$?"
   fi

@@ -13,3 +13,6 @@ function private() {
   fi
 }
 alias private='private ' # expand aliases
+function soh() {
+  sudo -- bash -c 'cd ~/Documents/.soh/; exec bash -i'
+}
