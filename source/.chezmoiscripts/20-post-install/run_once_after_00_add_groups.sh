@@ -9,6 +9,8 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 groups=(adm cdrom video plugdev input lpadmin vboxusers libvirt loadkeys power)
 user="$(id -un)"
 
+log "Adding user groups to $user"
+
 if [ -z "$user" ] || [ "$user" == 'root' ]; then abort "Can't set groups on user '$user'" 1; fi
 if has_cmd getent; then
   function group_exists() { getent group -- "$1" &>/dev/null; }
@@ -17,7 +19,13 @@ elif has_cmd perl; then
 else
   abort 'perl or getent is required to add groups' 1
 fi
+
 for group in "${groups[@]}"; do
-  group_exists "$group" || continue          # group doesn't exist, skip it
+  group_exists "$group" || {
+    log "Skipping group '$group' because does it not exist"
+    continue # group doesn't exist, skip it
+  }
+  log "Adding group $group"
   sudo_cmd usermod -a -G "$group" -- "$user" # add to the group
 done
+success
