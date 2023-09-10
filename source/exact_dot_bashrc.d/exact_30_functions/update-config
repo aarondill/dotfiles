@@ -108,6 +108,7 @@ function update-root-config() {
   add_dirs=()
   add_exact_dirs=()
   while IFS= read -r -d $'\0' file; do
+    [ -z "$file" ] && continue
     rootpath="/$file"
     homepath="$dotroot/$file"
     # Hasn't yet been copied to root (or deleted, but that's up to the user), so ignore it.
@@ -131,6 +132,7 @@ function update-root-config() {
 
   dotroot_source=$(chezmoi source-path -- "$dotroot")
   while IFS= read -r -d $'\0' dir; do
+    [ -z "$dir" ] && continue
     rootpath="/$dir"
     homepath="$dotroot/$dir"
     # Hasn't yet been copied to root (or deleted, but that's up to the user), so ignore it.
