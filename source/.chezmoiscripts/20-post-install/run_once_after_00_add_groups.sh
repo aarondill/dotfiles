@@ -18,6 +18,6 @@ else
   abort 'perl or getent is required to add groups' 1
 fi
 for group in "${groups[@]}"; do
-  group_exists "$group" || continue # group doesn't exist, skip it
-  usermod -a -G "$group" -- "$user" # add to the group
+  group_exists "$group" || continue          # group doesn't exist, skip it
+  sudo_cmd usermod -a -G "$group" -- "$user" # add to the group
 done
