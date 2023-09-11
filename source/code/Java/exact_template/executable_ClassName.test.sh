@@ -26,13 +26,13 @@ RESET_COLOR="$(tput sgr0 2>/dev/null || printf '')"
 
 THIS="${0-test.sh}" # Used in err.
 THIS="${THIS##*/}"
-log() { [ -t 1 ] && printf "$YELLOW_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@"; }
+log() { if [ -t 1 ]; then printf "$YELLOW_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@"; fi; }
 show_run() {
   log "Running: $*"
   log ''
   "$@"
 }
-err() { [ -t 2 ] && printf "${THIS:+$THIS: }$RED_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@" >&2; }
+err() { if [ -t 2 ]; then printf "${THIS:+$THIS: }$RED_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@" >&2; fi; }
 abort() { err "$1" && exit "${2:-1}"; }
 # make a relative path absolute, according to $2 or $this_dir
 resolve() {
@@ -53,6 +53,12 @@ resolve() {
     printf '%s' "$ret"   # no newline
   fi
 }
+
+if [ "${1:-}" == '-t' ] || [ "${1:-}" == '--test' ]; then
+  # handle ./cmd --test to allow user input
+  # HACK: no way to not use this. (ie '--' doesn't work.)
+  stdin_file=- && shift 1
+fi
 
 this_dir="$(readlink -f -- "$(dirname "$0")")" # might break if cwd is a symlink
 this="$(basename "$0")"
@@ -77,7 +83,7 @@ if [ -n "$stdin_file" ] && ! [ "$stdin_file" = - ]; then
 fi
 stdin() {
   # setup stdin_file if it exists -- override the stdin variable above
-  if [ "${stdin_file:-}" = - ]; then
+  if ! [ -t 0 ] || [ "${stdin_file:-}" = - ]; then
     "$@"
   elif [ -e "${stdin_file:-}" ]; then
     "$@" <"$stdin_file"
@@ -104,7 +110,7 @@ for f in "${input_files[@]}"; do
 done
 
 _classpath="$output_dir"
-[ -n "$classpath" ] && _classpath="$_classpath:$classpath"
+if [ -n "$classpath" ]; then _classpath="$_classpath:$classpath"; fi
 
 show_run javac --class-path "$_classpath" -d "$output_dir" "${cargs[@]}" "$java_file"
 
