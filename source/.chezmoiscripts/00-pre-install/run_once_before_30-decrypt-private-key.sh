@@ -19,8 +19,9 @@ if ! command -v age &>/dev/null; then
   fi
 fi
 
-if [ ! -f "$HOME/.config/chezmoi/key.txt" ]; then
-  mkdir -p "$HOME/.config/chezmoi"
-  age --decrypt --output "$HOME/.config/chezmoi/key.txt" "$SOURCE_DIR/key.txt.age"
-  chmod 600 "$HOME/.config/chezmoi/key.txt"
+config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/chezmoi"
+if ! [ -f "$config_dir/key.txt" ]; then
+  mkdir -p "$config_dir"
+  age decrypt --output "$config_dir/key.txt" "$SOURCE_DIR/key.txt.age"
+  chmod 600 "$config_dir/key.txt"
 fi
