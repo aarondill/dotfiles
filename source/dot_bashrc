@@ -172,6 +172,8 @@ if [ -f ~/.config/tabtab/bash/__tabtab.bash ]; then . ~/.config/tabtab/bash/__ta
 
 # Startx on tty1 -- tty should not return tty* in an emulator or ssh
 if will_startx; then
+  # The command to run. Leave empty to use the default. This should be a absolute path!
+  startx_command=(~/code/repos/awesome/_scripts/run)
   # LOG_FILE="$HOME/.cache/visual/$(date +"%D-%T.%3N").log"
   LOG_FILE="$HOME/.cache/visual/visual.log"
   mkdir -p -- "$(dirname "$LOG_FILE")"
@@ -181,11 +183,11 @@ if will_startx; then
   [ -f "$LOG_FILE" ] && \mv -f -- "$LOG_FILE" "$LOG_FILE.old"
 
   if command -v visual &>/dev/null; then
-    exec visual >|"$LOG_FILE" 2>&1 || true
+    exec visual "${startx_command[@]}" >|"$LOG_FILE" 2>&1 || true
   else
-    exec startx >|"$LOG_FILE" 2>&1 || true
+    exec startx "${startx_command[@]}" >|"$LOG_FILE" 2>&1 || true
   fi
-  unset LOG_FILE
+  unset LOG_FILE startx_command
 fi
 unset -f will_startx
 
