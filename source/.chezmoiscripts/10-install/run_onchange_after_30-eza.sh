@@ -12,6 +12,8 @@ install_eza() {
   cargo install --all-features --git "$REPO_URL"
 }
 
+# if has_pacman; then # eza is in extra repo on arch
+#   log_and_run "Installing eza using pacman" pacman -S eza
 if has_cmd cargo; then # only with cargo installed
   log_and_run "Installing eza using cargo" install_eza
 fi
