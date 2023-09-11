@@ -6,11 +6,18 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 # shellcheck source=../.utils.sh
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
-log "Installing bun using install script"
-tmp_file=$(download_file https://bun.sh/install)
-rm_exit "$tmp_file"
+if ! has_cmd bun; then
+  log "Installing bun using install script"
+  tmp_file=$(download_file https://bun.sh/install)
+  rm_exit "$tmp_file"
 
-SHELL="Don't Change My Bash Config!!" bash -- "$tmp_file"
+  SHELL="Don't Change My Bash Config!!" bash -- "$tmp_file"
 
-rm_exit_cleanup "$tmp_file"
-success
+  rm_exit_cleanup "$tmp_file"
+  success
+fi
+
+file=~/.local/share/bash-completion/completions/bun
+log "Installing bun completions"
+mkdir -p "$(dirname -- "$file")"
+SHELL=bash bun completions >"$file"
