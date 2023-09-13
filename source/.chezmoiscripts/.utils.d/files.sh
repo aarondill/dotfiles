@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # ==> files.sh <==
+. ../.utils.sh # assert_source_once
 assert_source_once "${BASH_SOURCE[0]}" || return 0
 if true; then
-  . ./flow.sh    # has_cmd sudo_cmd cmd_or_sudo
-  . ../.utils.sh # assert_source_once
+  . ./flow.sh # has_cmd sudo_cmd cmd_or_sudo
 fi
 
 ## --------------------------------------------------------------------------------------------------

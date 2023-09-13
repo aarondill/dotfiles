@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # ==> package.sh <==
+. ../.utils.sh # assert_source_once
 assert_source_once "${BASH_SOURCE[0]}" || return 0
 if true; then
-  . ./flow.sh    # abort
-  . ../.utils.sh # assert_source_once
+  . ./flow.sh # abort
 fi
 
 ## --------------------------------------------------------------------------------------------------

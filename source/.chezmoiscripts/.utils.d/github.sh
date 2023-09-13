@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # ==> github.sh <==
+. ../.utils.sh # assert_source_once
 assert_source_once "${BASH_SOURCE[0]}" || return 0
 if true; then
   . ./output.sh   # err log
   . ./flow.sh     # abort
   . ./download.sh # get_url_headers download_file
   . ./json.sh     # get_json_prop
-  . ../.utils.sh  # assert_source_once
 fi
 
 ## --------------------------------------------------------------------------------------------------
