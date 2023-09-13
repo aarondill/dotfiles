@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 # usage: assert_source_once "${BASH_SOURCE[0]}" || return 0
+# NOTE: this function uses the base filename, with all invalid characters replaced with _.
+# be careful with naming.
 function assert_source_once() {
   local var
   var="_$(basename -- "$1")_already_sourced"
