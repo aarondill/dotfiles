@@ -81,7 +81,7 @@ function git_clone() {
   if [ -n "$branch" ]; then opts+=("--branch=$branch"); fi
 
   args=("$repo")
-  if [ -n "$dest" ]; then opts+=("$dest"); fi
+  if [ -n "$dest" ]; then args+=("$dest"); fi
 
   git clone "${opts[@]}" -- "${args[@]}"
 }
