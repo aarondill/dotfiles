@@ -73,15 +73,15 @@ function log_github_install() {
   log "$msg"
 }
 
-# usage: git_clone <repo> <dest> [branch]
+# usage: git_clone <repo> [dest] [branch]
 function git_clone() {
-  repo=$1
-  dest=$2
-  branch=${3:-}
-  args=(--sparse --filter=tree:0 --single-branch) # fastest/least storage possible
-  if [ -n "$branch" ]; then
-    args+=("--branch=$branch")
-  fi
+  local repo=$1 dest=${2:-} branch=${3:-} opts args
+  # opts=(--depth=1 --filter=tree:0 --single-branch)
+  opts=(--depth=1 --single-branch) # fastest/least storage possible
+  if [ -n "$branch" ]; then opts+=("--branch=$branch"); fi
 
-  git clone "${args[@]}" -- "$repo" "$dest"
+  args=("$repo")
+  if [ -n "$dest" ]; then opts+=("$dest"); fi
+
+  git clone "${opts[@]}" -- "${args[@]}"
 }
