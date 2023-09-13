@@ -17,3 +17,13 @@ function log() { printf "$BLUE_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@"; }
 function err() { printf "${THIS:+$THIS:}$RED_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@" >&2; }
 # success - no arguments
 function success() { printf "$GREEN_COLOR$BOLD_COLOR%s$RESET_COLOR\n" "Success!"; }
+# verbose echo do something -> echo do something\ndo something
+function verbose() {
+  declare -i i=0
+  for a in "$@"; do
+    i=$((i + 1))
+    printf "'%s'" "$a"
+    if [ "$i" -lt "$#" ]; then printf ' '; else printf '\n'; fi # print ' ' if not last, or \n if last
+  done
+  "$@" # run the input
+}
