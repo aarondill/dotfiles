@@ -32,6 +32,7 @@ function rm_exit() {
 }
 
 # deletes the file given and removes it from the exit trap
+# safe to call even if the trap has not been set (ie, library code!)
 function rm_exit_cleanup() {
   rm -fr -- "$@" || true
   for file_to_rm; do
