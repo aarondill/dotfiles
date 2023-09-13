@@ -76,12 +76,15 @@ if [ -n "$exa" ]; then
   *) ls="$ls --icons" ;;
   esac
 
+  ll="$ls -l"
+  if [ "$exa" = 'eza' ]; then ll="$ll -M"; fi
+
   # shellcheck disable=SC2139 # I expect it to expand on definition
   alias ls="$ls --grid"
   alias la="ls -a"
 
   # shellcheck disable=SC2139 # I expect it to expand on definition
-  alias ll="$ls -l -M"
+  alias ll="$ll"
   alias lla="ll -a"
   alias llaa="ll -aa"
 else
