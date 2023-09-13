@@ -1,5 +1,5 @@
 /**
- * public class ClassName
+ * Primary java class: ClassName
  *
  * <pre>
  * Author:  Aaron Dill
