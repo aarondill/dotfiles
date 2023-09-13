@@ -81,6 +81,25 @@ function has_cmd() {
   for cmd; do command -v "$cmd" &>/dev/null || failed=1; done
   return "$failed"
 }
+
+# usage: has_cmd <cmds>...
+# Find the first available command in a list and print it.
+# example: nodejs=$(first_cmd node nodejs)
+function first_cmd() {
+  local cmd
+  local cmds=("$@")
+  if [ "${#cmds}" -eq 0 ] && ! [ -t 0 ]; then # if none given, and stdin is not a terminal
+    readarray -t cmds                         # then split stdin by newline
+  fi
+  for cmd in "${cmds[@]}"; do
+    if has_cmd "$cmd"; then
+      printf '%s' "$cmd"
+      return 0
+    fi
+  done
+  return 1
+}
+
 # usage: wait_key [prompt]
 # default prompt: 'Press enter to continue'
 function wait_key() { read -r -p "${1:-Press enter to continue}"; }
