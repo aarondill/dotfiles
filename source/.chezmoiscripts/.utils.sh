@@ -1,4 +1,13 @@
 #!/usr/bin/env bash
+
+# usage: assert_source_once || return 0
+function assert_source_once() {
+  var="_$(basename -- "$0")_already_sourced"
+  if [ -n "${!var}" ]; then return 1; fi
+  declare "$var=1"
+  return 0
+}
+assert_source_once || return 0
 # ==> .utils.sh <==
 
 # THIS FILE IS SOURCED! preserve the old options
@@ -10,15 +19,6 @@ case $- in
 esac
 # for this file's safety, won't affect the functions defined here!
 set -euC -o pipefail
-
-# usage: assert_source_once || return 0
-function assert_source_once() {
-  var="_$(basename -- "$0")_already_sourced"
-  if [ -n "${!var}" ]; then return 1; fi
-  declare "$var=1"
-  return 0
-}
-assert_source_once || return 0
 
 # This is run repeatedly, should
 # Source this file to get utilities
