@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # ==> flow.sh <==
 if false; then
-  . ./output.sh # err, log, success
+  . ./output.sh  # err, log, success
+  . ../.utils.sh # assert_source_once
 fi
+assert_source_once || return 0
 
 ## --------------------------------------------------------------------------------------------------
 ## ------------------------------------------ Control Flow ------------------------------------------
