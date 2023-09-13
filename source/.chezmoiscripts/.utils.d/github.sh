@@ -51,10 +51,17 @@ function install_from_github() (
     return 2
   fi
 
-  if [ "$version" = "latest" ]; then version=$(get_latest_version_github "$github_repo"); fi
+  local url="https://github.com/$github_repo"
+  if [ "$version" = "latest" ]; then
+    # Skip the version lookup using the static 'latest' url
+    url+="/releases/latest/download/$asset"
+  else
+    # download from the given version
+    url+="/releases/download/$version/$asset"
+  fi
 
   log_github_install "$github_repo" "$version" "$asset" "$destination"
-  download_file "https://github.com/$github_repo/releases/download/$version/$asset" "$destination" +x
+  download_file "$url" "$destination" +x
 )
 # usage: log_github_install <repo> <version> [asset] [dest]
 # example: log_github_install aaron/example latest example.sh /usr/local/bin/
@@ -64,4 +71,17 @@ function log_github_install() {
   if [ -n "$asset" ]; then msg+=" ($asset)"; fi
   if [ -n "$destination" ]; then msg+=" to $destination"; fi
   log "$msg"
+}
+
+# usage: git_clone <repo> <dest> [branch]
+function git_clone() {
+  repo=$1
+  dest=$2
+  branch=${3:-}
+  args=(--sparse --filter=tree:0 --single-branch) # fastest/least storage possible
+  if [ -n "$branch" ]; then
+    args+=("--branch=$branch")
+  fi
+
+  git clone "${args[@]}" -- "$repo" "$dest"
 }
