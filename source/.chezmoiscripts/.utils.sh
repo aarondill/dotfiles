@@ -33,6 +33,8 @@ export __FROM_UTILS_SH=1 # used in the .utils.d/* to determine if called from he
 . "$SCRIPT_DIR"/.utils.d/download.sh # download functions
 # shellcheck source=./.utils.d/tempfile.sh
 . "$SCRIPT_DIR"/.utils.d/tempfile.sh # tempfile functions
+# shellcheck source=./.utils.d/json.sh
+. "$SCRIPT_DIR"/.utils.d/json.sh # json functions
 # shellcheck source=./.utils.d/github.sh
 . "$SCRIPT_DIR"/.utils.d/github.sh # github functions
 # shellcheck source=./.utils.d/package.sh
