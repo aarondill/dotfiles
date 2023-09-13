@@ -24,7 +24,7 @@ export WARNINGS=none
 
 install_from_make() {
   # Shows on errors
-  THIS="Make"
+  export THIS="Make"
 
   # Try install deps *first*
   if has_apt; then
@@ -47,7 +47,7 @@ install_from_make() {
   rm_exit "$temp"
 
   # Clone to tempdir
-  git clone --quiet -- "$REPO_URL" "$temp" >/dev/null
+  git_clone "$REPO_URL" "$temp"
 
   # build from source
   cd "$temp"

@@ -50,7 +50,7 @@ NPM=$(which yarn 2>/dev/null) || abort "yarn is required to install extensions s
 TEMP=$(mktemp -d)
 rm_exit "$TEMP"
 
-git clone https://github.com/oae/gnome-shell-extensions-sync.git "$TEMP"
+git_clone 'https://github.com/oae/gnome-shell-extensions-sync.git' "$TEMP"
 
 pushd "$TEMP" >/dev/null
 "$NPM" install

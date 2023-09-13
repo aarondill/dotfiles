@@ -16,5 +16,5 @@ if has_cmd tldr && [ "$(tldr --version)" = "tealdeer ${version#v}" ]; then
   abort 'already up to date.' 0
 fi
 
-install_from_github "$REPO" "$version" "$FILE" "$DESTINATION"
+install_from_github "$REPO" 'latest' "$FILE" "$DESTINATION"
 success

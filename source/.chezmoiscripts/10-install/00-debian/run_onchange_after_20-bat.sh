@@ -30,8 +30,8 @@ esac
 
 asset="bat-musl_${version#v}_${arch}.deb"
 
-log_github_install "$REPO" "$version" "$asset"
-tmp=$(download_file "https://github.com/$REPO/releases/download/$version/$asset")
+tmp=$(mktemp) || abort 'Could not create temporary directory'
 rm_exit "$tmp"
+install_from_github "$REPO" "$version" "$asset" "$tmp"
 apt_install "$tmp"
 rm_exit_cleanup "$tmp"

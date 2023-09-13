@@ -29,7 +29,7 @@ aur_install_makepkg() {
   local tmpdir REPO="https://aur.archlinux.org/$1.git"
   tmpdir="$(mktemp -d)"
   rm_exit "$tmpdir"
-  git clone "$REPO" "$tmpdir"
+  git_clone "$REPO" "$tmpdir"
   pushd "$tmpdir" >/dev/null
   (export -n SHELLOPTS && makepkg -sirc)
   popd >/dev/null

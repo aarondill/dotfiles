@@ -20,7 +20,7 @@ rm_exit "$tmp_dir"
 
 # This is very costly
 # Only download toplevel files
-git clone --sparse --filter=blob:none 'https://github.com/ryanoasis/nerd-fonts' "$tmp_dir"
+git_clone 'https://github.com/ryanoasis/nerd-fonts' "$tmp_dir"
 log "Downloading $NERD_FONT_TO_INSTALL fonts"
 # Download specific files for $NERD_FONT_TO_INSTALL fonts
 git -C "$tmp_dir" sparse-checkout add "patched-fonts/$NERD_FONT_TO_INSTALL"

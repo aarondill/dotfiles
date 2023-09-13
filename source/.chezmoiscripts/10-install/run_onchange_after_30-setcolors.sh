@@ -11,14 +11,14 @@ REPO_URL='https://github.com/evanpurkhiser/linux-vt-setcolors'
 
 install_from_make() {
   # Shows on errors
-  THIS="Make"
+  export THIS="Make"
 
   # Temp directory
   temp=$(mktemp -d)
   rm_exit "$temp"
 
   # Clone to tempdir
-  git clone --quiet -- "$REPO_URL" "$temp" >/dev/null
+  git_clone "$REPO_URL" "$temp"
 
   # build from source
   pushd "$temp" >/dev/null

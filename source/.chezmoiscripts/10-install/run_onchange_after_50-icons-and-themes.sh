@@ -12,7 +12,7 @@ function install_humanity_icons() {
   TMP_DIR=$(mktemp -d)
   rm_exit "$TMP_DIR"
 
-  git clone --single-branch --branch=ubuntu/devel 'https://git.launchpad.net/ubuntu/+source/humanity-icon-theme' "$TMP_DIR"
+  git_clone 'https://git.launchpad.net/ubuntu/+source/humanity-icon-theme' "$TMP_DIR" 'ubuntu/devel'
   sudo_cmd mv -vi "$TMP_DIR/Humanity" "$TMP_DIR/Humanity-Dark" "/usr/share/icons"
 
   rm_exit_cleanup "$TMP_DIR"
@@ -31,7 +31,7 @@ function install_yaru() {
 
   TMP_DIR=$(mktemp -d)
   rm_exit "$TMP_DIR"
-  git clone --filter=tree:0 --single-branch https://github.com/ubuntu/yaru.git "$TMP_DIR"
+  git_clone 'https://github.com/ubuntu/yaru.git' "$TMP_DIR"
 
   local meson=meson
   if ! version_gt "$("$meson" --version)" "0.59.0"; then

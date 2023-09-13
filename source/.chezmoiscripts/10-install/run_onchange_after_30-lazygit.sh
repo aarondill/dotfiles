@@ -21,7 +21,7 @@ function install_lazygit() (
   fi
 
   tmp=$(mktemp)
-  rm "$tmp"
+  rm_exit "$tmp"
   install_from_github "$REPO" "$version" "$file" "$tmp"
   # output to destination
   sudo_cmd tar -xz -C "$BINDIR" -f "$tmp" lazygit

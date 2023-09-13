@@ -60,9 +60,9 @@ Debian)
   ;;
 esac
 
-log_github_install "$REPO" "$version" "$asset"
-tmp=$(download_file "https://github.com/$REPO/releases/download/$version/$asset")
+tmp=$(mktemp)
 rm_exit "$tmp"
+install_from_github "$REPO" "$version" "$asset" "$tmp"
 apt_install "$tmp"
 rm_exit_cleanup "$tmp"
 
