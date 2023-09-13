@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # ==> flow.sh <==
-if false; then
+assert_source_once "${BASH_SOURCE[0]}" || return 0
+if true; then
   . ./output.sh  # err, log, success
   . ../.utils.sh # assert_source_once
 fi
-assert_source_once "${BASH_SOURCE[0]}" || return 0
 
 ## --------------------------------------------------------------------------------------------------
 ## ------------------------------------------ Control Flow ------------------------------------------

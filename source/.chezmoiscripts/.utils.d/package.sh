@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # ==> package.sh <==
-if false; then
+assert_source_once "${BASH_SOURCE[0]}" || return 0
+if true; then
   . ./flow.sh    # abort
   . ../.utils.sh # assert_source_once
 fi
-assert_source_once "${BASH_SOURCE[0]}" || return 0
 
 ## --------------------------------------------------------------------------------------------------
 ## ------------------------------------------- APT utils --------------------------------------------

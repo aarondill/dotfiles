@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # ==> download.sh <==
-if false; then
+assert_source_once "${BASH_SOURCE[0]}" || return 0
+if true; then
   . ./flow.sh     # abort
   . ./output.sh   # log
   . ./tempfile.sh # _add_tempfiles, rm_exit_cleanup
   . ./files.sh    # sudo_mkdir
   . ../.utils.sh  # assert_source_once
 fi
-assert_source_once "${BASH_SOURCE[0]}" || return 0
 ## --------------------------------------------------------------------------------------------------
 ## -------------------------------------------- Download --------------------------------------------
 ## --------------------------------------------------------------------------------------------------
