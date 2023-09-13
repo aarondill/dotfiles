@@ -4,6 +4,7 @@ if false; then
   . ./output.sh   # err log
   . ./flow.sh     # abort
   . ./download.sh # get_url_headers download_file
+  . ./json.sh     # get_json_prop
 fi
 ## --------------------------------------------------------------------------------------------------
 ## --------------------------------------------- GitHub ---------------------------------------------
@@ -11,11 +12,10 @@ fi
 
 # get_latest_version_github "someone/something" -> v1.2.3 (tagname)
 function get_latest_version_github() (
-  set -e                              # in subshell
+  set -e # in subshell
+
   local version_url version repo="$1" # combined $OWNER/$REPO
-  # version_url=$(get_url_headers "https://github.com/$repo/releases/latest" | grep -m1 -iF "location:" | tr -d '\r')
-  # version="${version_url##*/}" # remove everything up to last slash
-  version=$(curl "https://api.github.com/repos/$repo/releases/latest" | grep "tag_name" | cut -d'"' -f4) # parsing JSON...
+  version=$(download "https://api.github.com/repos/$repo/releases/latest" | get_json_prop 'tag_name')
   if [ -z "$version" ]; then
     err "Failed while attempting to install $repo. Please manually install at https://github.com/$repo/releases"
     return 2
