@@ -4,7 +4,7 @@ if false; then
   . ./flow.sh    # has_cmd sudo_cmd cmd_or_sudo
   . ../.utils.sh # assert_source_once
 fi
-assert_source_once || return 0
+assert_source_once "${BASH_SOURCE[0]}" || return 0
 
 ## --------------------------------------------------------------------------------------------------
 ## --------------------------------------------- Files ----------------------------------------------

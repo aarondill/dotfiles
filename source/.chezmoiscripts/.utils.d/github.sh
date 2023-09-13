@@ -7,7 +7,7 @@ if false; then
   . ./json.sh     # get_json_prop
   . ../.utils.sh  # assert_source_once
 fi
-assert_source_once || return 0
+assert_source_once "${BASH_SOURCE[0]}" || return 0
 
 ## --------------------------------------------------------------------------------------------------
 ## --------------------------------------------- GitHub ---------------------------------------------

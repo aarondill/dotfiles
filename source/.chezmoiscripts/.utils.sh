@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
 
-# usage: assert_source_once || return 0
+# usage: assert_source_once "${BASH_SOURCE[0]}" || return 0
 function assert_source_once() {
-  var="_$(basename -- "$0")_already_sourced"
-  if [ -n "${!var}" ]; then return 1; fi
-  declare "$var=1"
+  local var
+  var="_$(basename -- "$1")_already_sourced"
+  # shellcheck disable=SC2001 # I can't use ${var//sub/rep}
+  var=$(sed 's/[^a-zA-Z1-9_]/_/g' <<<"$var") # remove unsafe characters and replace with _
+  if [ -n "${!var:-}" ]; then return 1; fi
+  declare -g "$var=1"
   return 0
 }
-assert_source_once || return 0
+assert_source_once "${BASH_SOURCE[0]}" || return 0
 # ==> .utils.sh <==
 
 # THIS FILE IS SOURCED! preserve the old options

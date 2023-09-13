@@ -5,7 +5,7 @@ if false; then
   . ./flow.sh    # abort
   . ../.utils.sh # assert_source_once
 fi
-assert_source_once || return 0
+assert_source_once "${BASH_SOURCE[0]}" || return 0
 
 ## --------------------------------------------------------------------------------------------------
 ## ---------------------------------------------- JSON ----------------------------------------------
