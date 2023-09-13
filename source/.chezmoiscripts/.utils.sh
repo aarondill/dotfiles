@@ -11,16 +11,25 @@ esac
 # for this file's safety, won't affect the functions defined here!
 set -euC -o pipefail
 
+# usage: assert_source_once || return 0
+function assert_source_once() {
+  var="_$(basename -- "$0")_already_sourced"
+  if [ -n "${!var}" ]; then return 1; fi
+  declare "$var=1"
+  return 0
+}
+assert_source_once || return 0
+
 # This is run repeatedly, should
 # Source this file to get utilities
 (return 0 2>/dev/null) && _SOURCED=1 || _SOURCED=0
 if [ "$_SOURCED" -eq 0 ]; then printf '%s\n' "You should source this file. not run it." >&2; fi
+unset _SOURCED
 
 # Use already calculated source_dir if present (from parent script)
 SCRIPT_DIR="${SOURCE_DIR:-${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}}/.chezmoiscripts"
 
 export SHELLOPTS
-export __FROM_UTILS_SH=1 # used in the .utils.d/* to determine if called from here.
 # shellcheck source=./.utils.d/output.sh
 . "$SCRIPT_DIR"/.utils.d/output.sh # output functions
 # shellcheck source=./.utils.d/flow.sh
@@ -39,7 +48,6 @@ export __FROM_UTILS_SH=1 # used in the .utils.d/* to determine if called from he
 . "$SCRIPT_DIR"/.utils.d/github.sh # github functions
 # shellcheck source=./.utils.d/package.sh
 . "$SCRIPT_DIR"/.utils.d/package.sh # Pacman/APT functions
-unset __FROM_UTILS_SH
 
 ## --------------------------------------------------------------------------------------------------
 ## ------------------------------------------- Variables --------------------------------------------
