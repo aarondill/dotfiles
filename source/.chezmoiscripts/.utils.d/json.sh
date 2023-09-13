@@ -82,7 +82,7 @@ function _get_json_prop_fx() {
   for s in "$@"; do
     args+=(".[\"$s\"]") # fx takes multiple arguments, each builds on the last
   done
-  fx "${args[@]}"
+  fx "${args[@]}" 'x??""' # if undef, return empty string not "null"
 }
 
 # usage get_json_prop <prop>
