@@ -4,13 +4,13 @@ _UTIL_D="$(dirname -- "${BASH_SOURCE[0]}")"
 if [ -z "${_LEADER:-}" ]; then
   _LEADER="${BASH_SOURCE[0]}"
   _OLD_PWD="$(pwd)"
-  cd -- "$_UTIL_D"
+  builtin cd -- "$_UTIL_D"
   . ../.utils.sh # assert_source_once
 fi
 assert_source_once "${BASH_SOURCE[0]}" || return 0
 
 if [ "${BASH_SOURCE[0]}" = "$_LEADER" ]; then
-  cd -- "$_OLD_PWD"
+  builtin cd -- "$_OLD_PWD"
   unset _OLD_PWD _UTIL_D _LEADER
 fi
 
