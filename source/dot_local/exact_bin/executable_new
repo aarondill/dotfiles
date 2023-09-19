@@ -3,6 +3,19 @@
 shopt -s nullglob dotglob extglob
 set -euC -o pipefail
 
+template_parent_dir="$HOME/code"
+usage() {
+
+  cat <<EOF
+Usage: $THIS [LANG] [--] <DIR>...
+Creates a new project in the given language, based on the template found at $template_parent_dir/LANG/template
+
+OPTIONS:
+  -h, --help     display this help message
+  -l, --lang     the language of the project
+EOF
+  return 0
+}
 function err() { printf '%s\n' "$@" >&2; }
 function log() { printf '%s\n' "$@"; }
 function abort() {
@@ -21,15 +34,40 @@ function joinByChar() {
 }
 function _cleanup() { [ -n "$tmp" ] && rm -rf "$tmp" && trap '' EXIT; }
 
-lang="${1:-}"
-if [ -z "$lang" ]; then abort "usage: new <lang> [dest]" 2; fi
-shift # remove lang from arguments
+# Returns a string that should be 'eval'ed to set the positional arguments
+# Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
+# Input: $LONGOPTS,$SHORTOPTS
+# eval "$(parse_args "$@")"
+function parse_args() {
+  local parsed
+  local code=0 && getopt --test &>/dev/null || code=$?
+  if [ "$code" -ne 4 ]; then abort "Enhanced getopt is required for this script to work. Please install it." 1; fi
+  parsed=$(getopt --options="$SHORTOPTS" --longoptions="$LONGOPTS" --name "${THIS:-$0}" -- "$@") ||
+    exit 2                     # getopt has already complained about wrong arguments to stdout - Exit script
+  printf '%s' "set -- $parsed" # output getopt’s output this way to handle the quoting right
+}
+
+LONGOPTS=help,lang:
+SHORTOPTS=h,v,q,p:,t:
+ARGSTRING="$(parse_args "$@")"
+eval "$ARGSTRING"
+
+if [ -d "$PWD/template" ]; then
+  # Allow calling new from a template dir
+  # ie: ~/code/c means use c as a language
+  lang=$(basename "$PWD")
+  log "Note: Using '$lang' as the template language. To change this behavior, pass -- as the first argument"
+else
+  lang="${1:-}"
+  if [ -z "$lang" ]; then abort "usage: new <lang> [dest]" 2; fi
+  shift # remove lang from arguments
+fi
 
 cmd=$(cmdpath "new-$lang")
 if [ -x "$cmd" ]; then exec -- "$cmd" "$@"; fi # new-$lang command
 
-tmp="$(mktemp)" && trap _cleanup EXIT    # use one file for all loops
-template_dir="$HOME/code/$lang/template" # find the template directory
+tmp="$(mktemp)" && trap _cleanup EXIT              # use one file for all loops
+template_dir="$template_parent_dir/$lang/template" # find the template directory
 if ! [ -d "$template_dir" ]; then abort "Could not find $template_dir" 1; fi
 
 if [ "$#" -eq 0 ]; then set -- new; fi # default to 'new' if no arguments given

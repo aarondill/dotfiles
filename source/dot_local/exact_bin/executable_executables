@@ -25,20 +25,12 @@ abort() {
 # Input: $LONGOPTS,$SHORTOPTS
 # eval "$(parse_args "$@")"
 function parse_args() {
-  # -allow a command to fail with !’s side effect on errexit
-  # -use return value from ${PIPESTATUS[0]}, because ! hosed $?
-  # shellcheck disable=SC2251
-  ! getopt --test >/dev/null
-  if [[ "${PIPESTATUS[0]}" -ne 4 ]]; then abort "Enhanced getopt is required for this script to work. Please install it." 1; fi
-
   local parsed
-  if parsed=$(getopt --options="$SHORTOPTS" --longoptions="$LONGOPTS" --name "${THIS:-$0}" -- "$@"); then
-    # output getopt’s output this way to handle the quoting right:
-    printf '%s' "set -- $parsed"
-    return 0
-  fi
-  # getopt has already complained about wrong arguments to stdout - Exit script
-  exit 2
+  local code=0 && getopt --test &>/dev/null || code=$?
+  if [ "$code" -ne 4 ]; then abort "Enhanced getopt is required for this script to work. Please install it." 1; fi
+  parsed=$(getopt --options="$SHORTOPTS" --longoptions="$LONGOPTS" --name "${THIS:-$0}" -- "$@") ||
+    exit 2                     # getopt has already complained about wrong arguments to stdout - Exit script
+  printf '%s' "set -- $parsed" # output getopt’s output this way to handle the quoting right
 }
 
 path=$PATH

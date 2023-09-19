@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euC -o pipefail
 # Runs the java file specified with the given stdin and arguments
+# Be careful to avoid variables that collide with the template program (~/.local/bin/new)
+# Included are FILEPATH,REALPATH,FILENAME,DIRNAME,DATE,TIME,EXTENSION,BASENAME,ROOT and potentially more
+# All variables will be in all capitals.
 
 # BEGIN CONFIGURATION
 
