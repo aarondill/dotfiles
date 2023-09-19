@@ -47,10 +47,8 @@ function parse_args() {
   printf '%s' "set -- $parsed" # output getopt’s output this way to handle the quoting right
 }
 
-LONGOPTS=help,lang:
-SHORTOPTS=h,v,q,p:,t:
-ARGSTRING="$(parse_args "$@")"
-eval "$ARGSTRING"
+LONGOPTS=help,lang: SHORTOPTS=h,l:
+ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING"
 
 if [ -d "$PWD/template" ]; then
   # Allow calling new from a template dir

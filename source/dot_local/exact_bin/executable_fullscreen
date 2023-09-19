@@ -39,8 +39,7 @@ function parse_args() {
 
 # option --long/-l requires 1 argument
 LONGOPTS=help,display: SHORTOPTS=h,d:
-ARGSTRING="$(parse_args "$@")"
-eval "$ARGSTRING"
+ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING"
 
 display="${DISPLAY:-}"
 while true; do

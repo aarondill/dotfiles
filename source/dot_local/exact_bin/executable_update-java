@@ -51,8 +51,7 @@ function parse_args() {
 }
 
 LONGOPTS=help,yes,quiet SHORTOPTS=h,y,q
-ARGSTRING="$(parse_args "$@")"
-eval "$ARGSTRING"
+ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING"
 
 yes=0 quiet=0
 while true; do

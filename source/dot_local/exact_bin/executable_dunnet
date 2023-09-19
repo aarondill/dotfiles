@@ -43,8 +43,7 @@ function parse_args() {
 }
 
 LONGOPTS=help,nosave,emacs:,save: SHORTOPTS=h,n,e:,s:
-ARGSTRING="$(parse_args "$@")"
-eval "$ARGSTRING"
+ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING"
 
 emacs=
 while true; do

@@ -33,10 +33,8 @@ function parse_args() {
   printf '%s' "set -- $parsed" # output getopt’s output this way to handle the quoting right
 }
 
-LONGOPTS=help
-SHORTOPTS=h
-ARGSTRING="$(parse_args "$@")"
-eval "$ARGSTRING"
+LONGOPTS=help SHORTOPTS=h
+ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING"
 
 while true; do
   case "$1" in

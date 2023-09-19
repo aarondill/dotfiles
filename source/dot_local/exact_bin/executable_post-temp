@@ -46,10 +46,8 @@ function parse_args() {
 if [ "$#" -eq 0 ]; then usage && exit 0; fi
 
 verbose=false quiet=false
-LONGOPTS=help,verbose,quiet,python:,temp:
-SHORTOPTS=h,v,q,p:,t:
-ARGSTRING="$(parse_args "$@")"
-eval "$ARGSTRING"
+LONGOPTS=help,verbose,quiet,python:,temp: SHORTOPTS=h,v,q,p:,t:
+ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING"
 
 python=
 while true; do

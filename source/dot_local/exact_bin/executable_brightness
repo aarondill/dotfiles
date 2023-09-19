@@ -41,8 +41,7 @@ function parse_args() {
 }
 
 LONGOPTS="help,device:" SHORTOPTS="h,d:"
-ARGSTRING="$(parse_args "$@")"
-eval "$ARGSTRING"
+ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING"
 
 device=''
 while true; do
