@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+function err() { printf '%s\n' "$@" >&2; }
+function log() { printf '%s\n' "$@"; }
+function abort() {
+  err "$1"
+  exit "${2:-1}"
+}
+
+lang="${1:-}"
+dest="${2:-new}"
+if [ -z "$lang" ]; then
+  abort "usage: new <lang> [dest]" 2
+fi
+shift                             # remove lang from arguments
+if [ "$#" -gt 0 ]; then shift; fi # remove dest from arguments
+if command -v "new-$lang" &>/dev/null; then
+  exec -- "new-$lang" "$dest" "$@"
+fi
+
+template_dir="$HOME/code/$lang/template"
+if ! [ -d "$template_dir" ]; then
+  abort "Could not find $template_dir" 1
+fi
+
+# Copy the template directory
+cp -ri "$template_dir" "$dest"
+
+date=$(date '+%m/%d/%Y')
+time=$(date '+%H:%M')
+for f in "$dest"/**; do                           # handle string replacements
+  if ! [ -f "$f" ]; then continue; fi             # ignore directories
+  fp=$(realpath --relative-to="$dest" -s -- "$f") # filepath relative to root
+  rp=$(realpath -s -- "$f")                       # full realpath
+  bn=$(basename -- "$f")                          # basename of file
+  dn=$(dirname -- "$fp")                          # dirname relative to root
+  sed -i "s:\${FILENAME}:${bn//:/\\:}:" -- "$f"
+  sed -i "s:\${FILEPATH}:${fp//:/\\:}:" -- "$f"
+  sed -i "s:\${DIRNAME}:${dn//:/\\:}:" -- "$f"
+  sed -i "s:\${REALPATH}:${rp//:/\\:}:" -- "$f"
+  sed -i "s:\${DATE}:${date//:/\\:}:g" -- "$f"
+  sed -i "s:\${TIME}:${time//:/\\:}:g" -- "$f"
+done

@@ -3,7 +3,7 @@
  *
  * <pre>
  * Author:  Aaron Dill
- * Date:    $DATE
+ * Date:    ${DATE}
  * Course:  Computer Science I AP
  * Period:  3rd
  * </pre>
