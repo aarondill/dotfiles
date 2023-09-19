@@ -16,8 +16,8 @@ OPTIONS:
 EOF
   return 0
 }
-function err() { printf '%s\n' "$@" >&2; }
-function log() { printf '%s\n' "$@"; }
+function err() { printf '%s\n' "$@" >&2 || true; }
+function log() { printf '%s\n' "$@" || true; }
 function abort() {
   err "$1"
   exit "${2:-1}"
@@ -33,6 +33,34 @@ function joinByChar() {
   printf '%s' "$*"
 }
 function _cleanup() { [ -n "$tmp" ] && rm -rf "$tmp" && trap '' EXIT; }
+# usage: substitute file <file >file.new && mv file.new file
+# This evaluates shell expansion patterns (ie. $ENV/${ENV} -> value_of_ENV)
+# Use \$ENV or \${ENV} to escape them
+# Supported vars include FILEPATH,REALPATH,FILENAME,DIRNAME,DATE,TIME,EXTENSION,BASENAME,ROOT
+# NOTE: uses the environment variable `dest` as the root directory
+function substitute() {
+  local path="$1" env_pattern envs
+  if [ -z "$path" ]; then abort "substitute requires a filepath!" 2; fi
+  local envs=(DATE TIME FILEPATH DIRNAME REALPATH FILENAME EXTENSION BASENAME ROOT)
+  # shellcheck disable=SC2034 # These are dynamically used later
+  {
+    declare -I -- "${envs[@]}"                               # these are local, but keep predefined values
+    export -- "${envs[@]}"                                   # these should be exported to the perl command
+    FILEPATH=$(realpath --relative-to="$dest" -s -- "$path") # filepath relative to root -- root/dir/file.ext -> dir/file.ext
+    REALPATH=$(realpath -s -- "$path")                       # full realpath             -- root/dir/file.ext -> /home/aaron/root/dir/file.ext
+    FILENAME=$(basename -- "$path")                          # basename of file          -- root/dir/file.ext -> file.ext
+    DIRNAME=$(basename -- "$(dirname -- "$path")")           # name of parent directory  -- root/dir/file.ext -> root/dir
+    EXTENSION="${FILENAME##*.}"                              # file extension (last!)    -- root/dir/file.ext -> .ext
+    BASENAME="${FILENAME%.*}"                                # name without extension    -- root/dir/file.ext -> file
+    ROOT="$dest"                                             # name of root (project)    -- root/dir/file -> root
+    if [ "$EXTENSION" = "$FILENAME" ]; then EXTENSION=''; fi # Ensure extension is not the filename
+  }
+
+  # env_pattern='([A-Z][A-Z_0-9]*)' # only match capital variables!
+  env_pattern="($(joinByChar '|' "${envs[@]}"))" # only match the given variables!
+
+  perl -pe 's;(\\*)(\$'"$env_pattern"'|\$\{'"$env_pattern"'\});substr($1,0,int(length($1)/2)).(length($1)%2?$2:$ENV{$3||$4});eg' # Source: https://stackoverflow.com/a/25019138
+}
 
 # Returns a string that should be 'eval'ed to set the positional arguments
 # Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
@@ -49,64 +77,54 @@ function parse_args() {
 
 LONGOPTS=help,lang: SHORTOPTS=h,l:
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING"
+lang=
+while true; do
+  case "$1" in
+  --help | -h) usage && exit 0 ;;
+  -l | --lang) lang="$2" && shift 2 ;;
+  --) shift && break ;;
+  *) abort "This is a bug" 3 ;;
+  esac
+done
 
-if [ -d "$PWD/template" ]; then
-  # Allow calling new from a template dir
-  # ie: ~/code/c means use c as a language
-  lang=$(basename "$PWD")
-  log "Note: Using '$lang' as the template language. To change this behavior, pass -- as the first argument"
-else
-  lang="${1:-}"
-  if [ -z "$lang" ]; then abort "usage: new <lang> [dest]" 2; fi
-  shift # remove lang from arguments
+if [ -z "$lang" ]; then
+  if [ -d "$PWD/template" ]; then
+    # Allow calling new from a template dir
+    # ie: ~/code/c means use c as a language
+    lang=$(basename "$PWD")
+    log "Note: Using '$lang' as the template language. To change this behavior, use the -l flag"
+  else
+    lang="${1:-}" && shift &>/dev/null # remove lang from arguments
+  fi
 fi
 
+[ -z "$lang" ] && abort "language is required" 2
 cmd=$(cmdpath "new-$lang")
 if [ -x "$cmd" ]; then exec -- "$cmd" "$@"; fi # new-$lang command
 
-tmp="$(mktemp)" && trap _cleanup EXIT              # use one file for all loops
 template_dir="$template_parent_dir/$lang/template" # find the template directory
-if ! [ -d "$template_dir" ]; then abort "Could not find $template_dir" 1; fi
+# Doesn't exist. Warn the user!
+if ! [ -d "$template_dir" ]; then err "Could not find $template_dir. Making empty directories instead."; fi
 
 if [ "$#" -eq 0 ]; then set -- new; fi # default to 'new' if no arguments given
+# use one file for all loops -- but we don't need it if there's no template
+if [ -d "$template_dir" ]; then tmp="$(mktemp)" && trap _cleanup EXIT; fi
 for dest in "$@"; do
   if [ -z "$dest" ]; then err "refusing to create empty named directory!" && continue; fi
   # Don't overwrite existing files
   if [ -d "$dest" ]; then err "$dest already exists! Please move it or choose a new name" && continue; fi
 
-  # Copy the template directory
-  cp -ri -- "$template_dir/" "$dest"
+  mkdir -p -- "$(dirname -- "$dest")" # Ensure parent directory exists
+
+  if ! [ -d "$template_dir/" ]; then
+    mkdir -- "$dest"
+    continue # No template, just make the directory and continue
+  fi
+
+  cp -ri -- "$template_dir/" "$dest" # Copy the template directory - Note: The trailing slash is important to copy the target if it's a symlink
 
   # shellcheck disable=SC2034 # These are dynamically used later
   DATE=$(date '+%m/%d/%Y') TIME=$(date '+%H:%M')
-
-  # usage: substitute file <file >file.new && mv file.new file
-  # This evaluates shell expansion patterns (ie. $ENV/${ENV} -> value_of_ENV)
-  # Use \$ENV or \${ENV} to escape them
-  # Supported vars include FILEPATH,REALPATH,FILENAME,DIRNAME,DATE,TIME,EXTENSION,BASENAME,ROOT
-  function substitute() {
-    local path="$1" env_pattern envs
-    if [ -z "$path" ]; then abort "substitute requires a filepath!" 2; fi
-    local envs=(DATE TIME FILEPATH DIRNAME REALPATH FILENAME EXTENSION BASENAME ROOT)
-    # shellcheck disable=SC2034 # These are dynamically used later
-    {
-      declare -I -- "${envs[@]}"                               # these are local, but keep predefined values
-      export -- "${envs[@]}"                                   # these should be exported to the perl command
-      FILEPATH=$(realpath --relative-to="$dest" -s -- "$path") # filepath relative to root -- root/dir/file.ext -> dir/file.ext
-      REALPATH=$(realpath -s -- "$path")                       # full realpath             -- root/dir/file.ext -> /home/aaron/root/dir/file.ext
-      FILENAME=$(basename -- "$path")                          # basename of file          -- root/dir/file.ext -> file.ext
-      DIRNAME=$(basename -- "$(dirname -- "$path")")           # name of parent directory  -- root/dir/file.ext -> root/dir
-      EXTENSION="${FILENAME##*.}"                              # file extension (last!)    -- root/dir/file.ext -> .ext
-      BASENAME="${FILENAME%.*}"                                # name without extension    -- root/dir/file.ext -> file
-      ROOT="$dest"                                             # name of root (project)    -- root/dir/file -> root
-      if [ "$EXTENSION" = "$FILENAME" ]; then EXTENSION=''; fi # Ensure extension is not the filename
-    }
-
-    # env_pattern='([A-Z][A-Z_0-9]*)' # only match capital variables!
-    env_pattern="($(joinByChar '|' "${envs[@]}"))" # only match the given variables!
-
-    perl -pe 's;(\\*)(\$'"$env_pattern"'|\$\{'"$env_pattern"'\});substr($1,0,int(length($1)/2)).(length($1)%2?$2:$ENV{$3||$4});eg' # Source: https://stackoverflow.com/a/25019138
-  }
 
   # Note: FILEPATH,REALPATH,FILENAME,EXTENSION,BASENAME are relatively useless here
   for f in "$dest"/**; do # handle filename replacements
