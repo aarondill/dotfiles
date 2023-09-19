@@ -5,6 +5,11 @@ function abort() {
   err "$1"
   exit "${2:-1}"
 }
+function has() {
+  local c && for c in "$@"; do
+    command -v -- "$c" &>/dev/null || return
+  done
+}
 
 lang="${1:-}"
 dest="${2:-new}"
@@ -13,7 +18,7 @@ if [ -z "$lang" ]; then
 fi
 shift                             # remove lang from arguments
 if [ "$#" -gt 0 ]; then shift; fi # remove dest from arguments
-if command -v "new-$lang" &>/dev/null; then
+if has "new-$lang"; then
   exec -- "new-$lang" "$dest" "$@"
 fi
 
