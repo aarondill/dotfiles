@@ -5,7 +5,7 @@ set -euC -o pipefail
 
 template_parent_dir="$HOME/code"
 usage() {
-
+  THIS=$(basename "$0")
   cat <<EOF
 Usage: $THIS [LANG] [--] <DIR>...
 Creates a new project in the given language, based on the template found at $template_parent_dir/LANG/template
@@ -14,21 +14,23 @@ First checks for new-LANG command, if found, pass DIRs and exit
 Second checks for a file $template_parent_dir/LANG/template, if found, pass DIRs and exit
 Third checks for a directory $template_parent_dir/LANG/template, if found, copy to DIRs and continue
 
-
 For each DIR, a series of variable expansions are applied to the filenames and contents of all files and directories contained
 Variables (List may be incomplete):
-    FILEPATH:		The filepath relative to root -- root/dir/file.ext -> dir/file.ext
-    REALPATH:		The full realpath             -- root/dir/file.ext -> /home/aaron/root/dir/file.ext
-    FILENAME:		The basename of file          -- root/dir/file.ext -> file.ext
-    DIRNAME:		The name of parent directory  -- root/dir/file.ext -> root/dir
-    EXTENSION:	The file extension (last!)    -- root/dir/file.ext -> .ext
-    BASENAME:		The name without extension    -- root/dir/file.ext -> file
-    ROOT:				The name of root (project)    -- root/dir/file -> root
+    DATE:        The date of creation (mm/dd/yyyy)                             -- 09/19/2023
+    TIME:        The time of creation (hh:mm)                                  -- 16:25
+    FILEPATH:    The filepath relative to ROOT                                 -- root/dir/file.ext -> dir/file.ext
+    REALPATH:    The absolute path to the file                                 -- root/dir/file.ext -> /home/aaron/root/dir/file.ext
+    FILENAME:    The basename of the file                                      -- root/dir/file.ext -> file.ext
+    DIRNAME:     The name of the parent directory                              -- root/dir/file.ext -> root/dir
+    EXTENSION:   The LAST file extension. Empty if none                        -- root/dir/file.ext -> .ext
+    BASENAME:    The filename without extension (if present)                   -- root/dir/file.ext -> file
+    ROOT:        The name of the root (DIR on cmdline)                         -- root/dir/file -> root
 
 OPTIONS:
-  -l, --lang LANG     the language of the project (language argument is treated as DIR)
-  -h, --help          display this help message
-  -d, --debug         enable debugging output
+  -l, --lang LANG          the language of the project (language argument is treated as DIR)
+  -t, --template TEMPLATE  the template to use (Note, this skips the new-LANG check)
+  -h, --help               display this help message
+  -d, --debug              enable debugging output
 EOF
   return 0
 }
@@ -124,20 +126,21 @@ function parse_args() {
   printf '%s' "set -- $parsed" # output getopt’s output this way to handle the quoting right
 }
 
-LONGOPTS=help,lang:,debug SHORTOPTS=h,l:,d
-ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING"
-lang=
+LONGOPTS=help,lang:,debug,template: SHORTOPTS=h,l:,d,t
+ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
+lang='' template=''
 while true; do
   case "$1" in
   --help | -h) usage && exit 0 ;;
   --lang | -l) lang="$2" && shift 2 ;;
   --debug | -d) DEBUG=1 && shift 1 ;;
+  --template | -t) template="$2" && shift 2 ;;
   --) shift && break ;;
   *) abort "This is a bug" 3 ;;
   esac
 done
 
-if [ -z "$lang" ]; then
+if [ -z "$template" ] && [ -z "$lang" ]; then
   case "$PWD" in
   "$template_parent_dir"/*)              # Allow calling new from a template dir. ie: ~/code/c or ~/code/c/dir means use c as a language
     lang="${PWD#"$template_parent_dir"}" # ~/code/c/dir -> c/dir
@@ -149,23 +152,24 @@ if [ -z "$lang" ]; then
     shift &>/dev/null || true # remove lang from arguments
     ;;
   esac
+  [ -z "$lang" ] && abort "language is required" 2
 fi
-[ -z "$lang" ] && abort "language is required" 2
+
 if [ "$#" -eq 0 ]; then set -- new; fi # default to 'new' if no arguments given
 
 cmd=$(cmdpath "new-$lang")
 if [ -x "$cmd" ]; then exec -- "$cmd" "$@"; fi # new-$lang command
 
-template_dir="$template_parent_dir/$lang/template" # find the template directory
+template="$template_parent_dir/$lang/template" # find the template directory
 # Doesn't exist. Warn the user!
-if [ -f "$template_dir" ]; then
-  log "Using '$template_dir' as the template file"
-  [ -x "$template_dir" ] || abort "$template_dir is not executable! Aborting!" 1
-  exec -- "$template_dir" "$@"
-elif ! [ -d "$template_dir" ]; then
-  abort "Could not find $template_dir. Aborting!" 1
+if [ -f "$template" ]; then
+  log "Using '$template' as the template file"
+  [ -x "$template" ] || abort "$template is not executable! Aborting!" 1
+  exec -- "$template" "$@"
+elif ! [ -d "$template" ]; then
+  abort "Could not find $template. Aborting!" 1
 fi
-log "Using template directory '$template_dir'"
+log "Using template directory '$template'"
 
 # use one file for all loops -- but we don't need it if there's no template
 tmp="$(mktemp)" && trap _cleanup EXIT
@@ -176,7 +180,7 @@ for dest in "$@"; do
 
   log "Creating '$dest'"
   mkdir -p -- "$(dirname -- "$dest")" # Ensure parent directory exists
-  cp -ri -- "$template_dir/" "$dest"  # Copy the template directory - Note: The trailing slash is important to copy the target if it's a symlink
+  cp -ri -- "$template/" "$dest"      # Copy the template directory - Note: The trailing slash is important to copy the target if it's a symlink
 
   # shellcheck disable=SC2034 # These are dynamically used later
   DATE=$(date '+%m/%d/%Y') TIME=$(date '+%H:%M')
