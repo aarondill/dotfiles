@@ -38,7 +38,7 @@ function parse_args() {
 
 pager=true edit=0
 LONGOPTS=help,no-pager,pager:,edit SHORTOPTS=h,P,p:,e
-ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING"
+ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 while true; do
   case "$1" in
   --help | -h) usage && exit 0 ;;

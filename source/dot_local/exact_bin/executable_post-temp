@@ -47,7 +47,7 @@ if [ "$#" -eq 0 ]; then usage && exit 0; fi
 
 verbose=false quiet=false
 LONGOPTS=help,verbose,quiet,python:,temp: SHORTOPTS=h,v,q,p:,t:
-ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING"
+ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 
 python=
 while true; do

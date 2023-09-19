@@ -42,7 +42,7 @@ function parse_args() {
 }
 
 LONGOPTS=help,verbose,yes,force,interactive,recursive SHORTOPTS=h,v,y,f,i,r
-ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING"
+ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 
 for arg in "$@"; do
   case "$arg" in

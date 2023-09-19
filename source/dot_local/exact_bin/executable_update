@@ -58,7 +58,7 @@ function parse_args() {
 }
 
 LONGOPTS=help,as-root,list SHORTOPTS=h,l
-ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING"
+ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 
 allow_root=0
 while true; do

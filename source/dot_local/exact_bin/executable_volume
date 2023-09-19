@@ -36,7 +36,7 @@ function parse_args() {
 }
 
 LONGOPTS="help,sink:,mute" SHORTOPTS="h,s:,m"
-ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING"
+ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 
 mute='false'
 while true; do

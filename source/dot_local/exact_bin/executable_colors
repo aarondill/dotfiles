@@ -47,7 +47,7 @@ function parse_args() {
 }
 
 LONGOPTS=help SHORTOPTS=h
-ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING"
+ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 
 for arg; do
   case "$arg" in

@@ -127,7 +127,7 @@ function parse_args() {
 }
 
 LONGOPTS=help,lang:,debug,template: SHORTOPTS=h,l:,d,t
-ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
+ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit || exit
 lang='' template=''
 while true; do
   case "$1" in

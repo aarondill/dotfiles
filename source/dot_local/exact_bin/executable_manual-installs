@@ -44,7 +44,7 @@ function parse_args() {
 # option --long/-l requires 1 argument
 LONGOPTS=help,manifest:
 SHORTOPTS=h,m:
-ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING"
+ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 
 while true; do
   case "$1" in
