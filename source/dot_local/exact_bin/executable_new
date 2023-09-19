@@ -8,7 +8,7 @@ usage() {
   THIS=$(basename "$0")
   cat <<EOF
 Usage: $THIS [LANG] [--] <DIR>...
-Creates a new project in the given language, based on the template found at $template_parent_dir/LANG/template
+Creates a new project in the given language. Note that slashes (/) in LANG will be replaced with underscores (_)
 
 First checks for new-LANG command, if found, pass DIRs and exit
 Second checks for a file $template_parent_dir/LANG/template, if found, pass DIRs and exit
@@ -27,7 +27,7 @@ Variables (List may be incomplete):
     ROOT:        The name of the root (DIR on cmdline)                         -- root/dir/file -> root
 
 OPTIONS:
-  -l, --lang LANG          the language of the project (language argument is treated as DIR)
+  -l, --lang LANG          the language of the project (language argument is treated as a DIR)
   -t, --template TEMPLATE  the template to use (Note, this skips the new-LANG check)
   -h, --help               display this help message
   -d, --debug              enable debugging output
@@ -143,8 +143,9 @@ done
 if [ -z "$template" ] && [ -z "$lang" ]; then
   case "$PWD" in
   "$template_parent_dir"/*)              # Allow calling new from a template dir. ie: ~/code/c or ~/code/c/dir means use c as a language
-    lang="${PWD#"$template_parent_dir"}" # ~/code/c/dir -> c/dir
-    lang=${lang%%/*}                     # -> c
+    lang="${PWD#"$template_parent_dir"}" # ~/code/c/dir -> /c/dir
+    lang=${lang#/}                       # /c/dir -> c/dir
+    lang=${lang%%/*}                     # c/dir -> c
     log "Note: Using '$lang' as the template language. To change this behavior, use the -l flag"
     ;;
   *)
@@ -152,10 +153,12 @@ if [ -z "$template" ] && [ -z "$lang" ]; then
     shift &>/dev/null || true # remove lang from arguments
     ;;
   esac
-  [ -z "$lang" ] && abort "language is required" 2
+  [ -z "$lang" ] && abort "Could not infer language. Please pass it using -l or the first argument" 2
 fi
 # find the template directory -- not given, and lang *was*
-if [ -z "$template" ] && [ -n "$lang" ]; then template="$template_parent_dir/$lang/template"; fi
+if [ -z "$template" ] && [ -n "$lang" ]; then
+  template="$template_parent_dir/${lang//\//_}/template" # replace slashes in lang with _
+fi
 
 if [ "$#" -eq 0 ]; then set -- new; fi # default to 'new' if no arguments given
 
