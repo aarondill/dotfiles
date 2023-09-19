@@ -126,7 +126,7 @@ function parse_args() {
   printf '%s' "set -- $parsed" # output getopt’s output this way to handle the quoting right
 }
 
-LONGOPTS=help,lang:,debug,template: SHORTOPTS=h,l:,d,t
+LONGOPTS=help,debug,lang:,template: SHORTOPTS=h,d,l:,t:
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 lang='' template=''
 while true; do
@@ -136,7 +136,7 @@ while true; do
   --debug | -d) DEBUG=1 && shift 1 ;;
   --template | -t) template="$2" && shift 2 ;;
   --) shift && break ;;
-  *) abort "This is a bug" 3 ;;
+  *) abort "This is a bug. \$*: $*" 3 ;;
   esac
 done
 
@@ -154,14 +154,15 @@ if [ -z "$template" ] && [ -z "$lang" ]; then
   esac
   [ -z "$lang" ] && abort "language is required" 2
 fi
+# find the template directory -- not given, and lang *was*
+if [ -z "$template" ] && [ -n "$lang" ]; then template="$template_parent_dir/$lang/template"; fi
 
 if [ "$#" -eq 0 ]; then set -- new; fi # default to 'new' if no arguments given
 
 cmd=$(cmdpath "new-$lang")
 if [ -x "$cmd" ]; then exec -- "$cmd" "$@"; fi # new-$lang command
 
-template="$template_parent_dir/$lang/template" # find the template directory
-# Doesn't exist. Warn the user!
+# Doesn't exist. Warn the user! Empty string will be caught by `! -d`
 if [ -f "$template" ]; then
   log "Using '$template' as the template file"
   [ -x "$template" ] || abort "$template is not executable! Aborting!" 1
@@ -171,9 +172,10 @@ elif ! [ -d "$template" ]; then
 fi
 log "Using template directory '$template'"
 
-# use one file for all loops -- but we don't need it if there's no template
-tmp="$(mktemp)" && trap _cleanup EXIT
+template=${template%/}                # remove trailing slash
+tmp="$(mktemp)" && trap _cleanup EXIT # use one file for all loops
 for dest in "$@"; do
+  dest=${dest%/} # remove trailing slash
   if [ -z "$dest" ]; then err "refusing to create empty named directory!" && continue; fi
   # Don't overwrite existing files
   if [ -d "$dest" ]; then err "$dest already exists! Please move it or choose a new name" && continue; fi
