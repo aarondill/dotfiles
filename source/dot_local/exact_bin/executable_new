@@ -141,26 +141,28 @@ while true; do
 done
 
 if [ -z "$template" ] && [ -z "$lang" ]; then
-  case "$PWD" in
-  "$template_parent_dir"/*)              # Allow calling new from a template dir. ie: ~/code/c or ~/code/c/dir means use c as a language
-    lang="${PWD#"$template_parent_dir"}" # ~/code/c/dir -> /c/dir
-    lang=${lang#/}                       # /c/dir -> c/dir
-    lang=${lang%%/*}                     # c/dir -> c
-    log "Note: Using '$lang' as the template language. To change this behavior, use the -l flag"
-    ;;
-  *)
-    lang="${1:-}"
-    shift &>/dev/null || true # remove lang from arguments
-    ;;
-  esac
-  [ -z "$lang" ] && abort "Could not infer language. Please pass it using -l or the first argument" 2
+  ## Disabled to encourage better habits!
+  # case "$PWD" in
+  # "$template_parent_dir"/*)              # Allow calling new from a template dir. ie: ~/code/c or ~/code/c/dir means use c as a language
+  #   lang="${PWD#"$template_parent_dir"}" # ~/code/c/dir -> /c/dir
+  #   lang=${lang#/}                       # /c/dir -> c/dir
+  #   lang=${lang%%/*}                     # c/dir -> c
+  #   log "Note: Using '$lang' as the template language. To change this behavior, use the -l flag"
+  #   ;;
+  # *)
+  lang="${1:-}"
+  shift &>/dev/null || true # remove lang from arguments
+  # ;;
+  # esac
+  [ -z "$lang" ] && abort "Language is required. Please pass it using -l or the first argument" 2
 fi
 # find the template directory -- not given, and lang *was*
 if [ -z "$template" ] && [ -n "$lang" ]; then
   template="$template_parent_dir/${lang//\//_}/template" # replace slashes in lang with _
 fi
 
-if [ "$#" -eq 0 ]; then set -- new; fi # default to 'new' if no arguments given
+# if [ "$#" -eq 0 ]; then set -- new; fi # default to 'new' if no arguments given
+if [ "$#" -eq 0 ]; then abort 'DIR is required' 2; fi
 
 cmd=$(cmdpath "new-$lang")
 if [ -x "$cmd" ]; then exec -- "$cmd" "$@"; fi # new-$lang command
