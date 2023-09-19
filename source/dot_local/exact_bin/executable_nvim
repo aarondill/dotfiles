@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+neovim_path=~/code/repos/neovim
+neovim="$neovim_path/build/bin/nvim"
+if [ -x "$neovim" ]; then
+  # echo "Running git version!"
+  VIMRUNTIME="$neovim_path/runtime/" exec -- "$neovim" "$@"
+elif [ -x /usr/bin/nvim ]; then
+  exec -- /usr/bin/nvim
+fi
+
+printf '%s\n' "Could not find nvim" >&2
+exit 2
