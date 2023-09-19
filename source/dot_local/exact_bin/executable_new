@@ -32,7 +32,7 @@ function joinByChar() {
   local IFS="$1" && shift
   printf '%s' "$*"
 }
-function _cleanup() { [ -n "$tmp" ] && rm -rf "$tmp" && trap '' EXIT; }
+function _cleanup() { [ -n "${tmp:-}" ] && rm -rf "$tmp" && trap '' EXIT; }
 # usage: substitute file <file >file.new && mv file.new file
 # This evaluates shell expansion patterns (ie. $ENV/${ENV} -> value_of_ENV)
 # Use \$ENV or \${ENV} to escape them
@@ -81,21 +81,24 @@ lang=
 while true; do
   case "$1" in
   --help | -h) usage && exit 0 ;;
-  -l | --lang) lang="$2" && shift 2 ;;
+  --lang | -l) lang="$2" && shift 2 ;;
   --) shift && break ;;
   *) abort "This is a bug" 3 ;;
   esac
 done
 
 if [ -z "$lang" ]; then
-  if [ -d "$PWD/template" ]; then
-    # Allow calling new from a template dir
-    # ie: ~/code/c means use c as a language
-    lang=$(basename "$PWD")
+  case "$PWD" in
+  "$template_parent_dir"/*)              # Allow calling new from a template dir. ie: ~/code/c or ~/code/c/dir means use c as a language
+    lang="${PWD#"$template_parent_dir"}" # ~/code/c/dir -> c/dir
+    lang=${lang%%/*}                     # -> c
     log "Note: Using '$lang' as the template language. To change this behavior, use the -l flag"
-  else
-    lang="${1:-}" && shift &>/dev/null # remove lang from arguments
-  fi
+    ;;
+  *)
+    lang="${1:-}"
+    shift &>/dev/null || true # remove lang from arguments
+    ;;
+  esac
 fi
 
 [ -z "$lang" ] && abort "language is required" 2
@@ -104,24 +107,20 @@ if [ -x "$cmd" ]; then exec -- "$cmd" "$@"; fi # new-$lang command
 
 template_dir="$template_parent_dir/$lang/template" # find the template directory
 # Doesn't exist. Warn the user!
-if ! [ -d "$template_dir" ]; then err "Could not find $template_dir. Making empty directories instead."; fi
+if ! [ -d "$template_dir" ]; then abort "Could not find $template_dir. Aborting!" 2; fi
+log "Using template '$template_dir'"
 
 if [ "$#" -eq 0 ]; then set -- new; fi # default to 'new' if no arguments given
 # use one file for all loops -- but we don't need it if there's no template
-if [ -d "$template_dir" ]; then tmp="$(mktemp)" && trap _cleanup EXIT; fi
+tmp="$(mktemp)" && trap _cleanup EXIT
 for dest in "$@"; do
   if [ -z "$dest" ]; then err "refusing to create empty named directory!" && continue; fi
   # Don't overwrite existing files
   if [ -d "$dest" ]; then err "$dest already exists! Please move it or choose a new name" && continue; fi
 
+  log "Creating '$dest'"
   mkdir -p -- "$(dirname -- "$dest")" # Ensure parent directory exists
-
-  if ! [ -d "$template_dir/" ]; then
-    mkdir -- "$dest"
-    continue # No template, just make the directory and continue
-  fi
-
-  cp -ri -- "$template_dir/" "$dest" # Copy the template directory - Note: The trailing slash is important to copy the target if it's a symlink
+  cp -ri -- "$template_dir/" "$dest"  # Copy the template directory - Note: The trailing slash is important to copy the target if it's a symlink
 
   # shellcheck disable=SC2034 # These are dynamically used later
   DATE=$(date '+%m/%d/%Y') TIME=$(date '+%H:%M')
