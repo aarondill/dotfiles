@@ -4,7 +4,7 @@ CFLAGS::=-I$(IDIR) -Wall
 OBJ::=$(patsubst %.c,%.o,$(wildcard *.c))
 HEADERS::=$(wildcard *.h)
 
-TARGET::=out
+TARGET::=$ROOT
 
 all: $(TARGET)
 

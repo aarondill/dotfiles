@@ -1,70 +1,96 @@
 #!/usr/bin/env bash
+# don't match -> empty string. Include dotfiles. Allow double star
+shopt -s nullglob dotglob extglob
+set -euC -o pipefail
+
 function err() { printf '%s\n' "$@" >&2; }
 function log() { printf '%s\n' "$@"; }
 function abort() {
   err "$1"
   exit "${2:-1}"
 }
-function has() {
+# Return the path of each command passed
+function cmdpath() {
   local c && for c in "$@"; do
-    command -v -- "$c" &>/dev/null || return
+    command -v -- "$c" 2>/dev/null || printf '\n'
   done
 }
+function joinByChar() {
+  local IFS="$1" && shift
+  printf '%s' "$*"
+}
+function _cleanup() { [ -n "$tmp" ] && rm -rf "$tmp" && trap '' EXIT; }
 
 lang="${1:-}"
-dest="${2:-new}"
-if [ -z "$lang" ]; then
-  abort "usage: new <lang> [dest]" 2
-fi
-shift                             # remove lang from arguments
-if [ "$#" -gt 0 ]; then shift; fi # remove dest from arguments
-if has "new-$lang"; then
-  exec -- "new-$lang" "$dest" "$@"
-fi
+if [ -z "$lang" ]; then abort "usage: new <lang> [dest]" 2; fi
+shift # remove lang from arguments
 
-template_dir="$HOME/code/$lang/template"
-if ! [ -d "$template_dir" ]; then
-  abort "Could not find $template_dir" 1
-fi
+cmd=$(cmdpath "new-$lang")
+if [ -x "$cmd" ]; then exec -- "$cmd" "$@"; fi # new-$lang command
 
-# Copy the template directory
-cp -ri "$template_dir" "$dest"
+tmp="$(mktemp)" && trap _cleanup EXIT    # use one file for all loops
+template_dir="$HOME/code/$lang/template" # find the template directory
+if ! [ -d "$template_dir" ]; then abort "Could not find $template_dir" 1; fi
 
-date=$(date '+%m/%d/%Y')
-time=$(date '+%H:%M')
+if [ "$#" -eq 0 ]; then set -- new; fi # default to 'new' if no arguments given
+for dest in "$@"; do
+  if [ -z "$dest" ]; then err "refusing to create empty named directory!" && continue; fi
+  # Don't overwrite existing files
+  if [ -d "$dest" ]; then err "$dest already exists! Please move it or choose a new name" && continue; fi
 
-# usage: substitute file <file >file.new && mv file.new file
-function substitute() {
-  local path="$1" fp rp bn dn
-  if [ -z "$path" ]; then abort "substitute requires a filepath!" 2; fi
-  fp=$(realpath --relative-to="$dest" -s -- "$path") # filepath relative to root
-  rp=$(realpath -s -- "$path")                       # full realpath
-  bn=$(basename -- "$path")                          # basename of file
-  dn=$(dirname -- "$fp")                             # dirname relative to root
+  # Copy the template directory
+  cp -ri -- "$template_dir/" "$dest"
 
-  sed \
-    -e "s:\${DATE}:${date//:/\\:}:g" \
-    -e "s:\${TIME}:${time//:/\\:}:g" \
-    -e "s:\${FILENAME}:${bn//:/\\:}:" \
-    -e "s:\${FILEPATH}:${fp//:/\\:}:" \
-    -e "s:\${DIRNAME}:${dn//:/\\:}:" \
-    -e "s:\${REALPATH}:${rp//:/\\:}:"
-}
+  # shellcheck disable=SC2034 # These are dynamically used later
+  DATE=$(date '+%m/%d/%Y') TIME=$(date '+%H:%M')
 
-for f in "$dest"/**; do # handle filename replacements
-  filename=$(basename -- "$f")
-  newname=$(printf '%s' "$filename" | substitute "$f")
-  if [ "$filename" != "$newname" ]; then
-    mv "$f" "$(dirname -- "$f")/$newname" # move to new location
-  fi
+  # usage: substitute file <file >file.new && mv file.new file
+  # This evaluates shell expansion patterns (ie. $ENV/${ENV} -> value_of_ENV)
+  # Use \$ENV or \${ENV} to escape them
+  # Supported vars include FILEPATH,REALPATH,FILENAME,DIRNAME,DATE,TIME,EXTENSION,BASENAME,ROOT
+  function substitute() {
+    local path="$1" env_pattern envs
+    if [ -z "$path" ]; then abort "substitute requires a filepath!" 2; fi
+    local envs=(DATE TIME FILEPATH DIRNAME REALPATH FILENAME EXTENSION BASENAME ROOT)
+    # shellcheck disable=SC2034 # These are dynamically used later
+    {
+      declare -I -- "${envs[@]}"                               # these are local, but keep predefined values
+      export -- "${envs[@]}"                                   # these should be exported to the perl command
+      FILEPATH=$(realpath --relative-to="$dest" -s -- "$path") # filepath relative to root -- root/dir/file.ext -> dir/file.ext
+      REALPATH=$(realpath -s -- "$path")                       # full realpath             -- root/dir/file.ext -> /home/aaron/root/dir/file.ext
+      FILENAME=$(basename -- "$path")                          # basename of file          -- root/dir/file.ext -> file.ext
+      DIRNAME=$(basename -- "$(dirname -- "$path")")           # name of parent directory  -- root/dir/file.ext -> root/dir
+      EXTENSION="${FILENAME##*.}"                              # file extension (last!)    -- root/dir/file.ext -> .ext
+      BASENAME="${FILENAME%.*}"                                # name without extension    -- root/dir/file.ext -> file
+      ROOT="$dest"                                             # name of root (project)    -- root/dir/file -> root
+      if [ "$EXTENSION" = "$FILENAME" ]; then EXTENSION=''; fi # Ensure extension is not the filename
+    }
+
+    # env_pattern='([A-Z][A-Z_0-9]*)' # only match capital variables!
+    env_pattern="($(joinByChar '|' "${envs[@]}"))" # only match the given variables!
+
+    perl -pe 's;(\\*)(\$'"$env_pattern"'|\$\{'"$env_pattern"'\});substr($1,0,int(length($1)/2)).(length($1)%2?$2:$ENV{$3||$4});eg' # Source: https://stackoverflow.com/a/25019138
+  }
+
+  # Note: FILEPATH,REALPATH,FILENAME,EXTENSION,BASENAME are relatively useless here
+  for f in "$dest"/**; do # handle filename replacements
+    filename=$(basename -- "$f") dir=$(dirname -- "$f")
+    newname=$(substitute "$f" <<<"$filename")
+    case "$newname" in
+    "$filename") ;; # ignore if same
+    */../* | ../* | */..) err "Disallowed directory traversal: $newname. Skipping." ;;
+    */*) mkdir -p "$dir/$(dirname -- "$newname")" ;& # make the directory and fallthrough
+    *) mv "$f" "$dir/$newname" ;;                    # move to new location
+    esac
+  done
+
+  for f in "$dest"/**; do               # handle string replacements
+    if ! [ -f "$f" ]; then continue; fi # ignore directories
+    # shellcheck disable=SC2094 # substitute doesn't output to a file
+    substitute "$f" <"$f" >|"$tmp"                             # Write to tmp file to avoid loosing data (https://www.shellcheck.net/wiki/SC2094)
+    cp -p --attributes-only -- "$f" "$tmp" 2>/dev/null || true # save the attributes from the original file (if possible)
+    mv -f -- "$tmp" "$f"                                       # overwrite existing file
+  done
 done
 
-function _cleanup() { [ -n "$tmp" ] && rm -rf "$tmp" && trap '' EXIT; }
-tmp="$(mktemp)" && trap _cleanup EXIT
-for f in "$dest"/**; do               # handle string replacements
-  if ! [ -f "$f" ]; then continue; fi # ignore directories
-  # shellcheck disable=SC2094 # substitute doesn't output to a file
-  substitute "$f" <"$f" >"$tmp" # Write to tmp file to avoid loosing data (https://www.shellcheck.net/wiki/SC2094)
-  mv -f -- "$tmp" "$f"          # overwrite existing file
-done
-_cleanup
+_cleanup # Explicitly cleanup if this is reached
