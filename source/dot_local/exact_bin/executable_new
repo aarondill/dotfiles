@@ -92,7 +92,7 @@ function handle_file_sub() {
   newname=$(substitute "$f" <<<"$filename") # Note: FILEPATH,REALPATH,FILENAME,EXTENSION,BASENAME are relatively useless here
   case "$newname" in
   "$filename") ;; # ignore if same
-  */../* | ../* | */..) err "Disallowed directory traversal: $newname. Skipping." ;;
+  */../* | ../* | */..) err "Disallowed directory traversal: '$newname'. Skipping." ;;
   */*) mkdir -p "$dir/$(dirname -- "$newname")" ;& # make the directory and fallthrough
   *)
     debug "move to $dir/$newname"
@@ -165,10 +165,10 @@ if [ -x "$cmd" ]; then exec -- "$cmd" "$@"; fi # new-$lang command
 # Doesn't exist. Warn the user! Empty string will be caught by `! -d`
 if [ -f "$template" ]; then
   log "Using '$template' as the template file"
-  [ -x "$template" ] || abort "$template is not executable! Aborting!" 1
+  [ -x "$template" ] || abort "'$template' is not executable! Aborting!" 1
   exec -- "$template" "$@"
 elif ! [ -d "$template" ]; then
-  abort "Could not find $template. Aborting!" 1
+  abort "Could not find template directory '$template'. Aborting!" 1
 fi
 log "Using template directory '$template'"
 
