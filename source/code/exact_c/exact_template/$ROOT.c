@@ -1,3 +1,7 @@
+/*
+ * Author:  Aaron Dill
+ * Date:    ${DATE}
+ */
 #include <stdio.h>
 int main(int argc, char *argv[]) {
   // All paths are relative to the source root unless specified otherwise.

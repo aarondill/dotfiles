@@ -5,11 +5,12 @@ OBJ::=$(patsubst %.c,%.o,$(wildcard *.c))
 HEADERS::=$(wildcard *.h)
 
 TARGET::=${ROOT}
-ifeq ($(strip $(TARGET)),) # ensure TARGET is never empty
+# Ensure TARGET is never empty
+ifeq ($(strip $(TARGET)),)
 	TARGET::=out
 endif
 
-# note: $(patsubst %,'%',$^) quotes file lists when passed to shell. Doesn't handle spaces, just variable expansion
+# patsubst %,'%',$^ quotes file lists when passed to shell. Doesn't handle spaces, just variable expansion
 
 all: $(TARGET)
 
