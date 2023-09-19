@@ -38,7 +38,7 @@ code/js/.gitignore
 code/js/EslintTests.js
 .config/tealdeer
 .config/starship.toml
-code/Java/java-format.xml
+code/java/java-format.xml
 .local/share/man/man1
 .config/pnpm/rc
 .config/protonvpn
@@ -61,7 +61,7 @@ code/Java/java-format.xml
 .local/share/applications/github.desktop
 .local/share/applications/sso.desktop
 .local/share/applications/canvas.desktop
-code/Java/template
+code/java/template
 .config/firejail
 code/.alexrc.mjs
 code/config

@@ -32,16 +32,39 @@ cp -ri "$template_dir" "$dest"
 
 date=$(date '+%m/%d/%Y')
 time=$(date '+%H:%M')
-for f in "$dest"/**; do                           # handle string replacements
-  if ! [ -f "$f" ]; then continue; fi             # ignore directories
-  fp=$(realpath --relative-to="$dest" -s -- "$f") # filepath relative to root
-  rp=$(realpath -s -- "$f")                       # full realpath
-  bn=$(basename -- "$f")                          # basename of file
-  dn=$(dirname -- "$fp")                          # dirname relative to root
-  sed -i "s:\${FILENAME}:${bn//:/\\:}:" -- "$f"
-  sed -i "s:\${FILEPATH}:${fp//:/\\:}:" -- "$f"
-  sed -i "s:\${DIRNAME}:${dn//:/\\:}:" -- "$f"
-  sed -i "s:\${REALPATH}:${rp//:/\\:}:" -- "$f"
-  sed -i "s:\${DATE}:${date//:/\\:}:g" -- "$f"
-  sed -i "s:\${TIME}:${time//:/\\:}:g" -- "$f"
+
+# usage: substitute file <file >file.new && mv file.new file
+function substitute() {
+  local path="$1" fp rp bn dn
+  if [ -z "$path" ]; then abort "substitute requires a filepath!" 2; fi
+  fp=$(realpath --relative-to="$dest" -s -- "$path") # filepath relative to root
+  rp=$(realpath -s -- "$path")                       # full realpath
+  bn=$(basename -- "$path")                          # basename of file
+  dn=$(dirname -- "$fp")                             # dirname relative to root
+
+  sed \
+    -e "s:\${DATE}:${date//:/\\:}:g" \
+    -e "s:\${TIME}:${time//:/\\:}:g" \
+    -e "s:\${FILENAME}:${bn//:/\\:}:" \
+    -e "s:\${FILEPATH}:${fp//:/\\:}:" \
+    -e "s:\${DIRNAME}:${dn//:/\\:}:" \
+    -e "s:\${REALPATH}:${rp//:/\\:}:"
+}
+
+for f in "$dest"/**; do # handle filename replacements
+  filename=$(basename -- "$f")
+  newname=$(printf '%s' "$filename" | substitute "$f")
+  if [ "$filename" != "$newname" ]; then
+    mv "$f" "$(dirname -- "$f")/$newname" # move to new location
+  fi
 done
+
+function _cleanup() { [ -n "$tmp" ] && rm -rf "$tmp" && trap '' EXIT; }
+tmp="$(mktemp)" && trap _cleanup EXIT
+for f in "$dest"/**; do               # handle string replacements
+  if ! [ -f "$f" ]; then continue; fi # ignore directories
+  # shellcheck disable=SC2094 # substitute doesn't output to a file
+  substitute "$f" <"$f" >"$tmp" # Write to tmp file to avoid loosing data (https://www.shellcheck.net/wiki/SC2094)
+  mv -f -- "$tmp" "$f"          # overwrite existing file
+done
+_cleanup

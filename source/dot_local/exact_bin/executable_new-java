@@ -18,7 +18,7 @@ for dir in "$@"; do
     abort "file '$dir' already exists. Please move it or create a new name." 1
   fi
   classname=$(basename "$dir")
-  cp -T -ri ~/code/Java/template/ "$dir"
+  cp -T -ri ~/code/java/template/ "$dir"
   for f in "$dir"/*; do
     fbn=$(basename "$f")
     fdn=$(dirname "$f")
