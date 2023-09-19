@@ -4,15 +4,20 @@ CFLAGS::=-I$(IDIR) -Wall
 OBJ::=$(patsubst %.c,%.o,$(wildcard *.c))
 HEADERS::=$(wildcard *.h)
 
-TARGET::=$ROOT
+TARGET::=${ROOT}
+ifeq ($(strip $(TARGET)),) # ensure TARGET is never empty
+	TARGET::=out
+endif
+
+# note: $(patsubst %,'%',$^) quotes file lists when passed to shell. Doesn't handle spaces, just variable expansion
 
 all: $(TARGET)
 
 %.o: %.c $(HEADERS)
-	$(CC) -c -o $@ $< $(CFLAGS)
+	$(CC) -c -o $(patsubst %,'%',$@) $(patsubst %,'%',$<) $(CFLAGS)
 
 $(TARGET): $(OBJ)
-	$(CC) -o $@ $^ $(CFLAGS) 
+	$(CC) -o $(patsubst %,'%',$@) $(patsubst %,'%',$^) $(CFLAGS)
 
 clean:
-	$(RM) *~ $(TARGET) $(OBJ)
+	$(RM) ./*~ $(patsubst %,'%',$(TARGET)) $(patsubst %,'%',$(OBJ))
