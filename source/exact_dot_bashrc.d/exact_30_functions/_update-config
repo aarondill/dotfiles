@@ -66,3 +66,4 @@ code/java/template
 code/.alexrc.mjs
 code/config
 code/c/template
+code/c/.clang-format
