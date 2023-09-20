@@ -1,10 +1,10 @@
-CC::=gcc
+CC=gcc
 IDIR=.
-CFLAGS::=-I$(IDIR) -Wall
-OBJ::=$(patsubst %.c,%.o,$(wildcard *.c))
-HEADERS::=$(wildcard *.h)
+override CFLAGS+=-I$(IDIR) -Wall -lm
+OBJ=$(patsubst %.c,%.o,$(wildcard *.c))
+HEADERS=$(wildcard *.h)
 
-TARGET::=${ROOT}
+TARGET=${ROOT}
 # Ensure TARGET is never empty
 ifeq ($(strip $(TARGET)),)
 	TARGET::=out
