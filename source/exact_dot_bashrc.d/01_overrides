@@ -14,7 +14,7 @@ PROMPT_COMMAND=("${PROMPT_COMMAND[@]}")
 rm_rf=( # These will be removed forcefully.
   ~/.dotnet/
   ~/.pki/               # RM the stupid files in HOME from chrome
-  ~/.mozilla/           # RM the firefox files - I don't even care.
+  ~/.mozilla/firefox    # RM the firefox files - I don't even care.
   ~/.hplip/             # RM the hplip files - This is just configuration
   ~/.dbus/              # RM the dbus files - This is fine.
   ~/.java/              # RM the java files - should be in ~/.config/java/
@@ -28,6 +28,7 @@ rmdir=( # These will only be removed if empty
   ~/.snap
   ~/.sane/{xsane/,}
   ~/.gnome/{apps/,}
+  ~/.mozilla/{extensions/,}
 )
 function _rm_files() (
   cd ~ || return # subshell!

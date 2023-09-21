@@ -89,6 +89,10 @@ if [ -z "${DBUS_SESSION_BUS_ADDRESS:-}" ] && [ -n "${XDG_RUNTIME_DIR:-}" ] &&
   export DBUS_SESSION_BUS_ADDRESS
 fi
 
+if [ -z "${XAUTHORITY:-}" ] && [ -n "${XDG_RUNTIME_DIR:-}" ]; then
+  export XAUTHORITY="$XDG_RUNTIME_DIR/Xauthority"
+fi
+
 printf '%s ' exec "${cmd[@]}" && printf '\n'
 # export XDG_SESSION_TYPE=x11
 exec "${cmd[@]}"
