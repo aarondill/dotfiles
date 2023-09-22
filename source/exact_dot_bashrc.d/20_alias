@@ -6,7 +6,7 @@
 #
 
 # Is a command available?
-function has() { command -v -- "$1" &>/dev/null; }
+function has() { [ -x "$(command -v -- "$1")" ]; }
 
 # I'm stupid and can't remember what to type
 alias quit='exit'
