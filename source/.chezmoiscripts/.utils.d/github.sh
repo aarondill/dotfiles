@@ -75,16 +75,17 @@ function install_from_github() (
     url+="/releases/download/$version/$asset"
   fi
 
-  log_github_install "$github_repo" "$version" "$asset" "$destination"
+  log_github_install "$github_repo" "$version" "$asset" "$destination" "$url"
   download_file "$url" "$destination" +x
 )
 # usage: log_github_install <repo> <version> [asset] [dest]
-# example: log_github_install aaron/example latest example.sh /usr/local/bin/
+# example: log_github_install aaron/example latest example.sh /usr/local/bin/ http...
 function log_github_install() {
-  local github_repo=$1 version=$2 asset=${3:-} destination=${4:-}
+  local github_repo="$1" version="$2" asset="${3:-}" destination="${4:-}" url="${5:-}"
   local msg="Installing $github_repo version $version"
   if [ -n "$asset" ]; then msg+=" ($asset)"; fi
   if [ -n "$destination" ]; then msg+=" to $destination"; fi
+  if [ -n "$url" ]; then msg+=" ($url)"; fi
   log "$msg"
 }
 
