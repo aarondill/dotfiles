@@ -2,7 +2,7 @@
 set -euC -o pipefail
 # usage: visual awesome :2 || visual :3 || visual || visual awesome args -- :3
 THIS=visual
-usage() {
+function usage() {
   cat <<EOF || return 0
 $THIS [client] [client-args --] [:display] 
 
@@ -13,10 +13,10 @@ the arguments will be passed directly to the startx script
 EOF
 }
 
-log() { printf '%s\n' "$@"; }
-err() { printf "${THIS:-}: %s\n" "$@" >&2; }
-abort() { err "$1" && exit "${2:-1}"; }
-cmd() { command -v "$@" &>/dev/null; }
+function log() { printf '%s\n' "$@"; }
+function err() { printf "${THIS:-}: %s\n" "$@" >&2; }
+function abort() { err "$1" && exit "${2:-1}"; }
+function cmd() { command -v "$@" &>/dev/null; }
 
 if ! cmd which; then abort "which is required for this script" 1; fi
 if ! cmd startx; then abort "startx is required for this script" 1; fi

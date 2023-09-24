@@ -11,7 +11,7 @@ OFF_COLOR="$(tput sgr0 2>/dev/null || printf '')"
 # Set English language
 LANG=en_US.UTF-8
 
-usage() {
+function usage() {
   cat <<EOF
 $THIS [options] [--] [arguments]
 Cleans up the excess snap revisions and files. Use \$SUDO to change the program used.
@@ -26,10 +26,10 @@ EOF
   return 0
 }
 
-log() { printf '%s\n' "$@"; }
-color() { printf '%b' "$@"; }
-err() { printf "$RED_COLOR$THIS: %s\n$OFF_COLOR" "$@" >&2; }
-abort() {
+function log() { printf '%s\n' "$@"; }
+function color() { printf '%b' "$@"; }
+function err() { printf "$RED_COLOR$THIS: %s\n$OFF_COLOR" "$@" >&2; }
+function abort() {
   err "$1"
   exit "${2:-1}"
 }

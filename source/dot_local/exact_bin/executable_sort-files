@@ -2,7 +2,7 @@
 set -euC -o pipefail
 
 THIS=sort-files
-usage() {
+function usage() {
   cat <<EOF
 $THIS [options] [--] [DIR...]
 Outputs the files in the current (or specified) directory in order of largest to smallest.
@@ -20,9 +20,9 @@ EOF
   return 0
 }
 
-log() { printf '%s\n' "$@"; }
-err() { printf "$THIS: %s\n" "$@" >&2; }
-abort() { err "$1" && exit "${2:-1}"; }
+function log() { printf '%s\n' "$@"; }
+function err() { printf "$THIS: %s\n" "$@" >&2; }
+function abort() { err "$1" && exit "${2:-1}"; }
 # use like `"${sudo[@]}" do_something`
 # shellcheck disable=SC2206 # Splitting is intentional.
 sudo=(${SUDO:-sudo})

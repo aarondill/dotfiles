@@ -10,7 +10,7 @@ set -euC -o pipefail
 THIS=dunnet
 save_file="$HOME/.config/emacs/games/dunnet.save"
 
-usage() {
+function usage() {
   cat <<EOF
 $THIS [options] [--] [emacs-options]
                   
@@ -25,9 +25,9 @@ options:
 EOF
   return 0
 }
-log() { printf '%s\n' "$@"; }
-err() { printf "$THIS: %s\n" "$@" >&2; }
-abort() { err "$1" && exit "${2:-1}"; }
+function log() { printf '%s\n' "$@"; }
+function err() { printf "$THIS: %s\n" "$@" >&2; }
+function abort() { err "$1" && exit "${2:-1}"; }
 
 # Returns a string that should be 'eval'ed to set the positional arguments
 # Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.

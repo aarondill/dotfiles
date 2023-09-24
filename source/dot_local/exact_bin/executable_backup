@@ -146,7 +146,7 @@ REMOVE_OLDER_THAN=3M
 # ----------------------------------------------------------------
 # ----------------------------------------------------------------
 
-usage() {
+function usage() {
   cat <<-EOF
 backup [opts]...
 
@@ -162,9 +162,9 @@ Flags:
 --verbose,-v    Show all duplicity commands before running them (set BACKUP_VERBOSE to set this)
 EOF
 }
-log() { printf '%s\n' "$@"; }
-err() { printf '%s\n' "$@" >&2; }
-abort() {
+function log() { printf '%s\n' "$@"; }
+function err() { printf '%s\n' "$@" >&2; }
+function abort() {
   err "$1"
   exit "${2:-1}"
 }
@@ -266,7 +266,7 @@ fi
 # ----------------------------------------------------------------
 # ----------------------------------------------------------------
 
-verbose() {
+function verbose() {
   # a dry-run likely wants to be verbose
   if [ -n "${BACKUP_VERBOSE:-}" ] || [ -n "${BACKUP_DRY_RUN:-}" ]; then
     printf "'%s' " "$@" # print it

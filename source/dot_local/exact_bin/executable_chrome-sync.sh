@@ -2,7 +2,7 @@
 set -euC -o pipefail
 # Syncs the google-chrome assets to /dev/shm to decrease disk writes and improve speeds
 # This should be run before and after google-chrome if possible
-required() {
+function required() {
   for cmd in "$@"; do
     if ! command -v "$cmd" >/dev/null 2>&1; then
       printf '%s\n' "$cmd is required to run $0" >&2
@@ -29,7 +29,7 @@ function posix_realpath {
   printf "%s\n" "$dir/$(basename -- "$1")"
 }
 
-sync_shm() {
+function sync_shm() {
   local path volatile static link
   path=$(posix_realpath "$1")
 

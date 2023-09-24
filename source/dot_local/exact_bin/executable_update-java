@@ -7,7 +7,7 @@
 set -euC -o pipefail
 
 THIS=update-java
-usage() {
+function usage() {
   cat <<EOF
 $THIS [-y | --yes] <JAVADIR> [priority = 1112] [JVM_VERS_DIR]
 Updates java symlinks to the path specified using update-alternatives.
@@ -26,9 +26,9 @@ EOF
   return 0
 }
 
-log() { printf '%s\n' "$@"; }
-err() { printf "${THIS:-$0}: %s\n" "$@" >&2; }
-abort() {
+function log() { printf '%s\n' "$@"; }
+function err() { printf "${THIS:-$0}: %s\n" "$@" >&2; }
+function abort() {
   err "$1"
   exit "${2:-1}"
 }
@@ -65,7 +65,7 @@ while true; do
 done
 if [ "$#" -eq 0 ]; then usage && exit 2; fi
 
-log_run() {
+function log_run() {
   [ "$quiet" != 1 ] && log "$*"
   "$@"
 }

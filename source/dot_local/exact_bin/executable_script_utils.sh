@@ -9,7 +9,7 @@
 set -euC -o pipefail
 
 THIS="script_utils.sh"
-usage() {
+function usage() {
   cat <<EOF || return 0
 $THIS [options] [--] [arguments]
                   
@@ -25,9 +25,9 @@ Options:
 EOF
 }
 
-log() { printf '%s\n' "$@"; }
-err() { printf "${THIS:+$THIS: }%s\n" "$@" >&2; }
-abort() {
+function log() { printf '%s\n' "$@"; }
+function err() { printf "${THIS:+$THIS: }%s\n" "$@" >&2; }
+function abort() {
   err "$1"
   exit "${2:-1}"
 }

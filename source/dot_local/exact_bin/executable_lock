@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euC
 
-err() { printf '%s\n' "$@" >&2; }
-abort() {
+function err() { printf '%s\n' "$@" >&2; }
+function abort() {
   err "$1"
   exit "${2:-1}"
 }
@@ -13,8 +13,8 @@ elif [ -z "${DISPLAY:-}" ]; then
   abort "Please run this script in a Xorg session" 2
 fi
 
-optional() { "$@" || true; }
-revert() {
+function optional() { "$@" || true; }
+function revert() {
   optional xset dpms force on
   optional xset dpms 0 0 0
 }

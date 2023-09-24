@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 set -euC -o pipefail
 # Sets up rg function for paging rg output, if rg and delta are both available
-has_cmd() { command -v -- "$@" &>/dev/null; }
-err() { printf '%s\n' "$@" >&2; }
-abort() {
+function has_cmd() { command -v -- "$@" &>/dev/null; }
+function err() { printf '%s\n' "$@" >&2; }
+function abort() {
   err "$1"
   exit "${2:-1}"
 }
 
-find_next_command() {
+function find_next_command() {
   local script_dir=${1%/*}
   local command_name=${1##*/}
   local real_command=

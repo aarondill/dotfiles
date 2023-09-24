@@ -7,7 +7,7 @@
 #
 set -euC -o pipefail
 THIS=contents
-usage() {
+function usage() {
   cat <<EOF
 $THIS [file|executable...]
                   
@@ -19,9 +19,9 @@ options:
 EOF
   return 0
 }
-log() { printf '%s\n' "$@"; }
-err() { printf "$THIS: %s\n" "$@" >&2; }
-abort() { err "$1" && exit "${2:-1}"; }
+function log() { printf '%s\n' "$@"; }
+function err() { printf "$THIS: %s\n" "$@" >&2; }
+function abort() { err "$1" && exit "${2:-1}"; }
 
 # Returns a string that should be 'eval'ed to set the positional arguments
 # Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
@@ -77,7 +77,7 @@ for file in "$@"; do
   continue
 done
 
-find_prog() {
+function find_prog() {
   for p in "$@"; do
     if { [ -f "$p" ] && [ -x "$p" ]; } || [ -x "$(which -- "$1" 2>/dev/null)" ]; then
       printf '%s' "$p"

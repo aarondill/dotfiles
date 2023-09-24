@@ -10,7 +10,7 @@
 set -euC -o pipefail
 
 # usage 'get_nth_line 2', 1 indexed
-get_nth_line() {
+function get_nth_line() {
   local _ line i
   declare -i end="$1"
   for ((i = 1; i < end; i++)); do read -r _; done || return 0

@@ -2,10 +2,10 @@
 set -euC -o pipefail
 
 THIS=rmgit
-log() { printf '%s\n' "$@"; }
-err() { printf "$THIS: %s\n" "$@" >&2; }
-abort() { err "$1" && exit "${2:-1}"; }
-verbose() {
+function log() { printf '%s\n' "$@"; }
+function err() { printf "$THIS: %s\n" "$@" >&2; }
+function abort() { err "$1" && exit "${2:-1}"; }
+function verbose() {
   [ "${VERBOSE:-}" -eq 1 ] && log "$*"
   "$@"
 }
@@ -69,7 +69,7 @@ function check_status() {
 }
 
 exit=0
-_exit() {
+function _exit() {
   local code=${1:-$?} # first arg, or last code (like exit)
   [ "$code" -gt "$exit" ] && exit=$code
   return 0

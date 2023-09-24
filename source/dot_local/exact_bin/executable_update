@@ -7,7 +7,7 @@
 set -euC -o pipefail
 
 THIS=update
-usage() {
+function usage() {
   cat <<EOF
 $THIS [OPTIONS]... -- [METHOD]...
 Update system packages and third party packages
@@ -35,14 +35,14 @@ GREEN_COLOR="$(tput setaf 2 2>/dev/null || printf '')"
 BOLD_COLOR="$(tput bold 2>/dev/null || printf '')"
 RESET_COLOR="$(tput sgr0 2>/dev/null || printf '')"
 
-log() { printf "$YELLOW_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@"; }
-show_run() {
+function log() { printf "$YELLOW_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@"; }
+function show_run() {
   log "running: $*"
   "$@"
 }
-err() { printf "${THIS:+$THIS:}$RED_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@" >&2; }
-success() { printf "$GREEN_COLOR$BOLD_COLOR%s$RESET_COLOR\n" "Success!" && printf '\n'; }
-abort() { err "$1" && exit "${2:-1}"; }
+function err() { printf "${THIS:+$THIS:}$RED_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@" >&2; }
+function success() { printf "$GREEN_COLOR$BOLD_COLOR%s$RESET_COLOR\n" "Success!" && printf '\n'; }
+function abort() { err "$1" && exit "${2:-1}"; }
 
 # Returns a string that should be 'eval'ed to set the positional arguments
 # Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
@@ -118,8 +118,8 @@ sudo=(${SUDO:-sudo})
   CARGO_ARGS=(${CARGO_ARGS:-})
 }
 
-cmd_available() { command -v "$@" &>/dev/null; }
-cmd_path() { command -v "$@"; }
+function cmd_available() { command -v "$@" &>/dev/null; }
+function cmd_path() { command -v "$@"; }
 
 is_something_to_do=0
 for i in "$native" "$flatpak" "$snap" "$pnpm" "$npm" "$cargo"; do

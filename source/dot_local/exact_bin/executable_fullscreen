@@ -2,10 +2,10 @@
 # usage: fullscreen [Search-Term]
 set -euC -o pipefail
 THIS=fullscreen
-log() { printf '%s\n' "$@"; }
-err() { printf "$THIS: %s\n" "$@" >&2; }
-abort() { err "$1" && exit "${2:-1}"; }
-usage() {
+function log() { printf '%s\n' "$@"; }
+function err() { printf "$THIS: %s\n" "$@" >&2; }
+function abort() { err "$1" && exit "${2:-1}"; }
+function usage() {
   command cat <<EOF
 $THIS [options...] [--] [SEARCH] [xdotool-args...]
 

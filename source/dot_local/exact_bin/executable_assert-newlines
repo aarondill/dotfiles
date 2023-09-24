@@ -7,12 +7,12 @@
 # end in a newline.
 #
 set -euC -o pipefail
-log() { printf '%s\n' "$@"; }
-err() { printf "$THIS: %s\n" "$@" >&2; }
-abort() { err "$1" && exit "${2:-1}"; }
+function log() { printf '%s\n' "$@"; }
+function err() { printf "$THIS: %s\n" "$@" >&2; }
+function abort() { err "$1" && exit "${2:-1}"; }
 
 THIS=assert-newlines
-usage() {
+function usage() {
   cat <<-EOF
   $THIS DIR...
 

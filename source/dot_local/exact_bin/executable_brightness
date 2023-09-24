@@ -4,7 +4,7 @@ set -euC -o pipefail
 
 THIS="brightness"
 
-usage() {
+function usage() {
   cat <<-EOF
 usage: $THIS [OPTS]... [percent]
 Sets the brightness to the specified integer percentage. Use n{+,-} to increment the brightness.
@@ -21,11 +21,11 @@ Options:
 EOF
 }
 
-log() { printf '%s\n' "$@"; }
-err() { printf "$THIS: %s\n" "$@" >&2; }
-abort() { err "$1" && exit "${2:-1}"; }
+function log() { printf '%s\n' "$@"; }
+function err() { printf "$THIS: %s\n" "$@" >&2; }
+function abort() { err "$1" && exit "${2:-1}"; }
 number_re='^[0-9]+$'
-is_integer() { [[ "$1" =~ $number_re ]]; }
+function is_integer() { [[ "$1" =~ $number_re ]]; }
 
 # Returns a string that should be 'eval'ed to set the positional arguments
 # Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.

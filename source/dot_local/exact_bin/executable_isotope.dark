@@ -6,10 +6,10 @@ set -euC -o pipefail
 
 THIS=isotope.dark
 
-log() { printf '%s\n' "$@"; }
-err() { printf "$THIS: %s\n" "$@" >&2; }
-abort() { err "$1" && exit "${2:-1}"; }
-usage() {
+function log() { printf '%s\n' "$@"; }
+function err() { printf "$THIS: %s\n" "$@" >&2; }
+function abort() { err "$1" && exit "${2:-1}"; }
+function usage() {
   cat <<EOF
 $THIS [-h|--help]
 Sets the color of tty using setcolors (EvanPurkhiser/linux-vt-setcolors)

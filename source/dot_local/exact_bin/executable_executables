@@ -3,7 +3,7 @@ set -euC -o pipefail
 
 THIS='executables'
 
-usage() {
+function usage() {
   cat <<EOF
 Usage: $THIS
 Lists executables present in \$PATH
@@ -14,9 +14,9 @@ OPTIONS:
 EOF
   return 0
 }
-log() { printf '%s\n' "$@"; }
-err() { printf "$THIS: %s\n" "$@" >&2; }
-abort() {
+function log() { printf '%s\n' "$@"; }
+function err() { printf "$THIS: %s\n" "$@" >&2; }
+function abort() {
   err "$1"
   exit "${2:-1}"
 }
@@ -46,7 +46,7 @@ while true; do
   esac
 done
 
-get_execs() {
+function get_execs() {
   local d f path dirs=()
   path="${1:-$PATH}"
   if ! [[ $path = *: ]]; then path="$path:"; fi

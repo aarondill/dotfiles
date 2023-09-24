@@ -3,11 +3,11 @@ set -euC -o pipefail
 shopt -s nullglob # *not-exists* = ""
 shopt -s globstar # **
 
-log() { printf '%s\n' "$@"; }
+function log() { printf '%s\n' "$@"; }
 
 # Check the size of `dir` before and after running `cmd`
 # Usage: size_diff dir cmd [args...]
-size_diff() {
+function size_diff() {
   local dir oldsize newsize saving
   dir=$1
   oldsize=$(du -sk -- "$dir" | awk '{ print $1 * 1024 }')
@@ -30,7 +30,7 @@ size_diff() {
   log "Total saving: $saving"
 }
 
-clean_config_dir() {
+function clean_config_dir() {
   local dir=$1 file
 
   # causes issues?
@@ -50,13 +50,13 @@ clean_config_dir() {
   done
 }
 
-clean_cache_dir() {
+function clean_cache_dir() {
   local dir=$1
   local file="$dir/Default"
   if [ -e "$file" ]; then rm -rf -- "$file"; fi
 }
 
-clean_browser_conf_and_cache() {
+function clean_browser_conf_and_cache() {
   local config_dir=${1%/}/ cache_dir=${2%/}/ # ensure trailing slash (to dereference symlinks)
   log "Cleaning config directory $config_dir"
   size_diff "$config_dir" clean_config_dir "$config_dir"

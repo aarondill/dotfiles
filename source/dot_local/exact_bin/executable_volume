@@ -5,7 +5,7 @@ set -euC -o pipefail
 THIS="volume"
 sink='@DEFAULT_SINK@'
 
-usage() {
+function usage() {
   cat <<-EOF
 usage: $THIS [OPTS]... [PERCENT|'mute']
 Sets the volume to the specified PERCENT. Use n{+,-} to incremenet the volume.
@@ -18,9 +18,9 @@ Options:
 EOF
 }
 
-log() { printf '%s\n' "$@"; }
-err() { printf "$THIS: %s\n" "$@" >&2; }
-abort() { err "$1" && exit "${2:-1}"; }
+function log() { printf '%s\n' "$@"; }
+function err() { printf "$THIS: %s\n" "$@" >&2; }
+function abort() { err "$1" && exit "${2:-1}"; }
 
 # Returns a string that should be 'eval'ed to set the positional arguments
 # Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.

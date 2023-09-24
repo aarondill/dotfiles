@@ -4,7 +4,7 @@ shopt -s nullglob dotglob globstar
 set -euC -o pipefail
 
 template_parent_dir="$HOME/code"
-usage() {
+function usage() {
   THIS=$(basename "$0")
   cat <<EOF
 Usage: $THIS [LANG] [--] <DIR>...
