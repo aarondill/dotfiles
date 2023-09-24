@@ -73,9 +73,7 @@ function download_file() {
     dir=$(dirname "$dest")
   fi
   # might still exist if the user cancels with SIGINT - can't be avoided without overwriting global trap states
-  if temp=$(mktemp); then :; else # highlighting :)
-    abort "Could not create temporary directory" 1
-  fi
+  temp=$(mktemp) || abort "Could not create temporary directory" 1
   _add_tempfiles "$temp" || true # just incase the user defines the trap, slight safety without overwriting their trap
 
   download "$file_url" >|"$temp" || rm_exit_cleanup "$temp" # this will clean up and remove from the trap. Whether it's set or not.
