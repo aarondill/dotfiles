@@ -20,4 +20,4 @@ fi
 file=~/.local/share/bash-completion/completions/bun
 log "Installing bun completions"
 mkdir -p "$(dirname -- "$file")"
-SHELL=bash bun completions >"$file"
+SHELL=bash bun completions >|"$file"
