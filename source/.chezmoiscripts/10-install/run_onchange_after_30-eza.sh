@@ -9,7 +9,7 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 REPO_URL='https://github.com/eza-community/eza'
 
 install_eza() {
-  cargo install --all-features --git "$REPO_URL"
+  run_own_shell cargo install --all-features --git "$REPO_URL"
 }
 
 # if has_pacman; then # eza is in extra repo on arch
