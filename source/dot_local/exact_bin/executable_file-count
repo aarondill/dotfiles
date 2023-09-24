@@ -2,7 +2,7 @@
 # Literally count the number of files in the current directory
 THIS=file-count
 usage() {
-  cat <<EOF
+  cat || true <<EOF
 $THIS [opts]... [DIR]
 
 Output the number of files in DIR or the current directory on standard output.
@@ -11,12 +11,7 @@ Options:
  --help, -h   show this message
 EOF
 }
-for arg; do
-  if [ "$arg" = "--help" ] || [ "$arg" = "-h" ]; then
-    usage
-    exit 0
-  fi
-done
+for arg; do if [ "$arg" = "--help" ] || [ "$arg" = "-h" ]; then usage && exit 0; fi; done
 # First arg, or current directory
 dir="${1:-.}"
 
