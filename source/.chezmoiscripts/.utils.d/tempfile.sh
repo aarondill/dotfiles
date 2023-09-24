@@ -28,6 +28,7 @@ _cleanup_tempfiles() {
 }
 # An internal function. Don't call this.
 _add_tempfiles() {
+  local file temp
   for file; do
     for temp in "${_TEMPFILES[@]}"; do
       if [ "$file" = "$temp" ]; then continue 2; fi # continue `for file;` loop
