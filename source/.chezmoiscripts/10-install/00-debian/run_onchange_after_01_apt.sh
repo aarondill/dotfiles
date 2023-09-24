@@ -18,7 +18,7 @@ PACKAGES=(
   dconf-editor duf gh git grep inotify-tools less make
   neofetch neovim net-tools openvpn p7zip-full rsync tlp
   trash-cli tree util-linux zip zoxide speedtest-cli
-  ripgrep libfuse2 hexedit luajit python3-pip exa
+  ripgrep libfuse2 hexedit luajit python3-pip
   consolation # Literally the best thing to ever be invented
   # fonts
   fonts-noto-cjk fonts-noto-mono
