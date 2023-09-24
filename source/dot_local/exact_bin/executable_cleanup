@@ -1,23 +1,40 @@
 #!/usr/bin/env bash
 set -euC -o pipefail
-log() { printf '%s\n' "$@"; }
-err() { printf '%s\n' "$@" 1>&2; }
-abort() {
+function log() { printf '%s\n' "$@"; }
+function err() { printf '%s\n' "$@" 1>&2; }
+function abort() {
   err "$1"
   exit "${2:-1}"
 }
-has() { command -v -- "$1" &>/dev/null; }
+function has() { [ -x "$(command -v -- "$1")" ]; }
 # shellcheck disable=SC2206 # split intentionally
 SUDO=(${SUDO:-sudo})
-sudo_cmd() { "${SUDO[@]}" "$@"; }
+function sudo_cmd() { "${SUDO[@]}" "$@"; }
+function get_fs_root() { stat --format '%m' -- "$1"; }
+# usage: human_readable [number] [precision]
+function human_readable() {
+  local p=${2:-2} # default two places
+  local args=()
+  if [ -n "${1:-}" ]; then args+=("$1"); fi # optional number
+  numfmt --to=si --format="%.${p}f" -- "${args[@]}"
+}
+function get_used_bytes() {
+  [ -n "$1" ] || return 2 # Empty string
+  [ -e "$1" ] || return 1 # ENOENT
+  # -P for posix output, -k for 1024 bytes output(depends on POSIXLY_CORRECT otherwise)
+  # Tail to just get line desired
+  # Multiply by 1024 to convert from KiB to B
+  # NOTE: the call to awk could break if the dev file has a space in it...
+  df -Pk -- "$1" | tail -n +2 | awk '{print $3 * 1024}'
+}
 
 # Get size before starting
 
-oldsize_root=$(df / | tail -n +2 | awk '{print $3}')
-if [ "$(findmnt /)" = "$(findmnt ~)" ]; then
+oldsize_root=$(get_used_bytes /) # Convert from KiB to B
+if [ "$(get_fs_root /)" = "$(get_fs_root ~)" ]; then
   oldsize="$oldsize_root"
 else
-  oldsize_home=$(df ~ | tail -n +2 | awk '{print $3}')
+  oldsize_home=$(get_used_bytes ~) # Convert from KiB to B
   oldsize=$((oldsize_root + oldsize_home))
 fi
 
@@ -79,21 +96,15 @@ sudo_cmd fstrim -av
 log "Cleaning old logs >1G"
 sudo journalctl --vacuum-size=1G
 
-newsize_root=$(df / | tail -n +2 | awk '{print $3}')
-if [ "$(findmnt /)" = "$(findmnt ~)" ]; then
+newsize_root=$(get_used_bytes /)
+if [ "$(get_fs_root /)" = "$(get_fs_root ~)" ]; then
   newsize="$newsize_root"
 else
-  newsize_home=$(df ~ | tail -n +2 | awk '{print $3}')
+  newsize_home=$(get_used_bytes ~)
   newsize=$((newsize_root + newsize_home))
 fi
-
 saving=$((oldsize - newsize))
-if command -v numfmt &>/dev/null; then # After this point, don't use any of these variables for math!!
-  oldsize=$(numfmt --to=si -- "$oldsize")
-  newsize=$(numfmt --to=si -- "$newsize")
-  saving=$(numfmt --to=si -- "$saving")
-fi
 
-log "Old size: $oldsize"
-log "New size: $newsize"
-log "Total saving: $saving"
+log "Old size: $(human_readable "$oldsize")"
+log "New size: $(human_readable "$newsize")"
+log "Total saving: $(human_readable "$saving")"
