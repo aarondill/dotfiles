@@ -64,15 +64,16 @@ import sys
 import json
 j = json.load(sys.stdin)
 for k in sys.argv[1:]:
-    if j is None:
+    if j is None or k is None:
         sys.exit(3)
     if isinstance(j, dict):
         k not in j and sys.exit(1)
     elif isinstance(j, list):
-        int(k) >= len(j) and sys.exit(1)
+        k = int(k)
+        k >= len(j) and sys.exit(1)
     else:
         sys.exit(3)
-    j = j[int(k)]
+    j = j[k]
 
 if isinstance(j, dict) or isinstance(j, list):
     j = json.dumps(j)
