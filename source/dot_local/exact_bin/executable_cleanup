@@ -31,9 +31,8 @@ function get_used_bytes() {
 # Get size before starting
 
 oldsize_root=$(get_used_bytes /) # Convert from KiB to B
-if [ "$(get_fs_root /)" = "$(get_fs_root ~)" ]; then
-  oldsize="$oldsize_root"
-else
+oldsize="$oldsize_root"
+if [ "$(get_fs_root /)" != "$(get_fs_root ~)" ]; then
   oldsize_home=$(get_used_bytes ~) # Convert from KiB to B
   oldsize=$((oldsize_root + oldsize_home))
 fi
@@ -42,49 +41,48 @@ fi
 
 if has pnpm; then
   log "Cleaning pnpm store"
-  pnpm store prune
+  pnpm store prune || true
 fi
 
 log "Cleaning browser cache"
-clean-google-cache
+clean-google-cache || true
 
 if has snap; then
   log "Cleaning up snap packages"
-  snap-cleanup -y
+  snap-cleanup -y || true
 fi
 
 log "Cleaning package manager cache"
 if has nala; then
-  sudo_cmd nala clean
+  sudo_cmd nala clean || true
 elif has apt; then
-  sudo_cmd apt-get clean
-  sudo_cmd apt-get autoclean
+  sudo_cmd apt-get clean && sudo_cmd apt-get autoclean || true
 elif has yay; then
-  yay -Sc
+  yay -Sc || true
 elif has pacman; then
-  sudo_cmd pacman -Sc
+  sudo_cmd pacman -Sc || true
 else
   err "Could not find a package manager to clean up"
 fi
 
 if has flatpak; then
   log "Repairing flatpak repo"
-  sudo_cmd flatpak repair
+  sudo_cmd flatpak repair || true
 fi
 
 log "Cleaning up cache files"
-rm -rf -- ~/.cache/node/corepack/
-rmdir --ignore-fail-on-non-empty -- ~/.cache/node/
-rm -rf -- ~/.cache/npm/
-rm -rf -- ~/.cache/yarn/
-rm -rf -- ~/.cache/gnome-desktop-thumbnailer/
-rm -rf -- ~/.cache/mesa_shader_cache/
+rm -rf -- ~/.cache/node/corepack/ || true
+rmdir --ignore-fail-on-non-empty -- ~/.cache/node/ || true
+rm -rf -- ~/.cache/npm/ || true
+rm -rf -- ~/.cache/yarn/ || true
+rm -rf -- ~/.cache/gnome-desktop-thumbnailer/ || true
+rm -rf -- ~/.cache/mesa_shader_cache/ || true
 
 log "Cleaning the trash"
 if has trash-empty; then
-  trash-empty
+  trash-empty || true
 elif has gio; then
-  gio trash --empty
+  gio trash --empty || true
 else
   abort "Could not find a command to clean the trash"
 fi
@@ -94,12 +92,11 @@ sudo_cmd fstrim -av || true # this may fail (ex: in container or unsupported fs)
 
 # Size stats
 log "Cleaning old logs >1G"
-sudo journalctl --vacuum-size=1G
+sudo journalctl --vacuum-size=1G || true
 
 newsize_root=$(get_used_bytes /)
-if [ "$(get_fs_root /)" = "$(get_fs_root ~)" ]; then
-  newsize="$newsize_root"
-else
+newsize="$newsize_root"
+if [ "$(get_fs_root /)" != "$(get_fs_root ~)" ]; then
   newsize_home=$(get_used_bytes ~)
   newsize=$((newsize_root + newsize_home))
 fi
