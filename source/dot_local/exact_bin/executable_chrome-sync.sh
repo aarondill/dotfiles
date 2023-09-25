@@ -1,12 +1,17 @@
 #!/usr/bin/env bash
 set -euC -o pipefail
+function log() { printf '%s\n' "$@" || true; }
+function err() { printf '%s\n' "$@" >&2 || true; }
+function abort() {
+  err "$1"
+  exit "${2:-1}"
+}
 # Syncs the google-chrome assets to /dev/shm to decrease disk writes and improve speeds
 # This should be run before and after google-chrome if possible
 function required() {
   for cmd in "$@"; do
     if ! command -v "$cmd" >/dev/null 2>&1; then
-      printf '%s\n' "$cmd is required to run $0" >&2
-      exit 1
+      abort "$cmd is required to run $0" 1
     fi
   done
 }
@@ -26,7 +31,7 @@ function posix_realpath {
     cd "$(dirname -- "$1")" >/dev/null
     pwd -P
   )
-  printf "%s\n" "$dir/$(basename -- "$1")"
+  log "$dir/$(basename -- "$1")"
 }
 
 function sync_shm() {
@@ -64,10 +69,9 @@ function sync_shm() {
   fi
 }
 
-if [ "$#" -gt 0 ]; then
-  printf '%s\n' "This script accepts no arguments." >&2
-  exit 2
-fi
+if [ "$#" -gt 0 ]; then abort "This script accepts no arguments." 2; fi
+
+if [ -n "${SOMMELIER_VERSION:-}" ]; then abort "ChromeOS development environment is currently not supported." 1; fi
 
 conf_dir=${XDG_CONFIG_HOME:-$HOME/.config}
 cache_dir=${XDG_CACHE_HOME:-$HOME/.cache}
@@ -76,7 +80,7 @@ local_dir=$HOME/.local/share # other setups are not supported with firefox
 case "${BROWSER:-}" in # Sync active browser (or vivaldi as default)
 '' | *vivaldi*)
   # msg="Vivaldi chrome sync is disabled to test stability! Don't forget to reenable this."
-  # printf '%s\n' "$msg" >&2
+  # err "$msg"
   # DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u aaron)/bus" DISPLAY=:0 notify-send "Warning" "$msg" 2>/dev/null || true
   sync_shm "$conf_dir/vivaldi"  # PROFILE
   sync_shm "$cache_dir/vivaldi" # CACHE
