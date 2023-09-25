@@ -87,6 +87,6 @@ function download_file() {
 
   sudo_mkdir -p "$dir" || rm_exit_cleanup "$temp"
   # resets permissions
-  sudo_writable "$dir" sudo_cmd install --no-target-directory -- "$temp" "$dest" || rm_exit_cleanup "$temp"
+  sudo_writable "$dir" install --no-target-directory -- "$temp" "$dest" || rm_exit_cleanup "$temp"
   if [ -n "$mode" ]; then sudo_cmd chmod "$mode" "$dest" || true; fi
 }
