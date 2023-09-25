@@ -25,7 +25,7 @@ function get_used_bytes() {
   # Tail to just get line desired
   # Multiply by 1024 to convert from KiB to B
   # NOTE: the call to awk could break if the dev file has a space in it...
-  df -Pk -- "$1" | tail -n +2 | awk '{print $3 * 1024}'
+  df -Pk -- "$1" | tail -n +2 | awk '{printf "%d", $3 * 1024}'
 }
 
 # Get size before starting
