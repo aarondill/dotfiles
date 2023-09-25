@@ -73,6 +73,7 @@ format = "[$symbol$environment]($style) "
 [container]
 symbol = "cont "
 format = '[$symbol($name )]($style)'
+disabled = true # disable because it shows in chromeos dev mode
 
 [crystal]
 format = "[$symbol]($style)"
