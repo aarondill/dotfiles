@@ -121,3 +121,6 @@ if [ -n "$BASH_VERSION" ]; then
     . "$HOME/.bashrc"
   fi
 fi
+
+# A variable to use in chezmoi to make sure the user has sourced the profile
+export MY_PROFILE_HAS_LOADED=1
