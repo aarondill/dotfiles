@@ -17,13 +17,13 @@ function setup_ppa_spotify() {
   sudo_cmd mkdir -p /etc/apt/sources.list.d
   printf '%s\n' "deb http://repository.spotify.com stable non-free" | sudo_cmd tee /etc/apt/sources.list.d/spotify.list >/dev/null
 }
-function setup_ppa_vscode() {
-  sudo_cmd true
-  sudo_cmd mkdir -p /etc/apt/keyrings
-  download https://packages.microsoft.com/keys/microsoft.asc | sudo_cmd gpg --dearmor --yes -o /etc/apt/keyrings/packages.microsoft.gpg
-  sudo_cmd mkdir -p /etc/apt/sources.list.d
-  printf '%s\n' "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | sudo_cmd tee /etc/apt/sources.list.d/vscode.list >/dev/null
-}
+#function setup_ppa_vscode() {
+#  sudo_cmd true
+#  sudo_cmd mkdir -p /etc/apt/keyrings
+#  download https://packages.microsoft.com/keys/microsoft.asc | sudo_cmd gpg --dearmor --yes -o /etc/apt/keyrings/packages.microsoft.gpg
+#  sudo_cmd mkdir -p /etc/apt/sources.list.d
+#  printf '%s\n' "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | sudo_cmd tee /etc/apt/sources.list.d/vscode.list >/dev/null
+#}
 # function setup_ppa_google-chrome() {
 #   sudo_cmd true
 #   sudo_cmd mkdir -p /etc/apt/trusted.gpg.d/
@@ -45,6 +45,6 @@ function install_proprietary_software() {
 # Should already be installed, sanity check
 has_cmd gpg curl
 log_and_run 'installing spotify ppa' setup_ppa_spotify
-log_and_run 'installing vscode ppa' setup_ppa_vscode
+# log_and_run 'installing vscode ppa' setup_ppa_vscode
 # log_and_run 'installing google chrome ppa' setup_ppa_google-chrome
-log_and_run 'installing proprietary packages' install_proprietary_software spotify-client code
+log_and_run 'installing proprietary packages' install_proprietary_software spotify-client

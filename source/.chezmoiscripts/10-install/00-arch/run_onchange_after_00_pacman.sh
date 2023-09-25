@@ -35,9 +35,7 @@ VIRTUAL_MACHINE_PACKAGES=(
   virt-install
 )
 GRAPHICAL_PACKAGES=(
-  dconf-editor gparted gucharmap
-  # These are setup on ubuntu through a ppa
-  code spotify-launcher
+  dconf-editor gparted gucharmap spotify-launcher
   wmctrl xdotool xclip xdg-utils
 )
 GNOME_PACKAGES=(gnome-shell-extension-manager gnome-tweaks gnome-software gnome-software-plugin-flatpak)
