@@ -16,4 +16,4 @@ java=$code/java
 python=$code/Python
 chromeext=$code/chromeExtensions
 config=$code/config
-backup=/media/aaron/Backup/
+backup=/media/$USER/Backup/

@@ -6,8 +6,8 @@
 #
 #
 
-FZF_KEY_BIND_FILE=/home/aaron/.config/readline/fzf-key-bindings.bash
-FZF_COMPLETION_FILE=/home/aaron/.local/share/bash-completion/completions/fzf
+FZF_KEY_BIND_FILE=~/.config/readline/fzf-key-bindings.bash
+FZF_COMPLETION_FILE=~/.local/share/bash-completion/completions/fzf
 # Ensure fzf is installed, and key-bindings are reachable
 if ! command -v fzf &>/dev/null; then
   return
