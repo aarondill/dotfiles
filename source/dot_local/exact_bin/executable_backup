@@ -15,20 +15,16 @@ set -euC -o pipefail
 # may use "home_daily_s3" for the daily backup of a home directory to Amazon S3. The structure of the name is up to the user, it is only important that
 # the names be distinct. The symbolic name is currently only used to affect the expansion of --archive-dir , but may be used for additional features in
 # the future. Users running more than one distinct backup are encouraged to use this option. If not specified, the default value is a hash of the backend URL.
-os=$(. /etc/os-release && printf '%s\n' "${ID:-${NAME:-}}" || printf '')
-host=$(uname -n || printf '')
-NAME="full-system-$host-$os"
+os=$(. /etc/os-release 2>/dev/null && printf '%s\n' "${ID:-${NAME:-}}") || true
+host=$(uname -n 2>/dev/null) || true
+hostid=$(hostid 2>/dev/null) || true # added differential
+NAME="full-system-$host-$os-$hostid"
 
 # use '-path' to exclude
 # use '+path' or just 'path' to include
 # spaces are also permitted after the '+/-' (ie '+ path')
 # to use a path starting with '-' or '+', simply pass two of them (ie '--path' and '++path')
 # NOTE: order is important. the first matching pattern will be applied. (see man duplicity)
-
-if [ "$HOME" != "/home/aaron" ]; then
-  printf '%s\n' "This script is hackish and hardcoded to /home/aaron" >&2
-  exit 1
-fi
 
 # from man:duplicity:
 # The include and exclude options accept some extended shell globbing patterns. These patterns can contain '*', '**', '?', and '[...]'.
@@ -38,30 +34,30 @@ fi
 # Furthermore, if the pattern starts with "ignorecase:" (case insensitive), then this prefix will be removed and
 # any character in the string can be replaced with an upper- or lowercase version of itself.
 files=(
-  '-/home/aaron/.cache'
-  '-/home/aaron/.cache/deja-dup'
-  '-/home/aaron/.config/Code'
-  '-/home/aaron/.config/TabNine'
-  '-/home/aaron/.config/google-chrome'
-  '-/home/aaron/.config/google-chrome-static'
-  '-/home/aaron/.config/vivaldi'
-  '-/home/aaron/.config/vivaldi-static'
-  '-/home/aaron/.local/share'
-  '-/home/aaron/.local/share/Trash'
-  '-/home/aaron/.local/state'
-  '-/home/aaron/.luckyBackup/logs'
-  '-/home/aaron/.luckyBackup/snaps'
-  '-/home/aaron/.thunderbird'
-  '-/home/aaron/.var'
-  '-/home/aaron/.vscode'
-  '-/home/aaron/.xsession-errors'
-  '-/home/aaron/.Xauthority'
-  '-/home/aaron/Documents/.soh'
-  '-/home/aaron/Downloads'
-  '-/home/aaron/snap/*/*/.cache'
-  '-/home/aaron/vscode/repos'
+  "-$HOME/.cache"
+  "-$HOME/.cache/deja-dup"
+  "-$HOME/.config/Code"
+  "-$HOME/.config/TabNine"
+  "-$HOME/.config/google-chrome"
+  "-$HOME/.config/google-chrome-static"
+  "-$HOME/.config/vivaldi"
+  "-$HOME/.config/vivaldi-static"
+  "-$HOME/.local/share"
+  "-$HOME/.local/share/Trash"
+  "-$HOME/.local/state"
+  "-$HOME/.luckyBackup/logs"
+  "-$HOME/.luckyBackup/snaps"
+  "-$HOME/.thunderbird"
+  "-$HOME/.var"
+  "-$HOME/.vscode"
+  "-$HOME/.xsession-errors"
+  "-$HOME/.Xauthority"
+  "-$HOME/Documents/.soh"
+  "-$HOME/Downloads"
+  "-$HOME/snap/*/*/.cache"
+  "-$HOME/vscode/repos"
 
-  '+/home/aaron'
+  "+$HOME"
 
   '-/sys'
   '-/run'
@@ -70,7 +66,8 @@ files=(
   '-/dev/shm'
   '-/var/tmp'
   '-/tmp'
-  '-/media/aaron/Backup/UbuntuLaptop/duplicity_backup' # don't backup the backup :)
+  '-/media'     # don't backup the backup :)
+  '-/run/media' # don't backup the backup :)
   '-/**/lost+found'
   '-**'
 )
