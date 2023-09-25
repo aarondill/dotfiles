@@ -64,7 +64,7 @@ fi
 
 alias fslite='browser fslite.vercel.app'
 # Don't show loopback, and show more useful columns
-alias lsblk="lsblk -e 7 -o NAME,MAJ:MIN,SIZE,FSTYPE,LABEL,MOUNTPOINTS"
+alias lsblk="lsblk -e 7 -o NAME,MAJ:MIN,SIZE,FSTYPE,LABEL,MOUNTPOINT"
 exa= && if has eza; then exa=eza; elif has exa; then exa=exa; fi
 if [ -n "$exa" ]; then
   ls="$exa --color=auto -h --group"

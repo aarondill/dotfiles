@@ -66,8 +66,9 @@ files=(
   '-/dev/shm'
   '-/var/tmp'
   '-/tmp'
-  '-/media'     # don't backup the backup :)
-  '-/run/media' # don't backup the backup :)
+  '-/media' # don't backup the backup :)
+  '-/run/media'
+  '-/mnt'
   '-/**/lost+found'
   '-**'
 )
