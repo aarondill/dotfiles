@@ -14,7 +14,7 @@ function install_grub_editor() (
   fi
 
   version=$(get_latest_version_github "$REPO") # v1.0.0
-  if has_cmd dpkg-query; then
+  if has_cmd dpkg-query && apt_is_installed "grub-editor"; then
     local installed_version
     installed_version=$(dpkg-query --showformat='${Version}' --show grub-editor) # 1.2-1 # -1 seems to be constant
     if [ "v$installed_version" = "$version-1" ]; then
