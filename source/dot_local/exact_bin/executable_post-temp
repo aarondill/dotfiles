@@ -79,7 +79,7 @@ for file in "$@"; do
     exitcode=2 && continue
   fi
 
-  result="$(curl --fail-with-body -L -F "file=@$file" "$temp_source")" ||
+  result="$(curl -L -F "file=@$file" "$temp_source")" ||
     err 'Something went wrong during curl command.'
   # Example outputs:
   # {"message": "server error"}
