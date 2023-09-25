@@ -37,8 +37,8 @@ function install_pnpm_and_node() {
 
   # Setup pnpm
   log 'installing pnpm'
-  corepack enable
-  corepack prepare pnpm@latest --activate >/dev/null
+  sudo_cmd corepack enable
+  sudo_cmd corepack prepare pnpm@latest --activate >/dev/null
 
   add_global_dir_to_path || [ -n "$PNPM_HOME" ]
 
