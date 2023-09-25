@@ -16,9 +16,10 @@ java=$code/java
 python=$code/Python
 chromeext=$code/chromeExtensions
 config=$code/config
+repos=$code/repos
 backup=/media/$USER/Backup/
 
-dirs=("$code" "$bash" "$js" "$javascript" "$java" "$python" "$chromeext" "$config")
+dirs=("$code" "$bash" "$js" "$javascript" "$java" "$python" "$chromeext" "$config" "$repos")
 for d in "${dirs[@]}"; do
   if ! [ -d "$d" ]; then
     mkdir -p -- "$d"
