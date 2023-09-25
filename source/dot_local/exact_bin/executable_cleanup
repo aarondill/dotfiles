@@ -90,7 +90,7 @@ else
 fi
 
 log "Running TRIM on mounted partitions"
-sudo_cmd fstrim -av
+sudo_cmd fstrim -av || true # this may fail (ex: in container or unsupported fs)
 
 # Size stats
 log "Cleaning old logs >1G"
