@@ -8,26 +8,25 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 
 log "Installing NerdFonts"
 
-NERD_FONT_TO_INSTALL=UbuntuMono
-NERD_FONTS_DIR=~/.local/share/fonts/NerdFonts/
-REGULAR_FILE=UbuntuMonoNerdFontMono-Regular.ttf
+NERD_FONT_TO_INSTALL=UbuntuMono # name to download
+NERD_FONTS_DIR=~/.local/share/fonts/NerdFonts/ # destination
+REGULAR_FILE=UbuntuMonoNerdFontMono-Regular.ttf # An arbitray file in destination that is included
+REPO=ryanoasis/nerd-fonts
+
 # Test arbitrary file to ensure that nerd fonts is installed
-if [ -f "$NERD_FONTS_DIR/$REGULAR_FILE" ]; then abort "NerdFonts are already installed!" 0; fi
+if [ -f "$NERD_FONTS_DIR/$REGULAR_FILE" ]; then
+  abort "NerdFonts are already installed!" 0
+fi
 
-log "Downloading nerd fonts repository, this may take a while"
-tmp_dir=$(mktemp -d)
-rm_exit "$tmp_dir"
+mkdir -p -- "$NERD_FONTS_DIR" # ensure destination exists
+tmp=$(mktemp) || abort "Could not create temp file"
+rm_exit "$tmp"
 
-# This is very costly
-# Only download toplevel files
-git_clone 'https://github.com/ryanoasis/nerd-fonts' "$tmp_dir"
-log "Downloading $NERD_FONT_TO_INSTALL fonts"
-# Download specific files for $NERD_FONT_TO_INSTALL fonts
-# git -C "$tmp_dir" sparse-checkout add "patched-fonts/$NERD_FONT_TO_INSTALL"
+install_from_github "$REPO" latest "$NERD_FONT_TO_INSTALL.zip" "$tmp"
 
-log "Installing $NERD_FONT_TO_INSTALL fonts"
-# ALl files should be downloaded already!
-"$tmp_dir/install.sh" --use-single-width-glyphs --install-to-user-path "$NERD_FONT_TO_INSTALL"
 
-rm_exit_cleanup "$tmp_dir"
+log "Unzipping $NERD_FONT_TO_INSTALL font"
+unzip -- "$tmp" -d "$NERD_FONTS_DIR" 
+
+rm_exit_cleanup "$tmp"
 success
