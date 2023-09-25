@@ -25,6 +25,11 @@ NAME="full-system-$host-$os"
 # to use a path starting with '-' or '+', simply pass two of them (ie '--path' and '++path')
 # NOTE: order is important. the first matching pattern will be applied. (see man duplicity)
 
+if [ "$HOME" != "/home/aaron" ]; then
+  printf '%s\n' "This script is hackish and hardcoded to /home/aaron" >&2
+  exit 1
+fi
+
 # from man:duplicity:
 # The include and exclude options accept some extended shell globbing patterns. These patterns can contain '*', '**', '?', and '[...]'.
 # As in a normal shell, '*' can be expanded to any string of characters not containing "/", '?' expands to any character except "/",
