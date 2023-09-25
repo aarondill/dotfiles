@@ -7,10 +7,9 @@ set -euC -o pipefail
 
 test_url=1.1.1.1
 
-THIS=internet
 function usage() {
   cat <<EOF
-$THIS [options] [--] [arguments]
+internet [options] [--] [arguments]
                   
 Returns 0 if internet connection is present, else 1
 
@@ -23,7 +22,7 @@ EOF
 }
 
 function log() { printf '%s\n' "$@"; }
-function err() { printf "$THIS: %s\n" "$@" >&2; }
+function err() { printf "%s\n" "$@" >&2; }
 function abort() { err "$1" && exit "${2:-1}"; }
 
 # Returns a string that should be 'eval'ed to set the positional arguments
