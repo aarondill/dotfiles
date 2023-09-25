@@ -24,10 +24,10 @@ function install_grub_editor() (
 
   local asset=grub-editor_${version#v}-1_amd64.deb # grub-editor_1.0.0-1_amd64.deb - no other files are available.
   log_github_install "$REPO" "$version" "$asset"
-  # Download the .deb
-  temp=$(download_file "https://github.com/$REPO/releases/download/$version/$asset")
+  temp=$(mktemp -d)
+  download_file "https://github.com/$REPO/releases/download/$version/$asset" "$temp/grub-editor.deb" # Download the .deb
   rm_exit "$temp"
-  apt_install "$temp"
+  apt_install "$temp/grub-editor.deb"
   rm_exit_cleanup "$temp" # cleanup
 )
 
