@@ -45,7 +45,12 @@ function sudo_writable() {
   local dest="${1:-}"
   shift # don't call sudo_cmd with the file
   sudo=(sudo_cmd)
-  [ -n "$dest" ] && [ -w "$dest" ] && sudo=()
+  if [ -n "$dest" ]; then
+    # dest is writable, or doesn't exists, but parent is writable
+    if [ -w "$dest" ] || { ! [ -e "$dest" ] && [ -w "$(dirname -- "$dest")" ]; }; then
+      sudo=()
+    fi
+  fi
   "${sudo[@]}" "$@"
 }
 
