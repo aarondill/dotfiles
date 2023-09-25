@@ -48,7 +48,9 @@ function rm_exit() {
 
 # deletes the file given and removes it from the exit trap
 # safe to call even if the trap has not been set (ie, library code!)
+# exits with status of previous code
 function rm_exit_cleanup() {
+  local exit="$?" file_to_rm i
   rm -fr -- "$@" || true
   for file_to_rm; do
 
@@ -59,4 +61,5 @@ function rm_exit_cleanup() {
     done
 
   done
+  return "$exit"
 }
