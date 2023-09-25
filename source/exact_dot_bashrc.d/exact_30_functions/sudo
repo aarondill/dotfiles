@@ -9,7 +9,7 @@ if ! command -v sudo &>/dev/null; then
   return
 fi
 
-function _sudo() (
+function _run_sudo() (
   # These will only be available if sudo -e is given. But, in that case, it will help avoid writing to $HOME
   export XDG_STATE_HOME=~root/.local/state XDG_CACHE_HOME=~root/.cache
   # export XDG_DATA_HOME=~root/.local/share XDG_CONFIG_HOME=~root/.config
@@ -21,7 +21,7 @@ function _sudo() (
 function sudo() {
   # which is not available, or no command has been passed
   if [ "$#" -eq 0 ] || ! command -v which &>/dev/null; then
-    _sudo "$@"
+    _run_sudo "$@"
     return "$?"
   fi
 
@@ -35,7 +35,7 @@ function sudo() {
   done
 
   if [ "$#" -eq 0 ] || [ -z "${1:-}" ]; then
-    _sudo "${old_args[@]}" "$@" # options have been shifted off.
+    _run_sudo "${old_args[@]}" "$@" # options have been shifted off.
     return "$?"
   fi
 
@@ -47,6 +47,6 @@ function sudo() {
   # remove cmd, then replace with new value
   args=("${old_args[@]}" "$cmd" "${@:2}")
 
-  _sudo "${args[@]}"
+  _run_sudo "${args[@]}"
   return "$?"
 }
