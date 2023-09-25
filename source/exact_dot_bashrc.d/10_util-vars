@@ -17,3 +17,11 @@ python=$code/Python
 chromeext=$code/chromeExtensions
 config=$code/config
 backup=/media/$USER/Backup/
+
+dirs=("$code" "$bash" "$js" "$javascript" "$java" "$python" "$chromeext" "$config")
+for d in "${dirs[@]}"; do
+  if ! [ -d "$d" ]; then
+    mkdir -p -- "$d"
+  fi
+done
+unset d dirs
