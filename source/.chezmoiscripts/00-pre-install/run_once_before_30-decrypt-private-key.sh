@@ -22,6 +22,6 @@ fi
 config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/chezmoi"
 if ! [ -f "$config_dir/key.txt" ]; then
   mkdir -p "$config_dir"
-  age decrypt --output "$config_dir/key.txt" "$SOURCE_DIR/key.txt.age"
+  age --decrypt --output "$config_dir/key.txt" "$SOURCE_DIR/key.txt.age"
   chmod 600 "$config_dir/key.txt"
 fi
