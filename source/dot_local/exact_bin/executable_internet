@@ -65,7 +65,14 @@ if [ "$quiet" != true ]; then
   if [ "$exit" -eq 0 ]; then
     log "You have internet!"
   else
-    log "Your internet connection is not functional"
+    if [ -n "${SOMMELIER_VERSION:-}" ]; then
+      err "If running in chromeos container, try this to fix a container's connection to it's parent's internet:"
+      err "Press ctrl+alt+t to open crosh"
+      err "Run 'vmc start termina'"
+      err "Run 'lxc network attach lxdbr0 penguin'"
+    fi
+
+    err "Your internet connection is not functional"
   fi
 fi
 exit "$exit"
