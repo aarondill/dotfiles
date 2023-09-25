@@ -26,7 +26,13 @@ APT=$(which nala 2>/dev/null || which apt 2>/dev/null || printf '')
 function apt_is_installed() { dpkg -s "$@" &>/dev/null; }
 function apt_is_available() { for pac; do test -n "$(apt-cache show -- "$pac" 2>/dev/null)" || return 1; done; }
 # usage: apt_install file_or_package
-function apt_install() { sudo_cmd "$APT" install -- "$@"; }
+function apt_install() {
+	case "$APT" in 
+		# apt doesn't install files unless they end in .deb
+		*/apt) sudo_cmd dpkg -i -- "$@";;
+		*) sudo_cmd "$APT" install -- "$@";
+	esac
+}
 # Just updates, not upgrade - upgrade shouldn't be necessary, leave that to the user.
 function apt_update() { sudo_cmd "$APT" update; }
 function apt_is_held() { for pac; do [ -n "$(apt-mark showhold -- "$pac")" ] || return 1; done; }
