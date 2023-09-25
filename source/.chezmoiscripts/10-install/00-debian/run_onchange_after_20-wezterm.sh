@@ -60,11 +60,12 @@ Debian)
   ;;
 esac
 
-tmp=$(mktemp)
-rm_exit "$tmp"
-install_from_github "$REPO" "$version" "$asset" "$tmp"
-apt_install "$tmp"
-rm_exit_cleanup "$tmp"
+tmp_dir=$(mktemp -d)
+rm_exit "$tmp_dir"
+touch "$tmp_dir/wezterm.deb" || abort "Failed making wezterm.deb"
+install_from_github "$REPO" "$version" "$asset" "$tmp_dir/wezterm.deb"
+apt_install "$tmp_dir/wezterm.deb"
+rm_exit_cleanup "$tmp_dir"
 
 # set wezterm as default term
 # sudo_cmd update-alternatives --set x-terminal-emulator /usr/bin/open-wezterm-here

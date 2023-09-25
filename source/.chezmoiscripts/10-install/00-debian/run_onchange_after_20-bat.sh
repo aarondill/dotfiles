@@ -32,8 +32,8 @@ esac
 
 asset="${PACKAGE_NAME}_${version#v}_${arch}.deb"
 
-tmp=$(mktemp) || abort 'Could not create temporary directory'
-rm_exit "$tmp"
-install_from_github "$REPO" "$version" "$asset" "$tmp"
-apt_install "$tmp"
-rm_exit_cleanup "$tmp"
+tmp_dir=$(mktemp -d) || abort 'Could not create temporary directory'
+rm_exit "$tmp_dir"
+install_from_github "$REPO" "$version" "$asset" "$tmp_dir/$PACKAGE_NAME.deb"
+apt_install "$tmp_dir/$PACKAGE_NAME.deb"
+rm_exit_cleanup "$tmp_dir"

@@ -21,12 +21,12 @@ aarch64*) DEBARCH="arm64" ;;
 esac
 
 function install_vivaldi() {
-  local version=$1
-  sudo_cmd true
-  temp_file=$(download_file "https://downloads.vivaldi.com/$VIVALDI_STEAM_SHORT_ALT/${VIVALDI_STEAM}_${version}_${DEBARCH}.deb")
-  rm_exit "$temp_file"
-  apt_install "$temp_file"
-  rm_exit_cleanup "$temp_file"
+  local version="$1" temp_dir
+  temp_dir=$(mktemp -d)
+  rm_exit "$temp_dir"
+  download_file "https://downloads.vivaldi.com/$VIVALDI_STEAM_SHORT_ALT/${VIVALDI_STEAM}_${version}_${DEBARCH}.deb" "$temp_dir/vivaldi.deb"
+  apt_install "$temp_dir/vivaldi.deb"
+  rm_exit_cleanup "$temp_dir"
 }
 function get_vivaldi_version() {
   local vivaldi_version

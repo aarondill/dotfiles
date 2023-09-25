@@ -42,11 +42,12 @@ function install_delta() {
   fi
 
   asset="${fname}_${version}_${short_arch}.deb"
-  tmp=$(mktemp)
-  rm_exit "$tmp"
-  install_from_github "$REPO" "$version" "$asset" "$tmp"
-  apt_install "$tmp"
-  rm_exit_cleanup "$tmp"
+  tmp_dir=$(mktemp -d)
+  rm_exit "$tmp_dir"
+  touch "$tmp_dir/delta.deb" || abort "Could not create delta.deb"
+  install_from_github "$REPO" "$version" "$asset" "$tmp_dir/delta.deb"
+  apt_install "$tmp_dir/delta.deb"
+  rm_exit_cleanup "$tmp_dir"
 }
 if ! has_apt; then
   abort 'This script only supports Ubuntu/Debian. Please install delta through your package manager.' 0
