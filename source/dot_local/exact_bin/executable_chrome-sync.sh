@@ -77,8 +77,14 @@ conf_dir=${XDG_CONFIG_HOME:-$HOME/.config}
 cache_dir=${XDG_CACHE_HOME:-$HOME/.cache}
 local_dir=$HOME/.local/share # other setups are not supported with firefox
 
+if [ -z "${BROWSER:-}" ]; then
+  abort "BROWSER is empty. Check that it's exported." 2
+elif ! [ -x "$BROWSER" ] && ! command -v "$BROWSER" >/dev/null 2>/dev/null; then
+  abort "$BROWSER is not installed. Aborting." 1
+fi
+
 case "${BROWSER:-}" in # Sync active browser (or vivaldi as default)
-'' | *vivaldi*)
+*vivaldi*)
   # msg="Vivaldi chrome sync is disabled to test stability! Don't forget to reenable this."
   # err "$msg"
   # DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u aaron)/bus" DISPLAY=:0 notify-send "Warning" "$msg" 2>/dev/null || true
