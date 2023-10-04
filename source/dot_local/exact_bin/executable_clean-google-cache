@@ -10,12 +10,12 @@ function log() { printf '%s\n' "$@"; }
 function size_diff() {
   local dir oldsize newsize saving
   dir=$1
-  oldsize=$(du -sk -- "$dir" | awk '{ printf "%d", $1 * 1024 }')
+  oldsize=$(du -sk -- "$dir" | awk '{ printf "%.0f", $1 * 1024 }')
 
   shift  # remove dir
   "${@}" # run $2 $3 $4 ...
 
-  newsize=$(du -sk -- "$dir" | awk '{ printf "%d", $1 * 1024 }')
+  newsize=$(du -sk -- "$dir" | awk '{ printf "%.0f", $1 * 1024 }')
   saving=$((oldsize - newsize))
 
   # After this point, don't use any of these variables for math!!
