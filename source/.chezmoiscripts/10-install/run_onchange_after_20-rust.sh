@@ -22,3 +22,7 @@ if has_cmd rustup; then
 else
   log_and_run "Installing cargo using rustup" install_cargo
 fi
+
+if has_cmd cargo && ! has_cmd cargo-install-update; then
+  cargo install cargo-update # install update crate for update script
+fi
