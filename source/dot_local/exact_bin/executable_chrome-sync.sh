@@ -71,7 +71,7 @@ function sync_shm() {
 
 if [ "$#" -gt 0 ]; then abort "This script accepts no arguments." 2; fi
 
-if [ -n "${SOMMELIER_VERSION:-}" ]; then abort "ChromeOS development environment is currently not supported." 1; fi
+# if [ -n "${SOMMELIER_VERSION:-}" ]; then abort "ChromeOS development environment is currently not supported." 1; fi
 
 conf_dir=${XDG_CONFIG_HOME:-$HOME/.config}
 cache_dir=${XDG_CACHE_HOME:-$HOME/.cache}
@@ -83,7 +83,7 @@ elif ! [ -x "$BROWSER" ] && ! command -v "$BROWSER" >/dev/null 2>/dev/null; then
   abort "$BROWSER is not installed. Aborting." 1
 fi
 
-case "${BROWSER:-}" in # Sync active browser (or vivaldi as default)
+case "$BROWSER" in # Sync active browser (or vivaldi as default)
 *vivaldi*)
   # msg="Vivaldi chrome sync is disabled to test stability! Don't forget to reenable this."
   # err "$msg"
@@ -98,4 +98,5 @@ case "${BROWSER:-}" in # Sync active browser (or vivaldi as default)
   sync_shm "$conf_dir/google-chrome"  # PROFILE
   sync_shm "$cache_dir/google-chrome" # CACHE
   ;;
+*) abort "Browser $BROWSER is not supported" 3 ;;
 esac
