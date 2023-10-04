@@ -24,5 +24,10 @@ else
 fi
 
 if has_cmd cargo && ! has_cmd cargo-install-update; then
+  if has_apt; then # dep install
+    apt_install libssl-dev
+  elif has_pacman; then
+    pacman_install openssl
+  fi
   cargo install cargo-update # install update crate for update script
 fi
