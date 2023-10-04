@@ -23,7 +23,7 @@ function get_used_bytes() {
   [ -e "$1" ] || return 1 # ENOENT
   # -P for posix output, -k for 1024 bytes output(depends on POSIXLY_CORRECT otherwise)
   # Tail to just get line desired
-  # Multiply by 1024 to convert from KiB to B
+  # Multiply by 1024 to convert from KiB to B -- output with %f to avoid max_int.
   # NOTE: the call to awk could break if the dev file has a space in it...
   df -Pk -- "$1" | tail -n +2 | awk '{printf "%.0f", $3 * 1024}'
 }
