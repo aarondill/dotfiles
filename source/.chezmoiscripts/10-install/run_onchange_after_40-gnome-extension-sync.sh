@@ -1,7 +1,6 @@
 #!/bin/bash
 # Installs extension sync gnome extension
 set -euC -o pipefail
-export SHELLOPTS
 # Source utils
 SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 # shellcheck source=../.utils.sh

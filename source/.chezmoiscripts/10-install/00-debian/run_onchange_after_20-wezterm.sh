@@ -3,7 +3,6 @@
 # This is handled by pacman on arch because it's more recently updated
 
 set -euC -o pipefail
-export SHELLOPTS
 # Source utils
 SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 # shellcheck source=../../.utils.sh

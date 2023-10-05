@@ -34,7 +34,6 @@ unset _SOURCED
 # Use already calculated source_dir if present (from parent script)
 SCRIPT_DIR="${SOURCE_DIR:-${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}}/.chezmoiscripts"
 
-export SHELLOPTS
 # shellcheck source=./.utils.d/output.sh
 . "$SCRIPT_DIR"/.utils.d/output.sh # output functions
 # shellcheck source=./.utils.d/flow.sh
