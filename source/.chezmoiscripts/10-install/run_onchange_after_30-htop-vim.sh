@@ -51,14 +51,12 @@ install_from_make() {
   # build from source
   cd "$temp"
   "${PREHOOK[@]}"
-  (
-    export -n SHELLOPTS # Let shells set their own options
-    [ -x ./autogen.sh ] && ./autogen.sh
-    [ -x ./configure ] && ./configure "${CONFIGURE_ARGS[@]}"
-    make "${MAKE_ALL_ARGS[@]}" "${MAKE_ARGS[@]}"
-    # Install the updated application
-    sudo_cmd make "${MAKE_ALL_ARGS[@]}" "${MAKE_INSTALL_ARGS[@]}" install
-  )
+
+  [ -x ./autogen.sh ] && ./autogen.sh
+  [ -x ./configure ] && ./configure "${CONFIGURE_ARGS[@]}"
+  make "${MAKE_ALL_ARGS[@]}" "${MAKE_ARGS[@]}"
+  # Install the updated application
+  sudo_cmd make "${MAKE_ALL_ARGS[@]}" "${MAKE_INSTALL_ARGS[@]}" install
 
   rm_exit_cleanup "$temp"
 }
