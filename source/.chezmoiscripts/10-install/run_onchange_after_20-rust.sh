@@ -12,7 +12,7 @@ install_cargo() {
   curl --proto '=https' --tlsv1.2 -sSfL https://sh.rustup.rs -o "$tmp"
   local args=("$tmp" --profile minimal --no-modify-path)
   if ! chmod +x "$tmp"; then args=(sh "${args[@]}"); fi # Force it in sh if can't execute it
-  run_own_shell "${args[@]}"
+  "${args[@]}"
   rm_exit_cleanup "$tmp"
 }
 
@@ -25,5 +25,5 @@ fi
 if has_cmd cargo && ! has_cmd cargo-install-update; then
   # install update crate for update script
   # Note: deps are vendored with all-features
-  run_own_shell cargo install --all-features cargo-update
+  cargo install --all-features cargo-update
 fi

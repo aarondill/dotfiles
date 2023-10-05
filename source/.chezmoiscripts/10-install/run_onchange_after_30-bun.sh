@@ -10,7 +10,7 @@ if ! has_cmd bun; then
   tmp_file=$(download_file https://bun.sh/install)
   rm_exit "$tmp_file"
 
-  SHELL="Don't Change My Bash Config!!" run_own_shell bash -- "$tmp_file"
+  SHELL="Don't Change My Bash Config!!" bash -- "$tmp_file"
 
   rm_exit_cleanup "$tmp_file"
   success

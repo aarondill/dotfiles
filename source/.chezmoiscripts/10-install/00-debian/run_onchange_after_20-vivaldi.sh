@@ -36,7 +36,7 @@ function get_vivaldi_version() {
 
 vivaldi_version=$(get_vivaldi_version)
 if has_cmd vivaldi; then
-  current_version=$(run_own_shell vivaldi --version | sed "s/Vivaldi \(.*\) $VIVALDI_STEAM_SHORT_ALT/\1/g")
+  current_version=$(vivaldi --version | sed "s/Vivaldi \(.*\) $VIVALDI_STEAM_SHORT_ALT/\1/g")
   if [ "$current_version-1" = "$vivaldi_version" ]; then
     abort "Vivaldi is already up to date" 0
   fi

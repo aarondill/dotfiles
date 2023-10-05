@@ -118,13 +118,6 @@ function first_cmd() {
 # default prompt: 'Press enter to continue'
 function wait_key() { read -r -p "${1:-Press enter to continue}"; }
 
-# usage: run_own_shell <command>
-# unset SHELLOPTS and call the command
-function run_own_shell() {
-  export -n SHELLOPTS
-  "$@"
-}
-
 # Use instead of sudo. This will handle the case where the user is root.
 # note: the sudo command can be user specified, so don't pass any flag
 function sudo_cmd() {
