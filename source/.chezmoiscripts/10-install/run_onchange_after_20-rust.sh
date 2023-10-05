@@ -26,5 +26,5 @@ fi
 if has_cmd cargo && ! has_cmd cargo-install-update; then
   # install update crate for update script
   # Note: deps are vendored with all-features
-  cargo install --all-features cargo-update
+  run_own_shell cargo install --all-features cargo-update
 fi
