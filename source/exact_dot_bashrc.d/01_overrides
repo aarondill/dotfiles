@@ -13,13 +13,13 @@ PROMPT_COMMAND=("${PROMPT_COMMAND[@]}")
 
 rm_rf=( # These will be removed forcefully.
   ~/.dotnet/
-  ~/.pki/               # RM the stupid files in HOME from chrome
-  ~/.mozilla/firefox    # RM the firefox files - I don't even care.
-  ~/.hplip/             # RM the hplip files - This is just configuration
-  ~/.dbus/              # RM the dbus files - This is fine.
-  ~/.java/              # RM the java files - should be in ~/.config/java/
-  ~/.snap/warnings.json # RM the snap warnings file
-  ~/.BurpSuite/         # RM burp config
+  ~/.pki/                   # RM the stupid files in HOME from chrome
+  ~/.mozilla/firefox{,-esr} # RM the firefox files - I don't even care.
+  ~/.hplip/                 # RM the hplip files - This is just configuration
+  ~/.dbus/                  # RM the dbus files - This is fine.
+  ~/.java/                  # RM the java files - should be in ~/.config/java/
+  ~/.snap/warnings.json     # RM the snap warnings file
+  ~/.BurpSuite/             # RM burp config
   ~/.gnome/apps/*-BurpSuiteCommunity.desktop
   ~/.python_history
 )
