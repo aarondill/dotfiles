@@ -33,7 +33,7 @@ fi
 
 for key in "${!locations[@]}"; do
   d=${locations[$key]} # variable by name
-  declare "$key=$d"    # set variables (ie $code,$bash,...)
+  export "$key=$d"     # set variables (ie $code,$bash,...)
   alias "cd-$key=cd '$d'"
   # removed due to backup
   # if ! [ -d "$d" ]; then
