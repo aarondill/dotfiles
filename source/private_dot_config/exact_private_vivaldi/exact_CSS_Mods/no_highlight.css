@@ -1,0 +1,4 @@
+/* Remove the highlight around the active tab's favicon */
+.tab.active .favicon {
+  filter: none !important;
+}

@@ -1,0 +1,4 @@
+/* no pure white! */
+webview[src="about:blank"] {
+  filter: brightness(0%) !important;
+}
