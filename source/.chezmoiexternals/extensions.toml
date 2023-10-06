@@ -2,7 +2,7 @@
 # {{ $username := "aarondill" }}
 
 # Note: chromeext variable is set in ~/.bashrc.d/10_util-vars. If not defined, use code/chromeExtensions
-# {{ $path := env "chromeext" | default "code/chromeExtensions" }}
+# {{ $path := env "chromeext" | trimPrefix (print (env "HOME") "/") | default "code/chromeExtensions" }}
 # {{ $repos := list "CanvasWebAssignmentUpscale" "Fix_PAC_SAE" "googleCopyUser" "chrome-hist" "seizureChrome" }}
 # Path: {{$path}}
 # Repos: {{$repos | toJson}}
