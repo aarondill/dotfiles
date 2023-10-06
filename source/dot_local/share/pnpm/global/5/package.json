@@ -12,7 +12,7 @@
     "n": "^9.1.0",
     "neovim": "^4.10.1",
     "npkill": "^0.11.3",
-    "npm-check-updates": "^16.14.4",
+    "npm-check-updates": "^16.14.5",
     "prettier": "^3.0.3",
     "release-it": "^16.2.1",
     "sort-package-json": "^2.6.0",
@@ -20,7 +20,7 @@
     "typescript": "^5.2.2",
     "uglify-js": "^3.17.4",
     "vercel": "^32.4.1",
-    "vite": "^4.4.10",
+    "vite": "^4.4.11",
     "wipe-modules": "^1.2.0"
   },
   "//": "force core-js to be on latest. It shouldn't cause any issues.",
