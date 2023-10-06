@@ -1,0 +1,22 @@
+# Note: chromeext variable is set in ~/.bashrc.d/10_util-vars. If not defined, use code/chromeExtensions
+# Setup $path variable: {{ $path := env "chromeext" | default "code/chromeExtensions" }}{{$path}}
+
+["{{$path}}/CanvasWebAssignmentUpscale"]
+type = "git-repo"
+url = "https://github.com/aarondill/CanvasWebAssignmentUpscale.git"
+
+["{{$path}}/Fix_PAC_SAE"]
+type = "git-repo"
+url = "https://github.com/aarondill/Fix_PAC_SAE.git"
+
+["{{$path}}/googleCopyUser"]
+type = "git-repo"
+url = "https://github.com/aarondill/googleCopyUser.git"
+
+["{{$path}}/hist"]
+type = "git-repo"
+url = "https://github.com/aarondill/chrome-hist.git"
+
+["{{$path}}/seizureChrome"]
+type = "git-repo"
+url = "https://github.com/aarondill/seizureChrome.git"
