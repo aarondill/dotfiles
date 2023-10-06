@@ -77,9 +77,15 @@ conf_dir=${XDG_CONFIG_HOME:-$HOME/.config}
 cache_dir=${XDG_CACHE_HOME:-$HOME/.cache}
 local_dir=$HOME/.local/share # other setups are not supported with firefox
 
+# default BROWSER to x-www-browser/vivaldi if not specified.
+# This is used for systemd services which don't get .profile/.bashrc env variables
 if [ -z "${BROWSER:-}" ]; then
-  abort "BROWSER is empty. Check that it's exported." 2
-elif ! [ -x "$BROWSER" ] && ! command -v "$BROWSER" >/dev/null 2>/dev/null; then
+  [ -x "/usr/bin/x-www-browser" ] &&
+    BROWSER="$(realpath "/usr/bin/x-www-browser" 2>/dev/null)" ||
+    BROWSER="vivaldi"
+fi
+
+if ! [ -x "$BROWSER" ] && ! command -v "$BROWSER" >/dev/null 2>/dev/null; then
   abort "$BROWSER is not installed. Aborting." 1
 fi
 
