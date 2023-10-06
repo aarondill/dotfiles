@@ -67,3 +67,4 @@ code/.alexrc.mjs
 code/config
 code/c/template
 code/c/.clang-format
+.config/vivaldi-static/CSS_Mods
