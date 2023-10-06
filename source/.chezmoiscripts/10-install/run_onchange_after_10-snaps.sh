@@ -12,6 +12,9 @@ function install_snaps() {
 installed_or_log snap || exit 0
 log_and_run "Installing snaps" install_snaps
 
+# early abort if no firefox snap (nothing else to do)
+if ! snap list firefox &>/dev/null; then return 0; fi
+
 log 'disconnecting firefox:hunspell'
 CONNECTON=$(snap connections firefox | awk '/firefox:host-hunspell/{print $3}')
 # If still connected, disconnect
