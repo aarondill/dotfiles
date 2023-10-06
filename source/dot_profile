@@ -100,7 +100,10 @@ append_path "$CARGO_HOME/bin"
 
 export BUN_INSTALL="$XDG_DATA_HOME/bun"
 export BUN_INSTALL_CACHE_DIR="$XDG_CACHE_HOME/bun"
+export BUN_COMPLETION="$BUN_INSTALL/complete.bash"
 append_path "$BUN_INSTALL/bin"
+# shellcheck source=/home/aaron/.local/share/bun/complete.bash
+if [ -f "$BUN_COMPLETION" ]; then . "$BUN_COMPLETION"; fi
 
 # include flatpaks in path. (Have org.example.app names)
 append_path "/var/lib/flatpak/exports/bin"
