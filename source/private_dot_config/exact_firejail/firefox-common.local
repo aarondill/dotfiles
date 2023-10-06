@@ -25,6 +25,12 @@ whitelist ${HOME}/.local/share/applications
 whitelist ${HOME}/.local/share/icons
 whitelist ${DOWNLOADS}
 
+# Whitelist xauthority in /run/user/<ID>/Xauthority -- this is a hard coded value, but there's no way to expand the $XAUTHORITY variable.
+whitelist-ro ${RUNUSER}/Xauthority
+whitelist-ro ${RUNUSER}/xauthority
+whitelist-ro ${RUNUSER}/.Xauthority
+whitelist-ro ${RUNUSER}/.xauthority
+
 # Don't restrict dbus
 ignore dbus-user none
 ignore dbus-system none
