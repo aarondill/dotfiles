@@ -16,7 +16,7 @@ if ! has_cmd bun; then
   success
 fi
 
-file=~/.local/share/bash-completion/completions/bun
-log "Installing bun completions"
-mkdir -p "$(dirname -- "$file")"
-SHELL=bash bun completions >|"$file"
+BUN_COMPLETION="${BUN_COMPLETION:-${BUN_INSTALL:-$HOME/.bun}/complete.bash}"
+log "Installing bun completions to '$BUN_COMPLETION'"
+mkdir -p "$(dirname -- "$BUN_COMPLETION")"
+SHELL=bash bun completions >|"$BUN_COMPLETION"
