@@ -1,22 +1,15 @@
+# Hard coded username! Set this to your github username
+# {{ $username := "aarondill" }}
+
 # Note: chromeext variable is set in ~/.bashrc.d/10_util-vars. If not defined, use code/chromeExtensions
-# Setup $path variable: {{ $path := env "chromeext" | default "code/chromeExtensions" }}{{$path}}
+# {{ $path := env "chromeext" | default "code/chromeExtensions" }}
+# {{ $repos := list "CanvasWebAssignmentUpscale" "Fix_PAC_SAE" "googleCopyUser" "chrome-hist" "seizureChrome" }}
+# Path: {{$path}}
+# Repos: {{$repos | toJson}}
 
-["{{$path}}/CanvasWebAssignmentUpscale"]
-type = "git-repo"
-url = "https://github.com/aarondill/CanvasWebAssignmentUpscale.git"
-
-["{{$path}}/Fix_PAC_SAE"]
-type = "git-repo"
-url = "https://github.com/aarondill/Fix_PAC_SAE.git"
-
-["{{$path}}/googleCopyUser"]
-type = "git-repo"
-url = "https://github.com/aarondill/googleCopyUser.git"
-
-["{{$path}}/hist"]
-type = "git-repo"
-url = "https://github.com/aarondill/chrome-hist.git"
-
-["{{$path}}/seizureChrome"]
-type = "git-repo"
-url = "https://github.com/aarondill/seizureChrome.git"
+# {{range $index, $repo := $repos}}
+['{{$path}}/{{$repo}}']
+type = 'git-repo'
+url = 'https://github.com/{{$username}}/{{$repo}}.git'
+clone.args = ['--filter=tree:0']
+# End of {{ $repo -}} {{end}}
