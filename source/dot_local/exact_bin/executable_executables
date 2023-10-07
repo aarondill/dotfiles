@@ -5,8 +5,9 @@ THIS='executables'
 
 function usage() {
   cat <<EOF
-Usage: $THIS
+Usage: $THIS [PATTERN]...
 Lists executables present in \$PATH
+If PATTERN is specified, it will be passed to grep to filter the executables (OR)
 
 OPTIONS:
   -h, --help      display this help message
@@ -61,4 +62,15 @@ function get_execs() {
   done
 }
 
-get_execs "$path" | sort | uniq
+function filter() {
+  # if patterns given, pass them to grep, else output stdin exactly.
+  if [ "$#" -gt 0 ]; then
+    args=()
+    for pat; do args+=(-e "$pat"); done
+    grep "${args[@]}"
+  else
+    cat
+  fi
+}
+
+get_execs "$path" | sort | uniq | filter "$@"
