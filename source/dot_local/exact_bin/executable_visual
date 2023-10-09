@@ -89,8 +89,9 @@ if [ -z "${DBUS_SESSION_BUS_ADDRESS:-}" ] && [ -n "${XDG_RUNTIME_DIR:-}" ] &&
   export DBUS_SESSION_BUS_ADDRESS
 fi
 
-if [ -z "${XAUTHORITY:-}" ] && [ -n "${XDG_RUNTIME_DIR:-}" ]; then
-  export XAUTHORITY="$XDG_RUNTIME_DIR/Xauthority"
+if [ -z "${XAUTHORITY:-}" ] && [ -d "${XDG_RUNTIME_DIR:-}" ]; then
+  export XAUTHORITY="$XDG_RUNTIME_DIR/X11/Xauthority"
+  mkdir -p "$(dirname "$XAUTHORITY")" # Ensure the directory exists
 fi
 
 printf '%s ' exec "${cmd[@]}" && printf '\n'
