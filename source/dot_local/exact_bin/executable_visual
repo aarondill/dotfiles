@@ -90,6 +90,7 @@ if [ -z "${DBUS_SESSION_BUS_ADDRESS:-}" ] && [ -n "${XDG_RUNTIME_DIR:-}" ] &&
 fi
 
 if [ -z "${XAUTHORITY:-}" ] && [ -d "${XDG_RUNTIME_DIR:-}" ]; then
+  # NOTE: this path was chosen because in Ubuntu, it is permitted in the AppArmor config. See /etc/apparmor.d/abstractions/X.
   export XAUTHORITY="$XDG_RUNTIME_DIR/X11/Xauthority"
   mkdir -p "$(dirname "$XAUTHORITY")" # Ensure the directory exists
 fi
