@@ -37,7 +37,7 @@ cleanup)
   git repack -d
   git gc --prune=now --aggressive
   ;;
-yesterday) git hist --since yesterday '--branches=*' --author="$(git config user.name)" ;;
+yesterday) git hist --since "${1:-yesterday}" '--branches=*' --author="$(git config user.name)" ;;
 diff-origin)
   origin="${1:-$(git for-each-ref --format='%(upstream:short)' "$(git symbolic-ref -q HEAD)")}"
   if [ -z "$origin" ]; then abort "No upstream branch found." 1; fi
