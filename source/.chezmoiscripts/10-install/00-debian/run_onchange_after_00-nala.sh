@@ -4,6 +4,7 @@ set -euC -o pipefail
 SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 # shellcheck source=../../.utils.sh
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
+REPO=volian/nala REPO_ID=39215670
 
 read -r -d '' PYTHON_CODE <<-'EOF' || true
 import sys, json
@@ -21,7 +22,7 @@ function install_nala() {
     */volian-archive-keyring_*_all.deb) keyring_url=$REPLY ;;
     */volian-archive-scar_*_all.deb) scar_url=$REPLY ;;
     esac
-  done < <(download 'https://gitlab.com/api/v4/projects/39215670/releases/permalink/latest' | python3 -c "$PYTHON_CODE")
+  done < <(download "https://gitlab.com/api/v4/projects/$REPO_ID/releases/permalink/latest" | python3 -c "$PYTHON_CODE")
 
   tmp_dir=$(mktemp -d)
   rm_exit "$tmp_dir"
@@ -38,8 +39,12 @@ function install_nala() {
 if [ "$OS" != "Ubuntu" ]; then abort "Nala is only supported on Ubuntu" 0; fi
 
 if ! has_apt; then exit 0; fi
-if ! has_cmd nala; then
-  log_and_run "Installing nala" install_nala
+if has_cmd nala; then
+  cvers="$(nala --version)"                    # nala 0.13.0
+  lvers="$(get_latest_version_gitlab "$REPO")" # v0.13.0
+  if [ "$cvers" = "nala ${lvers#v}" ]; then abort "Already up to date! Aborting" 0; fi
 fi
+
+log_and_run "Installing nala" install_nala
 
 # log_and_run 'Setting up nala sources' sudo_cmd nala fetch --auto -y
