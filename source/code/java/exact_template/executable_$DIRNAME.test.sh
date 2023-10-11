@@ -97,7 +97,6 @@ stdin() {
   fi
 }
 
-cd "$this_dir"
 if ! [ -d "$output_dir" ]; then
   log "Creating output directory"
   show_run mkdir -p "$output_dir"
@@ -123,6 +122,11 @@ stdin show_run java --class-path "$_classpath" "$java_class" "${jargs[@]}" "$@" 
 if [ "$code" != 0 ]; then
   log
   err "Command failed with exit code: $code"
+  exit "$code"
 fi
 
-exit "$code"
+if [ "$output_dir" == "$this_dir" ]; then # cleanup current directory (not if build dir)
+  if [ -f "$class_file" ]; then
+    show_run rm -f "$class_file"
+  fi
+fi
