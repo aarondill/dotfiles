@@ -27,6 +27,7 @@ whitelist ${DOWNLOADS}
 
 # Whitelist xauthority in /run/user/<ID>/Xauthority -- this is a hard coded value, but there's no way to expand the $XAUTHORITY variable.
 whitelist-ro ${RUNUSER}/Xauthority
+whitelist-ro ${RUNUSER}/X11/Xauthority
 whitelist-ro ${RUNUSER}/xauthority
 whitelist-ro ${RUNUSER}/.Xauthority
 whitelist-ro ${RUNUSER}/.xauthority
