@@ -26,8 +26,3 @@ function first_lower() { local t && t="$(cat -)" && printf '%s' "${t,}"; }
 function upper() { local t && t="$(cat -)" && printf '%s' "${t^^}"; }
 # first_upper <<<"hello" -> "Hello"
 function first_upper() { local t && t="$(cat -)" && printf '%s' "${t^}"; }
-# requires sort -V to sort version strings. Errors if $1 is before $2
-function version_gt() {
-  printf '%s\n' "version_gt is deprecated. Use vers_gt instead!" >&2
-  vers_gt "$1" "$2"
-}
