@@ -66,3 +66,15 @@ function yay_install() {
   _pacman_exec yay --aur -S --needed -- "$@"
 }
 function has_pacman() { [ -n "$PACMAN" ]; }
+# relies on GNU sort!
+
+# usage: vers_eq 1 1. Returns 1==1
+vers_eq() { [ "$1" = "$2" ]; }
+# usage: vers_lte 1 2. Returns 1<=2
+vers_lte() { printf '%s\n' "$1" "$2" | sort -C -V; }
+# usage: vers_gte 1 2. Returns 1>=2
+vers_gte() { vers_lte "$2" "$1"; } # 1>=2 iff 2<=1
+# usage: vers_lt 1 2. Returns 1<2
+vers_lt() { ! vers_eq "$1" "$2" && vers_lte "$1" "$2"; } # x<y iff x=!y && x<=y
+# usage: vers_gt 1 2. Returns 1>2
+vers_gt() { ! vers_eq "$1" "$2" && vers_gte "$1" "$2"; } # x>y iff x=!y && x>=y
