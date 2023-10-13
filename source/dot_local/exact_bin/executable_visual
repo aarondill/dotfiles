@@ -13,10 +13,23 @@ the arguments will be passed directly to the startx script
 EOF
 }
 
-function log() { printf '%s\n' "$@"; }
-function err() { printf "${THIS:-}: %s\n" "$@" >&2; }
+function log() { printf '%s\n' "$@" || true; }
+function err() { printf "${THIS:-}: %s\n" "$@" >&2 || true; }
 function abort() { err "$1" && exit "${2:-1}"; }
 function cmd() { command -v "$@" &>/dev/null; }
+function verbose() {
+  local cmd=("$@")
+  { # output the command with quotes!
+    local i=0
+    for c in "${cmd[@]}"; do
+      printf "'%s'" "$c"
+      if [ "$i" -lt "${#cmd}" ]; then printf ' '; fi # space except last time.
+      i=$((i + 1))
+    done
+    printf '\n'
+  } || true
+  "${cmd[@]}"
+}
 
 if ! cmd which; then abort "which is required for this script" 1; fi
 if ! cmd startx; then abort "startx is required for this script" 1; fi
@@ -53,8 +66,7 @@ if [ -z "$wm" ]; then
 fi
 
 if wmpath=$(which "$wm" 2>/dev/null); then :; else
-  printf '%s\n' "Unable to find $wm in \$PATH" >&2
-  exit 2
+  abort "Unable to find $wm in \$PATH" 2
 fi
 
 # HACK: startx on ubuntu still unsets DBUS_SESSION_BUS_ADDRESS (even though it's fixed in upstream)
@@ -70,9 +82,10 @@ fi
 
 # if server is defined
 if [[ "$server" =~ $disp_regex ]]; then
-  cmd=("${cmd[@]}" --)
+  cmd+=(--)
 fi
-cmd=("${cmd[@]}" "$server" "${rest[@]}")
+if [ -n "$server" ]; then cmd+=("$server"); fi
+cmd+=("${rest[@]}")
 
 # from /etc/X11/Xsession.d/20dbus_xdg-runtime
 if [ -z "${DBUS_SESSION_BUS_ADDRESS:-}" ] && [ -n "${XDG_RUNTIME_DIR:-}" ] &&
@@ -95,6 +108,5 @@ if [ -z "${XAUTHORITY:-}" ] && [ -d "${XDG_RUNTIME_DIR:-}" ]; then
   mkdir -p "$(dirname "$XAUTHORITY")" # Ensure the directory exists
 fi
 
-printf '%s ' exec "${cmd[@]}" && printf '\n'
 # export XDG_SESSION_TYPE=x11
-exec "${cmd[@]}"
+verbose exec "${cmd[@]}"
