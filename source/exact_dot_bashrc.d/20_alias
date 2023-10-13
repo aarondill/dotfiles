@@ -34,6 +34,10 @@ alias reboot="history -a; /sbin/reboot"
 alias halt="history -a; /sbin/halt"
 alias shutdown="history -a; /sbin/shutdown"
 
+if has new; then
+  alias new-java='new -l java'
+fi
+
 # alias backup="~/.backup/dobackup"
 # alias lastbackup="/usr/bin/cat ~/.backup/backup-time"
 
