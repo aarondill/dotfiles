@@ -33,7 +33,7 @@ function install_yaru() {
   git_clone 'https://github.com/ubuntu/yaru.git' "$TMP_DIR"
 
   local meson=meson
-  if ! version_gt "$("$meson" --version)" "0.59.0"; then
+  if ! vers_gt "$("$meson" --version)" "0.59.0"; then
     local meson_version tmp_file
     meson_version=$(get_latest_version_github "mesonbuild/meson") # 1.2.0
     log "Installing meson $meson_version"
