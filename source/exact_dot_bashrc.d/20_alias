@@ -69,7 +69,9 @@ exa= && if has eza; then exa=eza; elif has exa; then exa=exa; fi
 if [ -n "$exa" ]; then
   ls="$exa --color=auto -h --group"
   if "$exa" --version | grep -qF '[+git]'; then
-    ls="$ls --git"
+    ls="$ls --git" # add --git argument if supported
+  else
+    export "${exa^^}_OVERRIDE_GIT=1" # {EXA,EZA}_OVERRIDE_GIT
   fi
   case "${TERM,,}" in
   linux | dumb) ;;
