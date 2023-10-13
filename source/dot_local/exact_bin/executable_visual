@@ -109,5 +109,4 @@ if [ -z "${XAUTHORITY:-}" ] && [ -d "${XDG_RUNTIME_DIR:-}" ]; then
 fi
 
 # export XDG_SESSION_TYPE=x11
-if command -v date &>/dev/null; then date; fi # show the date in the log.
 verbose exec "${cmd[@]}"
