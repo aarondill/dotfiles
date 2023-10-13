@@ -41,8 +41,11 @@ if [ "$OS" != "Ubuntu" ]; then abort "Nala is only supported on Ubuntu" 0; fi
 if ! has_apt; then exit 0; fi
 if has_cmd nala; then
   cvers="$(nala --version)"                    # nala 0.13.0
+  cvers=${cvers#nala }                         # remove 'nala '
   lvers="$(get_latest_version_gitlab "$REPO")" # v0.13.0
-  if [ "$cvers" = "nala ${lvers#v}" ]; then abort "Already up to date! Aborting" 0; fi
+  lvers=${lvers#v}                             # remove 'v'
+  # Current is >= latest, abort.
+  if vers_gte "$cvers" "$lvers"; then abort "Already up to date! Aborting" 0; fi
 fi
 
 log_and_run "Installing nala" install_nala
