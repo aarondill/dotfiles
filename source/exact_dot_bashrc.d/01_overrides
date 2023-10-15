@@ -22,14 +22,15 @@ rm_rf=( # These will be removed forcefully.
   ~/.BurpSuite/             # RM burp config
   ~/.gnome/apps/*-BurpSuiteCommunity.desktop
   ~/.python_history
-  ~/.vmware/
+  # ~/.vmware/
 )
 # rmdir will happen *after* rm_rf.
 rmdir=( # These will only be removed if empty
-  ~/.snap
+  ~/.snap/
   ~/.sane/{xsane/,}
   ~/.gnome/{apps/,}
   ~/.mozilla/{extensions/,}
+  ~/.gconf/
 )
 function _rm_files() (
   cd ~ || return # subshell!
