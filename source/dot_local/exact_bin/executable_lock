@@ -6,12 +6,20 @@ function abort() {
   err "$1"
   exit "${2:-1}"
 }
+function has() { [ -x "$(command -v "$1" &>/dev/null)" ]; }
 
-if [ "$#" -gt 0 ]; then
-  abort "This script does not accept any arguments" 2
-elif [ -z "${DISPLAY:-}" ]; then
-  abort "Please run this script in a Xorg session" 2
+pid_file=''
+if [ "$#" -gt 0 ]; then # args passed
+  # first arg *must* be -p
+  if [ "${1:-}" != '-p' ]; then abort 'usage: lock [-p pid_file]' 2; fi
+
+  # second arg *must* be non-empty (it's a file!)
+  if [ -z "${2:-}" ]; then abort "option requires an argument -- 'p'" 2; fi
+  # set pid_file to the file argument
+  pid_file="${2:-}"
 fi
+
+if [ -z "${DISPLAY:-}" ]; then abort "Please run this script in a Xorg session" 1; fi
 
 function optional() { "$@" || true; }
 function revert() {
@@ -19,9 +27,11 @@ function revert() {
   optional xset dpms 0 0 0
 }
 trap revert HUP INT TERM EXIT
-# every 5 seconds
-optional xset +dpms dpms 5 5 5
-# force off the first time
-optional sleep .5 && optional xset dpms force off &
-i3lock -n -f -e -c 000000
+optional xset +dpms dpms 5 5 5                      # every 5 seconds
+optional sleep .5 && optional xset dpms force off & # force off the first time
+i3lock -n -f -e -c 000000 &
+pid="$!"                                                          # get the pid of the i3lock process (note -n to not fork!)
+if [ -n "$pid_file" ]; then printf '%s\n' "$pid" >"$pid_file"; fi # write to the pid_file if present
+wait "$pid"                                                       # block until the i3lock process ends
+
 revert
