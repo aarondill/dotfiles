@@ -44,6 +44,13 @@ function err() { printf "${THIS:+$THIS:}$RED_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "
 function success() { printf "$GREEN_COLOR$BOLD_COLOR%s$RESET_COLOR\n" "Success!" && printf '\n'; }
 function abort() { err "$1" && exit "${2:-1}"; }
 
+WID=$(xdotool getwindowfocus 2>/dev/null) || true
+echo "WID: $WID"
+function seturgent() {
+  [ -n "$WID" ] || return 0
+  wmctrl -i -r "$WID" -b add,demands_attention
+}
+
 # Returns a string that should be 'eval'ed to set the positional arguments
 # Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
 # Input: $LONGOPTS,$SHORTOPTS
@@ -135,6 +142,7 @@ fi
 
 if [ "$native" -eq 1 ]; then
   log "Updating native packages!"
+  seturgent
   if cmd_available nala; then
     log "Using nala"
     show_run "${sudo[@]}" "$(cmd_path nala)" upgrade "${NATIVE_ARGS[@]}"
@@ -150,6 +158,8 @@ if [ "$native" -eq 1 ]; then
   elif cmd_available dnf; then
     log "Using dnf"
     show_run "${sudo[@]}" "$(cmd_path dnf)" upgrade "${NATIVE_ARGS[@]}"
+  else
+    log "Could not find a command to update native packages."
   fi
   success
 fi
@@ -157,6 +167,7 @@ fi
 if [ "$snap" -eq 1 ] && cmd_available snap; then
   log "Updating snap packages!"
   log
+  seturgent
   show_run "${sudo[@]}" "$(cmd_path snap)" refresh "${SNAP_ARGS[@]}"
   success
 fi
@@ -171,6 +182,7 @@ fi
 if [ "$flatpak" -eq 1 ] && cmd_available flatpak; then
   log "Updating flatpak packages!"
   log
+  seturgent
   show_run "$(cmd_path flatpak)" update "${FLATPAK_ARGS[@]}" # NOT as root!
   success
 fi
@@ -205,6 +217,7 @@ fi
 if [ "$pnpm" -eq 1 ] && cmd_available corepack; then
   log "Updating pnpm!"
   log
+  seturgent
   show_run "$(cmd_path corepack)" prepare pnpm@latest --activate
   success
 fi
@@ -224,6 +237,7 @@ fi
 if [ "$cargo" -eq 1 ] && cmd_available rustup; then
   log "Updating cargo and rustc!"
   log
+  seturgent
   show_run "$(cmd_path rustup)" update
   success
 fi
@@ -231,6 +245,7 @@ fi
 if [ "$cargo" -eq 1 ] && cmd_available cargo && cmd_available cargo-install-update; then
   log "Updating cargo installed packages!"
   log
+  seturgent
   show_run "$(cmd_path cargo)" install-update --all --git "${CARGO_ARGS[@]}"
   success
 fi
