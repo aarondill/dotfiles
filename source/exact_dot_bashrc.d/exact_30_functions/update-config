@@ -36,9 +36,9 @@ function update-config() (
   done
   unset lines
 
-  # Output a detail of which files are changing
-  changed_files=$(chezmoi status -- "${files[@]}" | awk '{ print $2 }')
-  changed_dirs=$(chezmoi status -- "${dirs[@]}" | awk '{ print $2 }')
+  # Output a detail of which files are changing -- sed command to remove the status
+  changed_files=$(chezmoi status -- "${files[@]}" | sed 's/^\s*\S\+\s\(.*\)$/\1/')
+  changed_dirs=$(chezmoi status -- "${dirs[@]}" | sed 's/^\s*\S\+\s\(.*\)$/\1/')
   if [ -n "$changed_files" ] || [ -n "$changed_dirs" ]; then
     printf 'Changed files:\n'
     printf '%s\n' "$changed_files" "$changed_dirs"
