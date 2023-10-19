@@ -168,11 +168,14 @@ function config-add() {
   local file
   files=()
   for file in "$@"; do
-    if [[ -r "$file" ]]; then
+    if [ -r "$file" ]; then
       # add to the array so i can update all at once
       files+=("$(realpath -s -- "$file")")
+    elif [ -e "$file" ]; then
+      printf '%s\n' "$file is not readable"
+      exitCode=1
     else
-      printf '%s is not a file\n' "$file"
+      printf '%s\n' "$file is not a file"
       # Exit 1 at end if any args were invalid
       exitCode=1
     fi
