@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euC -o pipefail
+
+this_dir=$(dirname -- "$0")
+DEST=$(realpath -- "$(dirname -- "$this_dir")")
+export LUA_PATH="$DEST/build/lib/?.lua;$DEST/build/lib/?/init.lua;;"
+echo "LUA_PATH=$LUA_PATH"
+if [ -n "${DISPLAY:-}" ]; then
+  exec "$DEST/build/awesome" "$@"
+else
+  exec visual "$DEST/build/awesome" "$@"
+fi

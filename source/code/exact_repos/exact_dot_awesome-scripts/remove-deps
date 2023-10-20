@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+this_dir=
+if [ -f "$0" ]; then this_dir=$(dirname -- "$0"); fi
+if ! [ -d "$this_dir" ]; then echo "Couldn't find script dir" >&2 && exit 1; fi
+
+names=(deps packages pkgs) exts=('-apt' '-APT' '') pkg_file=
+for f in "${names[@]}"; do
+    for ext in "${exts[@]}"; do
+        if [ -f "$this_dir/$f$ext" ]; then pkg_file="$this_dir/$f$ext" && break; fi
+    done
+done
+if [ -z "$pkg_file" ] || ! [ -f "$pkg_file" ]; then echo "Couldn't find self, and couldn't find a list of packages in destination" >&2 && exit 1; fi
+# shellcheck disable=SC2206
+sudo=() && if [ "$(id -u)" -ne 0 ]; then sudo=(${SUDO:-sudo}); fi
+
+xargs -d$'\n' -r -a "$pkg_file" -- "${sudo[@]}" apt-mark auto --
