@@ -41,7 +41,10 @@ fi
 
 if has pnpm; then
   log "Cleaning pnpm store"
-  pnpm store prune || true
+  (
+    cd # pnpm has issues if the current directory is not writable.
+    pnpm store prune || true
+  )
 fi
 
 log "Cleaning browser cache"
@@ -56,7 +59,7 @@ log "Cleaning package manager cache"
 if has nala; then
   sudo_cmd nala clean || true
 elif has apt; then
-  sudo_cmd apt-get clean && sudo_cmd apt-get autoclean || true
+  { sudo_cmd apt-get clean && sudo_cmd apt-get autoclean; } || true
 elif has yay; then
   yay -Sc || true
 elif has pacman; then
