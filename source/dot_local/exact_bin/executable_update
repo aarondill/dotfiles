@@ -45,7 +45,6 @@ function success() { printf "$GREEN_COLOR$BOLD_COLOR%s$RESET_COLOR\n" "Success!"
 function abort() { err "$1" && exit "${2:-1}"; }
 
 WID=$(xdotool getwindowfocus 2>/dev/null) || true
-echo "WID: $WID"
 function seturgent() {
   [ -n "$WID" ] || return 0
   wmctrl -i -r "$WID" -b add,demands_attention
