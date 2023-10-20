@@ -72,23 +72,25 @@ alias lsblk="lsblk -e 7 -o NAME,MAJ:MIN,SIZE,FSTYPE,LABEL,MOUNTPOINT"
 exa= && if has eza; then exa=eza; elif has exa; then exa=exa; fi
 if [ -n "$exa" ]; then
   ls="$exa --color=auto -h --group"
+  ll="ls -l"
   if "$exa" --version | grep -qF '[+git]'; then
-    ls="$ls --git" # add --git argument if supported
+    ls+=" --git" # add --git argument if supported
   else
     export "${exa^^}_OVERRIDE_GIT=1" # {EXA,EZA}_OVERRIDE_GIT
   fi
   case "${TERM,,}" in
-  linux | dumb) ;;
+  linux | dumb) ;; # don't show icons in linux terminal.
   *) ls="$ls --icons" ;;
   esac
 
-  ll="$ls -l"
-  if [ "$exa" = 'eza' ]; then ll="$ll -M"; fi
+  if [ "$exa" = 'eza' ]; then
+    ls+=" --no-quotes"
+    ll+=" -M"
+  fi
 
   # shellcheck disable=SC2139 # I expect it to expand on definition
   alias ls="$ls --grid"
   alias la="ls -a"
-
   # shellcheck disable=SC2139 # I expect it to expand on definition
   alias ll="$ll"
   alias lla="ll -a"
@@ -100,7 +102,7 @@ else
   alias lla="ls -lA"
   alias llaa="ls -la"
 fi
-unset ls exa
+unset ls ll exa
 
 alias cl='clear'
 alias tree='tree -a' # show hidden

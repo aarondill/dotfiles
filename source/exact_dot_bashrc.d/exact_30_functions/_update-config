@@ -69,3 +69,4 @@ code/c/template
 code/c/.clang-format
 .config/vivaldi-static/CSS_Mods
 .config/shellcheckrc
+code/repos/.awesome-scripts
