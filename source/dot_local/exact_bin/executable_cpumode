@@ -36,6 +36,7 @@ function usage() {
 usage: $THIS [OPTS]... [newmode]
 Sets the kernal power saving/performance mode
 Call without arguments to show the current and available modes
+in a human-readable format.
 
 the environment variable \`SUDO\` can be set to use a different
 program for root elevation. It will be split by the shell, so
@@ -43,11 +44,24 @@ spaces in the program name will likely be mutilited.
 
 Options:
   -h, --help         Show this help message.
+  -a, --available    Show only the available modes. (incompatible with -c)
+  -c, --current      Show only the current selected mode. (incompatible with -a)
+  -q, --quiet        Don't output non-esential information on stdout.
+
+Exit code:
+  0 on success
+  1 on miscellaneous errors
+  2 on usage error
+  3 on unsupported kernal
+  4 on setting nonexistent mode.
 EOF
 }
 
-function log() { printf '%s\n' "$@"; }
-function err() { printf "%s\n" "$@" >&2; }
+quiet=0
+
+# note: respects quiet!=0
+function log() { { [ "$quiet" = 0 ] && printf '%s\n' "$@"; } || true; }
+function err() { printf "%s\n" "$@" >&2 || true; }
 function abort() { err "$1" && exit "${2:-1}"; }
 # use like `"${sudo[@]}" do_something`
 # shellcheck disable=SC2206 # Splitting is intentional.
@@ -67,14 +81,32 @@ function parse_args() {
   printf '%s' "set -- $parsed" # output getopt’s output this way to handle the quoting right
 }
 
-LONGOPTS=help SHORTOPTS=h
+LONGOPTS=help,available,current,handle-completion-options,quiet SHORTOPTS=h,a,c,q
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 
+print_only=''
+quiet=1
 while true; do
   case "$1" in
-  --help | -h) usage && exit 0 ;;
+  -h | --help) usage && exit 0 ;;
+  -q | --quiet) quiet=1 && shift ;;
+  -a | --available)
+    [ -z "$print_only" ] || abort "--available and --current are mutually exclusive" 2
+    print_only=available && shift
+    ;;
+  -c | --current)
+    [ -z "$print_only" ] || abort "--available and --current are mutually exclusive" 2
+    print_only=current && shift
+    ;;
+  --handle-completion-options) # note: no short option!
+    # Remove the current option (the completion handling)
+    # Remove double commas, remove trailing commas, remove leading commas
+    LONGOPTS=${LONGOPTS/${1#--}/} LONGOPTS=${LONGOPTS/,,/} LONGOPTS=${LONGOPTS%,} LONGOPTS=${LONGOPTS#,}
+    printf '%s\n' "--${LONGOPTS//,/ --} -${SHORTOPTS//,/ -}"
+    exit 0
+    ;;
   --) shift && break ;;
-  *) abort "This is a bug" 3 ;;
+  *) abort "This is a bug" 1 ;;
   esac
 done
 
@@ -86,27 +118,30 @@ if ! [ -f "$AVAIL_PATH" ] || ! [ -f "$CURRENT_PATH" ]; then
   abort 'Please make sure your kernal supports scaling governors' 3
 fi
 
-avail_options=$(cat "$AVAIL_PATH")
-current=$(cat "$CURRENT_PATH")
-case "$#" in
-0)
-  cat <<EOF
-available options: $avail_options
-currently selected: $current
-EOF
-  ;;
-1)
+function show_output() {
+  local current="$(cat "$CURRENT_PATH")"
+  case "$print_only" in
+  '')
+    log "available options: $avail_options"
+    log "currently selected: $current"
+    ;;
+  'available') printf '%s\n' "$avail_options" ;;
+  'current') printf '%s\n' "$current" ;;
+  esac
+}
+
+function set_mode() {
   mode=$1
   case " $avail_options " in
   *" $mode "*) log "Setting mode: $mode" ;;
-  *)
-    err "$mode is not an available mode."
-    abort "Available modes are: $avail_options" 2
-    ;;
+  *) abort "'$mode' is not an available mode." 4 ;; # call without args to check available
   esac
-
-  if [ "$current" = "$mode" ]; then abort "Mode '$mode' already selected" 0; fi
   printf '%s' "$mode" | "${sudo[@]}" tee "${PATHS[@]}" >/dev/null
-  ;;
+}
+
+avail_options=$(cat "$AVAIL_PATH")
+case "$#" in
+0) show_output ;;
+1) set_mode "$1" ;;
 *) abort 'Too many arguments.' 2 ;;
 esac

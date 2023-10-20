@@ -242,9 +242,17 @@ if [ "$cargo" -eq 1 ] && cmd_available rustup; then
 fi
 
 if [ "$cargo" -eq 1 ] && cmd_available cargo && cmd_available cargo-install-update; then
-  log "Updating cargo installed packages!"
-  log
-  seturgent
-  show_run "$(cmd_path cargo)" install-update --all --git "${CARGO_ARGS[@]}"
-  success
+
+  CPUMODE_BEFORE='' && if cmd_available cpumode; then
+    CPUMODE_BEFORE=$(cpumode -c) || err "Failed to get the CPU mode."
+    cpumode -q -- 'performance' 2>/dev/null || err "Failed to set the CPU mode to performance."
+  fi
+  {
+    log "Updating cargo installed packages!"
+    log
+    seturgent
+    show_run "$(cmd_path cargo)" install-update --all --git "${CARGO_ARGS[@]}"
+    success
+  } || true # || true to ensure that the cpumode can be restored
+  if [ -n "$CPUMODE_BEFORE" ]; then cpumode -q -- "$CPUMODE_BEFORE" 2>/dev/null || err "Failed to restore the CPU mode."; fi
 fi
