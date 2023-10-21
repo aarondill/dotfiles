@@ -30,11 +30,24 @@ for arg; do
   esac
 done
 
-du -h --max-depth=1 -a --one-file-system -- "${args[@]}" | sort "${sort_args[@]}" | awk '{
+du -h --max-depth=1 -a --one-file-system -- "${args[@]}" | sort "${sort_args[@]}" | awk '
+  # shell_quote --- quote an argument for passing to the shell
+  function shell_quote(s, SINGLE, QSINGLE, i, X, n, ret){
+    if (s == "") return "\"\""
+    SINGLE = "\x27"  # single quote
+    QSINGLE = "\"\x27\""
+    n = split(s, X, SINGLE)
+    ret = SINGLE X[1] SINGLE
+    for (i = 2; i <= n; i++)
+        ret = ret QSINGLE SINGLE X[i] SINGLE
+    return ret
+  }
+
+  {
     printf("%4s ", $1);
     s="";
     for (i = 2; i <= NF; i++) s = s $i " ";
     s = substr(s, 1, length(s)-1);
     sub( /^.\//, "", s)
-    system("ls -F --color=always -d -- \"" s "\"")
-    }'
+    system("ls -F --color=always -d -- " shell_quote(s))
+  }'
