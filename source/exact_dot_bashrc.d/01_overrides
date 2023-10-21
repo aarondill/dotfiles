@@ -31,6 +31,7 @@ rmdir=( # These will only be removed if empty
   ~/.gnome/{apps/,}
   ~/.mozilla/{extensions/,}
   ~/.gconf/
+  ~/.vmware/
 )
 function _rm_files() (
   cd ~ || return # subshell!

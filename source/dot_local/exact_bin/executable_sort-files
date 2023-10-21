@@ -5,13 +5,11 @@ THIS=sort-files
 function usage() {
   cat <<EOF
 $THIS [options] [--] [DIR...]
-Outputs the files in the current (or specified) directory in order of largest to smallest.
-
-Arguments are passed to du. See 'du --help' or 'man du' for more information.
-Default options are: '-h --max-depth=1 -a --one-file-system'
+Outputs the files in the current (or specified) directory in order of smallest to largest.
 
 Options:
 -h, --help              show this message
+-r, --reverse           output from largest to smallest
 EOF
   return 0
 }
@@ -20,15 +18,19 @@ function log() { printf '%s\n' "$@"; }
 function err() { printf "$THIS: %s\n" "$@" >&2; }
 function abort() { err "$1" && exit "${2:-1}"; }
 
+sort_args=(-hs)
+args=()
 for arg; do
   case "$arg" in
-  --) break ;;
+  --) args+=("$@") && break ;;
   -h | --help) usage && exit 0 ;;
+  -hr | -rh) usage && exit 0 ;; # handle manually for now
+  -r | --reverse) sort_args+=(-r) ;;
+  *) args+=("$arg") ;;
   esac
 done
 
-dir=${1:-.}
-du -h --max-depth=1 -a --one-file-system "${dir%/}" "${@:2}" | sort -hs | awk '{
+du -h --max-depth=1 -a --one-file-system -- "${args[@]}" | sort "${sort_args[@]}" | awk '{
     printf("%4s ", $1);
     s="";
     for (i = 2; i <= NF; i++) s = s $i " ";
