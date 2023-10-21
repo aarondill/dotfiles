@@ -7,10 +7,6 @@ function usage() {
 $THIS [options] [--] [DIR...]
 Outputs the files in the current (or specified) directory in order of largest to smallest.
 
-the environment variable \`SUDO\` can be set to use a different
-program for root elevation. It will be split by the shell, so
-spaces in the program name will likely be mutilited.
-
 Arguments are passed to du. See 'du --help' or 'man du' for more information.
 Default options are: '-h --max-depth=1 -a --one-file-system'
 
@@ -23,10 +19,6 @@ EOF
 function log() { printf '%s\n' "$@"; }
 function err() { printf "$THIS: %s\n" "$@" >&2; }
 function abort() { err "$1" && exit "${2:-1}"; }
-# use like `"${sudo[@]}" do_something`
-# shellcheck disable=SC2206 # Splitting is intentional.
-sudo=(${SUDO:-sudo})
-[ "$(id -u)" -eq 0 ] && sudo=()
 
 for arg; do
   case "$arg" in
@@ -36,10 +28,7 @@ for arg; do
 done
 
 dir=${1:-.}
-# shellcheck disable=SC2016 # it's awk, you just don't know
-"${sudo[@]}" du -h --max-depth=1 -a --one-file-system "${dir%/}" "${@:2}" |
-  sort -hs |
-  "${sudo[@]}" awk '{
+du -h --max-depth=1 -a --one-file-system "${dir%/}" "${@:2}" | sort -hs | awk '{
     printf("%4s ", $1);
     s="";
     for (i = 2; i <= NF; i++) s = s $i " ";
