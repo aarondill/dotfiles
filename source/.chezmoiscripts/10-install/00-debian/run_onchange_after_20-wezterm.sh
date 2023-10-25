@@ -25,7 +25,8 @@ if [ "$OS" != "Ubuntu" ] && [ "$OS" != "Debian" ]; then
 fi
 
 REPO=wez/wezterm
-version=$(get_latest_version_github "$REPO") # 20230712-072601-f4abf8fd
+# version=$(get_latest_version_github "$REPO") # 20230712-072601-f4abf8fd
+version=nightly
 if has_cmd dpkg-query && apt_is_installed wezterm; then
   installed_version=$(dpkg-query --showformat='${Version}' --show wezterm)
   if [ "$installed_version" = "$version" ]; then
