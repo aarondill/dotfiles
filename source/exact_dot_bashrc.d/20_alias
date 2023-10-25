@@ -22,6 +22,8 @@ else
   alias fd="fd -uu"
 fi
 alias rg="rg -uu -i"
+alias rd='ripdrag -xr'
+alias rdt='ripdrag -ktr'
 # Show progress pls
 alias dd="dd status=progress"
 # Ask before overwriting
@@ -72,7 +74,6 @@ alias lsblk="lsblk -e 7 -o NAME,MAJ:MIN,SIZE,FSTYPE,LABEL,MOUNTPOINT"
 exa= && if has eza; then exa=eza; elif has exa; then exa=exa; fi
 if [ -n "$exa" ]; then
   ls="$exa --color=auto -h --group"
-  ll="ls -l"
   if "$exa" --version | grep -qF '[+git]'; then
     ls+=" --git" # add --git argument if supported
   else
@@ -80,12 +81,13 @@ if [ -n "$exa" ]; then
   fi
   case "${TERM,,}" in
   linux | dumb) ;; # don't show icons in linux terminal.
-  *) ls="$ls --icons" ;;
+  *) ls+=" --icons" ;;
   esac
 
-  if [ "$exa" = 'eza' ]; then
-    ls+=" --no-quotes"
-    ll+=" -M"
+  ll="$ls -l"
+  if [ "$exa" = 'eza' ]; then # These only work on eza. The rest should be supported for both versions!
+    ls+=" --no-quotes"        # quotes break alignment. To Be fixed by: https://github.com/eza-community/eza/pull/551
+    ll+=" -M"                 # Show mounts (underline) :) Only works with long view and no grid!
   fi
 
   # shellcheck disable=SC2139 # I expect it to expand on definition

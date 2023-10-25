@@ -22,7 +22,7 @@ function terminate() {
   local i=0
   while ps --pid "$process" &>/dev/null; do
     signal=${signals[i]}
-    if [ "$signal" = KILL ]; then printf '%s\n' "Attempting to force kill it." >&2; fi
+    printf "%s\n" "Sending signal '$signal' to process $process"
     kill "-$signal" "$process"
     i=$((i + 1))
     if [ "$i" -ge "$signal_qty" ]; then
