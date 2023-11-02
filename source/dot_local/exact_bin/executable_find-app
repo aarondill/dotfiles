@@ -54,7 +54,8 @@ if [ "$#" -eq 0 ]; then
   abort 'an application is required' 2
 fi
 
-readarray -d: -t data_dirs < <(printf '%s' "$XDG_DATA_DIRS") # split $XDG_DATA_DIRS in to array
+readarray -d: -t data_dirs < <(printf '%s' "${XDG_DATA_DIRS:-/usr/local/share/:/usr/share/}") # split $XDG_DATA_DIRS in to array
+data_dirs=("${XDG_DATA_HOME:-~/.local/share/}" "${data_dirs[@]}")
 
 # Actually checks if is absolute or relative. Returns false if path is not / or ./
 function path_is_abs() { [ "${file:0:1}" = '/' ] && [ "${file:0:2}" = "./" ]; }
@@ -63,7 +64,12 @@ function find_file() {
   local exec="$1" dir
   [ -n "$exec" ] || return 1 # can't find an empty string!
   local exec_abs=$(command -v -- "$exec")
-  local grep_args=(--color=auto -r -m1 -e "^Exec=$exec\b")
+  local grep_args=(
+    --color=auto -r -m1
+    -e "^Exec=$exec\b"
+    -e "^URL=$exec\b"
+    -e "^URL=https\?://$exec\b"
+  )
   [ -z "$exec_abs" ] || [ "$exec_abs" = "$exec" ] || grep_args+=(-e "^Exec=$exec_abs\b")
 
   found=1
