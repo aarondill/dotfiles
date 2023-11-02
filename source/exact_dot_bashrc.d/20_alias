@@ -35,7 +35,6 @@ alias poweroff="history -a; /sbin/poweroff"
 alias reboot="history -a; /sbin/reboot"
 alias halt="history -a; /sbin/halt"
 alias shutdown="history -a; /sbin/shutdown"
-
 # Toggle capslock from terminal (bc capslock key is remapped)
 alias capslock='xdotool key Caps_Lock'
 alias CAPSLOCK='xdotool key Caps_Lock'
