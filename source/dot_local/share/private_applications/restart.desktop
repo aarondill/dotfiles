@@ -1,0 +1,9 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Version=1.0
+Type=Application
+Exec=systemctl reboot
+Name=Reboot
+Comment=Reboot your device
+Icon=system-reboot-symbolic
+Categories=Utilities;System

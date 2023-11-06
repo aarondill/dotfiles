@@ -1,0 +1,9 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Version=1.0
+Type=Application
+Exec=systemctl poweroff
+Name=Shutdown
+Comment=Shutdown your device
+Icon=system-shutdown-symbolic
+Categories=Utilities;System
