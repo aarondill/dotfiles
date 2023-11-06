@@ -3,7 +3,7 @@
 Version=1.0
 Type=Application
 Exec=systemctl reboot
-Name=Reboot
+Name=Reboot/Restart
 Comment=Reboot your device
 Icon=system-reboot-symbolic
 Categories=Utilities;System
