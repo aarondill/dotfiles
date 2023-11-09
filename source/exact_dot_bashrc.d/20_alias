@@ -88,10 +88,13 @@ if [ -n "$exa" ]; then
   esac
 
   ll="$ls -l"
-  if [ "$exa" = 'eza' ]; then                 # These only work on eza. The rest should be supported for both versions!
-    ls+=" --smart-group" ll+=" --smart-group" # only show group if group != owner
-    ll+=" -M"                                 # Show mounts (underline) :) Only works with long view and no grid!
+  if [ "$exa" = 'eza' ]; then                  # These only work on eza. The rest should be supported for both versions!
+    eza_only="--smart-group --color-scale age" # only show group if group != owner
+    ls+=" $eza_only" ll+=" $eza_only"
+
+    ll+=" -M" # Show mounts (underline) :) Only works with long view and no grid!
     # ls+=" --no-quotes"                        # no quotes (now) break alignment. See: https://github.com/eza-community/eza/pull/551
+    unset eza_only
   fi
 
   # shellcheck disable=SC2139 # I expect it to expand on definition
