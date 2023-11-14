@@ -36,4 +36,5 @@ for v in "${!versions[@]}"; do
 done
 
 # This is my own script! should be in ~/.local/bin/update-java!
+log "updating java to $destination/jdk-$update_version"
 sudo_cmd ~/.local/bin/update-java --quiet --yes "$destination/jdk-$update_version"
