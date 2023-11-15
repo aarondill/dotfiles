@@ -74,7 +74,13 @@ prepend_path "$HOME/bin"
 # set PATH so it includes user's private bin if it exists
 prepend_path "$HOME/.local/bin"
 
-if [ -d /usr/lib/jvm ]; then
+if command -v "java" >/dev/null 2>/dev/null; then
+  java_home=$(realpath -- "$(command -v -- java)")
+  java_home=${java_home%/*} java_home=${java_home%/*} # $(dirname $(dirname $java_home))
+  JAVA_HOME="$java_home"
+  unset java_home
+fi
+if ! [ -d "${JAVA_HOME:-}" ] && [ -d /usr/lib/jvm ]; then
   # set JAVA_HOME to latest jvm available
   # use sort -V to sort versions. only available in core-utils-7
   # Remove trailing NULL byte with tr -d to avoid bash warning
