@@ -85,7 +85,7 @@ if ! [ -d "$JVM_VERS_DIR" ]; then
   err "'$JVM_VERS_DIR' is not a directory. It will be created on confirmation" "$JVM_VERS_DIR"
 fi
 
-if ! [ -d "$JAVADIR" ]; then abort "'$JAVADIR' is not a directory\n" 2; fi
+if ! [ -d "$JAVADIR" ]; then abort "'$JAVADIR' is not a directory" 2; fi
 JAVADIR=$(realpath -- "$JAVADIR")
 
 if [[ "$JAVADIR" =~ ?(.*)/bin$ ]]; then
@@ -108,7 +108,7 @@ fi
 JVM_VERS_DIR=$(realpath -- "$JVM_VERS_DIR")
 
 if [[ $(dirname -- "$JAVADIR") != "$JVM_VERS_DIR" ]]; then
-  printf 'Copying files to "%s"\n' "$JVM_VERS_DIR" >&2
+  err "Copying files to '$JVM_VERS_DIR'"
   "${sudo[@]}" cp --archive --interactive "$JAVADIR" "$JVM_VERS_DIR"
   JAVADIR="$JVM_VERS_DIR/$(basename -- "$JAVADIR")"
 fi
