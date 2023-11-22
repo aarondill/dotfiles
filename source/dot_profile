@@ -61,6 +61,8 @@ export _JAVA_OPTIONS=-Djava.util.prefs.userRoot="$XDG_CONFIG_HOME"/java
 export HAS_ALLOW_UNSAFE=y
 export HISTFILE="$XDG_STATE_HOME/${SHELL##*/}_history" # /bash_history
 export GTK_USE_PORTAL=1
+# set wezterm to be quieter
+export WEZTERM_LOG=config=info,warn
 
 export WGETRC="$XDG_CONFIG_HOME/wgetrc"
 export ASPELL_CONF="per-conf $XDG_CONFIG_HOME/aspell/aspell.conf; personal $XDG_CONFIG_HOME/aspell/en.pws; repl $XDG_CONFIG_HOME/aspell/en.prepl"
