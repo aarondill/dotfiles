@@ -20,7 +20,7 @@ program for root elevation. It will be split by the shell, so
 spaces in the program name will likely be mutilited.
 
 METHOD_ARGS to pass additional options to each command. (IE, NATIVE_ARGS)
-Currently supported methods are: native, snap, flatpak, pnpm, npm, cargo
+Currently supported methods are: native, snap, flatpak, pnpm, npm, cargo, vmware
 use 'native' to enable or '+native' to disable. ORDER MATTERS!
 Options:
 --as-root: allow running as root (Discouraged!)
@@ -91,9 +91,9 @@ for arg; do
   esac
 done
 
-native=0 flatpak=0 snap=0 pnpm=0 npm=0 cargo=0
+native=0 flatpak=0 snap=0 pnpm=0 npm=0 cargo=0 vmware=0
 if [ "$#" -eq 0 ] || [ "$all_exclude" -eq 1 ]; then
-  native=1 flatpak=1 snap=1 pnpm=1 npm=1 cargo=1
+  native=1 flatpak=1 snap=1 pnpm=1 npm=1 cargo=1 vmware=1
 fi
 
 for arg; do          # Doesn't do anything if $# is zero
@@ -105,6 +105,7 @@ for arg; do          # Doesn't do anything if $# is zero
   pnpm) pnpm=1 ;; +pnpm) pnpm=0 ;;
   npm) npm=1 ;; +npm) npm=0 ;;
   cargo) cargo=1 ;; +cargo) cargo=0 ;;
+  vmware) vmware=1 ;; +vmware) vmware=0 ;;
   all) native=1 flatpak=1 snap=1 pnpm=1 npm=1 ;;
   +all) native=0 flatpak=0 snap=0 pnpm=0 npm=0 ;;
   esac
@@ -122,13 +123,14 @@ sudo=(${SUDO:-sudo})
   PNPM_ARGS=(${PNPM_ARGS:-})
   NPM_ARGS=(${NPM_ARGS:-})
   CARGO_ARGS=(${CARGO_ARGS:-})
+  VMWARE_ARGS=(${VMWARE_ARGS:-})
 }
 
 function cmd_available() { command -v "$@" &>/dev/null; }
 function cmd_path() { command -v "$@"; }
 
 is_something_to_do=0
-for i in "$native" "$flatpak" "$snap" "$pnpm" "$npm" "$cargo"; do
+for i in "$native" "$flatpak" "$snap" "$pnpm" "$npm" "$cargo" "$vmware"; do
   [ "$i" -eq 1 ] || continue # only if something is activated
   is_something_to_do=1
   break
@@ -255,4 +257,17 @@ if [ "$cargo" -eq 1 ] && cmd_available cargo && cmd_available cargo-install-upda
     success
   } || true # || true to ensure that the cpumode can be restored
   if [ -n "$CPUMODE_BEFORE" ]; then cpumode -q -- "$CPUMODE_BEFORE" 2>/dev/null || err "Failed to restore the CPU mode."; fi
+fi
+
+if [ "$vmware" -eq 1 ] && cmd_available vmplayer; then # Check that vmware is already installed
+  # log "updating vmware using vmware-installer!"
+  # seturgent
+  # show_run "${sudo[@]}" "$(cmd_path vmware-installer)" --console --eulas-agreed "${VMWARE_ARGS[@]}"
+  # success
+
+  # These need to be updated because they break randomly otherwise
+  log "updating vmware modconfig!"
+  seturgent
+  show_run "${sudo[@]}" "$(cmd_path vmware-modconfig)" --console --install-all
+  success
 fi

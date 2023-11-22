@@ -73,3 +73,4 @@ code/repos/.awesome-scripts
 .local/share/applications/mathlab.desktop
 .local/share/applications/restart.desktop
 .local/share/applications/shutdown.desktop
+.config/clangd/config.yaml
