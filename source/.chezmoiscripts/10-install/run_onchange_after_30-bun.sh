@@ -12,7 +12,7 @@ if has_cmd bun; then
   latest_bun=${latest_bun#bun-v}                        # 1.0.14
 fi
 
-if ! has_cmd bun || vers_gte "$current_bun" "$latest_bun"; then
+if ! has_cmd bun || vers_lt "$current_bun" "$latest_bun"; then
   log "Installing bun using install script"
   tmp_file=$(download_file https://bun.sh/install)
   rm_exit "$tmp_file"
