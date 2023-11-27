@@ -46,6 +46,10 @@ if has pnpm; then
     pnpm store prune || true
   )
 fi
+if has bun; then
+  log "Cleaning bun cache"
+  bun pm -g cache rm
+fi
 
 log "Cleaning browser cache"
 clean-google-cache || true
