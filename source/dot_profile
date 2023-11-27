@@ -63,6 +63,9 @@ export HISTFILE="$XDG_STATE_HOME/${SHELL##*/}_history" # /bash_history
 export GTK_USE_PORTAL=1
 # set wezterm to be quieter
 export WEZTERM_LOG=config=info,warn
+# https://github.com/nodejs/node/issues/41145#issuecomment-992948130
+# Bun, npm, and node are broken on ipv6. Because of course they are.
+export NODE_OPTIONS="--dns-result-order=ipv4first"
 
 export WGETRC="$XDG_CONFIG_HOME/wgetrc"
 export ASPELL_CONF="per-conf $XDG_CONFIG_HOME/aspell/aspell.conf; personal $XDG_CONFIG_HOME/aspell/en.pws; repl $XDG_CONFIG_HOME/aspell/en.prepl"
