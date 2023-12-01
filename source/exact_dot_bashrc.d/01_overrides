@@ -33,6 +33,7 @@ rmdir=( # These will only be removed if empty
   ~/.gconf/
   ~/.vmware/
   ~/tmp/
+  ~/.cups
 )
 function _rm_files() (
   cd ~ || return # subshell!
