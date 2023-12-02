@@ -161,6 +161,8 @@ Flags:
 --full,--incr   passed to duplicity to force a full or incremental backup
 --help          show this message
 --cleanup,-c    Cleanup old backups
+--status,-s     Get the collection-status
+--info,-i       A synonym for --status
 --dry-run,-n    Do not run any duplicity commands, just show them (set BACKUP_DRY_RUN to set this)
 --verbose,-v    Show all duplicity commands before running them (set BACKUP_VERBOSE to set this)
 EOF
@@ -175,13 +177,15 @@ function abort() {
 # Array of arguments to pass to duplicity
 args=()
 
-cleanup=0
+mode=backup
 command=() # an array for the sake of empty strings (allows to skip the command and dynamically create full backups)
 for arg in "$@"; do
   case "$arg" in
   --full | --incr) command=("${arg#--}") ;;
   --help | -h) usage && exit 0 ;;
-  --cleanup | -c) cleanup=1 ;;
+  --cleanup | -c) mode=cleanup ;;
+  --info | -i) ;& # fallthrough
+  --status | -s) mode=status ;;
   --dry-run | -n) BACKUP_DRY_RUN=1 ;; # overrides environment variables
   --verbose | -v) BACKUP_VERBOSE=1 ;; # overrides environment variables
   --*) abort "Unknown option: '$arg'" ;;
@@ -194,12 +198,7 @@ log ''
 log "--- Backup at $(date) ---"
 log ''
 
-if [ -z "${DUPLICITY:-}" ]; then
-  if ! command -v which &>/dev/null; then
-    abort "Which is required to find duplicity in PATH. Plese ensure it is installed or set \$DUPLICITY variable." 1
-  fi
-  DUPLICITY=$(which duplicity 2>/dev/null || printf '')
-fi
+DUPLICITY="${DUPLICITY:-"$(command -v duplicity 2>/dev/null || true)"}"
 # Ensure duplicity can be accessed
 if [ -z "$DUPLICITY" ]; then
   abort "Could not find duplicity. Please ensure it is installed" 1
@@ -279,31 +278,46 @@ function verbose() {
     "$@" # run it
   fi
 }
+did_something=
+# Sets did_something and verbosely runs "$@"
+function run() {
+  did_something=1
+  verbose "$@"
+}
 
 if [ "${#args[@]}" -eq 0 ]; then
   abort "No arguments were specified. Something went wrong" 3
 fi
 
-if [ "$cleanup" -eq 0 ]; then
+case "$mode" in
+backup)
   log "Backing up to $DESTINATION_URI"
-  verbose "$DUPLICITY" --full-if-older-than="${FULL_IF_OLDER:-1M}" "${command[@]}" "${args[@]}" -- "$SOURCE_DIR" "$DESTINATION_URI"
-else
+  run "$DUPLICITY" --full-if-older-than="${FULL_IF_OLDER:-1M}" "${command[@]}" "${args[@]}" -- "$SOURCE_DIR" "$DESTINATION_URI"
+  ;;
+cleanup)
   log "Cleaning up $DESTINATION_URI"
-  did_something=0
   if [ -n "${REMOVE_OLDER_THAN:-}" ]; then # only if defined
     log "Removing backups older than $REMOVE_OLDER_THAN"
-    did_something=1
     command=(remove-older-than "$REMOVE_OLDER_THAN" --force)
-    verbose "$DUPLICITY" "${command[@]}" "${args[@]}" -- "$DESTINATION_URI"
+    run "$DUPLICITY" "${command[@]}" "${args[@]}" -- "$DESTINATION_URI"
   fi
   if [ -n "$REMOVE_ALL_INC_OF_BUT_N_FULL" ]; then # only if defined
     log
     log "Removing all incremental backups except for $REMOVE_ALL_INC_OF_BUT_N_FULL of full at $DESTINATION_URI"
-    did_something=1
     command=(remove-all-inc-of-but-n-full "$REMOVE_ALL_INC_OF_BUT_N_FULL" --force)
-    verbose "$DUPLICITY" "${command[@]}" "${args[@]}" -- "$DESTINATION_URI"
+    run "$DUPLICITY" "${command[@]}" "${args[@]}" -- "$DESTINATION_URI"
   fi
-  if [ "$did_something" -eq 0 ]; then abort "Didn't do anything. Please check your configuration and try again." 2; fi
+  ;;
+status)
+  command=(collection-status)
+  run "$DUPLICITY" "${command[@]}" "${args[@]}" -- "$DESTINATION_URI"
+  exit 0 # Don't verify the backup
+  ;;
+*) abort "Unknown mode '$mode'. This is most likely a bug." 3 ;;
+esac
+
+if [ -z "$did_something" ]; then
+  abort "Didn't do anything. Please check your configuration and try again." 2
 fi
 
 log
