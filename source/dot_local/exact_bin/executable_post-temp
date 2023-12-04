@@ -26,7 +26,7 @@ EOF
   return 0
 }
 function log() { printf '%s\n' "$@"; }
-function err() { printf "$THIS: %s\n" "$@" >&2; }
+function err() { printf "%s\n" "$@" >&2; }
 function abort() { err "$1" && exit "${2:-1}"; }
 
 # Returns a string that should be 'eval'ed to set the positional arguments
@@ -100,7 +100,7 @@ for file in "$@"; do
     if [ -n "$message" ]; then err "$message"; else err "An unknown error occured"; fi
     exitcode=1
   else
-    [ "$quiet" != true ] && log "$status"
+    [ "$quiet" != true ] && err "$status"
     log "${url/tmpfiles.org\//tmpfiles.org\/dl\/}"
   fi
 done
