@@ -14,6 +14,7 @@ EOF
 stdin_file=    # This will override stdin. Relative to output_dir (use input_files if needed), use - to specify stdin
 cargs=()       # javac
 jargs=()       # java
+dargs=()       # javadoc
 classpath=     # output_dir will be automatically included
 output_dir=    # or "dist". Relative to this_dir
 input_files=() # a list of files to copy (symlink) to the output_dir. Releative to this_dir
@@ -56,22 +57,62 @@ resolve() {
     printf '%s' "$ret"   # no newline
   fi
 }
-
-if [ "${1:-}" == '-t' ] || [ "${1:-}" == '--test' ]; then
-  # handle ./cmd --test to allow user input
-  # HACK: no way to not use this. (ie '--' doesn't work.)
-  stdin_file=- && shift 1
-fi
-
 this_dir="$(readlink -f -- "$(dirname "$0")")" # might break if cwd is a symlink
 this="$(basename "$0")"
 
-java_class=${this%.test.sh}                             # ClassName.test.sh -> ClassName
-java_class=${java_class%.sh}                            # ClassName.sh -> ClassName
+java_class=${this%.test.sh}  # ClassName.test.sh -> ClassName
+java_class=${java_class%.sh} # ClassName.sh -> ClassName
+
+usage() {
+  cat <<EOF
+  Usage: $this [options] [--] [args]
+  Run $java_class.java with the given arguments
+
+  Options:
+    -h, --help          Show this message and exit.
+    -o, --output        Set the output directory
+    -i, --input         Set the input file
+    -t, --test          Alias for -i -
+    -d, --doc           Only generate documentation using javadoc
+    -c, --compile       Compile the program (default)
+    -r, --run           Run the program (default)
+    --do                Set do order (default: "run:compile:")
+
+  Note: to generate documentation and run, use \`$this -d -c -r\`
+EOF
+  :
+}
+
+do=
+args=()
+while [ $# -gt 0 ]; do
+  case "$1" in
+  -o | --output) output_dir="$1" ;;
+  -h | --help) usage && exit 0 ;;
+  # handle ./cmd -i - to allow user input
+  -i | --input) stdin_file=$2 && shift ;;
+  -t | --test) stdin_file=- ;; # alias for `-i -`
+  -d | --doc) do=:doc: ;;
+  -c | --compile) do+=:compile: ;; # note: default. only for overriding
+  -r | --run) do+=:run: ;;         # note: default. only for overriding
+  --do) do="$2" && shift ;;        # set do manually
+  --*=*)                           # Handle `--opt=val` -> `--opt val`
+    opt=${1%%=*} val=${1##*=}
+    set -- TO_BE_SHIFTED "$opt" "$val" "$@"
+    ;;
+  --) args+=("$@") && break ;;
+  -*) abort "Unknown option: $1" ;;
+  *) args+=("$@") && break ;; # on first non-option, treat the rest as arguments for the script
+  esac
+  shift
+done
+set -- "${args[@]}"
+
 output_dir="$(resolve "${output_dir:-.}")"              # relative to $this_dir -- default is $this_dir
 java_file="$(resolve "$java_class.java")"               # relative to $this_dir
 class_file=$(resolve "$java_class.class" "$output_dir") # relative to $output_dir
 stdin_file=$(resolve "${stdin_file:-}" "$output_dir")   # relative to $output_dir
+doc_dest="$(resolve "doc" "$output_dir")"               # relative to $output_dir
 
 if ! [ -f "$java_file" ]; then abort "Could not find '$java_file'. Please double check the names of both files." 1; fi
 if [ -f "$class_file" ]; then
@@ -102,7 +143,8 @@ if ! [ -d "$output_dir" ]; then
   show_run mkdir -p "$output_dir"
 fi
 
-log "Setting up input files"
+# only log if input files is non-empty
+[ "${#input_files[@]}" -eq 0 ] || log "Setting up input files"
 for f in "${input_files[@]}"; do
   link_dest=$(resolve "$(basename "$f")" "$output_dir")
   link_src="$(resolve "$f")"
@@ -114,16 +156,51 @@ done
 _classpath="$output_dir"
 if [ -n "$classpath" ]; then _classpath="$_classpath:$classpath"; fi
 
-show_run javac --class-path "$_classpath" -d "$output_dir" "${cargs[@]}" "$java_file"
+[ "${do:0-1}" == ":" ] || do="$do:" # ensure do ends in a colon
+do=${do//::/:}                      # no empty elements
+do="${do#:}"                        # ensure do doesn't start with a colon
+[ "$do" != : ] || do=''             # no only seperator
+[ -n "$do" ] || do='compile:run:'   # default to compile:run
+while [ -n "$do" ]; do
 
-code=0
-stdin show_run java --class-path "$_classpath" "$java_class" "${jargs[@]}" "$@" || code=$?
-
-if [ "$code" != 0 ]; then
-  log
-  err "Command failed with exit code: $code"
-  exit "$code"
-fi
+  code=0
+  command="${do%%:*}" # first element of do
+  case "$command" in
+  doc)
+    # used to link to the correct documentation versions
+    JAVA_MAJOR_VERSION=$(java -version 2>&1 | grep -oP 'version "?(1\.)?\K\d+')
+    show_run rm -rf -- "$doc_dest"
+    show_run javadoc \
+      -link "https://docs.oracle.com/en/java/javase/$JAVA_MAJOR_VERSION/docs/api/" \
+      -docencoding UTF-8 \
+      -charset UTF-8 \
+      -nonavbar -notree -noindex -nohelp -nodeprecatedlist \
+      -d "$doc_dest" \
+      --class-path "$_classpath" \
+      -private "${dargs[@]}" \
+      "$java_file" "$@"
+    ;;
+  compile)
+    show_run javac \
+      --class-path "$_classpath" \
+      -d "$output_dir" \
+      "${cargs[@]}" "$java_file"
+    ;;
+  run)
+    stdin show_run java \
+      --class-path "$_classpath" \
+      "${jargs[@]}" "$java_class" "$@"
+    ;;
+  '') abort "Empty command! This is a bug!" 3 ;;
+  *) abort "Unrecognized command: $command" 3 ;;
+  esac || code="$?"
+  if [ "$code" != 0 ]; then
+    log
+    err "Command failed with exit code: $code"
+    exit "$code"
+  fi
+  do="${do#*:}" # remove first element (up to colon)
+done
 
 if [ "$output_dir" == "$this_dir" ]; then # cleanup current directory (not if build dir)
   if [ -f "$class_file" ]; then
