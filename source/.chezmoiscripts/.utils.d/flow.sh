@@ -49,7 +49,7 @@ function confirm_exact() {
 # Usage: log_and_run "Installing something" apt install -y something
 function log_and_run() {
   local err_status=0 opts=''
-  local task="$1" command="$2" args=("${@:3}")
+  local task="$1" cmd=("${@:2}")
   log "${task^}..." # Uppercase
 
   # store errexit option
@@ -66,7 +66,7 @@ function log_and_run() {
   set +e
   (
     set -e
-    "$command" "${args[@]}"
+    "${cmd[@]}"
   )
   err_status=$?
   set -e
