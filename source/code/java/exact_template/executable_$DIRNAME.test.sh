@@ -87,10 +87,10 @@ do=
 args=()
 while [ $# -gt 0 ]; do
   case "$1" in
-  -o | --output) output_dir="$1" ;;
+  -o | --output) output_dir="$2" && shift ;;
   -h | --help) usage && exit 0 ;;
   # handle ./cmd -i - to allow user input
-  -i | --input) stdin_file=$2 && shift ;;
+  -i | --input) stdin_file="$2" && shift ;;
   -t | --test) stdin_file=- ;; # alias for `-i -`
   -d | --doc) do=:doc: ;;
   -c | --compile) do+=:compile: ;; # note: default. only for overriding
@@ -120,6 +120,23 @@ if [ -f "$class_file" ]; then
   show_run rm -f "$class_file"
 fi
 
+if ! [ -d "$output_dir" ]; then
+  log "Creating output directory"
+  show_run mkdir -p "$output_dir"
+fi
+
+# ensure stdin_file gets copied to output_dir
+if [ -n "$stdin_file" ] && [ "$stdin_file" != '-' ]; then input_files+=("$stdin_file"); fi
+# only log if input files is non-empty
+[ "${#input_files[@]}" -eq 0 ] || log "Setting up input files"
+for f in "${input_files[@]}"; do
+  link_dest=$(resolve "$(basename "$f")" "$output_dir")
+  link_src="$(resolve "$f")"
+  if ! [ -e "$link_src" ]; then continue; fi   # source file doesn't exist
+  if [ -e "$link_dest" ]; then continue; fi    # destination file already exists
+  show_run ln -Tsi -- "$link_src" "$link_dest" # dead links will be interactively replaced
+done
+
 if [ -n "$stdin_file" ] && ! [ "$stdin_file" = - ]; then
   if ! [ -e "$stdin_file" ]; then
     abort "Could not find '$stdin_file'. Please double check the name of the file, or remove it from the stdin_file." 1
@@ -137,21 +154,6 @@ stdin() {
     "$@"
   fi
 }
-
-if ! [ -d "$output_dir" ]; then
-  log "Creating output directory"
-  show_run mkdir -p "$output_dir"
-fi
-
-# only log if input files is non-empty
-[ "${#input_files[@]}" -eq 0 ] || log "Setting up input files"
-for f in "${input_files[@]}"; do
-  link_dest=$(resolve "$(basename "$f")" "$output_dir")
-  link_src="$(resolve "$f")"
-  if ! [ -e "$link_src" ]; then continue; fi   # source file doesn't exist
-  if [ -e "$link_dest" ]; then continue; fi    # destination file already exists
-  show_run ln -Tsi -- "$link_src" "$link_dest" # dead links will be interactively replaced
-done
 
 _classpath="$output_dir"
 if [ -n "$classpath" ]; then _classpath="$_classpath:$classpath"; fi

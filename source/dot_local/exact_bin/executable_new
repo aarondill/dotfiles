@@ -8,9 +8,9 @@ function usage() {
   THIS=$(basename "$0")
   cat <<EOF
 Usage: $THIS [LANG] [--] <DIR>...
-Creates a new project in the given language. Note that slashes (/) in LANG will be replaced with underscores (_)
+Creates a new project in the given language. 
 
-First checks for new-LANG command, if found, pass DIRs and exit
+First checks for new-LANG command ('/' replaced with '_'), if found, pass DIRs and exit
 Second checks for a file $template_parent_dir/LANG/template, if found, pass DIRs and exit
 Third checks for a directory $template_parent_dir/LANG/template, if found, copy to DIRs and continue
 
@@ -156,15 +156,17 @@ if [ -z "$template" ] && [ -z "$lang" ]; then
   # esac
   [ -z "$lang" ] && abort "Language is required. Please pass it using -l or the first argument" 2
 fi
+lang=${lang%/} # remove trailing slash if present
+lang=${lang#/} # remove leading slash if present
 # find the template directory -- not given, and lang *was*
 if [ -z "$template" ] && [ -n "$lang" ]; then
-  template="$template_parent_dir/${lang//\//_}/template" # replace slashes in lang with _
+  template="$template_parent_dir/$lang/template"
 fi
 
 # if [ "$#" -eq 0 ]; then set -- new; fi # default to 'new' if no arguments given
 if [ "$#" -eq 0 ]; then abort 'DIR is required' 2; fi
 
-cmd=$(cmdpath "new-$lang")
+cmd=$(cmdpath "new-${lang//\//_}")             # replace slashes with underscores
 if [ -x "$cmd" ]; then exec -- "$cmd" "$@"; fi # new-$lang command
 
 # Doesn't exist. Warn the user! Empty string will be caught by `! -d`
