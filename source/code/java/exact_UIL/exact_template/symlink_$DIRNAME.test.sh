@@ -1,1 +1,0 @@
-../../template/$DIRNAME.test.sh
