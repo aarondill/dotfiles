@@ -15,7 +15,9 @@ Second checks for a file $template_parent_dir/LANG/template, if found, pass DIRs
 Third checks for a directory $template_parent_dir/LANG/template, if found, copy to DIRs and continue
 
 For each DIR, a series of variable expansions are applied to the filenames and contents of all files and directories contained
-Variables (List may be incomplete):
+Variables:
+Note: list may be incomplete
+Note: For each \$VAR, there is a \$var which has the same value but lowercase
     DATE:        The date of creation (mm/dd/yyyy)                             -- 09/19/2023
     TIME:        The time of creation (hh:mm)                                  -- 16:25
     FILEPATH:    The filepath relative to ROOT                                 -- root/dir/file.ext -> dir/file.ext
@@ -61,7 +63,10 @@ function substitute() {
   local path="$1" dest="$2"
   local env_pattern
   if [ -z "$path" ]; then abort "substitute requires a filepath!" 2; fi
-  local envs=(DATE TIME FILEPATH DIRNAME REALPATH FILENAME EXTENSION BASENAME ROOT)
+  local envs=(
+    DATE TIME FILEPATH DIRNAME REALPATH FILENAME EXTENSION BASENAME ROOT
+    date time filepath dirname realpath filename extension basename root
+  )
   # shellcheck disable=SC2034 # These are dynamically used later
   {
     declare -I -- "${envs[@]}"                               # these are local, but keep predefined values
@@ -74,6 +79,11 @@ function substitute() {
     BASENAME="${FILENAME%.*}"                                # name without extension    -- root/dir/file.ext -> file
     ROOT="$(basename -- "$dest")"                            # name of root (passed val) -- root/dir/file -> root
     if [ "$EXTENSION" = "$FILENAME" ]; then EXTENSION=''; fi # Ensure extension is not the filename
+
+    filepath=${FILEPATH,,} realpath=${REALPATH,,}
+    filename=${FILENAME,,} dirname=${DIRNAME,,}
+    extension=${EXTENSION,,} basename=${BASENAME,,}
+    root=${ROOT,,} date=${DATE,,} time=${TIME,,}
   }
 
   # env_pattern='([A-Z][A-Z_0-9]*)' # only match capital variables!
