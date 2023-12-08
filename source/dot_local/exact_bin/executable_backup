@@ -159,16 +159,17 @@ If neither argument is passed, a full will be made if the most recent full backu
 
 Flags:
 --full,--incr   passed to duplicity to force a full or incremental backup
+--print,-p      print the location of the backup (note: hardcoded within the script)
 --help          show this message
---cleanup,-c    Cleanup old backups
---status,-s     Get the collection-status
---info,-i       A synonym for --status
---dry-run,-n    Do not run any duplicity commands, just show them (set BACKUP_DRY_RUN to set this)
---verbose,-v    Show all duplicity commands before running them (set BACKUP_VERBOSE to set this)
+--cleanup,-c    cleanup old backups
+--status,-s     get the collection-status
+--info,-i       a synonym for --status
+--dry-run,-n    do not run any duplicity commands, just show them (set BACKUP_DRY_RUN to set this)
+--verbose,-v    show all duplicity commands before running them (set BACKUP_VERBOSE to set this)
 EOF
 }
-function log() { printf '%s\n' "$@"; }
-function err() { printf '%s\n' "$@" >&2; }
+function log() { printf '%s\n' "$@" || true; }
+function err() { printf '%s\n' "$@" >&2 || true; }
 function abort() {
   err "$1"
   exit "${2:-1}"
@@ -183,6 +184,7 @@ for arg in "$@"; do
   case "$arg" in
   --full | --incr) command=("${arg#--}") ;;
   --help | -h) usage && exit 0 ;;
+  --print | -p) mode=print ;;
   --cleanup | -c) mode=cleanup ;;
   --info | -i) ;& # fallthrough
   --status | -s) mode=status ;;
@@ -220,46 +222,55 @@ for pat in "${files[@]}"; do
 done
 
 # exclude-if-present
-for file in "${exclude_if_present[@]}"; do
-  args=("${args[@]}" "--exclude-if-present=$file")
-done
+# check is set and not empty
+# note: "${!var[@]}" returns the indicies (ie 0 1 2 3) for the full array
+if [ -n "${!exclude_if_present[*]}" ]; then
+  for file in "${exclude_if_present[@]}"; do
+    args+=("--exclude-if-present=$file")
+  done
+fi
 
 # volsize
-args=("${args[@]}" "--volsize=$VOLSIZE")
+if [ -n "${VOLSIZE:-}" ]; then
+  args+=("--volsize=$VOLSIZE")
+fi
 
 # Encryption
-if [ "$ENCRYPTION_TYPE" = 'no' ]; then
-  args=("${args[@]}" "--no-encryption")
+if [ "${ENCRYPTION_TYPE:-}" = 'no' ]; then
+  args+=("--no-encryption")
+elif [ -n "${ENCRYPTION_TYPE:-}" ]; then
+  # Don't abort here. Try it, but it probably won't work
+  err "Warning: Encryption type '${ENCRYPTION_TYPE}' is not supported"
 fi
 
 # verbosity
 if [ -n "${VERBOSITY:-}" ]; then
-  args=("${args[@]}" "--verbosity=$VERBOSITY")
+  args+=("--verbosity=$VERBOSITY")
 fi
 
 # timeout
 if [ -n "${TIMEOUT:-}" ]; then
-  args=("${args[@]}" "--timeout=$TIMEOUT")
+  args+=("--timeout=$TIMEOUT")
 fi
 
 # archive-dir
 if [ -n "${ARCHIVE_DIR:-}" ]; then
-  args=("${args[@]}" "--archive-dir=$ARCHIVE_DIR")
+  args+=("--archive-dir=$ARCHIVE_DIR")
 fi
 
 # tempdir
 if [ -n "${TEMP_DIR:-}" ]; then
-  args=("${args[@]}" "--tempdir=$TEMP_DIR")
+  args+=("--tempdir=$TEMP_DIR")
 fi
 
 # log-file
 if [ -n "${LOGFILE:-}" ]; then
-  args=("${args[@]}" "--log-file=$LOGFILE")
+  args+=("--log-file=$LOGFILE")
 fi
 
 # name
 if [ -n "${NAME:-}" ]; then
-  args=("${args[@]}" "--name=$NAME")
+  args+=("--name=$NAME")
 fi
 
 # ----------------------------------------------------------------
@@ -301,7 +312,7 @@ cleanup)
     command=(remove-older-than "$REMOVE_OLDER_THAN" --force)
     run "$DUPLICITY" "${command[@]}" "${args[@]}" -- "$DESTINATION_URI"
   fi
-  if [ -n "$REMOVE_ALL_INC_OF_BUT_N_FULL" ]; then # only if defined
+  if [ -n "${REMOVE_ALL_INC_OF_BUT_N_FULL:-}" ]; then # only if defined
     log
     log "Removing all incremental backups except for $REMOVE_ALL_INC_OF_BUT_N_FULL of full at $DESTINATION_URI"
     command=(remove-all-inc-of-but-n-full "$REMOVE_ALL_INC_OF_BUT_N_FULL" --force)
@@ -312,6 +323,28 @@ status)
   command=(collection-status)
   run "$DUPLICITY" "${command[@]}" "${args[@]}" -- "$DESTINATION_URI"
   exit 0 # Don't verify the backup
+  ;;
+print)
+  # Note: Don't change these headers!
+  # Note: The format should always be '%s: %s'
+  # Note: This should be human readable, but also should be script compatible
+  # Note: Parse these with `grep '^Name: ' | sed 's/^Name: \(.*\)/\1/'`
+  log "Name: ${NAME:-}"
+  log "Backup location: ${DESTINATION_URI:-}"
+  log "Source location: ${SOURCE_DIR:-}"
+  log "Archive location: ${ARCHIVE_DIR:-}"
+  log "Tmp location: ${TEMP_DIR:-}"
+  log "Log file: ${LOGFILE:-}"
+  log "Duplicity executable: ${DUPLICITY:-}"
+  log "Verbosity: ${VERBOSITY:-}"
+  log "Encryption type: ${ENCRYPTION_TYPE:-}"
+  log "Volume size: ${VOLSIZE:-}"
+  log "Full if older than: ${FULL_IF_OLDER:-}"
+  log "Timeout: ${TIMEOUT:-}"
+  # One option per line
+  # This *must* be last beause the number of lines is unknown
+  log "Duplicity Options:" "${args[@]}"
+  exit 0
   ;;
 *) abort "Unknown mode '$mode'. This is most likely a bug." 3 ;;
 esac
