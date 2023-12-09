@@ -3,7 +3,28 @@
 shopt -s nullglob dotglob globstar
 set -euC -o pipefail
 
-template_parent_dir="$HOME/code"
+template_parent_dir=("$HOME/code" "$HOME/Templates")
+# joins arguments by first argument.
+# Usage: join "|" a b c "d e" -> "a|b|c|d e"
+function join() {
+  local sep="${1:-}" ret="${2:-}"
+  if ! shift 2; then return 0; fi
+  printf "%s" "$ret" "${@/#/$sep}" || true
+}
+function debug() { if [ -n "${DEBUG:-}" ]; then printf 'DEBUG: %s\n' "$@" >&2 || true; fi; }
+function err() { printf '%s\n' "$@" >&2 || true; }
+function log() { printf '%s\n' "$@" || true; }
+function abort() {
+  err "$1"
+  exit "${2:-1}"
+}
+# Return the path of each command passed
+function cmdpath() {
+  local c && for c in "$@"; do
+    command -v -- "$c" 2>/dev/null || printf '\n'
+  done
+}
+function _cleanup() { [ -z "${tmp:-}" ] || rm -rf "$tmp" && trap '' EXIT; }
 function usage() {
   THIS=$(basename "$0")
   cat <<EOF
@@ -11,8 +32,11 @@ Usage: $THIS [LANG] [--] <DIR>...
 Creates a new project in the given language. 
 
 First checks for new-LANG command ('/' replaced with '_'), if found, pass DIRs and exit
-Second checks for a file $template_parent_dir/LANG/template, if found, pass DIRs and exit
-Third checks for a directory $template_parent_dir/LANG/template, if found, copy to DIRs and continue
+Second checks each of the following directories for a file at /LANG/template:
+$(join ', ' "${template_parent_dir[@]}") 
+if it finds a file, it will pass DIRs and exit
+if it finds a directory, it will copy it to each DIR and continue with the below process
+else, outputs an error message and exits
 
 For each DIR, a series of variable expansions are applied to the filenames and contents of all files and directories contained
 Variables:
@@ -36,24 +60,6 @@ OPTIONS:
 EOF
   return 0
 }
-function debug() { if [ -n "${DEBUG:-}" ]; then printf 'DEBUG: %s\n' "$@" >&2 || true; fi; }
-function err() { printf '%s\n' "$@" >&2 || true; }
-function log() { printf '%s\n' "$@" || true; }
-function abort() {
-  err "$1"
-  exit "${2:-1}"
-}
-# Return the path of each command passed
-function cmdpath() {
-  local c && for c in "$@"; do
-    command -v -- "$c" 2>/dev/null || printf '\n'
-  done
-}
-function joinByChar() {
-  local IFS="$1" && shift
-  printf '%s' "$*"
-}
-function _cleanup() { [ -z "${tmp:-}" ] || rm -rf "$tmp" && trap '' EXIT; }
 # usage: substitute file "$dest" <file >file.new && mv file.new file
 # This evaluates shell expansion patterns (ie. $ENV/${ENV} -> value_of_ENV)
 # Use \$ENV or \${ENV} to escape them
@@ -87,7 +93,7 @@ function substitute() {
   }
 
   # env_pattern='([A-Z][A-Z_0-9]*)' # only match capital variables!
-  env_pattern="($(joinByChar '|' "${envs[@]}"))" # only match the given variables!
+  env_pattern="($(join '|' "${envs[@]}"))" # only match the given variables!
 
   perl -pe 's;(\\*)(\$'"$env_pattern"'|\$\{'"$env_pattern"'\});substr($1,0,int(length($1)/2)).(length($1)%2?$2:$ENV{$3||$4});eg' # Source: https://stackoverflow.com/a/25019138
 }
@@ -172,7 +178,11 @@ lang=${lang%/} # remove trailing slash if present
 lang=${lang#/} # remove leading slash if present
 # find the template directory -- not given, and lang *was*
 if [ -z "$template" ] && [ -n "$lang" ]; then
-  template="$template_parent_dir/$lang/template"
+  for dir in "${template_parent_dir[@]}"; do
+    template="$dir/$lang/template"
+    # Note: this check may have false positives, but I don't care.
+    ! [ -e "$template" ] || break
+  done
 fi
 
 # if [ "$#" -eq 0 ]; then set -- new; fi # default to 'new' if no arguments given
@@ -187,7 +197,7 @@ if [ -f "$template" ]; then
   [ -x "$template" ] || abort "'$template' is not executable! Aborting!" 1
   exec -- "$template" "$@"
 elif ! [ -d "$template" ]; then
-  abort "Could not find template directory '$template'. Aborting!" 1
+  abort "Could not find template '$template'. Aborting!" 1
 fi
 log "Using template directory '$template'"
 

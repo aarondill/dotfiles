@@ -7,6 +7,7 @@
 #
 
 set -euC -o pipefail
+shopt -s nullglob globstar # Better globs
 
 THIS="script_utils.sh"
 function usage() {
@@ -24,12 +25,28 @@ Options:
 -s, --short       enable short
 EOF
 }
-
-function log() { printf '%s\n' "$@"; }
-function err() { printf "${THIS:+$THIS: }%s\n" "$@" >&2; }
-function abort() {
-  err "$1"
-  exit "${2:-1}"
+# joins arguments by first argument.
+# Usage: join "|" a b c "d e" -> "a|b|c|d e"
+function join() {
+  local sep="${1:-}" ret="${2:-}"
+  if ! shift 2; then return 0; fi
+  printf "%s" "$ret" "${@/#/$sep}" || true
+}
+# Outputs only if $DEBUG is set
+function debug() { [ -z "${DEBUG:-}" ] || printf 'DEBUG: %s\n' "$@" >&2 || true; }
+function log() { printf '%s\n' "$@" || true; }
+function err() { printf "%s\n" "$@" >&2 || true; }
+function abort() { err "$1" && exit "${2:-1}"; }
+# Return the path of each command passed
+function cmdpath() {
+  local c && for c in "$@"; do
+    command -v -- "$c" 2>/dev/null || printf '\n' || true
+  done
+}
+function has_cmd() {
+  local c && for c in "$@"; do
+    command -v -- "$c" 2>/dev/null || return "$?"
+  done
 }
 # use like '"${sudo[@]}" do_something'
 # shellcheck disable=SC2206 # Splitting is intentional.
