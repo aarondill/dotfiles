@@ -124,3 +124,5 @@
   hdiff = alias-wrapper hdiff
 	cleanup = alias-wrapper cleanup
 	rg = grep
+[safe]
+	directory = /home/aaron/code/repos/sigil
