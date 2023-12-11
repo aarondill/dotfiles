@@ -45,7 +45,7 @@ function cmdpath() {
 }
 function has_cmd() {
   local c && for c in "$@"; do
-    command -v -- "$c" 2>/dev/null || return "$?"
+    command -v -- "$c" &>/dev/null || return "$?"
   done
 }
 # use like '"${sudo[@]}" do_something'

@@ -1,11 +1,37 @@
 #!/usr/bin/env bash
+set -euC -o pipefail
+log() { printf '%s\n' "$@" || true; }
+err() { printf "%s\n" "$@" >&2 || true; }
+abort() { err "$1" && exit "${2:-1}"; }
+has_cmd() {
+  local c && for c in "$@"; do
+    command -v -- "$c" &>/dev/null || return "$?"
+  done
+}
+
+# Outputs the most $2 recently modified files in directory $1
 get_latest() {
   local dir="${1:-.}" num=${2:-1}
-  find "$dir" -mindepth 1 -maxdepth 1 -type f -printf "%T@ %p\n" | sort -n | cut -d' ' -f 2- | tail -n "$num"
-
+  find "$dir" -mindepth 1 -maxdepth 1 -printf "%T@ %p\n" | sort -n | cut -d' ' -f 2- | tail -n "$num"
 }
-dest="${1:-.}"
-latest="$(get_latest ~/Downloads/)"
+
+dest='' && case "${1:-}" in
+--) dest="${2:-.}" ;;
+--help) log "Usage: ${0##*/} DEST" && exit 0 ;;
+*) dest="${1:-.}" ;;
+esac
+
+downloads="${XDG_DOWNLOAD_DIR:-}" # Check the environment
+# Use xdg-user-dir if available
+if [ -z "$downloads" ] && has_cmd xdg-user-dir; then
+  downloads="$(xdg-user-dir "DOWNLOAD" 2>/dev/null)"
+fi
+downloads="${downloads:-~/Downloads/}" # We still haven't found something? use ~/Downloads/
+if [ -z "$downloads" ]; then
+  abort "Could not find downloads directory! Set \$XDG_DOWNLOAD_DIR or configure xdg-user-dir!" 1
+fi
+
+latest="$(get_latest "$downloads")"
 printf '%s\n' "Copying '$latest' to '$dest'"
 # cp -Pp -R is posix for cp --archive
-cp -pP -i -- "$latest" "$dest"
+cp -pP -R -i -- "$latest" "$dest"
