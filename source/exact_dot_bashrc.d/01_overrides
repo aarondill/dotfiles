@@ -36,15 +36,17 @@ rmdir=( # These will only be removed if empty
   ~/.cups
 )
 function _rm_files() (
+  local f
   cd ~ || return # subshell!
   for f in "${rm_rf[@]}"; do
     [ -e "$f" ] || [ -L "$f" ] || continue # the file exists? or is a link?
     rm -rf -- "$f" 2>/dev/null
   done
   for f in "${rmdir[@]}"; do
-    [ -e "$f" ] || [ -L "$f" ] || continue # the file exists? or is a link?
+    [ -e "$f" ] || [ -L "$f" ] || continue         # the file exists? or is a link?
+    [ -z "$(fuser "$f" 2>/dev/null)" ] || continue # is a process using this file? (A shell open here?)
     rmdir -- "$f" 2>/dev/null
   done
 )
 _rm_files
-unset f rm_rf rmdir _rm_files
+unset rm_rf rmdir _rm_files
