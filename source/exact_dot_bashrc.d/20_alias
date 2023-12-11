@@ -28,6 +28,8 @@ alias rdt='ripdrag -ktr'
 alias dd="dd status=progress"
 # Ask before overwriting
 alias mv="mv -i"
+# Note: only works for simple moves.
+unmv() { mv -i "$2" "$1"; }
 alias cp="cp -ai"
 alias rm="rm --preserve-root"
 # Save history on exit
