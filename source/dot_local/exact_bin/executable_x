@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+set -euC -o pipefail
+function log() { printf '%s\n' "$@" || true; }
+function err() { printf "%s\n" "$@" >&2 || true; }
+function abort() { err "$1" && exit "${2:-1}"; }
+# extract archives. should handle multiple files.
+function x() {
+  local archive
+  for archive; do
+    case "$archive" in
+    '') err "Refusing to extract empty string" ;;
+    *.tar.bz2) tar -xvjf "$archive" ;;
+    *.tar.gz) tar -xvzf "$archive" ;;
+    *.bz2) bunzip2 "$archive" ;;
+    *.rar) unrar x "$archive" ;;
+    *.gz) gunzip "$archive" ;;
+    *.tar) tar xf "$archive" ;;
+    *.tbz2) tar -xvjf "$archive" ;;
+    *.tgz) tar -xvzf "$archive" ;;
+    *.zip) unzip "$archive" ;;
+    *.xpi) unzip "$archive" ;;
+    *.Z) uncompress "$archive" ;;
+    *.7z) 7z x "$archive" ;;
+    *.ace) unace e "$archive" ;;
+    *.arj) arj -y e "$archive" ;;
+    *) err "'$archive' cannot be extracted via ${FUNCNAME[0]}: unrecognized archive format" ;;
+    esac
+  done
+}
+
+if [ "$0" = "${BASH_SOURCE[0]}" ]; then
+  x "$@"
+fi

@@ -27,4 +27,4 @@ function compush() { # Commit and push to git
       git push
   fi
 }
-alias gitroot='cd $(git rev-parse --show-toplevel)'
+alias gitroot='cd "$(git rev-parse --show-toplevel)"'
