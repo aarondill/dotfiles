@@ -23,10 +23,14 @@ function _age_displaytime {
 function age() {
   local file
   for file; do
+    [ -L "$file" ] || [ -f "$file" ] || {
+      printf "%s\n" "${FUNCNAME[0]}: cannot stat '$file': No such file or directory" >&2
+      continue
+    }
     local current=$(date +%s)
-    local birthdate=$(stat -t "$file" -c "%W")
-    local access_date=$(stat -t "$file" -c "%X")
-    local mod_date=$(stat -t "$file" -c "%Y")
+    local birthdate=$(stat -c "%W" -- "$file")
+    local access_date=$(stat -c "%X" -- "$file")
+    local mod_date=$(stat -c "%Y" -- "$file")
     local since_birth=$(("$current" - "$birthdate"))
     local since_access=$(("$current" - "$access_date"))
     local since_mod=$(("$current" - "$mod_date"))
