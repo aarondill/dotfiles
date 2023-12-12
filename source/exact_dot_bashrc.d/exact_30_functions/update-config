@@ -21,11 +21,13 @@ function update-config() (
     crontab -l >|~/.config/crontab
   fi
 
-  # Finds files line-by-line, ignoring the first 3 lines
-  readarray -t lines <<<"$(tail -n+4 -- ~/.bashrc.d/30_functions/_update-config)"
+  # Finds files line-by-line
+  readarray -t lines <~/.bashrc.d/30_functions/_update-config
   files=()
   dirs=()
   for file in "${lines[@]}"; do
+    [ "${file:0:1}" != "#" ] || continue      # ignore lines starting with #
+    [ -n "$file" ] || continue                # ignore empty lines
     if [ -f "$file" ] || [ -L "$file" ]; then # -L tests for dangling symlink / directory link which should be added as a file
       files+=("$file")
     elif [ -d "$file" ]; then
