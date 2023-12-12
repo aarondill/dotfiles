@@ -9,20 +9,15 @@
 set -euC -o pipefail
 shopt -s nullglob globstar # Better globs
 
-THIS="script_utils.sh"
+THIS="$0"
 function usage() {
-  cat <<EOF || return 0
+  cat <<-EOF || return 0
 $THIS [options] [--] [arguments]
                   
-This does SOMETHING
-the environment variable \`SUDO\` can be set to use a different
-program for root elevation. It will be split by the shell, so
-spaces in the program name will likely be mutilited.
+This does SOMETHING. The program using this script should set it's own usage message by overriding the usage function!
 
 Options:
 -h, --help        show this message
--l, --long=long   do something with \$long
--s, --short       enable short
 EOF
 }
 # joins arguments by first argument.
@@ -36,6 +31,7 @@ function join() {
 function debug() { [ -z "${DEBUG:-}" ] || printf 'DEBUG: %s\n' "$@" >&2 || true; }
 function log() { printf '%s\n' "$@" || true; }
 function err() { printf "%s\n" "$@" >&2 || true; }
+# Usage: abort message [code]
 function abort() { err "$1" && exit "${2:-1}"; }
 # Return the path of each command passed
 function cmdpath() {
@@ -48,10 +44,14 @@ function has_cmd() {
     command -v -- "$c" &>/dev/null || return "$?"
   done
 }
-# use like '"${sudo[@]}" do_something'
-# shellcheck disable=SC2206 # Splitting is intentional.
-sudo=(${SUDO:-sudo})
-[ "$(id -u)" -eq 0 ] && sudo=()
+# Use in place of sudo. sudo ls -> sudo_cmd ls
+function sudo_cmd() {
+  local sudo=()
+  if [ "$(id -u)" -ne 0 ]; then # non-root, read in sudo from $SUDO
+    read -ra sudo -d '' <<<"${SUDO:-sudo}" || true
+  fi
+  "${sudo[@]}" "$@"
+}
 
 # Returns a string that should be 'eval'ed to set the positional arguments
 # Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
@@ -66,6 +66,7 @@ function parse_args() {
   printf '%s' "set -- $parsed" # output getopt’s output this way to handle the quoting right
 }
 
+# If this file is being sourced, stop now!
 if [ "$0" != "${BASH_SOURCE[0]}" ]; then return 0; fi
 
 # option --long/-l requires 1 argument
