@@ -66,6 +66,8 @@ function parse_args() {
   printf '%s' "set -- $parsed" # output getopt’s output this way to handle the quoting right
 }
 
+if [ "$0" != "${BASH_SOURCE[0]}" ]; then return 0; fi
+
 # option --long/-l requires 1 argument
 LONGOPTS="help,short,long:" SHORTOPTS="h,s,l:"
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
@@ -80,4 +82,6 @@ while true; do
   esac
 done
 # handle non-option arguments
-if [[ "$#" -eq 0 ]]; then abort "POS_ARGUMENT is required" 2; fi
+if [ "$#" -eq 0 ]; then abort "POS_ARGUMENT is required" 2; fi
+log "short=$short"
+log "long=$long"

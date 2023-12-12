@@ -68,7 +68,7 @@ EOF
 function substitute() {
   local path="$1" dest="$2"
   local env_pattern
-  if [ -z "$path" ]; then abort "substitute requires a filepath!" 2; fi
+  if [ -z "$path" ]; then abort "${FUNCNAME[0]} requires a filepath!" 2; fi
   local envs=(
     DATE TIME FILEPATH DIRNAME REALPATH FILENAME EXTENSION BASENAME ROOT
     date time filepath dirname realpath filename extension basename root

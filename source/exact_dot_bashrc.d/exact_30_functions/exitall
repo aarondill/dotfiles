@@ -26,9 +26,9 @@ function exit() { exitall "$@"; }
 function exitall() {
   local exit_code=$?
   # if exitall called directly, or passed 'all'
-  if caller 0 &>/dev/null || [ "${1,,}" != "all" ]; then
-    builtin exit 196
-  fi                            # code to close recursively
+  if ! caller 0 &>/dev/null || [ "${1,,}" == "all" ]; then
+    builtin exit 196 # code to close recursively
+  fi
   (builtin exit "$exit_code")   # preserve exit code if none provided
   builtin exit "$@" 2>/dev/null # passthrough argument to exit
 }
