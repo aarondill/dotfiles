@@ -1,32 +1,74 @@
 #!/usr/bin/env bash
+export BASH_TPL_TAG_DELIMS='{{ }}'
+export BASH_TPL_TAG_STMT_DELIM=
+export BASH_TPL_STMT_DELIM="#@"
+export BASH_TPL_STMT_BLOCK_DELIMS=
+export BASH_TPL_TEXT_DELIM=
+export BASH_TPL_DIR_DELIM=":"
+export BASH_TPL_CMT_DELIM="%#"
+
 # don't match -> empty string. Include dotfiles. Allow double star
 shopt -s nullglob dotglob globstar
 set -euC -o pipefail
+# Find the current file and it's directory
+# Source: https://stackoverflow.com/a/246128
+SOURCE="${BASH_SOURCE[0]:-}" DIR=''
+while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$(builtin cd -P -- "$(command dirname -- "$SOURCE")" &>/dev/null && builtin pwd)" || true
+  SOURCE="$(command readlink -- "$SOURCE")" || true
+  [[ "$SOURCE" == /* ]] || SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+DIR="$(builtin cd -P -- "$(command dirname -- "$SOURCE")" &>/dev/null && builtin pwd)" || true
+DIR="${DIR:-"$PWD"}"
+utils="$DIR/script_utils.sh"
+[ -f "$utils" ] || utils="$(basename -- "$utils")" || true # If utils is not a file, search for it in "$PATH" instead.
+# shellcheck source=./script_utils.sh
+. "$utils"             # Note: this may error. I can't use it in a conditional or bashls fails.
+[ "$?" -eq 0 ] || exit # set -e means that this line should be irrelevant, but just in case.
 
 template_parent_dir=("$HOME/code" "$HOME/Templates")
-# joins arguments by first argument.
-# Usage: join "|" a b c "d e" -> "a|b|c|d e"
-function join() {
-  local sep="${1:-}" ret="${2:-}"
-  if ! shift 2; then return 0; fi
-  printf "%s" "$ret" "${@/#/$sep}" || true
-}
-function debug() { if [ -n "${DEBUG:-}" ]; then printf 'DEBUG: %s\n' "$@" >&2 || true; fi; }
-function err() { printf '%s\n' "$@" >&2 || true; }
-function log() { printf '%s\n' "$@" || true; }
-function abort() {
-  err "$1"
-  exit "${2:-1}"
-}
-# Return the path of each command passed
-function cmdpath() {
-  local c && for c in "$@"; do
-    command -v -- "$c" 2>/dev/null || printf '\n'
-  done
-}
-function _cleanup() { [ -z "${tmp:-}" ] || rm -rf "$tmp" && trap '' EXIT; }
+
+BASH_TPL=$(cmdpath bash-tpl 2>/dev/null) || true
+function get_bash_tpl() {
+  ! [ -x "$BASH_TPL" ] || return 0
+  err "could not find bash-tpl!"
+  # outputs to stderr
+  select choice in "install" "use perl" "install to temp file" "abort"; do
+    case "$choice" in
+    "install")
+      dest=/usr/local/bin/bash-tpl
+      sudo_cmd true
+      download 'https://github.com/TekWizely/bash-tpl/releases/latest/download/bash-tpl' | sudo_cmd tee "$dest" >/dev/null
+      sudo_cmd chmod +x "$dest"
+      BASH_TPL="$dest"
+      return 0
+      ;;
+    "use perl")
+      err "Using perl to do substitutions. Note that this does *not* support most shell expansions and will almost definitely result in incorrect output."
+      sleep 1
+      BASH_TPL=''
+      return 1
+      ;;
+    "install to temp file")
+      dest=$(mktemp)
+      add_tmpfile "$dest"
+      err "Downloading bash-tpl to '$dest'..."
+      download 'https://github.com/TekWizely/bash-tpl/releases/latest/download/bash-tpl' >"$dest"
+      chmod +x "$dest"
+      BASH_TPL="$dest"
+      return 0
+      ;;
+    abort) abort "Aborting" 1 ;;
+    '') ;; # ignore the empty string
+    *) abort "Unknown choice: $choice. This is a bug!" 3 ;;
+    esac
+    [ -z "$choice" ] || break
+  done </dev/tty 2>/dev/tty
+  return 1
+} && get_bash_tpl
+
+THIS=${SOURCE:-$(basename -- "$0")}
 function usage() {
-  THIS=$(basename "$0")
   cat <<EOF
 Usage: $THIS [LANG] [--] <DIR>...
 Creates a new project in the given language. 
@@ -60,6 +102,7 @@ OPTIONS:
 EOF
   return 0
 }
+
 # usage: substitute file "$dest" <file >file.new && mv file.new file
 # This evaluates shell expansion patterns (ie. $ENV/${ENV} -> value_of_ENV)
 # Use \$ENV or \${ENV} to escape them
@@ -92,10 +135,15 @@ function substitute() {
     root=${ROOT,,} date=${DATE,,} time=${TIME,,}
   }
 
-  # env_pattern='([A-Z][A-Z_0-9]*)' # only match capital variables!
-  env_pattern="($(join '|' "${envs[@]}"))" # only match the given variables!
-
-  perl -pe 's;(\\*)(\$'"$env_pattern"'|\$\{'"$env_pattern"'\});substr($1,0,int(length($1)/2)).(length($1)%2?$2:$ENV{$3||$4});eg' # Source: https://stackoverflow.com/a/25019138
+  if [ -x "${BASH_TPL:-}" ]; then
+    debug "Using bash-tpl ($BASH_TPL) to substitute values in $path"
+    "$BASH_TPL" | bash
+  else
+    debug "Using perl to substitute variables in $path"
+    # env_pattern='([A-Z][A-Z_0-9]*)' # only match capital variables!
+    env_pattern="($(join '|' "${envs[@]}"))"                                                                                       # only match the given variables!
+    perl -pe 's;(\\*)(\$'"$env_pattern"'|\$\{'"$env_pattern"'\});substr($1,0,int(length($1)/2)).(length($1)%2?$2:$ENV{$3||$4});eg' # Source: https://stackoverflow.com/a/25019138
+  fi
 }
 # usage: for f in "$dest"/*; do handle_file_sub "$f"; done
 # Handles substitutions in filenames and contents recursively
@@ -107,7 +155,8 @@ function handle_file_sub() {
   debug "handling $f"
   # handle filename replacements
   filename=$(basename -- "$f") dir=$(dirname -- "$f")
-  newname=$(substitute "$f" "$dest" <<<"$filename") # Note: FILEPATH,REALPATH,FILENAME,EXTENSION,BASENAME are relatively useless here
+  # Note: FILEPATH,REALPATH,FILENAME,EXTENSION,BASENAME are relatively useless here
+  newname=$(substitute "$f" "$dest" <<<"$filename") || abort "Error while handling file: $f" "$?"
   case "$newname" in
   "$filename") ;; # ignore if same
   */../* | ../* | */..) err "Disallowed directory traversal: '$newname'. Skipping." ;;
@@ -125,23 +174,11 @@ function handle_file_sub() {
   elif ! [ -L "$f" ] && [ -f "$f" ]; then # Don't write to links
     debug "handle file $f"
     # shellcheck disable=SC2094 # substitute doesn't output to a file
-    substitute "$f" "$dest" <"$f" >|"$tmp"                     # Write to tmp file to avoid loosing data (https://www.shellcheck.net/wiki/SC2094)
+    # Write to tmp file to avoid loosing data (https://www.shellcheck.net/wiki/SC2094)
+    substitute "$f" "$dest" <"$f" >|"$tmp" || abort "Error while handling file: $f" "$?"
     cp -p --attributes-only -- "$f" "$tmp" 2>/dev/null || true # save the attributes from the original file (if possible)
     mv -f -- "$tmp" "$f"                                       # overwrite existing file
   fi
-}
-
-# Returns a string that should be 'eval'ed to set the positional arguments
-# Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
-# Input: $LONGOPTS,$SHORTOPTS
-# eval "$(parse_args "$@")"
-function parse_args() {
-  local parsed
-  local code=0 && getopt --test &>/dev/null || code=$?
-  if [ "$code" -ne 4 ]; then abort "Enhanced getopt is required for this script to work. Please install it." 1; fi
-  parsed=$(getopt --options="$SHORTOPTS" --longoptions="$LONGOPTS" --name "${THIS:-$0}" -- "$@") ||
-    exit 2                     # getopt has already complained about wrong arguments to stdout - Exit script
-  printf '%s' "set -- $parsed" # output getopt’s output this way to handle the quoting right
 }
 
 LONGOPTS=help,debug,lang:,template: SHORTOPTS=h,d,l:,t:
@@ -172,8 +209,8 @@ if [ -z "$template" ] && [ -z "$lang" ]; then
   shift &>/dev/null || true # remove lang from arguments
   # ;;
   # esac
-  [ -z "$lang" ] && abort "Language is required. Please pass it using -l or the first argument" 2
 fi
+[ -n "$lang" ] || abort "Language is required. Please pass it using -l or the first argument" 2
 lang=${lang%/} # remove trailing slash if present
 lang=${lang#/} # remove leading slash if present
 # find the template directory -- not given, and lang *was*
@@ -188,8 +225,8 @@ fi
 # if [ "$#" -eq 0 ]; then set -- new; fi # default to 'new' if no arguments given
 if [ "$#" -eq 0 ]; then abort 'DIR is required' 2; fi
 
-cmd=$(cmdpath "new-${lang//\//_}")             # replace slashes with underscores
-if [ -x "$cmd" ]; then exec -- "$cmd" "$@"; fi # new-$lang command
+cmdpath=$(cmdpath "new-${lang//\//_}") || true         # replace slashes with underscores
+if [ -x "$cmdpath" ]; then exec -- "$cmdpath" "$@"; fi # new-$lang command
 
 # Doesn't exist. Warn the user! Empty string will be caught by `! -d`
 if [ -f "$template" ]; then
@@ -201,10 +238,9 @@ elif ! [ -d "$template" ]; then
 fi
 log "Using template directory '$template'"
 
-template=${template%/}                  # remove trailing slash
-if [ "$#" -gt 0 ]; then                 # Don't create a tempdir if we aren't going to loop
-  tmp="$(mktemp)" && trap _cleanup EXIT # use one file for all loops
-fi
+template=${template%/}            # remove trailing slash
+[ "$#" -eq 0 ] || tmp="$(mktemp)" # use one file for all loops
+add_tmpfile "$tmp"
 for dest in "$@"; do
   dest=${dest%/} # remove trailing slash
   if [ -z "$dest" ]; then err "refusing to create empty named directory!" && continue; fi
@@ -216,9 +252,7 @@ for dest in "$@"; do
   cp -ri -- "$template/" "$dest"      # Copy the template directory - Note: The trailing slash is important to copy the target if it's a symlink
 
   # These are dynamically used later
-  export DATE=$(date '+%m/%d/%Y') TIME=$(date '+%H:%M')
+  DATE=$(date '+%m/%d/%Y') TIME=$(date '+%H:%M')
 
   for f in "$dest"/*; do handle_file_sub "$f" "$dest"; done
 done
-
-_cleanup # Explicitly cleanup if this is reached

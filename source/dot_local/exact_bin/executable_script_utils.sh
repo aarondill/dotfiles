@@ -9,6 +9,25 @@
 set -euC -o pipefail
 shopt -s nullglob globstar # Better globs
 
+# Include this section in any scripts that intend to import this utility module.
+if false; then
+  # Find the current file and it's directory
+  # Source: https://stackoverflow.com/a/246128
+  SOURCE="${BASH_SOURCE[0]:-}" DIR=''
+  while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+    DIR="$(builtin cd -P -- "$(command dirname -- "$SOURCE")" &>/dev/null && builtin pwd)" || true
+    SOURCE="$(command readlink -- "$SOURCE")" || true
+    [[ "$SOURCE" == /* ]] || SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+  done
+  DIR="$(builtin cd -P -- "$(command dirname -- "$SOURCE")" &>/dev/null && builtin pwd)" || true
+  DIR="${DIR:-"$PWD"}"
+  utils="$DIR/script_utils.sh"
+  [ -f "$utils" ] || utils="$(basename -- "$utils")" || true # If utils is not a file, search for it in "$PATH" instead.
+  # shellcheck source=./script_utils.sh
+  . "$utils"             # Note: this may error. I can't use it in a conditional or bashls fails.
+  [ "$?" -eq 0 ] || exit # set -e means that this line should be irrelevant, but just in case.
+fi
+
 THIS="$0"
 function usage() {
   cat <<-EOF || return 0
@@ -31,18 +50,30 @@ function join() {
 function debug() { [ -z "${DEBUG:-}" ] || printf 'DEBUG: %s\n' "$@" >&2 || true; }
 function log() { printf '%s\n' "$@" || true; }
 function err() { printf "%s\n" "$@" >&2 || true; }
+
 # Usage: abort message [code]
 function abort() { err "$1" && exit "${2:-1}"; }
-# Return the path of each command passed
+# Return the path of each command passed, if found
 function cmdpath() {
+  local e=0
   local c && for c in "$@"; do
-    command -v -- "$c" 2>/dev/null || printf '\n' || true
+    command -v -- "$c" || e="$?"
   done
+  return "$e"
 }
 function has_cmd() {
   local c && for c in "$@"; do
     command -v -- "$c" &>/dev/null || return "$?"
   done
+}
+# Returns the first executable command found
+function first_cmd() {
+  local c && for c in "$@"; do
+    has_cmd "$c" || continue
+    printf "%s" "$c" || true
+    return 0
+  done
+  return 1 # None found
 }
 # Use in place of sudo. sudo ls -> sudo_cmd ls
 function sudo_cmd() {
@@ -51,6 +82,62 @@ function sudo_cmd() {
     read -ra sudo -d '' <<<"${SUDO:-sudo}" || true
   fi
   "${sudo[@]}" "$@"
+}
+
+tmpfiles=()
+# Cleans up the tmp files. If _cleanup is defined, calls it with the same arguments
+# Usage: cleanup [files...]
+# If no files are specified, cleans up all files in "${tmpfiles[@]}"
+function cleanup() {
+  local files=("${tmpfiles[@]}")
+  [ $? -eq 0 ] || files=("$@") # If arguments are given, clean up *only* those
+  if command -v _cleanup; then _cleanup "$@"; fi
+  if [ "${#tmpfiles[@]}" -eq 0 ]; then return 0; fi
+  local tmp && for tmp in "${files[@]}"; do
+    rm -Rf -- "$tmp"
+  done
+}
+# Adds a temporary file to the list of files to cleanup
+# Note: traps the EXIT signal!
+function add_tmpfile() {
+  tmpfiles+=("$@")
+  trap 'cleanup' EXIT
+}
+
+# download -p <URL> [output] outputs to stdout if output is not specified
+# if -p is passed, the command will output progress information to stderr.
+# This is for the user, not to parse.
+# this should output *only* the contents and should follow redirects.
+function download() {
+  local progress=0 cmd=()
+  local non_options=()
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+    "-p") progress=1 ;;
+    --) non_options+=("${@:2}") && break ;;
+    -?*) abort "Unknown option: $1" ;;
+    *) non_options+=("$1") ;;
+    esac
+    shift
+  done
+  set -- "${non_options[@]}"
+
+  local url="${1:-}" output="${2:-}"
+  [ -n "$url" ] || abort "'download' requires a URL argument." 1
+  case "$(first_cmd curl wget)" in
+  curl)
+    cmd=(curl -SfL -o "${output:-"-"}")
+    [ "$progress" -eq 1 ] || cmd+=(-s)
+    ;;
+  wget)
+    cmd=(wget -O "${output:-"-"}")
+    [ "$progress" -eq 1 ] || cmd+=(-q)
+    ;;
+  *) abort "'download' requires 'curl' or 'wget'." 1 ;;
+  esac
+  cmd+=(-- "$url")
+
+  "${cmd[@]}"
 }
 
 # Returns a string that should be 'eval'ed to set the positional arguments
