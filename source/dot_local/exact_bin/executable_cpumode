@@ -60,7 +60,10 @@ EOF
 quiet=0
 
 # note: respects quiet!=0
-function log() { { [ "$quiet" = 0 ] && printf '%s\n' "$@"; } || true; }
+function log() {
+  if [ "$quiet" != 0 ]; then return; fi
+  printf '%s\n' "$@" || true
+}
 function err() { printf "%s\n" "$@" >&2 || true; }
 function abort() { err "$1" && exit "${2:-1}"; }
 # use like `"${sudo[@]}" do_something`
@@ -85,7 +88,6 @@ LONGOPTS=help,available,current,handle-completion-options,quiet SHORTOPTS=h,a,c,
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 
 print_only=''
-quiet=1
 while true; do
   case "$1" in
   -h | --help) usage && exit 0 ;;
@@ -119,7 +121,8 @@ if ! [ -f "$AVAIL_PATH" ] || ! [ -f "$CURRENT_PATH" ]; then
 fi
 
 function show_output() {
-  local current="$(cat "$CURRENT_PATH")"
+  local current
+  current="$(cat "$CURRENT_PATH")"
   case "$print_only" in
   '')
     log "available options: $avail_options"
