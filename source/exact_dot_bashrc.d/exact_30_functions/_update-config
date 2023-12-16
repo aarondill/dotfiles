@@ -74,3 +74,4 @@ code/java/template
 code/js/.gitignore
 code/js/EslintTests.js
 code/repos/.awesome-scripts
+.config/autorandr
