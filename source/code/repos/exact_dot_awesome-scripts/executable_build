@@ -28,6 +28,7 @@ install_deps() {                                                 # {{{ 1
   sudo=() && if [ "$(id -u)" -ne 0 ]; then sudo=(${SUDO:-sudo}); fi
 
   xargs -d$'\n' -r -a "$pkg_file" -- "${sudo[@]}" apt install --mark-auto
+  mkdir -p "$DEST/build"
   touch "$DEST/build/.has_installed_deps"
 } # }}}
 install_deps
@@ -38,4 +39,4 @@ export LUA_PATH='/usr/share/lua/5.3/?.lua;/usr/share/lua/5.3/?/init.lua;;'
 export LUA_CPATH='/usr/lib/x86_64-linux-gnu/lua/5.3/?.so;;'
 
 cd "$DEST"
-make CMAKE_ARGS="-DGENERATE_DOC:BOOLEAN=OFF -DAWESOME_DATA_PATH=$DEST/build/" "$@"
+make CMAKE_ARGS="-DGENERATE_DOC:BOOLEAN=OFF -DAWESOME_DATA_PATH=$DEST/build/ -DGENERATE_MANPAGES:BOOLEAN=OFF" "$@"
