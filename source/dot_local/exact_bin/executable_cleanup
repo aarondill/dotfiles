@@ -47,6 +47,10 @@ if has pnpm; then
   )
 fi
 if has bun; then
+  if [ -n "${BUN_INSTALL:-}" ]; then
+    mkdir -p "$BUN_INSTALL/install/global/"
+    touch "$BUN_INSTALL/install/global/package.json"
+  fi
   log "Cleaning bun cache"
   bun pm -g cache rm
 fi
