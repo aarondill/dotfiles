@@ -1,13 +1,20 @@
 #!/usr/bin/env bash
 set -euC -o pipefail
-log() { printf '%s\n' "$@" || true; }
-err() { printf "%s\n" "$@" >&2 || true; }
-abort() { err "$1" && exit "${2:-1}"; }
-has_cmd() {
-  local c && for c in "$@"; do
-    command -v -- "$c" &>/dev/null || return "$?"
-  done
-}
+# Find the current file and it's directory
+# Source: https://stackoverflow.com/a/246128
+SOURCE="${BASH_SOURCE[0]:-}" DIR=''
+while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$(builtin cd -P -- "$(command dirname -- "$SOURCE")" &>/dev/null && builtin pwd)" || true
+  SOURCE="$(command readlink -- "$SOURCE")" || true
+  [[ "$SOURCE" == /* ]] || SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+DIR="$(builtin cd -P -- "$(command dirname -- "$SOURCE")" &>/dev/null && builtin pwd)" || true
+DIR="${DIR:-"$PWD"}"
+utils="$DIR/script_utils.sh"
+[ -f "$utils" ] || utils="$(basename -- "$utils")" || true # If utils is not a file, search for it in "$PATH" instead.
+# shellcheck source=./script_utils.sh
+. "$utils"             # Note: this may error. I can't use it in a conditional or bashls fails.
+[ "$?" -eq 0 ] || exit # set -e means that this line should be irrelevant, but just in case.
 
 # Outputs the most $2 recently modified files in directory $1
 get_latest() {
@@ -15,6 +22,19 @@ get_latest() {
   find "$dir" -mindepth 1 -maxdepth 1 -printf "%T@ %p\n" | sort -n | cut -d' ' -f 2- | tail -n "$num"
 }
 
+# option --long/-l requires 1 argument
+LONGOPTS="help,remove" SHORTOPTS="h,r"
+ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
+
+remove=0
+while true; do
+  case "$1" in
+  -h | --help) usage && exit 0 ;;
+  -r | --remove) remove=1 && shift ;;
+  --) shift && break ;;
+  *) abort "This is a bug" 3 ;;
+  esac
+done
 dest='' && case "${1:-}" in
 --) dest="${2:-.}" ;;
 --help) log "Usage: ${0##*/} DEST" && exit 0 ;;
@@ -27,9 +47,7 @@ if [ -z "$downloads" ] && has_cmd xdg-user-dir; then
   downloads="$(xdg-user-dir "DOWNLOAD" 2>/dev/null)"
 fi
 downloads="${downloads:-~/Downloads/}" # We still haven't found something? use ~/Downloads/
-if [ -z "$downloads" ]; then
-  abort "Could not find downloads directory! Set \$XDG_DOWNLOAD_DIR or configure xdg-user-dir!" 1
-fi
+if [ -z "$downloads" ]; then abort "Could not find downloads directory! Set \$XDG_DOWNLOAD_DIR or configure xdg-user-dir!" 1; fi
 
 latest="$(get_latest "$downloads")"
 printf '%s\n' "Copying '$latest' to '$dest'"

@@ -104,6 +104,22 @@ function add_tmpfile() {
   trap 'cleanup' EXIT
 }
 
+function get_xdg_dir() {
+  local dirname=${1^^}
+  local var="XDG_${dirname}_DIR"
+
+  local dir="${!var:-}" # Check the environment
+  # Use xdg-user-dir if available
+  if [ -z "$dir" ] && has_cmd xdg-user-dir; then
+    downloads="$(xdg-user-dir "DOWNLOAD" 2>/dev/null)"
+  fi
+  downloads="${downloads:-~/Downloads/}" # We still haven't found something? use ~/Downloads/
+  if [ -n "$dir" ]; then
+    printf '%s' "$dir"
+  fi
+  [ -n "$dir" ] || return 1 && return 0
+}
+
 # download -p <URL> [output] outputs to stdout if output is not specified
 # if -p is passed, the command will output progress information to stderr.
 # This is for the user, not to parse.
