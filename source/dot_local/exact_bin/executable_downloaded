@@ -17,39 +17,59 @@ utils="$DIR/script_utils.sh"
 [ "$?" -eq 0 ] || exit # set -e means that this line should be irrelevant, but just in case.
 
 # Outputs the most $2 recently modified files in directory $1
+# Relies on GNU find!
 get_latest() {
   local dir="${1:-.}" num=${2:-1}
   find "$dir" -mindepth 1 -maxdepth 1 -printf "%T@ %p\n" | sort -n | cut -d' ' -f 2- | tail -n "$num"
 }
 
-# option --long/-l requires 1 argument
-LONGOPTS="help,remove" SHORTOPTS="h,r"
+THIS="${BASH_SOURCE[0]##*/}"
+usage() {
+  cat <<-EOF || true
+usage: $THIS [opts]... [--] [DEST]
+Manipulate the most recently downloaded (modified) file
+
+Options:
+  -h, --help         Show this help message.
+  -r, --remove       Remove the most recently downloaded file (incompatable with -c or -p)
+  -c, --copy         Copy the most recently downloaded file to DEST (incompatable with -r or -p)
+  -p, --print        Print the most recently downloaded file (incompatable with -r or -p)
+  -n, --num=n        Operate on the nth most recent file, instead of the first
+EOF
+}
+
+LONGOPTS="help,remove,copy,print,num:" SHORTOPTS="h,r,c,p,n:"
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 
-remove=0
+do=copy num=1 # 1=most recent
 while true; do
   case "$1" in
   -h | --help) usage && exit 0 ;;
-  -r | --remove) remove=1 && shift ;;
+  -r | --remove) do=remove && shift ;;
+  -c | --copy) do=copy && shift ;; # default
+  -p | --print) do=print && shift ;;
+  -n | --num)
+    num="$2" && shift 2
+    case "$num" in *[!0-9]* | '') abort "Invalid number: $num" 2 ;; esac
+    ;;
   --) shift && break ;;
   *) abort "This is a bug" 3 ;;
   esac
 done
-dest='' && case "${1:-}" in
---) dest="${2:-.}" ;;
---help) log "Usage: ${0##*/} DEST" && exit 0 ;;
-*) dest="${1:-.}" ;;
-esac
-
-downloads="${XDG_DOWNLOAD_DIR:-}" # Check the environment
-# Use xdg-user-dir if available
-if [ -z "$downloads" ] && has_cmd xdg-user-dir; then
-  downloads="$(xdg-user-dir "DOWNLOAD" 2>/dev/null)"
-fi
+dest=${1:-.}
+downloads=$(get_xdg_dir "DOWNLOAD") || true
 downloads="${downloads:-~/Downloads/}" # We still haven't found something? use ~/Downloads/
-if [ -z "$downloads" ]; then abort "Could not find downloads directory! Set \$XDG_DOWNLOAD_DIR or configure xdg-user-dir!" 1; fi
 
-latest="$(get_latest "$downloads")"
-printf '%s\n' "Copying '$latest' to '$dest'"
-# cp -Pp -R is posix for cp --archive
-cp -pP -R -i -- "$latest" "$dest"
+file="$(get_latest "$downloads" "$num" | head -n 1)"
+case "$do" in
+remove)
+  log "Removing '$file'"
+  rm -i -r -- "$file"
+  ;;
+copy)
+  log "Copying '$file' to '$dest'"
+  # cp -Pp -R is posix for cp --archive
+  cp -pP -R -i -- "$file" "$dest"
+  ;;
+print) printf '%s\n' "$file" ;;
+esac

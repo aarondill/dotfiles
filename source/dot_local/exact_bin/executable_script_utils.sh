@@ -104,20 +104,23 @@ function add_tmpfile() {
   trap 'cleanup' EXIT
 }
 
+# Usage: get_xdg_dir "DOWNLOAD"
+# Use the same way as you would use xdg-user-dir
+# Exits 1 if no value was found.
+# Note: if xdg-user-dir is not installed, this may fail
 function get_xdg_dir() {
   local dirname=${1^^}
   local var="XDG_${dirname}_DIR"
 
   local dir="${!var:-}" # Check the environment
-  # Use xdg-user-dir if available
-  if [ -z "$dir" ] && has_cmd xdg-user-dir; then
-    downloads="$(xdg-user-dir "DOWNLOAD" 2>/dev/null)"
+  if [ -z "$dir" ]; then
+    # Use xdg-user-dir if available
+    ! has_cmd xdg-user-dir || dir="$(xdg-user-dir "$dirname" 2>/dev/null)"
   fi
-  downloads="${downloads:-~/Downloads/}" # We still haven't found something? use ~/Downloads/
-  if [ -n "$dir" ]; then
-    printf '%s' "$dir"
-  fi
-  [ -n "$dir" ] || return 1 && return 0
+
+  [ -n "$dir" ] || return 1
+  if [ -t 1 ]; then printf '%s\n' "$dir"; else printf '%s' "$dir"; fi
+  return 0
 }
 
 # download -p <URL> [output] outputs to stdout if output is not specified
