@@ -42,6 +42,7 @@ export XDG_CACHE_HOME="$HOME/.cache"
 for dir in "$XDG_CACHE_HOME" "$XDG_STATE_HOME" "$XDG_CONFIG_HOME" "$XDG_DATA_HOME"; do
   if ! [ -d "$dir" ]; then mkdir -p -- "$dir"; fi
 done
+unset dir
 
 # Stop less from saving it's history
 export LESSHISTFILE=-
