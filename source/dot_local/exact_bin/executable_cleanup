@@ -98,13 +98,14 @@ else
   abort "Could not find a command to clean the trash"
 fi
 
+log "Cleaning old logs >1G"
+sudo journalctl --vacuum-size=1G || true
+
+# This should be done last. It will (likely) not free any space, but should still be regularly done
 log "Running TRIM on mounted partitions"
 sudo_cmd fstrim -av || true # this may fail (ex: in container or unsupported fs)
 
 # Size stats
-log "Cleaning old logs >1G"
-sudo journalctl --vacuum-size=1G || true
-
 newsize_root=$(get_used_bytes /)
 newsize="$newsize_root"
 if [ "$(get_fs_root /)" != "$(get_fs_root ~)" ]; then
