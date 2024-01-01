@@ -76,3 +76,4 @@ code/js/EslintTests.js
 code/repos/.awesome-scripts
 .config/autorandr
 .config/redshift
+.config/vimium-options.json

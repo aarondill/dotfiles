@@ -196,10 +196,6 @@ for arg in "$@"; do
   esac
 done
 
-log ''
-log "--- Backup at $(date) ---"
-log ''
-
 DUPLICITY="${DUPLICITY:-"$(command -v duplicity 2>/dev/null || true)"}"
 # Ensure duplicity can be accessed
 if [ -z "$DUPLICITY" ]; then
@@ -302,6 +298,10 @@ fi
 
 case "$mode" in
 backup)
+  log ''
+  log "--- Backup at $(date) ---"
+  log ''
+
   log "Backing up to $DESTINATION_URI"
   run "$DUPLICITY" --full-if-older-than="${FULL_IF_OLDER:-1M}" "${command[@]}" "${args[@]}" -- "$SOURCE_DIR" "$DESTINATION_URI"
   ;;
