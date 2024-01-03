@@ -13,7 +13,7 @@ Call with no positional arguments to output the current volume.
 
 Options:
   -h, --help        Show this help message.
-  -m, --mute        Toggle mute on the device
+  -m, --mute        Toggle mute on the device (PERCENT is ignored).
   -s, --sink=sink   pactl sink to set the volume on (default: $sink)
 EOF
 }
@@ -38,20 +38,22 @@ function parse_args() {
 LONGOPTS="help,sink:,mute" SHORTOPTS="h,s:,m"
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 
-mute='false'
+mute=0
 while true; do
   case "$1" in
   --help | -h) usage && exit 0 ;;
   -s | --sink) sink="$2" && shift 2 ;;
-  -m | --mute) mute="true" && shift ;;
+  -m | --mute) mute=1 && shift ;;
   --) shift && break ;;
   *) abort "This is a bug" 3 ;;
   esac
 done
 
-if [ "${1:-}" = "mute" ] || [ "${1:-}" = "m" ]; then mute="true"; fi
+case "${1:-}" in
+mute | m) mute=1 ;;
+esac
 
-if [ "$mute" = true ]; then
+if [ "$mute" -eq 1 ]; then
   pactl set-sink-mute "$sink" toggle
 elif [ "$#" -eq 0 ]; then
   pactl get-sink-volume "$sink"
