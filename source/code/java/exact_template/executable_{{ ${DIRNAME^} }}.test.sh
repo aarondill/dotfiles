@@ -18,6 +18,7 @@ dargs=()       # javadoc
 classpath=     # output_dir will be automatically included
 output_dir=    # or "dist". Relative to this_dir
 input_files=() # a list of files to copy (symlink) to the output_dir. Releative to this_dir
+main_class=    # the class containing the main method if different
 
 # END CONFIGURATION
 
@@ -66,7 +67,7 @@ java_class=${java_class%.sh} # ClassName.sh -> ClassName
 usage() {
   cat <<EOF
   Usage: $this [options] [--] [args]
-  Run $java_class.java with the given arguments
+  Run ${main_class:-"$java_class".java} with the given arguments
 
   Options:
     -h, --help          Show this message and exit.
@@ -191,7 +192,7 @@ while [ -n "$do" ]; do
   run)
     stdin show_run java \
       --class-path "$_classpath" \
-      "${jargs[@]}" "$java_class" "$@"
+      "${jargs[@]}" "${main_class:-"$java_class"}" "$@"
     ;;
   '') abort "Empty command! This is a bug!" 3 ;;
   *) abort "Unrecognized command: $command" 3 ;;
