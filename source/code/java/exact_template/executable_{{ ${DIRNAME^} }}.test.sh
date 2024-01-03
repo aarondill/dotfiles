@@ -76,8 +76,9 @@ usage() {
     -t, --test          Alias for -i -
     -d, --doc           Only generate documentation using javadoc
     -c, --compile       Compile the program (default)
+    -l, --cleanup       Cleanup the program (default)
     -r, --run           Run the program (default)
-    --do                Set do order (default: "run:compile:")
+    --do                Set do order (default: "run:compile:cleanup:")
 
   Note: to generate documentation and run, use \`$this -d -c -r\`
 EOF
@@ -96,6 +97,7 @@ while [ $# -gt 0 ]; do
   -d | --doc) do=:doc: ;;
   -c | --compile) do+=:compile: ;; # note: default. only for overriding
   -r | --run) do+=:run: ;;         # note: default. only for overriding
+  -l | --cleanup) do+=:cleanup: ;; # note: default. only for overriding
   --do) do="$2" && shift ;;        # set do manually
   --*=*)                           # Handle `--opt=val` -> `--opt val`
     opt=${1%%=*} val=${1##*=}
@@ -109,18 +111,17 @@ while [ $# -gt 0 ]; do
 done
 set -- "${args[@]}"
 
-output_dir="$(resolve "${output_dir:-.}")"              # relative to $this_dir -- default is $this_dir
-java_file="$(resolve "$java_class.java")"               # relative to $this_dir
-class_file=$(resolve "$java_class.class" "$output_dir") # relative to $output_dir
-stdin_file=$(resolve "${stdin_file:-}" "$output_dir")   # relative to $output_dir
-doc_dest="$(resolve "doc" "$output_dir")"               # relative to $output_dir
+output_dir="$(resolve "${output_dir:-.}")" # relative to $this_dir -- default is $this_dir
+java_file="$(resolve "$java_class.java")"  # relative to $this_dir
+# relative to $output_dir
+class_files=("$(resolve "$java_class.class" "$output_dir")")
+# Add main class if given
+[ -z "${main_class:-}" ] || class_files+=("$(resolve "$main_class.class" "$output_dir")")
+
+stdin_file=$(resolve "${stdin_file:-}" "$output_dir") # relative to $output_dir
+doc_dest="$(resolve "doc" "$output_dir")"             # relative to $output_dir
 
 if ! [ -f "$java_file" ]; then abort "Could not find '$java_file'. Please double check the names of both files." 1; fi
-if [ -f "$class_file" ]; then
-  log "Cleaning up old class file"
-  show_run rm -f "$class_file"
-fi
-
 if ! [ -d "$output_dir" ]; then
   log "Creating output directory"
   show_run mkdir -p "$output_dir"
@@ -159,15 +160,13 @@ stdin() {
 _classpath="$output_dir"
 if [ -n "$classpath" ]; then _classpath="$_classpath:$classpath"; fi
 
-[ "${do:0-1}" == ":" ] || do="$do:" # ensure do ends in a colon
-do=${do//::/:}                      # no empty elements
-do="${do#:}"                        # ensure do doesn't start with a colon
-[ "$do" != : ] || do=''             # no only seperator
-[ -n "$do" ] || do='compile:run:'   # default to compile:run
+[ "${do:0-1}" == ":" ] || do="$do:"       # ensure do ends in a colon
+do=${do//::/:}                            # no empty elements
+do="${do#:}"                              # ensure do doesn't start with a colon
+[ "$do" != : ] || do=''                   # no only seperator
+[ -n "$do" ] || do='compile:run:cleanup:' # default to compile:run:cleanup
 while [ -n "$do" ]; do
-
-  code=0
-  command="${do%%:*}" # first element of do
+  code=0 command="${do%%:*}" # first element of do
   case "$command" in
   doc)
     # used to link to the correct documentation versions
@@ -194,6 +193,9 @@ while [ -n "$do" ]; do
       --class-path "$_classpath" \
       "${jargs[@]}" "${main_class:-"$java_class"}" "$@"
     ;;
+  cleanup)
+    show_run rm -f "${class_files[@]}"
+    ;;
   '') abort "Empty command! This is a bug!" 3 ;;
   *) abort "Unrecognized command: $command" 3 ;;
   esac || code="$?"
@@ -204,9 +206,3 @@ while [ -n "$do" ]; do
   fi
   do="${do#*:}" # remove first element (up to colon)
 done
-
-if [ "$output_dir" == "$this_dir" ]; then # cleanup current directory (not if build dir)
-  if [ -f "$class_file" ]; then
-    show_run rm -f "$class_file"
-  fi
-fi
