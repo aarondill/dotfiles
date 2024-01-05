@@ -11,14 +11,15 @@ set -euC -o pipefail
 stdin=
 IFS='' read -r -d '' stdin <<'EOF' || true
 EOF
-stdin_file=    # This will override stdin. Relative to output_dir (use input_files if needed), use - to specify stdin
-cargs=()       # javac
-jargs=()       # java
-dargs=()       # javadoc
-classpath=     # output_dir will be automatically included
-output_dir=    # or "dist". Relative to this_dir
-input_files=() # a list of files to copy (symlink) to the output_dir. Releative to this_dir
-main_class=    # the class containing the main method if different
+stdin_file=      # This will override stdin. Relative to output_dir (use input_files if needed), use - to specify stdin
+cargs=()         # javac
+jargs=()         # java
+dargs=()         # javadoc
+classpath=       # output_dir will be automatically included
+output_dir=      # or "dist". Relative to this_dir
+input_files=()   # a list of files to copy (symlink) to the output_dir. Releative to this_dir
+main_class=      # the class containing the main method if different
+cleanup_files=() # A list of files to remove when cleaning up. Releative to this_dir
 
 # END CONFIGURATION
 
@@ -196,6 +197,7 @@ while [ -n "$do" ]; do
     ;;
   cleanup)
     show_run rm -f "${class_files[@]}"
+    show_run rm -f "${cleanup_files[@]}"
     ;;
   '') abort "Empty command! This is a bug!" 3 ;;
   *) abort "Unrecognized command: $command" 3 ;;
