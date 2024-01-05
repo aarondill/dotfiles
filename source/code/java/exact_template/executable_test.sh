@@ -19,7 +19,7 @@ classpath=       # output_dir will be automatically included
 output_dir=      # or "dist". Relative to this_dir
 input_files=()   # a list of files to copy (symlink) to the output_dir. Releative to this_dir
 main_class=      # the class containing the main method if different
-cleanup_files=() # A list of files to remove when cleaning up. Releative to this_dir
+cleanup_files=() # A list of files to remove when cleaning up. Releative to output_dir
 
 # END CONFIGURATION
 
@@ -197,7 +197,11 @@ while [ -n "$do" ]; do
     ;;
   cleanup)
     show_run rm -f "${class_files[@]}"
-    show_run rm -f "${cleanup_files[@]}"
+    abs_cleanup=()
+    for f in "${cleanup_files[@]}"; do # Resolve all the files from output_dir
+      abs_cleanup+=("$(resolve "$f" "$output_dir")")
+    done
+    show_run rm -f "${abs_cleanup[@]}"
     ;;
   '') abort "Empty command! This is a bug!" 3 ;;
   *) abort "Unrecognized command: $command" 3 ;;
