@@ -5,16 +5,17 @@ shopt -s globstar # **
 
 function log() { printf '%s\n' "$@"; }
 
+MEASURE_DISK_DIFF=1
 # Check the size of `dir` before and after running `cmd`
 # Usage: size_diff dir cmd [args...]
 function size_diff() {
-  local dir oldsize newsize saving
-  dir=$1
+  local dir="$1" oldsize newsize saving code=0 cmd=("${@:2}")
+  if [ "$MEASURE_DISK_DIFF" -ne 1 ]; then
+    "${cmd[@]}" || code=$? # Just run it
+    return "$code"
+  fi
   oldsize=$(du -sk -- "$dir" | awk '{ printf "%.0f", $1 * 1024 }')
-
-  shift  # remove dir
-  "${@}" # run $2 $3 $4 ...
-
+  "${cmd[@]}" || code="$?" # don't error here
   newsize=$(du -sk -- "$dir" | awk '{ printf "%.0f", $1 * 1024 }')
   saving=$((oldsize - newsize))
 
@@ -28,6 +29,7 @@ function size_diff() {
   log "Old size: $oldsize"
   log "New size: $newsize"
   log "Total saving: $saving"
+  return "$code" # Maintain exit code
 }
 
 function clean_config_dir() {
@@ -63,6 +65,10 @@ function clean_browser_conf_and_cache() {
   log "Cleaning cache directory $cache_dir"
   size_diff "$cache_dir" clean_cache_dir "$cache_dir"
 }
+
+if [ -n "${NO_MEASURE_DISK_DIFF:-}" ]; then
+  MEASURE_DISK_DIFF=0 # Read from environment
+fi
 
 config_dir="${XDG_CONFIG_HOME:-$HOME/.config}"
 cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}"

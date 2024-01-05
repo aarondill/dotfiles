@@ -56,7 +56,8 @@ if has bun; then
 fi
 
 log "Cleaning browser cache"
-clean-google-cache || true
+# Cleaner output
+NO_MEASURE_DISK_DIFF=1 clean-google-cache || true
 
 if has snap; then
   log "Cleaning up snap packages"
