@@ -40,11 +40,19 @@ RESET_COLOR="$(tput sgr0 2>/dev/null || printf '')"
 THIS="$this" # Used in err.
 # Logs only if there is a terminal and not quiet
 log() { if [ -t 1 ] && [ "$quiet" -eq 0 ]; then printf "$YELLOW_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@"; fi; }
-show_run() {
-  log "Running: $*"
-  log ''
-  "$@"
+# verbose echo do something -> echo do something\ndo something
+verbose() {
+  declare -i i=0
+  local output='> '
+  for a in "$@"; do
+    i=$((i + 1))
+    output+="'$a'"
+    if [ "$i" -lt "$#" ]; then output+=' '; fi # print ' ' if not last
+  done
+  log "$output" # This will handle 'quiet' - though extra work has been done
+  "$@"          # run the input
 }
+
 err() { if [ -t 2 ]; then printf "${THIS:+$THIS: }$RED_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@" >&2; fi; }
 abort() { err "$1" && exit "${2:-1}"; }
 # make a relative path absolute, according to $2 or $this_dir
@@ -119,15 +127,19 @@ set -- "${args[@]}"
 output_dir="$(resolve "${output_dir:-.}")" # relative to $this_dir -- default is $this_dir
 java_file="$(resolve "$java_class.java")"  # relative to $this_dir -- The main java source file
 compile_files=("$java_file")
-for f in "${additional_files[@]:-}"; do # Resolve all the files
+for f in "${additional_files[@]}"; do # Resolve all the files
   compile_files+=("$(resolve "$f")")
 done
 class_files=() # Files to clean up
 for f in "${compile_files[@]}"; do
   class_files+=("$(resolve "$(basename "${f%.java}").class" "$output_dir")") # relative to $output_dir
 done
+
 if [ -n "${main_class:-}" ]; then # Add main class if given
   class_files+=("$(resolve "$main_class.class" "$output_dir")")
+  main_class_java="$(resolve "$main_class.java")"
+  # If the main class has it's own file, compile it
+  if [ -f "$main_class_java" ]; then compile_files+=("$main_class_java"); fi
 fi
 
 stdin_file=$(resolve "${stdin_file:-}" "$output_dir") # relative to $output_dir
@@ -136,7 +148,7 @@ doc_dest="$(resolve "doc" "$output_dir")"             # relative to $output_dir
 if ! [ -f "$java_file" ]; then abort "Could not find '$java_file'. Please double check the names of both files." 1; fi
 if ! [ -d "$output_dir" ]; then
   log "Creating output directory"
-  show_run mkdir -p "$output_dir"
+  verbose mkdir -p "$output_dir"
 fi
 
 # ensure stdin_file gets copied to output_dir
@@ -146,9 +158,9 @@ if [ -n "$stdin_file" ] && [ "$stdin_file" != '-' ]; then input_files+=("$stdin_
 for f in "${input_files[@]}"; do
   link_dest=$(resolve "$(basename "$f")" "$output_dir")
   link_src="$(resolve "$f")"
-  if ! [ -e "$link_src" ]; then continue; fi   # source file doesn't exist
-  if [ -e "$link_dest" ]; then continue; fi    # destination file already exists
-  show_run ln -Tsi -- "$link_src" "$link_dest" # dead links will be interactively replaced
+  if ! [ -e "$link_src" ]; then continue; fi  # source file doesn't exist
+  if [ -e "$link_dest" ]; then continue; fi   # destination file already exists
+  verbose ln -Tsi -- "$link_src" "$link_dest" # dead links will be interactively replaced
 done
 
 if [ -n "$stdin_file" ] && ! [ "$stdin_file" = - ]; then
@@ -183,8 +195,8 @@ while [ -n "$do" ]; do
   doc)
     # used to link to the correct documentation versions
     JAVA_MAJOR_VERSION=$(java -version 2>&1 | grep -oP 'version "?(1\.)?\K\d+')
-    show_run rm -rf -- "$doc_dest"
-    show_run javadoc \
+    verbose rm -rf -- "$doc_dest"
+    verbose javadoc \
       -link "https://docs.oracle.com/en/java/javase/$JAVA_MAJOR_VERSION/docs/api/" \
       -docencoding UTF-8 \
       -charset UTF-8 \
@@ -195,24 +207,24 @@ while [ -n "$do" ]; do
       "$java_file" "$@"
     ;;
   compile)
-    show_run javac \
+    verbose javac \
       --class-path "$_classpath" \
       -d "$output_dir" \
       "${cargs[@]}" \
       "${compile_files[@]}"
     ;;
   run)
-    stdin show_run java \
+    stdin verbose java \
       --class-path "$_classpath" \
       "${jargs[@]}" "${main_class:-"$java_class"}" "$@"
     ;;
   cleanup)
-    show_run rm -f "${class_files[@]}"
+    [ "${#class_files[@]}" -eq 0 ] || verbose rm -f "${class_files[@]}"
     abs_cleanup=()
     for f in "${cleanup_files[@]}"; do # Resolve all the files from output_dir
       abs_cleanup+=("$(resolve "$f" "$output_dir")")
     done
-    show_run rm -f "${abs_cleanup[@]}"
+    [ "${#abs_cleanup[@]}" -eq 0 ] || verbose rm -f "${abs_cleanup[@]}"
     ;;
   '') abort "Empty command! This is a bug!" 3 ;;
   *) abort "Unrecognized command: $command" 3 ;;
