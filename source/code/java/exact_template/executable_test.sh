@@ -5,6 +5,8 @@ set -euC -o pipefail
 # Included are FILEPATH,REALPATH,FILENAME,DIRNAME,DATE,TIME,EXTENSION,BASENAME,ROOT and potentially more
 # All variables will be in all capitals.
 
+quiet=0 # this may be set in the configuration
+
 # BEGIN CONFIGURATION
 
 # stdin. Tabs will be maintained
@@ -23,7 +25,6 @@ cleanup_files=()    # A list of files to remove when cleaning up. Releative to o
 additional_files=() # A list of java files to add to the compilation step (passed to javac). Releative to this_dir
 
 # END CONFIGURATION
-
 this="$(basename "$0")"
 this_dir="$(readlink -f -- "$(dirname "$0")")" # might break if cwd is a symlink
 [ -f "$this_dir/.config" ] && . "$this_dir/.config"
@@ -37,7 +38,8 @@ BOLD_COLOR="$(tput bold 2>/dev/null || printf '')"
 RESET_COLOR="$(tput sgr0 2>/dev/null || printf '')"
 
 THIS="$this" # Used in err.
-log() { if [ -t 1 ]; then printf "$YELLOW_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@"; fi; }
+# Logs only if there is a terminal and not quiet
+log() { if [ -t 1 ] && [ "$quiet" -eq 0 ]; then printf "$YELLOW_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@"; fi; }
 show_run() {
   log "Running: $*"
   log ''
@@ -88,8 +90,7 @@ EOF
   :
 }
 
-do=
-args=()
+do='' args=()
 while [ $# -gt 0 ]; do
   case "$1" in
   -o | --output) output_dir="$2" && shift ;;
@@ -101,8 +102,9 @@ while [ $# -gt 0 ]; do
   -c | --compile) do+=:compile: ;; # note: default. only for overriding
   -r | --run) do+=:run: ;;         # note: default. only for overriding
   -l | --cleanup) do+=:cleanup: ;; # note: default. only for overriding
-  --do) do="$2" && shift ;;        # set do manually
-  --*=*)                           # Handle `--opt=val` -> `--opt val`
+  -q | --quiet) quiet=1 ;;
+  --do) do="$2" && shift ;; # set do manually
+  --*=*)                    # Handle `--opt=val` -> `--opt val`
     opt=${1%%=*} val=${1##*=}
     set -- TO_BE_SHIFTED "$opt" "$val" "$@"
     ;;
