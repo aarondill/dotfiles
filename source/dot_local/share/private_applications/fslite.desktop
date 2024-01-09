@@ -1,5 +1,12 @@
 [Desktop Entry]
 Name=Fslite
-URL=https://fslite.vercel.app
 Icon=/home/aaron/.local/share/icons/fslite.ico
-Type=Link
+
+# Uncomment this to open *Vivaldi* in 'app-mode' (no titlebar)
+Exec=vivaldi --app=https://fslite.vercel.app
+Terminal=false
+Type=Application
+
+# Uncomment this to use the default browser (recommended)
+URL=https://fslite.vercel.app
+# Type=Link
