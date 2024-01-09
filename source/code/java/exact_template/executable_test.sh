@@ -11,15 +11,16 @@ set -euC -o pipefail
 stdin=
 IFS='' read -r -d '' stdin <<'EOF' || true
 EOF
-stdin_file=      # This will override stdin. Relative to output_dir (use input_files if needed), use - to specify stdin
-cargs=()         # javac
-jargs=()         # java
-dargs=()         # javadoc
-classpath=       # output_dir will be automatically included
-output_dir=      # or "dist". Relative to this_dir
-input_files=()   # a list of files to copy (symlink) to the output_dir. Releative to this_dir
-main_class=      # the class containing the main method if different
-cleanup_files=() # A list of files to remove when cleaning up. Releative to output_dir
+stdin_file=         # This will override stdin. Relative to output_dir (use input_files if needed), use - to specify stdin
+cargs=()            # javac
+jargs=()            # java
+dargs=()            # javadoc
+classpath=          # output_dir will be automatically included
+output_dir=         # or "dist". Relative to this_dir
+input_files=()      # a list of files to copy (symlink) to the output_dir. Releative to this_dir
+main_class=         # the class containing the main method if different
+cleanup_files=()    # A list of files to remove when cleaning up. Releative to output_dir
+additional_files=() # A list of java files to add to the compilation step (passed to javac). Releative to this_dir
 
 # END CONFIGURATION
 
@@ -114,11 +115,18 @@ done
 set -- "${args[@]}"
 
 output_dir="$(resolve "${output_dir:-.}")" # relative to $this_dir -- default is $this_dir
-java_file="$(resolve "$java_class.java")"  # relative to $this_dir
-# relative to $output_dir
-class_files=("$(resolve "$java_class.class" "$output_dir")")
-# Add main class if given
-[ -z "${main_class:-}" ] || class_files+=("$(resolve "$main_class.class" "$output_dir")")
+java_file="$(resolve "$java_class.java")"  # relative to $this_dir -- The main java source file
+compile_files=("$java_file")
+for f in "${additional_files[@]:-}"; do # Resolve all the files
+  compile_files+=("$(resolve "$f")")
+done
+class_files=() # Files to clean up
+for f in "${compile_files[@]}"; do
+  class_files+=("$(resolve "$(basename "${f%.java}").class" "$output_dir")") # relative to $output_dir
+done
+if [ -n "${main_class:-}" ]; then # Add main class if given
+  class_files+=("$(resolve "$main_class.class" "$output_dir")")
+fi
 
 stdin_file=$(resolve "${stdin_file:-}" "$output_dir") # relative to $output_dir
 doc_dest="$(resolve "doc" "$output_dir")"             # relative to $output_dir
@@ -188,7 +196,8 @@ while [ -n "$do" ]; do
     show_run javac \
       --class-path "$_classpath" \
       -d "$output_dir" \
-      "${cargs[@]}" "$java_file"
+      "${cargs[@]}" \
+      "${compile_files[@]}"
     ;;
   run)
     stdin show_run java \
