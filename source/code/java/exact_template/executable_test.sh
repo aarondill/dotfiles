@@ -84,14 +84,16 @@ usage() {
 
   Options:
     -h, --help          Show this message and exit.
-    -o, --output        Set the output directory
-    -i, --input         Set the input file
+    -o, --output=dir    Set the output directory
+    -i, --input=file    Set the input file
     -t, --test          Alias for -i -
     -d, --doc           Only generate documentation using javadoc
     -c, --compile       Compile the program (default)
     -l, --cleanup       Cleanup the program (default)
     -r, --run           Run the program (default)
-    --do                Set do order (default: "run:compile:cleanup:")
+    -m, --main=main     Change the main source file name. Default is directory_name.java
+    --dir=dir           Change the directory to search for files in.
+    --do=do:            Set do order (default: "run:compile:cleanup:")
 
   Note: to generate documentation and run, use \`$this -d -c -r\`
 EOF
@@ -110,6 +112,7 @@ while [ $# -gt 0 ]; do
   -c | --compile) do+=:compile: ;; # note: default. only for overriding
   -r | --run) do+=:run: ;;         # note: default. only for overriding
   -l | --cleanup) do+=:cleanup: ;; # note: default. only for overriding
+  -m | --main) java_class="${2%.java}" && shift ;;
   -q | --quiet) quiet=1 ;;
   --do) do="$2" && shift ;; # set do manually
   --*=*)                    # Handle `--opt=val` -> `--opt val`
@@ -117,7 +120,8 @@ while [ $# -gt 0 ]; do
     set -- TO_BE_SHIFTED "$opt" "$val" "$@"
     ;;
   --) args+=("$@") && break ;;
-  -*) abort "Unknown option: $1" ;;
+  --*) abort "Unknown option: $1" 2 ;;
+  -*) abort "Unknown option: $1" 2 ;;
   *) args+=("$@") && break ;; # on first non-option, treat the rest as arguments for the script
   esac
   shift
@@ -145,7 +149,7 @@ fi
 stdin_file=$(resolve "${stdin_file:-}" "$output_dir") # relative to $output_dir
 doc_dest="$(resolve "doc" "$output_dir")"             # relative to $output_dir
 
-if ! [ -f "$java_file" ]; then abort "Could not find '$java_file'. Please double check the names of both files." 1; fi
+if ! [ -f "$java_file" ]; then abort "Could not find '$java_file'. Please double check the name and ensure it matches the parent directory or use -m Classname." 1; fi
 if ! [ -d "$output_dir" ]; then
   log "Creating output directory"
   verbose mkdir -p "$output_dir"
