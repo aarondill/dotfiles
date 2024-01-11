@@ -50,6 +50,29 @@ function join() {
 function debug() { [ -z "${DEBUG:-}" ] || printf 'DEBUG: %s\n' "$@" >&2 || true; }
 function log() { printf '%s\n' "$@" || true; }
 function err() { printf "%s\n" "$@" >&2 || true; }
+# prints the command and runs it
+# verbose echo do something -> echo do something\ndo something
+verbose() {
+  # ${var@Q} will quote it.
+  # Q The expansion is a string that is the value of parameter quoted in a
+  # format that can be reused as input.
+  local output="> ${*@Q}"
+  log "$output"
+  "$@" # run the input
+}
+
+# confirm "do you really want to do %s?" "that" --> ...do that? (Y/n)
+# Strings are evaluated using printf
+function confirm() {
+  local prompt confirmation
+  # shellcheck disable=SC2059 # I know this is *generally* wrong, but this is intentional.
+  prompt="$(printf "$1" "${@:2}")"
+  read -rep "$prompt (Y/n) " confirmation </dev/tty
+  if [ -z "$confirmation" ] || [[ "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
+    return 0
+  fi
+  return 1
+}
 
 # Usage: abort message [code]
 function abort() { err "$1" && exit "${2:-1}"; }

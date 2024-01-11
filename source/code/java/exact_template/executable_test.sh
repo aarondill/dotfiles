@@ -42,14 +42,11 @@ THIS="$this" # Used in err.
 log() { if [ -t 1 ] && [ "$quiet" -eq 0 ]; then printf "$YELLOW_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@"; fi; }
 # verbose echo do something -> echo do something\ndo something
 verbose() {
-  declare -i i=0
-  local output='> '
-  for a in "$@"; do
-    i=$((i + 1))
-    output+="'$a'"
-    if [ "$i" -lt "$#" ]; then output+=' '; fi # print ' ' if not last
-  done
-  log "$output" # This will handle 'quiet' - though extra work has been done
+  # ${var@Q} will quote it.
+  # Q The expansion is a string that is the value of parameter quoted in a
+  # format that can be reused as input.
+  local output="> ${*@Q}"
+  log "$output" # This will handle 'quiet'
   "$@"          # run the input
 }
 
