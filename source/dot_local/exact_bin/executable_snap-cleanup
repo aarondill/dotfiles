@@ -1,15 +1,25 @@
 #!/bin/bash
 set -euC -o pipefail
-shopt -s nullglob # Globs with no match result in NUL string
-
-THIS=snap-cleanup
-# Color settings
-YELLOW_COLOR="$(tput setaf 3 2>/dev/null || printf '')"
-RED_COLOR="$(tput setaf 1 2>/dev/null || printf '')"
-OFF_COLOR="$(tput sgr0 2>/dev/null || printf '')"
+shopt -s nullglob globstar # Better globs
+# Find the current file and it's directory # Source: https://stackoverflow.com/a/246128
+SOURCE="${BASH_SOURCE[0]:-}" DIR=''
+while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$(builtin cd -P -- "$(command dirname -- "$SOURCE")" &>/dev/null && builtin pwd)" || true
+  SOURCE="$(command readlink -- "$SOURCE")" || true
+  [[ "$SOURCE" == /* ]] || SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+DIR="$(builtin cd -P -- "$(command dirname -- "$SOURCE")" &>/dev/null && builtin pwd)" || true
+DIR="${DIR:-"$PWD"}" utils="$DIR/script_utils.sh"
+[ -f "$utils" ] || utils="$(basename -- "$utils")" || true # If utils is not a file, search for it in "$PATH" instead.
+# shellcheck source=./script_utils.sh
+. "$utils"             # Note: this may error. I can't use it in a conditional or bashls fails.
+[ "$?" -eq 0 ] || exit # set -e means that this line should be irrelevant, but just in case.
 
 # Set English language
-LANG=en_US.UTF-8
+export LANG=en_US.UTF-8
+THIS="$(basename "$0")"
+
+if [ "$(id -u)" -ne 0 ]; then abort "This program must be run as root" 1; fi
 
 function usage() {
   cat <<EOF
@@ -26,34 +36,8 @@ EOF
   return 0
 }
 
-function log() { printf '%s\n' "$@"; }
-function color() { printf '%b' "$@"; }
-function err() { printf "$RED_COLOR$THIS: %s\n$OFF_COLOR" "$@" >&2; }
-function abort() {
-  err "$1"
-  exit "${2:-1}"
-}
-# use like `"${sudo[@]}" do_something`
-# shellcheck disable=SC2206 # Splitting is intentional.
-sudo=(${SUDO:-sudo})
-[ "$(id -u)" -eq 0 ] && sudo=()
-
-# Returns a string that should be 'eval'ed to set the positional arguments
-# Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
-# Input: $LONGOPTS,$SHORTOPTS
-# eval "$(parse_args "$@")"
-function parse_args() {
-  local parsed
-  local code=0 && getopt --test &>/dev/null || code=$?
-  if [ "$code" -ne 4 ]; then abort "Enhanced getopt is required for this script to work. Please install it." 1; fi
-  parsed=$(getopt --options="$SHORTOPTS" --longoptions="$LONGOPTS" --name "${THIS:-$0}" -- "$@") ||
-    exit 2                     # getopt has already complained about wrong arguments to stdout - Exit script
-  printf '%s' "set -- $parsed" # output getopt’s output this way to handle the quoting right
-}
-
-# option --long/-l requires 1 argument
 LONGOPTS=help,yes SHORTOPTS=h,y
-ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
+eval "$(parse_args "$@")"
 
 yes=0
 while true; do
@@ -68,33 +52,22 @@ done
 # Current status
 USED_BEFORE="$(df -k / | awk 'NR>1 {print $3}')"
 
-# snapd revisions clean
-if [ -x "$(command -v snap)" ]; then
-  # shellcheck disable=SC2162
-  if [ "$yes" = "0" ]; then
-    read -p "> Do you want to remove unused snapd revisions? [Y/n] " KEY
-    KEY="${KEY:0:1}" && KEY="${KEY,,}"
-    if [ -n "$KEY" ] && [ "$KEY" != "y" ]; then abort "aborting" 2; fi
-  fi
-  # remove unused snapd revisions
-  log "Removing unused snapd revisions..."
-  "${sudo[@]}" snap set system refresh.retain=2
-  "${sudo[@]}" snap list --all | awk '/disabled/ {print $1, $3}' |
-    while read -r SNAP_NAME SNAP_REV; do
-      "${sudo[@]}" snap remove "${SNAP_NAME}" --revision="${SNAP_REV}"
-    done
-  if [ -d /var/lib/snapd/cache ]; then
-    for file in /var/lib/snapd/cache/*; do
-      "${sudo[@]}" rm "$file"
-    done
-  fi
-  log "Nothing unused to uninstall"
-fi
+if ! has_cmd snap; then abort "snap command not found" 1; fi
+
+[ "$yes" -eq 1 ] ||
+  confirm "Do you want to remove unused snapd revisions?" || abort "aborting" 1
+
+# remove unused snapd revisions
+log "Removing unused snapd revisions..."
+snap set system refresh.retain=2
+snap list --all | awk '/disabled/ {print $1, $3}' |
+  while read -r SNAP_NAME SNAP_REV; do
+    snap remove "${SNAP_NAME}" --revision="${SNAP_REV}"
+  done
+for file in /var/lib/snapd/cache/*; do rm "$file"; done
 
 # Current status
 USED_AFTER="$(df -k / | awk 'NR>1 {print $3}')"
 
 # Summary
-color "${YELLOW_COLOR}"
-log "Freed up space: $(((USED_BEFORE - USED_AFTER) / 1024)) MB"
-color "${OFF_COLOR}"
+log_c "Freed up space: $(((USED_BEFORE - USED_AFTER) / 1024)) MB"

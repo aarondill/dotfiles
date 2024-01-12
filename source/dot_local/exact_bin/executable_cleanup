@@ -1,15 +1,20 @@
 #!/usr/bin/env bash
 set -euC -o pipefail
-function log() { printf '%s\n' "$@"; }
-function err() { printf '%s\n' "$@" 1>&2; }
-function abort() {
-  err "$1"
-  exit "${2:-1}"
-}
-function has() { [ -x "$(command -v -- "$1")" ]; }
-# shellcheck disable=SC2206 # split intentionally
-SUDO=(${SUDO:-sudo})
-function sudo_cmd() { "${SUDO[@]}" "$@"; }
+shopt -s nullglob globstar # Better globs
+# Find the current file and it's directory # Source: https://stackoverflow.com/a/246128
+SOURCE="${BASH_SOURCE[0]:-}" DIR=''
+while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$(builtin cd -P -- "$(command dirname -- "$SOURCE")" &>/dev/null && builtin pwd)" || true
+  SOURCE="$(command readlink -- "$SOURCE")" || true
+  [[ "$SOURCE" == /* ]] || SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+DIR="$(builtin cd -P -- "$(command dirname -- "$SOURCE")" &>/dev/null && builtin pwd)" || true
+DIR="${DIR:-"$PWD"}" utils="$DIR/script_utils.sh"
+[ -f "$utils" ] || utils="$(basename -- "$utils")" || true # If utils is not a file, search for it in "$PATH" instead.
+# shellcheck source=./script_utils.sh
+. "$utils"             # Note: this may error. I can't use it in a conditional or bashls fails.
+[ "$?" -eq 0 ] || exit # set -e means that this line should be irrelevant, but just in case.
+
 function get_fs_root() { stat --format '%m' -- "$1"; }
 # usage: human_readable [number] [precision]
 function human_readable() {
@@ -39,48 +44,25 @@ fi
 
 # Start doing things
 
-if has pnpm; then
+if has_cmd pnpm; then
   log "Cleaning pnpm store"
   (
     cd # pnpm has issues if the current directory is not writable.
-    pnpm store prune || true
+    verbose pnpm store prune || true
   )
 fi
-if has bun; then
+if has_cmd bun; then
   if [ -n "${BUN_INSTALL:-}" ]; then
     mkdir -p "$BUN_INSTALL/install/global/"
     touch "$BUN_INSTALL/install/global/package.json"
   fi
   log "Cleaning bun cache"
-  bun pm -g cache rm
+  verbose bun pm -g cache rm
 fi
 
 log "Cleaning browser cache"
 # Cleaner output
-NO_MEASURE_DISK_DIFF=1 clean-google-cache || true
-
-if has snap; then
-  log "Cleaning up snap packages"
-  snap-cleanup -y || true
-fi
-
-log "Cleaning package manager cache"
-if has nala; then
-  sudo_cmd nala clean || true
-elif has apt; then
-  { sudo_cmd apt-get clean && sudo_cmd apt-get autoclean; } || true
-elif has yay; then
-  yay -Sc || true
-elif has pacman; then
-  sudo_cmd pacman -Sc || true
-else
-  err "Could not find a package manager to clean up"
-fi
-
-if has flatpak; then
-  log "Repairing flatpak repo"
-  sudo_cmd flatpak repair || true
-fi
+NO_MEASURE_DISK_DIFF=1 verbose clean-google-cache || true
 
 log "Cleaning up cache files"
 rm -rf -- ~/.cache/node/corepack/ || true
@@ -91,20 +73,51 @@ rm -rf -- ~/.cache/gnome-desktop-thumbnailer/ || true
 rm -rf -- ~/.cache/mesa_shader_cache/ || true
 
 log "Cleaning the trash"
-if has trash-empty; then
-  trash-empty || true
-elif has gio; then
-  gio trash --empty || true
+if has_cmd trash-empty; then
+  verbose trash-empty || true
+elif has_cmd gio; then
+  verbose gio trash --empty || true
 else
-  abort "Could not find a command to clean the trash"
+  err_c "Could not find a command to clean the trash"
 fi
 
-log "Cleaning old logs >1G"
-sudo journalctl --vacuum-size=1G || true
+has_root=1
+if [ "$(id -u)" -ne 0 ]; then
+  log "Note: the following commands require root access. Running sudo to cache password."
+  log "If you do not have root access, exit the prompt and these actions will be skipped."
+  sudo_cmd true || has_root=0
+fi
 
-# This should be done last. It will (likely) not free any space, but should still be regularly done
-log "Running TRIM on mounted partitions"
-sudo_cmd fstrim -av || true # this may fail (ex: in container or unsupported fs)
+if [ "$has_root" -eq 1 ]; then
+  if has_cmd snap; then
+    log "Cleaning up snap packages"
+    snap-cleanup -y || true
+  fi
+  log "Cleaning package manager cache"
+  if has_cmd nala; then
+    sudo_cmd nala clean || true
+  elif has_cmd apt; then
+    { sudo_cmd apt-get clean && sudo_cmd apt-get autoclean; } || true
+  elif has_cmd yay; then
+    yay -Sc || true
+  elif has_cmd pacman; then
+    sudo_cmd pacman -Sc || true
+  else
+    err_c "Could not find a package manager to clean up"
+  fi
+
+  if has_cmd flatpak; then
+    log "Repairing flatpak repo"
+    sudo_cmd flatpak repair || true
+  fi
+
+  log "Cleaning old logs >1G"
+  sudo_cmd journalctl --vacuum-size=1G || true
+
+  # This should be done last. It will (likely) not free any space, but should still be regularly done
+  log "Running TRIM on mounted partitions"
+  sudo_cmd fstrim -av || true # this may fail (ex: in container or unsupported fs)
+fi
 
 # Size stats
 newsize_root=$(get_used_bytes /)

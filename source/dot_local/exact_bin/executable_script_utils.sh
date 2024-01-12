@@ -6,13 +6,11 @@
 # could be improved, but 🤷
 #
 
-set -euC -o pipefail
-shopt -s nullglob globstar # Better globs
-
 # Include this section in any scripts that intend to import this utility module.
 if false; then
-  # Find the current file and it's directory
-  # Source: https://stackoverflow.com/a/246128
+  set -euC -o pipefail
+  shopt -s nullglob globstar # Better globs
+  # Find the current file and it's directory # Source: https://stackoverflow.com/a/246128
   SOURCE="${BASH_SOURCE[0]:-}" DIR=''
   while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
     DIR="$(builtin cd -P -- "$(command dirname -- "$SOURCE")" &>/dev/null && builtin pwd)" || true
@@ -20,8 +18,7 @@ if false; then
     [[ "$SOURCE" == /* ]] || SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
   done
   DIR="$(builtin cd -P -- "$(command dirname -- "$SOURCE")" &>/dev/null && builtin pwd)" || true
-  DIR="${DIR:-"$PWD"}"
-  utils="$DIR/script_utils.sh"
+  DIR="${DIR:-"$PWD"}" utils="$DIR/script_utils.sh"
   [ -f "$utils" ] || utils="$(basename -- "$utils")" || true # If utils is not a file, search for it in "$PATH" instead.
   # shellcheck source=./script_utils.sh
   . "$utils"             # Note: this may error. I can't use it in a conditional or bashls fails.
@@ -46,10 +43,57 @@ function join() {
   if ! shift 2; then return 0; fi
   printf "%s" "$ret" "${@/#/$sep}" || true
 }
+
+# Return the path of each command passed, if found
+function cmdpath() {
+  local e=0
+  local c && for c in "$@"; do
+    command -v -- "$c" || e="$?"
+  done
+  return "$e"
+}
+function has_cmd() {
+  local c && for c in "$@"; do
+    command -v -- "$c" &>/dev/null || return "$?"
+  done
+}
+function has() { has_cmd "$@"; } # Fix a common error.
+
+YELLOW_COLOR='' TEAL_COLOR='' RED_COLOR='' PINK_COLOR='' OFF_COLOR=''
+if has_cmd tput; then
+  YELLOW_COLOR="$(tput setaf 3 2>/dev/null || printf '')" # Used for warn
+  TEAL_COLOR="$(tput setaf 6 2>/dev/null || printf '')"   # Used for log
+  RED_COLOR="$(tput setaf 1 2>/dev/null || printf '')"    # Used for error
+  PINK_COLOR="$(tput setaf 5 2>/dev/null || printf '')"   # Used for debug
+  OFF_COLOR="$(tput sgr0 2>/dev/null || printf '')"       # Used to return to default colors
+fi
+
+# Usage: color "$(tput setaf 3)"
+# Outputs the escape code using printf
+function color() { printf '%b' "$@" || true; }
+# Usage: _log_c "$COLOR" cmd args
+# Example: _log_c "$BLUE_COLOR" log "hello world in blue"
+function _log_c() {
+  ! [ -t 1 ] || color "$1" # color only if terminal is present
+  "$2" "${@:3}"
+  ! [ -t 1 ] || color "$OFF_COLOR"
+}
+
+# For each log function, include a log_c that prints in color if stdout is a terminal
+
 # Outputs only if $DEBUG is set
 function debug() { [ -z "${DEBUG:-}" ] || printf 'DEBUG: %s\n' "$@" >&2 || true; }
+function debug_c() { _log_c "$PINK_COLOR" debug "$@" || true; }
+
 function log() { printf '%s\n' "$@" || true; }
+function log_c() { _log_c "$TEAL_COLOR" log "$@" || true; }
+
 function err() { printf "%s\n" "$@" >&2 || true; }
+function err_c() { _log_c "$RED_COLOR" err "$@" || true; }
+
+function warn() { printf "%s\n" "$@" >&2 || true; }
+function warn_c() { _log_c "$YELLOW_COLOR" warn "$@" || true; }
+
 # prints the command and runs it
 # verbose echo do something -> echo do something\ndo something
 function verbose() {
@@ -76,19 +120,6 @@ function confirm() {
 
 # Usage: abort message [code]
 function abort() { err "$1" && exit "${2:-1}"; }
-# Return the path of each command passed, if found
-function cmdpath() {
-  local e=0
-  local c && for c in "$@"; do
-    command -v -- "$c" || e="$?"
-  done
-  return "$e"
-}
-function has_cmd() {
-  local c && for c in "$@"; do
-    command -v -- "$c" &>/dev/null || return "$?"
-  done
-}
 # Output a message about missing dependencies and return 1 if any
 # Use `set -e`, or `|| exit` to exit on error
 function check_dependencies() {
