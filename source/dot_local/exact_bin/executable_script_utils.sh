@@ -28,7 +28,7 @@ if false; then
   [ "$?" -eq 0 ] || exit # set -e means that this line should be irrelevant, but just in case.
 fi
 
-THIS="$0"
+THIS="$(basename -- "$0")" # This script is designed to be sourced. $0 should be the name of the parent script.
 function usage() {
   cat <<-EOF || return 0
 $THIS [options] [--] [arguments]
@@ -52,7 +52,7 @@ function log() { printf '%s\n' "$@" || true; }
 function err() { printf "%s\n" "$@" >&2 || true; }
 # prints the command and runs it
 # verbose echo do something -> echo do something\ndo something
-verbose() {
+function verbose() {
   # ${var@Q} will quote it.
   # Q The expansion is a string that is the value of parameter quoted in a
   # format that can be reused as input.
@@ -89,6 +89,19 @@ function has_cmd() {
     command -v -- "$c" &>/dev/null || return "$?"
   done
 }
+# Output a message about missing dependencies and return 1 if any
+# Use `set -e`, or `|| exit` to exit on error
+function check_dependencies() {
+  local cmd missing=()
+  for cmd in "$@"; do
+    if ! has_cmd "$cmd"; then missing+=("$cmd"); fi
+  done
+  if [ "${#missing[@]}" -eq 0 ]; then return 0; fi
+  # Output an error if there are missing dependencies
+  err "$THIS: $(join ', ' "${missing[@]}") is required to use this program!"
+  return 1 # this will exit on `set -e`
+}
+
 # Returns the first executable command found
 function first_cmd() {
   local c && for c in "$@"; do

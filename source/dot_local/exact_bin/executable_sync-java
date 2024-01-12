@@ -26,16 +26,14 @@ utils="$DIR/script_utils.sh"
 . "$utils"             # Note: this may error. I can't use it in a conditional or bashls fails.
 [ "$?" -eq 0 ] || exit # set -e means that this line should be irrelevant, but just in case.
 
-for cmd in "${deps[@]}"; do
-  if ! has_cmd "$cmd"; then abort "$cmd is required to use this program!" 3; fi
-done
+check_dependencies "${deps[@]}"
 
 # Dest defaults to my personal USB's name
 dest="${1:-/media/$USER/AARONDILL}"
 src="${2:-${java:-$HOME/code/java}}"
 
-if ! [ -d "$dest" ]; then abort "dest: $dest is not a directory!" 1; fi
-if ! [ -d "$src" ]; then abort "src: $src is not a directory!" 1; fi
+[ -d "$dest" ] || abort "dest: $dest is not a directory!" 1
+[ -d "$src" ] || abort "src: $src is not a directory!" 1
 
 # note: diff dest src to show what copying *will do*
 verbose diff -r -- "$dest" "$src" || confirm "source and destination differ. Do you want to override destination?" || abort 'aborting' 1
