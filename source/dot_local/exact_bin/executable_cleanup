@@ -45,10 +45,10 @@ fi
 # Start doing things
 
 if has_cmd pnpm; then
-  log "Cleaning pnpm store"
+  log_c "Cleaning pnpm store"
   (
     cd # pnpm has issues if the current directory is not writable.
-    verbose pnpm store prune || true
+    verbose_c pnpm store prune || true
   )
 fi
 if has_cmd bun; then
@@ -56,15 +56,15 @@ if has_cmd bun; then
     mkdir -p "$BUN_INSTALL/install/global/"
     touch "$BUN_INSTALL/install/global/package.json"
   fi
-  log "Cleaning bun cache"
-  verbose bun pm -g cache rm
+  log_c "Cleaning bun cache"
+  verbose_c bun pm -g cache rm
 fi
 
-log "Cleaning browser cache"
+log_c "Cleaning browser cache"
 # Cleaner output
-NO_MEASURE_DISK_DIFF=1 verbose clean-google-cache || true
+NO_MEASURE_DISK_DIFF=1 verbose_c clean-google-cache || true
 
-log "Cleaning up cache files"
+log_c "Cleaning up cache files"
 rm -rf -- ~/.cache/node/corepack/ || true
 rmdir --ignore-fail-on-non-empty -- ~/.cache/node/ || true
 rm -rf -- ~/.cache/npm/ || true
@@ -72,28 +72,28 @@ rm -rf -- ~/.cache/yarn/ || true
 rm -rf -- ~/.cache/gnome-desktop-thumbnailer/ || true
 rm -rf -- ~/.cache/mesa_shader_cache/ || true
 
-log "Cleaning the trash"
+log_c "Cleaning the trash"
 if has_cmd trash-empty; then
-  verbose trash-empty || true
+  verbose_c trash-empty || true
 elif has_cmd gio; then
-  verbose gio trash --empty || true
+  verbose_c gio trash --empty || true
 else
   err_c "Could not find a command to clean the trash"
 fi
 
 has_root=1
 if [ "$(id -u)" -ne 0 ]; then
-  log "Note: the following commands require root access. Running sudo to cache password."
-  log "If you do not have root access, exit the prompt and these actions will be skipped."
+  log_c "Note: the following commands require root access. Running sudo to cache password."
+  log_c "(If you do not have root access, exit the prompt and these actions will be skipped.)"
   sudo_cmd true || has_root=0
 fi
 
 if [ "$has_root" -eq 1 ]; then
   if has_cmd snap; then
-    log "Cleaning up snap packages"
-    snap-cleanup -y || true
+    log_c "Cleaning up snap packages"
+    sudo_cmd "$(cmdpath snap-cleanup)" -y || true
   fi
-  log "Cleaning package manager cache"
+  log_c "Cleaning package manager cache"
   if has_cmd nala; then
     sudo_cmd nala clean || true
   elif has_cmd apt; then
@@ -107,15 +107,15 @@ if [ "$has_root" -eq 1 ]; then
   fi
 
   if has_cmd flatpak; then
-    log "Repairing flatpak repo"
+    log_c "Repairing flatpak repo"
     sudo_cmd flatpak repair || true
   fi
 
-  log "Cleaning old logs >1G"
+  log_c "Cleaning old logs >1G"
   sudo_cmd journalctl --vacuum-size=1G || true
 
   # This should be done last. It will (likely) not free any space, but should still be regularly done
-  log "Running TRIM on mounted partitions"
+  log_c "Running TRIM on mounted partitions"
   sudo_cmd fstrim -av || true # this may fail (ex: in container or unsupported fs)
 fi
 
@@ -128,6 +128,6 @@ if [ "$(get_fs_root /)" != "$(get_fs_root ~)" ]; then
 fi
 saving=$((oldsize - newsize))
 
-log "Old size: $(human_readable "$oldsize")"
-log "New size: $(human_readable "$newsize")"
-log "Total saving: $(human_readable "$saving")"
+log_c "Old size: $(human_readable "$oldsize")"
+log_c "New size: $(human_readable "$newsize")"
+log_c "Total saving: $(human_readable "$saving")"

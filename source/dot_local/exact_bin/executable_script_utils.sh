@@ -63,20 +63,22 @@ YELLOW_COLOR='' TEAL_COLOR='' RED_COLOR='' PINK_COLOR='' OFF_COLOR=''
 if has_cmd tput; then
   YELLOW_COLOR="$(tput setaf 3 2>/dev/null || printf '')" # Used for warn
   TEAL_COLOR="$(tput setaf 6 2>/dev/null || printf '')"   # Used for log
+  GREEN_COLOR="$(tput setaf 2 2>/dev/null || printf '')"  # Used for verbose commands
   RED_COLOR="$(tput setaf 1 2>/dev/null || printf '')"    # Used for error
   PINK_COLOR="$(tput setaf 5 2>/dev/null || printf '')"   # Used for debug
   OFF_COLOR="$(tput sgr0 2>/dev/null || printf '')"       # Used to return to default colors
 fi
 
 # Usage: color "$(tput setaf 3)"
+# Only outputs if stdout is a terminal
 # Outputs the escape code using printf
-function color() { printf '%b' "$@" || true; }
+function color() { ! [ -t 1 ] || printf '%b' "$@" || true; }
 # Usage: _log_c "$COLOR" cmd args
 # Example: _log_c "$BLUE_COLOR" log "hello world in blue"
 function _log_c() {
-  ! [ -t 1 ] || color "$1" # color only if terminal is present
+  color "$1"
   "$2" "${@:3}"
-  ! [ -t 1 ] || color "$OFF_COLOR"
+  color "$OFF_COLOR"
 }
 
 # For each log function, include a log_c that prints in color if stdout is a terminal
@@ -94,15 +96,19 @@ function err_c() { _log_c "$RED_COLOR" err "$@" || true; }
 function warn() { printf "%s\n" "$@" >&2 || true; }
 function warn_c() { _log_c "$YELLOW_COLOR" warn "$@" || true; }
 
-# prints the command and runs it
-# verbose echo do something -> echo do something\ndo something
-function verbose() {
+function _verbose() {
   # ${var@Q} will quote it.
   # Q The expansion is a string that is the value of parameter quoted in a
   # format that can be reused as input.
   local output="> ${*@Q}"
-  log "$output"
-  "$@" # run the input
+  log "$output" || true
+}
+# prints the command and runs it
+# verbose echo do something -> echo do something\ndo something
+function verbose() { _verbose "$@" && "$@"; }
+function verbose_c() {
+  _log_c "$GREEN_COLOR" _verbose "$@" || true
+  "$@"
 }
 
 # confirm "do you really want to do %s?" "that" --> ...do that? (Y/n)
