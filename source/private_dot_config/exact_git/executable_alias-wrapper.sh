@@ -60,11 +60,11 @@ cleanup)
 yesterday) git hist --since "${1:-yesterday}" '--branches=*' --author="$(git config user.name)" ;;
 diff-origin) # note: relies on the `git hist` alias.
   origin=${1:-$(get_remote_branch "HEAD")} || abort "No upstream branch found." 1
-  if has_changes HEAD "$origin"; then
+  if [ -n "$(git hist "HEAD..$origin")" ]; then
     log "Only Upstream:"
     git hist "HEAD..$origin"
   fi
-  if has_changes "$origin" HEAD; then
+  if [ -n "$(git hist "$origin..HEAD")" ]; then
     log "Only Local:"
     git hist "$origin..HEAD"
   fi
