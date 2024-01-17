@@ -69,6 +69,10 @@ diff-origin) # note: relies on the `git hist` alias.
     git hist "$origin..HEAD"
   fi
   ;;
+sync-tags)
+  origin=$(get_remote) || abort "No upstream found" 1
+  git fetch --prune "$origin" "+refs/tags/*:refs/tags/*"
+  ;;
 '') abort "usage: ${BASH_SOURCE[0]##*/} <command> [args]..." 2 ;;
 *) abort "Unknown command: $command" 2 ;;
 esac
