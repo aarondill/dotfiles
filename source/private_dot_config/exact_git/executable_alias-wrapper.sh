@@ -1,12 +1,31 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2120 # Optional arguments shouldn't be an error
 # a wrapper script for git aliases.
 set -euC -o pipefail
 log() { printf '%s\n' "$@"; }
-err() { printf "${THIS:+$THIS: }%s\n" "$@" >&2; }
+err() { printf "%s\n" "$@" >&2; }
 abort() {
   err "$1"
   exit "${2:-1}"
 }
+# Gets the remote name given a local branch (defaults to HEAD)
+# returns non-zero if not found
+get_remote() {
+  local symbolic remote branch="${1:-HEAD}"
+  symbolic="$(git rev-parse --symbolic-full-name "$branch")"
+  remote=$(git for-each-ref --format='%(upstream:remotename)' -- "$symbolic")
+  printf '%s\n' "$remote"
+  [ -n "$remote" ] || return 1
+}
+
+# Gets the tracking remote branch for the given branch (defaults to HEAD)
+# returns non-zero if not found
+get_remote_branch() {
+  local branch="${1:-HEAD}"
+  git rev-parse --abbrev-ref --symbolic-full-name "$branch@{u}" 2>/dev/null
+}
+# usage: has_changes <branch1> <branch1>
+has_changes() { [ -n "$(git cherry "$1" "$2")" ]; }
 
 command= && if [ -n "${1:-}" ]; then command="$1" && shift 1; fi
 case "$command" in
@@ -17,17 +36,18 @@ shallowify)
 sha1) git rev-parse --short "${1:-HEAD}" ;; # default to HEAD
 hdiff) git diff "HEAD~${1:-}" ;;            # default to HEAD~
 mvbranch)
-  if [ "$#" -lt 2 ]; then abort "usage: mvbranch <from> <to>" 2; fi
+  [ "$#" -eq 2 ] || abort "usage: $command <from> <to>" 2
+  origin=$(get_remote "$1") # note: both branches must use the same origin
   git branch -m "$1" "$2"
-  git push origin ":$1"
-  git push --set-upstream origin "$2"
+  git push "$origin" ":$1"
+  git push --set-upstream "$origin" "$2"
   ;;
 alias)
-  if [ -z "${1:-}" ] || [ -z "${2:-}" ]; then abort 'usage: alias <alias> <definition>' 2; fi
+  [ "$#" -eq 2 ] || abort "usage: $command <alias> <definition>" 2
   git config --global "alias.$1" "$2"
   ;;
 unalias)
-  if [ -z "${1:-}" ]; then abort "usage: unalias <alias>" 2; fi
+  [ -n "${1:-}" ] || abort "usage: $command <alias>" 2
   git config --global --unset "alias.$1"
   ;;
 cleanup)
@@ -38,20 +58,17 @@ cleanup)
   git gc --prune=now --aggressive
   ;;
 yesterday) git hist --since "${1:-yesterday}" '--branches=*' --author="$(git config user.name)" ;;
-diff-origin)
-  origin="${1:-$(git for-each-ref --format='%(upstream:short)' "$(git symbolic-ref -q HEAD)")}"
-  if [ -z "$origin" ]; then abort "No upstream branch found." 1; fi
-  only_up=$(git hist --color=always "HEAD..$origin")
-  only_local=$(git hist --color=always "$origin..HEAD")
-  if [ -n "$only_up" ]; then
+diff-origin) # note: relies on the `git hist` alias.
+  origin=${1:-$(get_remote_branch "HEAD")} || abort "No upstream branch found." 1
+  if has_changes HEAD "$origin"; then
     log "Only Upstream:"
-    log "$only_up"
+    git hist "HEAD..$origin"
   fi
-  if [ -n "$only_local" ]; then
+  if has_changes "$origin" HEAD; then
     log "Only Local:"
-    log "$only_local"
+    git hist "$origin..HEAD"
   fi
   ;;
-'') abort "usage: alias-wrapper.sh <command> [args]..." 2 ;;
-*) THIS=alias-wrapper.sh abort "Unknown command '$command'" 2 ;;
+'') abort "usage: ${BASH_SOURCE[0]##*/} <command> [args]..." 2 ;;
+*) abort "Unknown command: $command" 2 ;;
 esac
