@@ -64,7 +64,8 @@ file="$(get_latest "$downloads" "$num" | head -n 1)"
 case "$do" in
 remove)
   log "Removing '$file'"
-  rm -ri -- "$file"
+  confirm "remove '$file'?" || abort "aborting" 1
+  rm -rf -- "$file"
   ;;
 copy)
   log "Copying '$file' to '$dest'"

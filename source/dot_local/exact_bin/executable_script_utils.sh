@@ -59,6 +59,9 @@ function has_cmd() {
 }
 function has() { has_cmd "$@"; } # Fix a common error.
 
+# If this variable is set to 1, color will be turned on when stdout is a terminal (unless NO_COLOR is set)
+USE_COLOR=0
+
 YELLOW_COLOR='' TEAL_COLOR='' RED_COLOR='' PINK_COLOR='' OFF_COLOR=''
 if has_cmd tput; then
   YELLOW_COLOR="$(tput setaf 3 2>/dev/null || printf '')" # Used for warn
@@ -72,60 +75,70 @@ fi
 # Usage: color "$(tput setaf 3)"
 # Only outputs if stdout is a terminal
 # Outputs the escape code using printf
-function color() { ! [ -t 1 ] || printf '%b' "$@" || true; }
-# Usage: _log_c "$COLOR" cmd args
-# Example: _log_c "$BLUE_COLOR" log "hello world in blue"
-function _log_c() {
-  color "$1"
-  "$2" "${@:3}"
-  color "$OFF_COLOR"
+function color() {
+  [ -t 1 ] || return 0
+  [ "$USE_COLOR" -ne 0 ] || return 0
+  printf '%b' "$@" || true
 }
 
-# For each log function, include a log_c that prints in color if stdout is a terminal
+# printf in color. Note: this won't work with -v!
+# If stdout is not a terminal, or USE_COLOR is 0, calls printf without changing the color codes
+# Outputs the color code $1, then runs printf with the remaining arguments and then sets the color back to default
+# Returns printf's return code
+function printf_c() {
+  local code=0
+  color "$1" || true
+  # shellcheck disable=SC2059 # This is a printf wrapper. it needs to have variables in the format string
+  printf "${@:2}" || code="$?"
+  color "$OFF_COLOR" || true
+  return "$code"
+}
 
 # Outputs only if $DEBUG is set
-function debug() { [ -z "${DEBUG:-}" ] || printf 'DEBUG: %s\n' "$@" >&2 || true; }
-function debug_c() { _log_c "$PINK_COLOR" debug "$@" || true; }
-
-function log() { printf '%s\n' "$@" || true; }
-function log_c() { _log_c "$TEAL_COLOR" log "$@" || true; }
-
-function err() { printf "%s\n" "$@" >&2 || true; }
-function err_c() { _log_c "$RED_COLOR" err "$@" || true; }
-
-function warn() { printf "%s\n" "$@" >&2 || true; }
-function warn_c() { _log_c "$YELLOW_COLOR" warn "$@" || true; }
-
-function _verbose() {
+function debug() { [ -z "${DEBUG:-}" ] || printf_c "$PINK_COLOR" 'DEBUG: %s\n' "$@" >&2 || true; }
+function log() { printf_c "$TEAL_COLOR" '%s\n' "$@" || true; }
+function err() { printf_c "$RED_COLOR" "%s\n" "$@" >&2 || true; }
+function warn() { printf_c "$YELLOW_COLOR" "%s\n" "$@" >&2 || true; }
+# prints the command and runs it
+# verbose echo do something -> echo do something\ndo something
+function verbose() {
   # ${var@Q} will quote it.
   # Q The expansion is a string that is the value of parameter quoted in a
   # format that can be reused as input.
   local output="> ${*@Q}"
-  log "$output" || true
-}
-# prints the command and runs it
-# verbose echo do something -> echo do something\ndo something
-function verbose() { _verbose "$@" && "$@"; }
-function verbose_c() {
-  _log_c "$GREEN_COLOR" _verbose "$@" || true
+  printf_c "$GREEN_COLOR" '%s\n' "$output" || true
   "$@"
 }
 
-# confirm "do you really want to do %s?" "that" --> ...do that? (Y/n)
-# Strings are evaluated using printf
+# confirm "do you really want to do that?".
+# Case insensitive matching!
+# Accepts: 'y', 'yes', 'Y', and 'Yes' as true (exit 0)
+# Accepts: 'n', 'no', 'N', and 'No' as false (exit 1)
+# Unrecognized values are considered false (exit 3)
+# The second argument can be either y or n (default 'y') to choose the default value (given a blank answer)
 function confirm() {
-  local prompt confirmation
+  local prompt="$1" default=${2:-y}
+  local confirmation colorized_prompt
   # shellcheck disable=SC2059 # I know this is *generally* wrong, but this is intentional.
-  prompt="$(printf "$1" "${@:2}")"
-  read -rep "$prompt (Y/n) " confirmation </dev/tty
-  if [ -z "$confirmation" ] || [[ "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
-    return 0
+  colorized_prompt="$(color "$TEAL_COLOR")$prompt [Y/n]$(color "$OFF_COLOR") "
+  read -rep "$colorized_prompt" confirmation </dev/tty
+  if [ -z "$confirmation" ]; then     # no response
+    [ "$default" == 'y' ] || return 0 # default is yes, return true
+    return 1                          # default is no, return false
   fi
-  return 1
+
+  local trimed=${confirmation,,}
+  trimed=${trimed# *}
+  case "${confirmation,,}" in
+  y | yes) return 0 ;;
+  n | no) return 1 ;;
+  *) return 3 ;;
+  esac
 }
 
 # Usage: abort message [code]
 function abort() { err "$1" && exit "${2:-1}"; }
+
 # Output a message about missing dependencies and return 1 if any
 # Use `set -e`, or `|| exit` to exit on error
 function check_dependencies() {

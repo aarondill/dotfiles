@@ -15,9 +15,9 @@ DIR="${DIR:-"$PWD"}" utils="$DIR/script_utils.sh"
 . "$utils"             # Note: this may error. I can't use it in a conditional or bashls fails.
 [ "$?" -eq 0 ] || exit # set -e means that this line should be irrelevant, but just in case.
 
-# Set English language
-export LANG=en_US.UTF-8
-THIS="$(basename "$0")"
+export LANG=en_US.UTF-8      # Set English language
+USE_COLOR=1                  # Output color when using `log`, `err`, etc
+THIS="$(basename "$SOURCE")" # Find the name of the script
 
 if [ "$(id -u)" -ne 0 ]; then abort "This program must be run as root" 1; fi
 
@@ -50,7 +50,7 @@ while true; do
 done
 
 # Current status
-USED_BEFORE="$(df -k / | awk 'NR>1 {print $3}')"
+used_before="$(df -k / | awk 'NR>1 {print $3}')"
 
 if ! has_cmd snap; then abort "snap command not found" 1; fi
 
@@ -67,7 +67,7 @@ snap list --all | awk '/disabled/ {print $1, $3}' |
 for file in /var/lib/snapd/cache/*; do rm "$file"; done
 
 # Current status
-USED_AFTER="$(df -k / | awk 'NR>1 {print $3}')"
+used_after="$(df -k / | awk 'NR>1 {print $3}')"
 
 # Summary
-log_c "Freed up space: $(((USED_BEFORE - USED_AFTER) / 1024)) MB"
+log "Freed up space: $(((used_before - used_after) / 1024)) MB"
