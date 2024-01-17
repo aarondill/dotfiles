@@ -69,7 +69,7 @@ diff-origin) # note: relies on the `git hist` alias.
     git hist "$origin..HEAD"
   fi
   ;;
-sync-tags)
+sync-tags) # syncs tags with remote by removing local tags. Note: assumes remote as source of truth of tags.
   origin=$(get_remote) || abort "No upstream found" 1
   git fetch --prune "$origin" "+refs/tags/*:refs/tags/*"
   ;;
