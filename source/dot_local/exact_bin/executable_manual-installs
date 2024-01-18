@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -euC -o pipefail
+. script_utils.sh || exit
 
-THIS=manual-installs
+has_cmd dpkg || abort "dpkg not found! Is this a debian-based distribution?" 2
 
 release=$(. /etc/os-release && printf '%s' "$VERSION" | awk '{print $1}')
 codename=$(. /etc/os-release && printf '%s' "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
@@ -10,60 +11,39 @@ manifestURL="http://releases.ubuntu.com/$codename/ubuntu-$release-$desktop-amd64
 backupURL="http://releases.ubuntu.com/jammy/ubuntu-22.04.2-desktop-amd64.manifest"
 
 function usage() {
-  cat <<EOF
-$THIS [options]
-                  
+  cat <<EOF || true
+Usage: $THIS [options]
 uses apt-mark to fetch a list of manually installed packages and compares against the
 ubuntu manifest (or a given list of packages) to find the packages that were manually
 installed by the user.
 
 Options:
--h, --help           show this message
--m, --manifest=url   use the url given to download the manifest (default: $manifestURL)
+  -h, --help           show this message
+  -m, --manifest=url   use the url given to download the manifest (default: $manifestURL)
 EOF
-  return 0
 }
-
-function log() { printf '%s\n' "$@"; }
-function err() { printf "$THIS: %s\n" "$@" >&2; }
-function abort() { err "$1" && exit "${2:-1}"; }
-
-# Returns a string that should be 'eval'ed to set the positional arguments
-# Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
-# Input: $LONGOPTS,$SHORTOPTS
-# eval "$(parse_args "$@")"
-function parse_args() {
-  local parsed
-  local code=0 && getopt --test &>/dev/null || code=$?
-  if [ "$code" -ne 4 ]; then abort "Enhanced getopt is required for this script to work. Please install it." 1; fi
-  parsed=$(getopt --options="$SHORTOPTS" --longoptions="$LONGOPTS" --name "${THIS:-$0}" -- "$@") ||
-    exit 2                     # getopt has already complained about wrong arguments to stdout - Exit script
-  printf '%s' "set -- $parsed" # output getopt’s output this way to handle the quoting right
-}
-
-# option --long/-l requires 1 argument
-LONGOPTS=help,manifest:
-SHORTOPTS=h,m:
+LONGOPTS=help,manifest: SHORTOPTS=h,m:
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 
 while true; do
   case "$1" in
-  --help | -h) usage && exit 0 ;;
-  --) shift && break ;;
+  -h | --help) usage && exit 0 ;;
   -m | --manifest) manifestURL="$2" && shift 2 ;;
+  --) shift && break ;;
   *) abort "This is a bug" 3 ;;
   esac
 done
-
-if [ -z "$manifestURL" ]; then abort "No manifest URL was provided" 2; fi
+[ -n "$manifestURL" ] || abort "No manifest URL was provided" 2
+check_dependencies apt-mark curl dpkg || exit
 
 showmanual=$(apt-mark showmanual | sort)
 
+manifest_content=
 for url in "$manifestURL" "$backupURL"; do
   manifest_content=$(curl -SsLf -- "$url" | cut -f1 | sort) || true
-  if [ -n "$manifest_content" ]; then break; fi
-  err "downloading the manifest from '$manifestURL' failed"
+  [ -z "$manifest_content" ] || break # we got something, stop trying
+  err "downloading the manifest from '$manifestURL' failed!"
 done
-if [ -z "$manifest_content" ]; then abort "downloading the manifest failed. Aborting." 1; fi
+[ -n "$manifest_content" ] || abort "downloading the manifest failed. Aborting." 1
 
 comm -23 <(printf "%s" "$showmanual") <(printf "%s" "$manifest_content")
