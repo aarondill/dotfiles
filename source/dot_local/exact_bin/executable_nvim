@@ -3,10 +3,16 @@ neovim_path=~/code/repos/neovim
 neovim="$neovim_path/build/bin/nvim"
 if [ -x "$neovim" ]; then
   # echo "Running git version!"
-  VIMRUNTIME="$neovim_path/runtime/" exec -- "$neovim" "$@"
-elif [ -x /usr/bin/nvim ]; then
-  exec -- /usr/bin/nvim "$@"
+  export VIMRUNTIME="$neovim_path/runtime/"
+  exec -- "$neovim" "$@"
 fi
 
-printf '%s\n' "Could not find nvim" >&2
-exit 2
+while read -r -d: path; do
+  path=${path:-$PWD}                                  # empty path means pwd
+  [ "$path/nvim" != "${BASH_SOURCE[0]}" ] || continue # skip this_file
+  [ -x "$path/nvim" ] || continue
+  exec -- "$path/nvim" "$@" || continue
+done < <(printf '%s' "$PATH:")
+
+printf '%s\n' "nvim: command not found" >&2
+exit 127
