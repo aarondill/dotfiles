@@ -24,7 +24,7 @@ EOF
 }
 
 LONGOPTS=help,yes SHORTOPTS=h,y
-eval "$(parse_args "$@")"
+ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 
 yes=0
 while true; do

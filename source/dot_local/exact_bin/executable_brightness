@@ -25,7 +25,7 @@ function is_integer() {
 }
 
 LONGOPTS="help,device:" SHORTOPTS="h,d:"
-eval "$(parse_args "$@")" || exit
+ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 
 device='' show=0
 while true; do

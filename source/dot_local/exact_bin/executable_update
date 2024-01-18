@@ -24,7 +24,7 @@ EOF
 }
 
 LONGOPTS=help,as-root,list SHORTOPTS=h,l
-eval "$(parse_args "$@")" || exit
+ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 
 # This is the main driver for available methods!
 # To add a method, add it here, then add it to the case statement below

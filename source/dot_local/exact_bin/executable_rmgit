@@ -20,7 +20,7 @@ EOF
 }
 
 LONGOPTS=help,verbose,yes,force,interactive,recursive SHORTOPTS=h,v,y,f,i,r
-eval "$(parse_args "$@")" || exit
+ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 
 declare -i yes=0 force=0
 for arg in "$@"; do
