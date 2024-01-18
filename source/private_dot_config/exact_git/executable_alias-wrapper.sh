@@ -58,6 +58,9 @@ cleanup)
   git gc --prune=now --aggressive
   ;;
 yesterday) git hist --since "${1:-yesterday}" '--branches=*' --author="$(git config user.name)" ;;
+get-remote)
+  get_remote_branch "${1:-HEAD}" || abort "No upstream branch found." 1
+  ;;
 diff-origin) # note: relies on the `git hist` alias.
   origin=${1:-$(get_remote_branch "HEAD")} || abort "No upstream branch found." 1
   # note: use [ -n git hist ] because is faster than git cherry. Git cherry has to fetch the diff from remote.
