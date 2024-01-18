@@ -25,9 +25,9 @@ if false; then
   [ "$?" -eq 0 ] || exit # set -e means that this line should be irrelevant, but just in case.
 fi
 
-# This script is designed to be sourced. $0 should be the name of the parent script.
+# The name of the currently running script. Override this if the current filename's basename is not satisfactory.
 # If $0 is not defined, defaults to ${BASH_SOURCE[1]} (the calling script)
-THIS="$(basename -- "${0:-${BASH_SOURCE[1]}}")"
+THIS="$(basename -- "${0:-${BASH_SOURCE[1]}}")" # This script is designed to be sourced. $0 should be the name of the parent script.
 function usage() {
   cat <<-EOF || return 0
 $THIS [options] [--] [arguments]
@@ -62,9 +62,9 @@ function has_cmd() {
 function has() { has_cmd "$@"; } # Fix a common error.
 
 # If this variable is set to 1, color will be turned on when stdout is a terminal (unless NO_COLOR is set)
-USE_COLOR=0
+declare -i USE_COLOR=0
 # If this variable is set to 0, the verbose() function will not output anything, and just calls the arguments
-USE_VERBOSE=1
+declare -i USE_VERBOSE=1
 
 YELLOW_COLOR='' TEAL_COLOR='' RED_COLOR='' PINK_COLOR='' OFF_COLOR=''
 if has_cmd tput; then
@@ -128,7 +128,7 @@ function verbose() {
   "$@"
 }
 
-# confirm "do you really want to do that?".
+# confirm "do you really want to do that?"
 # Case insensitive matching!
 # Accepts: 'y', 'yes', 'Y', and 'Yes' as true (exit 0)
 # Accepts: 'n', 'no', 'N', and 'No' as false (exit 1)
@@ -137,7 +137,6 @@ function verbose() {
 function confirm() {
   local prompt="$1" default=${2:-y}
   local confirmation colorized_prompt
-  # shellcheck disable=SC2059 # I know this is *generally* wrong, but this is intentional.
   colorized_prompt="$(color "$TEAL_COLOR")$prompt [Y/n]$(color "$OFF_COLOR") "
   read -rep "$colorized_prompt" confirmation </dev/tty
   if [ -z "$confirmation" ]; then     # no response

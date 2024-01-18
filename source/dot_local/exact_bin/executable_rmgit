@@ -15,13 +15,6 @@ DIR="${DIR:-"$PWD"}" utils="$DIR/script_utils.sh"
 . "$utils"             # Note: this may error. I can't use it in a conditional or bashls fails.
 [ "$?" -eq 0 ] || exit # set -e means that this line should be irrelevant, but just in case.
 
-function verbose() {
-  [ "${VERBOSE:-}" -eq 1 ] && log "$*"
-  "$@"
-}
-
-declare -i VERBOSE=0 YES=0 FORCE=0
-
 function usage() {
   cat <<-EOF
 Usage: $THIS [OPTS] REPO...
@@ -38,85 +31,64 @@ EOF
   return 0
 }
 
-# Returns a string that should be 'eval'ed to set the positional arguments
-# Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
-# Input: $LONGOPTS,$SHORTOPTS
-# eval "$(parse_args "$@")"
-function parse_args() {
-  local parsed
-  local code=0 && getopt --test &>/dev/null || code=$?
-  if [ "$code" -ne 4 ]; then abort "Enhanced getopt is required for this script to work. Please install it." 1; fi
-  parsed=$(getopt --options="$SHORTOPTS" --longoptions="$LONGOPTS" --name "${THIS:-$0}" -- "$@") ||
-    exit 2                     # getopt has already complained about wrong arguments to stdout - Exit script
-  printf '%s' "set -- $parsed" # output getopt’s output this way to handle the quoting right
-}
-
 LONGOPTS=help,verbose,yes,force,interactive,recursive SHORTOPTS=h,v,y,f,i,r
-ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
+eval "$(parse_args "$@")" || exit
 
+declare -i yes=0 force=0
 for arg in "$@"; do
   case "$arg" in
   -h | --help) usage && exit 0 ;;
-  -v | --verbose) VERBOSE=1 && shift ;;
-  -y | --yes) YES=1 && shift ;;
-  -f | --force) FORCE=1 YES=1 && shift ;;
+  -v | --verbose) USE_VERBOSE=1 && shift ;;
+  -y | --yes) yes=1 && shift ;;
+  -f | --force) force=1 yes=1 && shift ;;
   -i | --interactive) ;& -r | --recursive) shift ;;
   --) shift && break ;;
   *) abort 'This is a bug' 3 ;;
   esac
 done
 
-if [ "$#" -eq 0 ]; then abort "missing operand" 2; fi
+[ "$#" -gt 0 ] || abort "missing operand" 2
 
 # usage: check_status repo
 # returns success if the repo is clean
 function check_status() {
-  local dir=$1
-  if [ -n "$(git -C "$dir" status --porcelain)" ]; then
-    return 1
-  fi
-  return 0
+  local dir="${1:-.}"
+  [ -n "$(git -C "$dir" status --porcelain)" ] || return 1
 }
 
-exit=0
+# The final exit code.
+exit_code=0
+# like exit, but sets the exit_code variable instead of exiting. always returns 0.
 function _exit() {
-  local code=${1:-$?} # first arg, or last code (like exit)
-  [ "$code" -gt "$exit" ] && exit=$code
+  local code=${1:-$?}                               # first arg, or last code (like exit)
+  [ "$code" -le "$exit_code" ] || exit_code="$code" # exit=max(exit, code)
   return 0
 }
-for repo in "$@"; do
-  if [ -z "$repo" ]; then
-    err "Refusing to remove empty string. (repo is required)"
-    _exit 2 && continue
-  fi
+# like abort(), but doesn't actually exit! always returns 0
+function _abort() { err "$1" && _exit "${2:-1}"; }
 
-  if ! [ -d "$repo" ] || ! [ -d "$repo"/.git ]; then
-    err "$repo is not a git repository"
-    _exit 1 && continue
-  fi
+for repo in "$@"; do
+  [ -z "$repo" ] || { _abort "Refusing to remove empty string. (repo is required)" 2 && continue; }
+  { [ -d "$repo" ] && [ -d "$repo/.git" ]; } || { _abort "$repo is not a git repository" 1 && continue; }
+
   # Only run it if the repo still is not corrupted (from previous rm -r)
   if git -C "$repo" rev-parse &>/dev/null; then
-    if ! check_status "$repo"; then
-      err "Refusing to remove dirty repo $repo"
-      _exit 1 && continue
-    fi
+    check_status "$repo" || { _abort "Refusing to remove dirty repo $repo" 1 && continue; }
   fi
 
-  if [ "$YES" -ne 1 ]; then
-    read -rep "$THIS: remove git repository '$repo'? " confirmation
-    if ! [[ "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
-      _exit 1 && continue
-    fi
-  fi
+  # only confirm if yes is not 1
+  [ "$yes" -eq 1 ] ||
+    confirm "$THIS: remove git repository '$repo'?" || { _exit 1 && continue; }
 
   base_args=(--recursive)
-  if [ "$FORCE" -eq 1 ]; then base_args+=(--force); fi
-  if [ "$VERBOSE" -eq 1 ]; then base_args+=(--verbose); fi
-  base_args+=(--)
+  [ "$force" -eq 0 ] || base_args+=(--force)
+  [ "$USE_VERBOSE" -eq 0 ] || base_args+=(--verbose)
 
   # Force rm .git
-  verbose rm --force "${base_args[@]}" "$repo/.git"
-  verbose rm "${base_args[@]}" "$repo/"
+  {
+    verbose rm --force --recursive -- "$repo/.git" &&
+      verbose rm "${base_args[@]}" -- "$repo/"
+  } || _exit "$?"
 done
 
-exit "$exit"
+exit "$exit_code"
