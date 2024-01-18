@@ -6,42 +6,23 @@
 # *Follows Symlinks*
 #
 set -euC -o pipefail
+. script_utils.sh || exit
 
-THIS=dunnet
 save_file="$HOME/.config/emacs/games/dunnet.save"
-
 function usage() {
   cat <<EOF
-$THIS [options] [--] [emacs-options]
-                  
+Usage: $THIS [options] [--] [emacs-options]
 Opens dunnet automatically loading the save file
 Depends on emacs being installed.
 
-options:
--h, --help         show this message
--n, --nosave       Don't use a save file
--s, --save=save    use save instead of $save_file
--e, --emacs=path   use path instead of searching \$PATH
+Options:
+  -n, --nosave       Don't use a save file
+  -h, --help         show this message
+  -s, --save=save    use save instead of $save_file
+  -e, --emacs=path   use path instead of searching \$PATH
 EOF
   return 0
 }
-function log() { printf '%s\n' "$@"; }
-function err() { printf "$THIS: %s\n" "$@" >&2; }
-function abort() { err "$1" && exit "${2:-1}"; }
-
-# Returns a string that should be 'eval'ed to set the positional arguments
-# Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
-# Input: $LONGOPTS,$SHORTOPTS
-# eval "$(parse_args "$@")"
-function parse_args() {
-  local parsed
-  local code=0 && getopt --test &>/dev/null || code=$?
-  if [ "$code" -ne 4 ]; then abort "Enhanced getopt is required for this script to work. Please install it." 1; fi
-  parsed=$(getopt --options="$SHORTOPTS" --longoptions="$LONGOPTS" --name "${THIS:-$0}" -- "$@") ||
-    exit 2                     # getopt has already complained about wrong arguments to stdout - Exit script
-  printf '%s' "set -- $parsed" # output getopt’s output this way to handle the quoting right
-}
-
 LONGOPTS=help,nosave,emacs:,save: SHORTOPTS=h,n,e:,s:
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 
@@ -57,35 +38,23 @@ while true; do
   esac
 done
 
-if [ -z "$emacs" ]; then
-  if ! command -v which &>/dev/null; then
-    abort "which is required to search PATH for emacs. Please install which or provide the path via --emacs" 2
-  fi
-  emacs="$(which emacs 2>/dev/null)" || true
-fi
+[ -n "$emacs" ] || emacs="$(cmdpath emacs 2>/dev/null)" || true
+[ -x "$emacs" ] || abort 'Emacs is required to run dunnet' 2
 
-# I don't know how to control emacs. just open dunnet pls
-if [ -z "$emacs" ] || ! [ -x "$emacs" ]; then
-  abort 'Emacs is required to run dunnet' 2
-fi
-
-dunnet="$(printf '%s\0' /usr/share/emacs/*/lisp/play/dunnet.elc | head -n1 -z | tr -d '\0')"
+dunnet="$(printf '%s\n' /usr/share/emacs/*/lisp/play/dunnet.elc | head -n1)"
 # no-site go-to-save-location no-init load-dunnet anything-else-passed
 emacs_args=(-Q -batch -l "$dunnet")
 
 # Output to tty and setup chdir
 if [ -n "$save_file" ]; then
-  printf '%s\n' "Run 'restore $(basename -- "$save_file")' to (re)load" "run 'save $(basename -- "$save_file")' to overwrite save data"
+  log "Run 'restore $(basename -- "$save_file")' to (re)load" "run 'save $(basename -- "$save_file")' to overwrite save data"
   emacs_args+=(-chdir "$(dirname "$save_file")")
 else
-  printf '%s\n' "run 'save /path/to/dunnet.save' to overwrite save data (relative to CWD)"
+  log "run 'save /path/to/dunnet.save' to overwrite save data (relative to CWD)"
 fi
 emacs_args+=("$@")
 
-if [ -n "$save_file" ] && [ -f "$save_file" ]; then
-  # save file exists, auto restore
-  cat <(printf '%s\n' "restore $(basename "$save_file")") - | exec emacs "${emacs_args[@]}"
-else
-  # No save file exists, just run it
-  exec emacs "${emacs_args[@]}"
-fi
+# No save file exists, just run it
+[ -f "$save_file" ] || exec emacs "${emacs_args[@]}"
+# save file exists, auto restore
+cat <(printf '%s\n' "restore $(basename "$save_file")") - | exec emacs "${emacs_args[@]}"
