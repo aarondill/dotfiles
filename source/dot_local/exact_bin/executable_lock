@@ -1,27 +1,21 @@
 #!/usr/bin/env bash
-set -euC
+set -euC -o pipefail
 
-function err() { printf '%s\n' "$@" >&2; }
-function abort() {
-  err "$1"
-  exit "${2:-1}"
-}
-function has() { [ -x "$(command -v "$1" &>/dev/null)" ]; }
+function optional() { "$@" || true; }
+function err() { optional printf '%s\n' "$@" >&2; }
+function abort() { err "$1" && exit "${2:-1}"; }
 
 pid_file=''
 if [ "$#" -gt 0 ]; then # args passed
   # first arg *must* be -p
-  if [ "${1:-}" != '-p' ]; then abort 'usage: lock [-p pid_file]' 2; fi
-
+  [ "${1:-}" == '-p' ] || abort 'usage: lock [-p pid_file]' 2
   # second arg *must* be non-empty (it's a file!)
-  if [ -z "${2:-}" ]; then abort "option requires an argument -- 'p'" 2; fi
+  [ -n "${2:-}" ] || abort "option requires an argument -- 'p'" 2
   # set pid_file to the file argument
   pid_file="${2:-}"
 fi
+[ -n "${DISPLAY:-}" ] || abort "Please run this script in a Xorg session" 1
 
-if [ -z "${DISPLAY:-}" ]; then abort "Please run this script in a Xorg session" 1; fi
-
-function optional() { "$@" || true; }
 function revert() {
   optional xset dpms force on
   optional xset dpms 0 0 0
@@ -30,8 +24,8 @@ trap revert HUP INT TERM EXIT
 optional xset +dpms dpms 5 5 5                      # every 5 seconds
 optional sleep .5 && optional xset dpms force off & # force off the first time
 i3lock -n -f -e -c 000000 &
-pid="$!"                                                          # get the pid of the i3lock process (note -n to not fork!)
-if [ -n "$pid_file" ]; then printf '%s\n' "$pid" >"$pid_file"; fi # write to the pid_file if present
-wait "$pid"                                                       # block until the i3lock process ends
+pid="$!"                                                # get the pid of the i3lock process (note -n to not fork!)
+[ -z "$pid_file" ] || printf '%s\n' "$pid" >"$pid_file" # write to the pid_file if present
+wait "$pid"                                             # block until the i3lock process ends
 
 revert
