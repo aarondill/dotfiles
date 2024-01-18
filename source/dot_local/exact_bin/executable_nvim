@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euC -o pipefail
 neovim_path=~/code/repos/neovim
 neovim="$neovim_path/build/bin/nvim"
 if [ -x "$neovim" ]; then
@@ -6,13 +7,19 @@ if [ -x "$neovim" ]; then
   export VIMRUNTIME="$neovim_path/runtime/"
   exec -- "$neovim" "$@"
 fi
+function find_in_path() {
+  local path cmd exclude="${2:-${BASH_SOURCE[0]}}"
+  cmd=${1%/} cmd="${1##*/}" # remove trailing slash -- then get basename
+  while read -r -d: path; do
+    path=${path:-$PWD}                         # empty path means pwd
+    [ "$path/$cmd" != "$exclude" ] || continue # skip this_file
+    [ -x "$path/$cmd" ] || continue
+    printf '%s' "$path/$cmd" || true
+    return 0
+  done < <(printf '%s' "$PATH:")
+  printf '%s\n' "$cmd: command not found" >&2 || true
+  return 127
+}
 
-while read -r -d: path; do
-  path=${path:-$PWD}                                  # empty path means pwd
-  [ "$path/nvim" != "${BASH_SOURCE[0]}" ] || continue # skip this_file
-  [ -x "$path/nvim" ] || continue
-  exec -- "$path/nvim" "$@" || continue
-done < <(printf '%s' "$PATH:")
-
-printf '%s\n' "nvim: command not found" >&2
-exit 127
+nvim="$(find_in_path nvim)" || exit
+exec -- "$nvim" "$@" || exit
