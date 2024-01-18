@@ -148,8 +148,8 @@ function confirm() {
   colorized_prompt="$(color "$TEAL_COLOR")$prompt [Y/n]$(color "$OFF_COLOR") "
   read -rep "$colorized_prompt" confirmation </dev/tty
   if [ -z "$confirmation" ]; then     # no response
-    [ "$default" == 'y' ] || return 0 # default is yes, return true
-    return 1                          # default is no, return false
+    [ "$default" == 'y' ] || return 1 # default is no, return false
+    return 0                          # default is yes, return true
   fi
 
   local trimed=${confirmation,,}

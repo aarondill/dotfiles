@@ -55,7 +55,7 @@ src="${2:-${java:-$HOME/code/java}}"
 
 check_dependencies "${deps[@]}" || exit
 # note: diff dest src to show what copying *will do*
-[ "$yes" -eq 1 ] || verbose diff -r -- "$dest" "$src" || confirm "source and destination differ. Do you want to override destination?" || abort 'aborting' 1
+[ "$yes" -eq 1 ] || verbose diff -r -- "$dest" "$src" || confirm "source and destination differ. Do you want to override destination?" y || abort 'aborting' 1
 # verbose, archive, recursive, update, progress
 rsync_args=(-varuP)
 [ "$keep" -eq 1 ] || rsync+=(--delete) # if not keep, then delete files not present in src
