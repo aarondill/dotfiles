@@ -74,11 +74,18 @@ if has_cmd tput; then
 fi
 
 # Usage: color "$(tput setaf 3)"
-# Only outputs if stdout is a terminal
+# Only outputs if stdout is a terminal and environment variables are correct
+# respects: FORCE_COLOR!=0, USE_COLOR!=0, NO_COLOR==''
+# note: if FORCE_COLOR is set and non-zero, other checks are ignored
+# If you use tput to get color codes (you should!), it will handle the TERM variable
 # Outputs the escape code using printf
 function color() {
-  [ -t 1 ] || return 0
-  [ "$USE_COLOR" -ne 0 ] || return 0
+  [ "${FORCE_COLOR:-}" != 0 ] || return 0  # FORCE_COLOR must not be 0
+  if [ -z "${FORCE_COLOR:-}" ]; then       # If FORCE_COLOR is set, don't do any other checks
+    [ -t 1 ] || return 0                   # stdout must be a terminal
+    [ "${USE_COLOR:-0}" != 0 ] || return 0 # USE_COLOR must be non-zero
+    [ -z "${NO_COLOR:-}" ] || return 0     # NO_COLOR must be null
+  fi
   printf '%b' "$@" || true
 }
 
@@ -178,7 +185,7 @@ tmpfiles=()
 # If no files are specified, cleans up all files in "${tmpfiles[@]}"
 function cleanup() {
   local files=("${tmpfiles[@]}")
-  [ $? -eq 0 ] || files=("$@") # If arguments are given, clean up *only* those
+  [ "$?" -eq 0 ] || files=("$@") # If arguments are given, clean up *only* those
   if command -v _cleanup; then _cleanup "$@"; fi
   if [ "${#tmpfiles[@]}" -eq 0 ]; then return 0; fi
   local tmp && for tmp in "${files[@]}"; do
@@ -234,7 +241,7 @@ function download() {
   case "$(first_cmd curl wget)" in
   curl)
     cmd=(curl -SfL -o "${output:-"-"}")
-    [ "$progress" -eq 1 ] || cmd+=(-s)
+    [ "$progress" = 1 ] || cmd+=(-s)
     ;;
   wget)
     cmd=(wget -O "${output:-"-"}")
