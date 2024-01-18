@@ -3,7 +3,7 @@ set -euC -o pipefail
 shopt -s nullglob # *not-exists* = ""
 shopt -s globstar # **
 
-function log() { printf '%s\n' "$@"; }
+function log() { printf '%s\n' "$@" || true; }
 
 MEASURE_DISK_DIFF=1
 # Check the size of `dir` before and after running `cmd`

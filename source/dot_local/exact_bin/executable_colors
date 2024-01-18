@@ -8,13 +8,11 @@
 # colors (default + 8 escapes).
 #
 set -euC -o pipefail
-
 ## UTILS ##################################
-THIS='colors'
+THIS=${BASH_SOURCE[0]##*/}
 function usage() {
-
   cat <<EOF
-$THIS [options]
+Usage: $THIS [options]
 Echoes all the color codes to the terminal to demonstrate what's
 available. Each line is the color code of one forground color,
 out of 17 (default + 16 escapes), followed by a test use of that
@@ -25,37 +23,17 @@ OPTIONS:
 EOF
   return 0
 }
-function log() { printf '%s\n' "$@"; }
-function err() { printf "$THIS: %s\n" "$@" >&2; }
-function abort() {
-  err "$1"
-  exit "${2:-1}"
-}
-
-## PARSE ARGS #############################
-# Returns a string that should be 'eval'ed to set the positional arguments
-# Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
-# Input: $LONGOPTS,$SHORTOPTS
-# eval "$(parse_args "$@")"
-function parse_args() {
-  local parsed
-  local code=0 && getopt --test &>/dev/null || code=$?
-  if [ "$code" -ne 4 ]; then abort "Enhanced getopt is required for this script to work. Please install it." 1; fi
-  parsed=$(getopt --options="$SHORTOPTS" --longoptions="$LONGOPTS" --name "${THIS:-$0}" -- "$@") ||
-    exit 2                     # getopt has already complained about wrong arguments to stdout - Exit script
-  printf '%s' "set -- $parsed" # output getopt’s output this way to handle the quoting right
-}
-
-LONGOPTS=help SHORTOPTS=h
-ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
-
+function log() { printf '%s\n' "$@" || true; }
+function err() { printf '%s\n' "$@" >&2 || true; }
+function abort() { err "$1" && exit "${2:-1}"; }
 for arg; do
   case "$arg" in
   --help | -h) usage && exit 0 ;;
   --) shift && break ;;
-  *) abort "This is a bug" 3 ;;
+  -*) abort "Unknown option: ${arg}" 2 ;;
   esac
 done
+[ "$#" -eq 0 ] || abort "This script does not support positional parameters" 2
 
 ## VARS ###################################
 T='T'              # The test text
