@@ -24,13 +24,8 @@ required mkdir rm mv ln touch tr
 
 # doesn't follow the last symlink. ie, in /sym/sym/sym/sym --> /real/real/real/sym
 function posix_realpath {
-  if ! [ -d "$(dirname -- "$1")" ]; then
-    return 1 # fail if not exist
-  fi
-  dir=$(
-    cd "$(dirname -- "$1")" >/dev/null
-    pwd -P
-  )
+  [ -d "$(dirname -- "$1")" ] || return 1 # fail if not exist
+  dir=$(cd "$(dirname -- "$1")" >/dev/null && pwd -P)
   log "$dir/$(basename -- "$1")"
 }
 

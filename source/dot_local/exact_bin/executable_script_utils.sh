@@ -10,20 +10,27 @@
 if false; then
   set -euC -o pipefail
   shopt -s nullglob globstar # Better globs
-  # Find the current file and it's directory # Source: https://stackoverflow.com/a/246128
-  SOURCE="${BASH_SOURCE[0]:-}" DIR=''
-  while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
-    DIR="$(builtin cd -P -- "$(command dirname -- "$SOURCE")" &>/dev/null && builtin pwd)" || true
-    SOURCE="$(command readlink -- "$SOURCE")" || true
-    [[ "$SOURCE" == /* ]] || SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
-  done
-  DIR="$(builtin cd -P -- "$(command dirname -- "$SOURCE")" &>/dev/null && builtin pwd)" || true
-  DIR="${DIR:-"$PWD"}" utils="$DIR/script_utils.sh"
-  [ -f "$utils" ] || utils="$(basename -- "$utils")" || true # If utils is not a file, search for it in "$PATH" instead.
-  # shellcheck source=./script_utils.sh
-  . "$utils"             # Note: this may error. I can't use it in a conditional or bashls fails.
-  [ "$?" -eq 0 ] || exit # set -e means that this line should be irrelevant, but just in case.
+  . script_utils.sh || exit
 fi
+
+# Find the absolute path of the calling file
+# note: relies on dirname, basename, and readlink
+# Source: https://stackoverflow.com/a/246128
+function get_script_path() {
+  local CDPATH='' OLDPWD=''
+  # note: ${1-other}, no colon. if given empty string, fail fast
+  local source="${1-${BASH_SOURCE[1]:-}}" dir=''
+  [ -n "$source" ] || return 1
+  while [ -L "$source" ]; do # resolve $source until the file is no longer a symlink
+    dir="$(builtin cd -P -- "$(dirname -- "$source")" &>/dev/null && builtin pwd)"
+    source="$(readlink -- "$source")"
+    [[ "$source" == /* ]] || source="$dir/$source" # if $source was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+  done
+  dir="$(builtin cd -P -- "$(dirname -- "$source")" &>/dev/null && builtin pwd)"
+  dir="${dir:-"$PWD"}"
+  source="$dir/$(basename -- "$source")"
+  printf '%s' "$source"
+}
 
 # The name of the currently running script. Override this if the current filename's basename is not satisfactory.
 # If $0 is not defined, defaults to ${BASH_SOURCE[1]} (the calling script)
