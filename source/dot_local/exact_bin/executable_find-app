@@ -34,7 +34,7 @@ while true; do
 done
 [ "$#" -gt 0 ] || abort 'an application is required' 2
 
-readarray -d: -t data_dirs < <(printf '%s' "${XDG_DATA_DIRS:-/usr/local/share/:/usr/share/}") # split $XDG_DATA_DIRS in to array
+data_dirs=() && split data_dirs : "${XDG_DATA_DIRS:-/usr/local/share/:/usr/share/}" # split $XDG_DATA_DIRS in to array
 data_dirs=("${XDG_DATA_HOME:-~/.local/share/}" "${data_dirs[@]}")
 
 # Actually checks if is absolute or relative. Returns false if path is not / or ./

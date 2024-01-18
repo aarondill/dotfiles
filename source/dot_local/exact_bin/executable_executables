@@ -32,7 +32,7 @@ function get_execs() {
   local d f dirs=()
   local path="${1:-$PATH}"
   path="${path#:}:" # ensure trailing colon
-  readarray -d ':' -t dirs < <(printf '%s' "$path") || true
+  split dirs ":" "$path"
   for d in "${dirs[@]}"; do
     [ -n "$d" ] || d=.
     for f in "$d"/.[!.]* "$d"/..?* "$d"/*; do

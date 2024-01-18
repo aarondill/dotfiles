@@ -45,10 +45,7 @@ while true; do
   -k | --keep) keep=1 && shift ;;
   -q | --quiet) USE_VERBOSE=0 && shift ;; # make the verbose function not output
   -y | --yes) yes=1 && shift ;;
-  -e | --exclude)
-    readarray -d: -t exclude_add < <(printf '%s' "$2") || true
-    exclude+=("${exclude_add[@]}")
-    ;;
+  -e | --exclude) exclude_add=() && split exclude_add : "$2" && exclude+=("${exclude_add[@]}") ;;
   --) shift && break ;;
   *) abort "This is a bug" 3 ;;
   esac

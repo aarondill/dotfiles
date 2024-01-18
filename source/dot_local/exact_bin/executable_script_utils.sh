@@ -33,6 +33,25 @@ function join() {
   if ! shift 2; then return 0; fi
   printf "%s" "$ret" "${@/#/$sep}" || true
 }
+# splits arguments by delim argument.
+# Note: if string ends in a delim, an empty element will be present in the output
+# Usage: split arr | "a|b|c" -> arr=(a b c)
+function split() {
+  local delim="$2" str="$3" elem ends_with_delim=0
+  [ -n "$delim" ] || abort "Invalid delimiter" 2
+  case "$str" in *"$delim") ends_with_delim=1 ;; esac
+  # shellcheck disable=SC2178 # It's not being treated as a string, declare -n is special
+  declare -n __out_arr="$1"  # we can now use __out_arr to assign to outside variable
+  __out_arr=()               # clear the output array
+  while [ -n "$str" ]; do    # Loop until str is empty
+    elem="${str%%"$delim"*}" # strip first delimiter and all trailing string
+    str=${str#"$elem"}       # strip element from remaining string
+    str=${str#"$delim"}      # strip delimiter if present
+    __out_arr+=("$elem")     # return the found element
+  done
+  # input string ends with delim? add an empty element
+  [ "$ends_with_delim" -eq 0 ] || __out_arr+=("")
+}
 
 # Return the path of each command passed, if found
 function cmdpath() {
