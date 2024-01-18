@@ -186,12 +186,17 @@ function first_cmd() {
   done
   return 1 # None found
 }
+# Use to set the $sudo array to an executable command
+# Usage: set_sudo_cmd && exec "${sudo[@]}" other-command
+function set_sudo_cmd() {
+  sudo=()
+  [ "$(id -u)" -ne 0 ] || return 0               # root, sudo is empty
+  read -ra sudo -d '' <<<"${SUDO:-sudo}" || true # non-root, read in sudo from $SUDO
+}
 # Use in place of sudo. sudo ls -> sudo_cmd ls
 function sudo_cmd() {
   local sudo=()
-  if [ "$(id -u)" -ne 0 ]; then # non-root, read in sudo from $SUDO
-    read -ra sudo -d '' <<<"${SUDO:-sudo}" || true
-  fi
+  set_sudo_cmd
   "${sudo[@]}" "$@"
 }
 
