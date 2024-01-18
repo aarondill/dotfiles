@@ -47,8 +47,8 @@ function update-config() (
   fi
 
   # don't force a tty prompt, instead just take my no.
-  yes no | chezmoi add --secrets warning --exact --no-tty -- "${dirs[@]}" >/dev/null
-  yes no | chezmoi add --secrets warning --no-tty -- "${files[@]}" >/dev/null
+  yes no | chezmoi add --secrets ignore --exact --no-tty -- "${dirs[@]}" >/dev/null
+  yes no | chezmoi add --secrets ignore --no-tty -- "${files[@]}" >/dev/null
 
   # Ensure everything is updated
   chezmoi re-add
