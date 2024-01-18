@@ -2,8 +2,8 @@
 
 # ~/.local/bin/script_utils.sh
 #
-# A template script for writing good scripts
-# could be improved, but 🤷
+# A utility script for writing other scripts
+# Note: must be in the PATH!
 #
 
 # Include this section in any scripts that intend to import this utility module.
@@ -12,25 +12,6 @@ if false; then
   shopt -s nullglob globstar # Better globs
   . script_utils.sh || exit
 fi
-
-# Find the absolute path of the calling file
-# note: relies on dirname, basename, and readlink
-# Source: https://stackoverflow.com/a/246128
-function get_script_path() {
-  local CDPATH='' OLDPWD=''
-  # note: ${1-other}, no colon. if given empty string, fail fast
-  local source="${1-${BASH_SOURCE[1]:-}}" dir=''
-  [ -n "$source" ] || return 1
-  while [ -L "$source" ]; do # resolve $source until the file is no longer a symlink
-    dir="$(builtin cd -P -- "$(dirname -- "$source")" &>/dev/null && builtin pwd)"
-    source="$(readlink -- "$source")"
-    [[ "$source" == /* ]] || source="$dir/$source" # if $source was a relative symlink, we need to resolve it relative to the path where the symlink file was located
-  done
-  dir="$(builtin cd -P -- "$(dirname -- "$source")" &>/dev/null && builtin pwd)"
-  dir="${dir:-"$PWD"}"
-  source="$dir/$(basename -- "$source")"
-  printf '%s' "$source"
-}
 
 # The name of the currently running script. Override this if the current filename's basename is not satisfactory.
 # If $0 is not defined, defaults to ${BASH_SOURCE[1]} (the calling script)
@@ -61,18 +42,38 @@ function cmdpath() {
   done
   return "$e"
 }
+# Returns 1 if all commands are available, 0 otherwise
 function has_cmd() {
   local c && for c in "$@"; do
     command -v -- "$c" &>/dev/null || return "$?"
   done
 }
-function has() { has_cmd "$@"; } # Fix a common error.
+# an alias for has_cmd
+function has() { has_cmd "$@"; }
+
+# Find the absolute path of the calling file
+# note: relies on dirname, basename, and readlink
+# Source: https://stackoverflow.com/a/246128
+function get_script_path() {
+  local CDPATH='' OLDPWD=''
+  # note: ${1-other}, no colon. if given empty string, fail fast
+  local source="${1-${BASH_SOURCE[1]:-}}" dir=''
+  [ -n "$source" ] || return 1
+  while [ -L "$source" ]; do # resolve $source until the file is no longer a symlink
+    dir="$(builtin cd -P -- "$(dirname -- "$source")" &>/dev/null && builtin pwd)"
+    source="$(readlink -- "$source")"
+    [[ "$source" == /* ]] || source="$dir/$source" # if $source was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+  done
+  dir="$(builtin cd -P -- "$(dirname -- "$source")" &>/dev/null && builtin pwd)"
+  dir="${dir:-"$PWD"}"
+  source="$dir/$(basename -- "$source")"
+  printf '%s' "$source"
+}
 
 # If this variable is set to 1, color will be turned on when stdout is a terminal (unless NO_COLOR is set)
 declare -i USE_COLOR=0
 # If this variable is set to 0, the verbose() function will not output anything, and just calls the arguments
 declare -i USE_VERBOSE=1
-
 YELLOW_COLOR='' TEAL_COLOR='' RED_COLOR='' PINK_COLOR='' OFF_COLOR=''
 if has_cmd tput; then
   YELLOW_COLOR="$(tput setaf 3 2>/dev/null || printf '')" # Used for warn
@@ -285,6 +286,7 @@ function parse_args() {
 # If this file is being sourced, stop now!
 if [ "$0" != "${BASH_SOURCE[0]}" ]; then return 0; fi
 
+# Anything below here is an example. it will only run if this script is directly ran.
 # option --long/-l requires 1 argument
 LONGOPTS="help,short,long:" SHORTOPTS="h,s,l:"
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
