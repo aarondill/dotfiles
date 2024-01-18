@@ -170,10 +170,7 @@ EOF
 }
 function log() { printf '%s\n' "$@" || true; }
 function err() { printf '%s\n' "$@" >&2 || true; }
-function abort() {
-  err "$1"
-  exit "${2:-1}"
-}
+function abort() { err "$1" && exit "${2:-1}"; }
 
 # Array of arguments to pass to duplicity
 args=()
@@ -276,25 +273,21 @@ fi
 # ----------------------------------------------------------------
 
 function verbose() {
-  # a dry-run likely wants to be verbose
-  if [ -n "${BACKUP_VERBOSE:-}" ] || [ -n "${BACKUP_DRY_RUN:-}" ]; then
-    printf "'%s' " "$@" # print it
-    printf '\n'
-  fi
-  if [ -z "${BACKUP_DRY_RUN:-}" ]; then
-    "$@" # run it
-  fi
+  local verbose=${BACKUP_VERBOSE:-}             # if BACKUP_VERBOSE, be verbose
+  [ -z "${BACKUP_DRY_RUN:-}" ] || verbose=1     # if dry-run, be verbose
+  [ -z "$verbose" ] || printf "%s\n" "> ${*@Q}" # print it
+
+  [ -z "${BACKUP_DRY_RUN:-}" ] || return 0
+  "$@" # run it
 }
-did_something=
+did_something=0
 # Sets did_something and verbosely runs "$@"
 function run() {
   did_something=1
   verbose "$@"
 }
 
-if [ "${#args[@]}" -eq 0 ]; then
-  abort "No arguments were specified. Something went wrong" 3
-fi
+[ "${#args[@]}" -gt 0 ] || abort "No arguments were specified. Something went wrong" 3
 
 case "$mode" in
 backup)
@@ -348,10 +341,7 @@ print)
   ;;
 *) abort "Unknown mode '$mode'. This is most likely a bug." 3 ;;
 esac
-
-if [ -z "$did_something" ]; then
-  abort "Didn't do anything. Please check your configuration and try again." 2
-fi
+[ "$did_something" -eq 1 ] || abort "Didn't do anything. Please check your configuration and try again." 2
 
 log
 log "Verifying $DESTINATION_URI"
