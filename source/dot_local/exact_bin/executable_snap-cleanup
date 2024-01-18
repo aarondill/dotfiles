@@ -1,23 +1,10 @@
 #!/bin/bash
 set -euC -o pipefail
 shopt -s nullglob globstar # Better globs
-# Find the current file and it's directory # Source: https://stackoverflow.com/a/246128
-SOURCE="${BASH_SOURCE[0]:-}" DIR=''
-while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
-  DIR="$(builtin cd -P -- "$(command dirname -- "$SOURCE")" &>/dev/null && builtin pwd)" || true
-  SOURCE="$(command readlink -- "$SOURCE")" || true
-  [[ "$SOURCE" == /* ]] || SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
-done
-DIR="$(builtin cd -P -- "$(command dirname -- "$SOURCE")" &>/dev/null && builtin pwd)" || true
-DIR="${DIR:-"$PWD"}" utils="$DIR/script_utils.sh"
-[ -f "$utils" ] || utils="$(basename -- "$utils")" || true # If utils is not a file, search for it in "$PATH" instead.
-# shellcheck source=./script_utils.sh
-. "$utils"             # Note: this may error. I can't use it in a conditional or bashls fails.
-[ "$?" -eq 0 ] || exit # set -e means that this line should be irrelevant, but just in case.
+. script_utils.sh || exit
 
-export LANG=en_US.UTF-8      # Set English language
-USE_COLOR=1                  # Output color when using `log`, `err`, etc
-THIS="$(basename "$SOURCE")" # Find the name of the script
+export LANG=en_US.UTF-8 # Set English language
+USE_COLOR=1             # Output color when using `log`, `err`, etc
 
 if [ "$(id -u)" -ne 0 ]; then abort "This program must be run as root" 1; fi
 

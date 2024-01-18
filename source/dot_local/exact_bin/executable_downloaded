@@ -1,20 +1,7 @@
 #!/usr/bin/env bash
 set -euC -o pipefail
-# Find the current file and it's directory
-# Source: https://stackoverflow.com/a/246128
-SOURCE="${BASH_SOURCE[0]:-}" DIR=''
-while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
-  DIR="$(builtin cd -P -- "$(command dirname -- "$SOURCE")" &>/dev/null && builtin pwd)" || true
-  SOURCE="$(command readlink -- "$SOURCE")" || true
-  [[ "$SOURCE" == /* ]] || SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
-done
-DIR="$(builtin cd -P -- "$(command dirname -- "$SOURCE")" &>/dev/null && builtin pwd)" || true
-DIR="${DIR:-"$PWD"}"
-utils="$DIR/script_utils.sh"
-[ -f "$utils" ] || utils="$(basename -- "$utils")" || true # If utils is not a file, search for it in "$PATH" instead.
-# shellcheck source=./script_utils.sh
-. "$utils"             # Note: this may error. I can't use it in a conditional or bashls fails.
-[ "$?" -eq 0 ] || exit # set -e means that this line should be irrelevant, but just in case.
+shopt -s nullglob globstar # Better globs
+. script_utils.sh || exit
 
 # Outputs the most $2 recently modified files in directory $1
 # Relies on GNU find!
@@ -23,7 +10,6 @@ get_latest() {
   find "$dir" -mindepth 1 -maxdepth 1 -printf "%T@ %p\n" | sort -n | cut -d' ' -f 2- | tail -n "$num"
 }
 
-THIS="${BASH_SOURCE[0]##*/}"
 usage() {
   cat <<-EOF || true
 usage: $THIS [opts]... [--] [DEST]
