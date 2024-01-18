@@ -28,6 +28,5 @@ function x() {
   done
 }
 
-if [ "$0" = "${BASH_SOURCE[0]}" ]; then
-  x "$@"
-fi
+# only run if run directly
+[ "$0" != "${BASH_SOURCE[0]}" ] || x "$@"

@@ -1,6 +1,4 @@
 #!/usr/bin/env sh
 # just a wrapper to force gio to open the right terminal
-if [ "$#" -gt 0 ]; then
-  set -- -e "$@" # If arguments are passed, prepend them with -e
-fi
+[ "$#" -eq 0 ] || set -- -e "$@" # If arguments are passed, prepend them with -e
 exec x-terminal-emulator "$@"
