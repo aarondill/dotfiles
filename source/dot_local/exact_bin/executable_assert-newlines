@@ -7,34 +7,16 @@
 # end in a newline.
 #
 set -euC -o pipefail
-function log() { printf '%s\n' "$@"; }
-function err() { printf "$THIS: %s\n" "$@" >&2; }
-function abort() { err "$1" && exit "${2:-1}"; }
-
-THIS=assert-newlines
+. script_utils.sh || exit
 function usage() {
-  cat <<-EOF
-  $THIS DIR...
-
-  searches all text files and appends a newline if it doesn't already end in a one.
+  cat <<EOF
+Usage: $THIS DIR...
+Searches all text files and appends a newline if it doesn't already end in a one.
 EOF
 }
 
-# Returns a string that should be 'eval'ed to set the positional arguments
-# Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
-# Input: $LONGOPTS,$SHORTOPTS
-# eval "$(parse_args "$@")"
-function parse_args() {
-  local parsed
-  local code=0 && getopt --test &>/dev/null || code=$?
-  if [ "$code" -ne 4 ]; then abort "Enhanced getopt is required for this script to work. Please install it." 1; fi
-  parsed=$(getopt --options="$SHORTOPTS" --longoptions="$LONGOPTS" --name "${THIS:-$0}" -- "$@") ||
-    exit 2                     # getopt has already complained about wrong arguments to stdout - Exit script
-  printf '%s' "set -- $parsed" # output getopt’s output this way to handle the quoting right
-}
-
 LONGOPTS=help SHORTOPTS=h
-ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
+eval "$(parse_args "$@")" || exit
 
 while true; do
   case "$1" in
@@ -44,20 +26,18 @@ while true; do
   esac
 done
 
-found=false
+declare -i found=0
 for arg in "$@"; do
-  if [ -n "$arg" ] && ! [ -e "$arg" ]; then
-    abort "file '$arg' does not exist" 2
-  fi
+  [ -e "$arg" ] || abort "file '$arg' does not exist" 2
 
-  IFS= readarray -d '' files < <(find "${arg:-.}" -not -path '*/.*' -type f -exec grep -Iq . {} \; -print0)
+  # lots of GNU-isms here
+  IFS= readarray -d '' files < <(find "${arg:-.}" -not -path '*/.*' -type f -exec grep -Iq . {} \; -print0) || true
   for file in "${files[@]}"; do
-    # Check if ends in new line
-    if ! [[ "$(tail -c1 "$file" | wc -l)" -gt 0 ]]; then
-      log "adding newline to $file"
-      found=true
-      printf '\n' >>"$file"
-    fi
+    # $() trims a trailing newline, so it should be empty if the file ends in a newline
+    [ -n "$(tail -c1 "$file")" ] || continue
+    log "Adding trailing newline to $file"
+    printf '\n' >>"$file"
+    found=1
   done
 done
-if [ $found = false ]; then log "No files without a ending newline were found"; fi
+[ "$found" -eq 1 ] || log "No files without a ending newline were found"
