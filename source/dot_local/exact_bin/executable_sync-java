@@ -10,26 +10,37 @@ set -euC -o pipefail
 shopt -s nullglob globstar # Better globs
 . script_utils.sh || exit
 deps=(rsync diff)
+exclude=('*.class' 'System Volume Information')
 function usage() {
   cat <<EOF
 $THIS [options] [--] [dest] [src]
 Syncs src to dest. Note: this is a destructive operation. Any files in dest will be overwritten or deleted.
 
 Options:
--h, --help        show this message
--y, --yes         Don't ask for confirmation
+  -h, --help               Show this message
+  -y, --yes                Don't ask for confirmation
+  -k, --keep               Keep files present in dest, but not in src. This can be used to later run \`$THIS src dest\`.
+  -e, --exclude=exclude    A colon separated list of file globs to exclude (defualt: $(join ":" "${exclude[@]}"))
 EOF
   return 0
 }
 
-LONGOPTS=help,yes SHORTOPTS=h,y
+LONGOPTS=help,yes,keep,exclude: SHORTOPTS=h,y,k,e:
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
-yes=0
+
+yes=0 keep=0
 while true; do
   case "$1" in
   -h | --help) usage && exit 0 ;;
   -y | --yes) yes=1 && shift ;;
   -q | --quiet) USE_VERBOSE=0 && shift ;; # make the verbose function not output
+  -k | --keep) keep=1 && shift ;;
+  -e | --exclude)
+    exclude_add=()
+    # note: a here-doc can't be used because it appends a newline
+    readarray -d: -t exclude_add < <(printf '%s' "$2") || true
+    exclude+=("${exclude_add[@]}")
+    ;;
   --) shift && break ;;
   *) abort "This is a bug" 3 ;;
   esac
@@ -45,10 +56,9 @@ src="${2:-${java:-$HOME/code/java}}"
 check_dependencies "${deps[@]}" || exit
 # note: diff dest src to show what copying *will do*
 [ "$yes" -eq 1 ] || verbose diff -r -- "$dest" "$src" || confirm "source and destination differ. Do you want to override destination?" || abort 'aborting' 1
-
-exclude=('*.class' 'System Volume Information')
-# verbose, archive, recursive, update, progress, delete
-rsync_args=(-varuP --delete)
+# verbose, archive, recursive, update, progress
+rsync_args=(-varuP)
+[ "$keep" -eq 1 ] || rsync+=(--delete) # if not keep, then delete files not present in src
 for e in "${exclude[@]}"; do rsync_args+=(--exclude "$e"); done
 verbose rsync "${rsync_args[@]}" -- "$java/" "$dest/"
 
