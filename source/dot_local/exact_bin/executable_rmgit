@@ -85,10 +85,8 @@ for repo in "$@"; do
   [ "$USE_VERBOSE" -eq 0 ] || base_args+=(--verbose)
 
   # Force rm .git
-  {
-    verbose rm --force --recursive -- "$repo/.git" &&
-      verbose rm "${base_args[@]}" -- "$repo/"
-  } || _exit "$?"
+  { verbose rm --force --recursive -- "$repo/.git" &&
+    verbose rm "${base_args[@]}" -- "$repo/"; } || _exit "$?"
 done
 
 exit "$exit_code"
