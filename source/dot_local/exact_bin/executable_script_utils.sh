@@ -143,9 +143,13 @@ function verbose() {
 # Unrecognized values are considered false (exit 3)
 # The second argument can be either y or n (default 'y') to choose the default value (given a blank answer)
 function confirm() {
-  local prompt="$1" default=${2:-y}
   local confirmation colorized_prompt
-  colorized_prompt="$(color "$TEAL_COLOR")$prompt [Y/n]$(color "$OFF_COLOR") "
+  local prompt="$1" default=${2:-y}
+  default=${default:0:1} default=${default,,} # lowercase first char of argument
+  case "$default" in                          # Set the prompt to have the right default value
+  y) prompt+=' [Y/n]' ;; n) prompt+=' [y/N]' ;;
+  esac
+  colorized_prompt="$(color "$TEAL_COLOR")$prompt$(color "$OFF_COLOR") "
   read -rep "$colorized_prompt" confirmation </dev/tty
   if [ -z "$confirmation" ]; then     # no response
     [ "$default" == 'y' ] || return 1 # default is no, return false
