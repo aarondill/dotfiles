@@ -6,102 +6,63 @@
 # *Follows Symlinks*
 #
 set -euC -o pipefail
-THIS=contents
+. script_utils.sh || exit
+
 function usage() {
   cat <<EOF
-$THIS [file|executable...]
-                  
-outputs the contents of a file using \$PAGER, calls which if file is not found
-options:
--P, --no-pager      Don't attempt to open the files using a pager (\$PAGER)
--p, --pager=PAGER   Use <PAGER> instead of \$PAGER
--e, --edit          Open the file in \$EDITOR instead of outputting the contents
+Usage: $THIS [file|executable...]
+Outputs the contents of a file using \$PAGER, calls \`command -v\` if file is not found
+
+Options:
+  -P, --no-pager      Don't attempt to open the files using a pager (\$PAGER)
+  -p, --pager=PAGER   Use <PAGER> instead of \$PAGER
+  -e, --edit          Open the file in \$EDITOR instead of outputting the contents
 EOF
   return 0
 }
-function log() { printf '%s\n' "$@"; }
-function err() { printf "$THIS: %s\n" "$@" >&2; }
-function abort() { err "$1" && exit "${2:-1}"; }
-
-# Returns a string that should be 'eval'ed to set the positional arguments
-# Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
-# Input: $LONGOPTS,$SHORTOPTS
-# eval "$(parse_args "$@")"
-function parse_args() {
-  local parsed
-  local code=0 && getopt --test &>/dev/null || code=$?
-  if [ "$code" -ne 4 ]; then abort "Enhanced getopt is required for this script to work. Please install it." 1; fi
-  parsed=$(getopt --options="$SHORTOPTS" --longoptions="$LONGOPTS" --name "${THIS:-$0}" -- "$@") ||
-    exit 2                     # getopt has already complained about wrong arguments to stdout - Exit script
-  printf '%s' "set -- $parsed" # output getopt’s output this way to handle the quoting right
-}
-
-pager=true edit=0
 LONGOPTS=help,no-pager,pager:,edit SHORTOPTS=h,P,p:,e
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
+pager=true edit=0
 while true; do
   case "$1" in
-  --help | -h) usage && exit 0 ;;
-  --no-pager | -P) pager=false && shift ;;
+  -h | --help) usage && exit 0 ;;
+  -P | --no-pager) pager=false && shift ;;
   -p | --pager) pager=$2 && shift 2 ;;
   -e | --edit) edit=1 && shift ;;
   --) shift && break ;;
   *) abort "This is a bug" 3 ;;
   esac
 done
-
-if [ "$#" -eq 0 ]; then
-  abort 'FILE is required' 2
-fi
+[ "$#" -gt 0 ] || abort 'FILE is required' 2
 
 files=()
+declare -i exit_code=0
 for file in "$@"; do
-  # Given a path
-  if [ -f "$file" ]; then
-    files+=("$file")
-    continue
-  fi
+  if [ -f "$file" ]; then files+=("$file") && continue; fi # Given a path
+  whichfile=$(cmdpath "$file" 2>/dev/null) || true
+  if [ -f "$whichfile" ]; then files+=("$whichfile") && continue; fi # given a name
 
-  if ! command -v which &>/dev/null; then
-    abort 'Which is required to search PATH for files' 2
-  fi
-  # given a name
-  whichfile=$(which "$file" 2>/dev/null)
-  if [ -f "$whichfile" ]; then
-    files+=("$whichfile")
-    continue
-  fi
-
-  # couldn't find
-  err "$file is not a file"
-  continue
+  err "$file is not a file" # couldn't find
+  exit_code=1
 done
-
-function find_prog() {
-  for p in "$@"; do
-    if { [ -f "$p" ] && [ -x "$p" ]; } || [ -x "$(which -- "$1" 2>/dev/null)" ]; then
-      printf '%s' "$p"
-      return 0
-    fi
-  done
-  return 1
-}
+[ "${#files[@]}" -gt 0 ] || exit "$exit_code" # we couldn't find any of them
 
 open=
 case "$edit" in
 0)
   # Use pager if can, else use cat
-  if [ "$pager" = true ] && [ -t 1 ]; then
-    PAGER=${PAGER:-$(find_prog pager cat /bin/cat)}
-  elif [ "$pager" = false ]; then
-    PAGER=$(find_prog cat /bin/cat)
+  if [ "$pager" = false ] || ! [ -t 1 ]; then
+    PAGER=$(first_cmd cat /bin/cat) || abort "Could not find pager" 1
+  elif [ "$pager" = true ]; then
+    PAGER=${PAGER:-$(first_cmd pager bat less cat /bin/cat)} || abort "Could not find pager" 1
   elif [ "$pager" != true ]; then
     PAGER="$pager"
   fi
   open="${PAGER:-cat}"
   ;;
-1) open=${EDITOR:-$(find_prog editor sensible-editor vim emacs /bin/cat)} ;;
+1) open=${EDITOR:-$(first_cmd editor sensible-editor vim emacs /bin/cat)} || abort "Could not find editor" 1 ;;
 esac
 
 # output them all -- open is expanded to allow flags
-exec $open -- "${files[@]}"
+$open -- "${files[@]}" || exit
+exit "$exit_code"
