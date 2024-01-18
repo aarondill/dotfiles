@@ -9,18 +9,14 @@ USE_COLOR=1             # Output color when using `log`, `err`, etc
 if [ "$(id -u)" -ne 0 ]; then abort "This program must be run as root" 1; fi
 
 function usage() {
-  cat <<EOF
+  cat <<EOF || true
 $THIS [options] [--] [arguments]
-Cleans up the excess snap revisions and files. Use \$SUDO to change the program used.
-the environment variable \`SUDO\` can be set to use a different
-program for root elevation. It will be split by the shell, so
-spaces in the program name will likely be mutilited.
+Cleans up the excess snap revisions and files. 
 
 Options:
--h, --help        show this message
--y, --yes         Don't ask for confirmation
+  -h, --help        show this message
+  -y, --yes         Don't ask for confirmation
 EOF
-  return 0
 }
 
 LONGOPTS=help,yes SHORTOPTS=h,y
@@ -39,10 +35,9 @@ done
 # Current status
 used_before="$(df -k / | awk 'NR>1 {print $3}')"
 
-if ! has_cmd snap; then abort "snap command not found" 1; fi
+has_cmd snap || abort "snap command not found" 1
 
-[ "$yes" -eq 1 ] ||
-  confirm "Do you want to remove unused snapd revisions?" || abort "aborting" 1
+[ "$yes" -eq 1 ] || confirm "Do you want to remove unused snapd revisions?" || abort "aborting" 1
 
 # remove unused snapd revisions
 log "Removing unused snapd revisions..."

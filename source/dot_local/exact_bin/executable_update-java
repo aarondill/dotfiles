@@ -5,130 +5,85 @@
 # Updates java symlinks to the path specified using update-alternatives
 #
 set -euC -o pipefail
+. script_utils.sh || exit
 
-THIS=update-java
 function usage() {
-  cat <<EOF
+  cat <<EOF || true
 $THIS [-y | --yes] <JAVADIR> [priority = 1112] [JVM_VERS_DIR]
 Updates java symlinks to the path specified using update-alternatives.
 Do not include /bin on JAVADIR.
 JVM_VERS_DIR will be determined by JAVA_HOME if set, or else default to /usr/lib/jvm
-
-
-the environment variable \`SUDO\` can be set to use a different
-program for root elevation. It will be split by the shell, so
-spaces in the program name will likely be mutilited.
+Note: relies on GNU find
 
 Options:
 -y, --yes     don't prompt for confirmation
 -q, --quiet   don't output debug info
 EOF
-  return 0
 }
-
-function log() { printf '%s\n' "$@"; }
-function err() { printf "${THIS:-$0}: %s\n" "$@" >&2; }
-function abort() {
-  err "$1"
-  exit "${2:-1}"
-}
-# use like `"${sudo[@]}" do_something`
-# shellcheck disable=SC2206 # Splitting is intentional.
-sudo=(${SUDO:-sudo})
-[ "$(id -u)" -eq 0 ] && sudo=()
-
-# Returns a string that should be 'eval'ed to set the positional arguments
-# Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
-# Input: $LONGOPTS,$SHORTOPTS
-# eval "$(parse_args "$@")"
-function parse_args() {
-  local parsed
-  local code=0 && getopt --test &>/dev/null || code=$?
-  if [ "$code" -ne 4 ]; then abort "Enhanced getopt is required for this script to work. Please install it." 1; fi
-  parsed=$(getopt --options="$SHORTOPTS" --longoptions="$LONGOPTS" --name "${THIS:-$0}" -- "$@") ||
-    exit 2                     # getopt has already complained about wrong arguments to stdout - Exit script
-  printf '%s' "set -- $parsed" # output getopt’s output this way to handle the quoting right
-}
-
 LONGOPTS=help,yes,quiet SHORTOPTS=h,y,q
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 
-yes=0 quiet=0
+yes=0
 while true; do
   case "$1" in
   -h | --help) usage && exit 0 ;;
   -y | --yes) yes=1 && shift ;;
-  -q | --quiet) quiet=1 && shift ;;
+  -q | --quiet) USE_VERBOSE=0 && shift ;;
   --) shift && break ;;
   *) abort "This is a bug" 3 ;;
   esac
 done
 if [ "$#" -eq 0 ]; then usage && exit 2; fi
 
-function log_run() {
-  [ "$quiet" != 1 ] && log "$*"
-  "$@"
-}
-
 JAVADIR=${1:-}
 PRIORITY=${2:-1112}
 BINDIR=/usr/bin
-if [[ -n "${3:-}" ]]; then
+if [ -n "${3:-}" ]; then
   JVM_VERS_DIR=$3
-elif [[ -n "${JAVA_HOME:-}" ]]; then
+elif [ -n "${JAVA_HOME:-}" ]; then
   JVM_VERS_DIR=$(dirname -- "$JAVA_HOME") # /usr/lib/jvm/jdk-version --> /usr/lib/jvm
 else
   JVM_VERS_DIR=/usr/lib/jvm
 fi
 
-if ! [ -d "$JVM_VERS_DIR" ]; then
-  err "'$JVM_VERS_DIR' is not a directory. It will be created on confirmation" "$JVM_VERS_DIR"
-fi
-
-if ! [ -d "$JAVADIR" ]; then abort "'$JAVADIR' is not a directory" 2; fi
+[ -d "$JVM_VERS_DIR" ] || err "'$JVM_VERS_DIR' is not a directory. It will be created on confirmation" "$JVM_VERS_DIR"
+[ -d "$JAVADIR" ] || abort "'$JAVADIR' is not a directory" 2
 JAVADIR=$(realpath -- "$JAVADIR")
 
-if [[ "$JAVADIR" =~ ?(.*)/bin$ ]]; then
-  if [ "$yes" -eq 1 ]; then confirmation=yes; else
-    read -rep "$JAVADIR ends in /bin, would you like to use it's parent? (yes) " confirmation >&2
-  fi
-  if [[ -z "$confirmation" || "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
+case "$JAVADIR" in */bin)
+  if [ "$yes" -eq 1 ] || confirm "$JAVADIR ends in /bin, would you like to use it's parent?"; then
     JAVADIR=$(dirname -- "$(realpath -- "$JAVADIR")")
   fi
-fi
+  ;;
+esac
+[ "$yes" -eq 1 ] || confirm "Are you sure you would like to link all binaries in $JAVADIR?" || abort "Aborting" 1
 
-if ! [ "$yes" -eq 1 ]; then
-  read -rep "Are you sure you would like to link all binaries in $JAVADIR? (yes) " confirmation
-  if [[ -n "$confirmation" && ! "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
-    abort "Aborting" 1
-  fi
-fi
-
-"${sudo[@]}" mkdir -p "$JVM_VERS_DIR"
+sudo_cmd mkdir -p "$JVM_VERS_DIR"
 JVM_VERS_DIR=$(realpath -- "$JVM_VERS_DIR")
 
-if [[ $(dirname -- "$JAVADIR") != "$JVM_VERS_DIR" ]]; then
-  err "Copying files to '$JVM_VERS_DIR'"
-  "${sudo[@]}" cp --archive --interactive "$JAVADIR" "$JVM_VERS_DIR"
+if [ "$(dirname -- "$JAVADIR")" != "$JVM_VERS_DIR" ]; then
+  log "Copying files to '$JVM_VERS_DIR'"
+  # cp -PpR is posix for cp --archive
+  sudo_cmd cp -PpRi -- "$JAVADIR" "$JVM_VERS_DIR/"
   JAVADIR="$JVM_VERS_DIR/$(basename -- "$JAVADIR")"
 fi
 
 function link() {
-  dest_path=$1 name=$2 from_path=$3 priority=$4
-  if command -v update-alternatives &>/dev/null; then
-    log_run "${sudo[@]}" update-alternatives --install "$dest_path" "$name" "$from_path" "$priority"
-    log_run "${sudo[@]}" update-alternatives --set "$name" "$from_path"
-  else
+  local dest_path=$1 name=$2 from_path=$3 priority=$4
+  if ! has_cmd update-alternatives; then
     # use ln because update-alternatives is not available
-    log_run "${sudo[@]}" ln -sf -T "$from_path" "$dest_path"
+    verbose sudo_cmd ln -sf -T "$from_path" "$dest_path"
+    return 0
   fi
+  verbose sudo_cmd update-alternatives --install "$dest_path" "$name" "$from_path" "$priority"
+  verbose sudo_cmd update-alternatives --set "$name" "$from_path"
 }
 
-while read -d $'\0' -sr from_path; do
+while read -d '' -r -s from_path; do
   name=$(basename -- "$from_path")
   dest_path="$BINDIR/$name"
   link "$dest_path" "$name" "$from_path" "$PRIORITY"
 done < <(find "$JAVADIR" -perm /u=x,g=x,o=x -type f -print0)
 
-log_run "${sudo[@]}" ln -sf -T "$JAVADIR" "$JVM_VERS_DIR/default-java"
+verbose sudo_cmd ln -sf -T "$JAVADIR" "$JVM_VERS_DIR/default-java"
 unset -v cmd

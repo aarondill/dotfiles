@@ -14,25 +14,25 @@ EOF
 }
 
 function log() { printf '%s\n' "$@" || true; }
-function err() { printf "${THIS:-}: %s\n" "$@" >&2 || true; }
+function err() { printf "%s\n" "$@" >&2 || true; }
 function abort() { err "$1" && exit "${2:-1}"; }
-function cmd() { command -v "$@" &>/dev/null; }
+function has_cmd() { command -v "$@" &>/dev/null; }
+function cmd_path() { command -v "$@"; }
+function first_cmd() {
+  local c && for c; do
+    has_cmd "$c" || continue
+    printf '%s' "$c" || true
+    return 0
+  done
+  return 1
+}
 function verbose() {
-  local cmd=("$@")
-  { # output the command with quotes!
-    local i=0
-    for c in "${cmd[@]}"; do
-      printf "'%s'" "$c"
-      if [ "$i" -lt "${#cmd}" ]; then printf ' '; fi # space except last time.
-      i=$((i + 1))
-    done
-    printf '\n'
-  } || true
-  "${cmd[@]}"
+  printf '%s\n' "> ${*@Q}" || true
+  "$@"
 }
 
-if ! cmd which; then abort "which is required for this script" 1; fi
-if ! cmd startx; then abort "startx is required for this script" 1; fi
+has_cmd which || abort "which is required for this script" 1
+has_cmd startx || abort "startx is required for this script" 1
 
 for arg in "$@"; do
   case "$arg" in
@@ -44,46 +44,38 @@ wm=${1:-}
 server=${2-}
 rest=("${@:3}")
 
-disp_regex="^:[[:digit:]]+$"
+is_integer() { [ -n "$1" ] && case "$1" in *[!0123456789]*) return 1 ;; esac }
+# returns true if the argument is a valid display number (:integer)
+is_display() { [ -n "$1" ] && [ "${1:0:1}" == ":" ] && is_integer "${1#:}"; }
 
 # visual -- [:3] --server-args
 if [ "$wm" == '--' ]; then
-  wm=
-  server=--
+  wm='' server=--
   rest=("${@:2}") # [:3] --server-args
 fi
 
 # visual :3
-if [ -z "$server" ] && [[ "$wm" =~ $disp_regex ]]; then server="$wm" wm=''; fi
+if [ -z "$server" ] && is_display "$wm"; then server="$wm" wm=''; fi
 
 # visual :3 OR visual awesome
-if [ -z "$wm" ]; then
-  if [ -x "$(command -v x-window-manager)" ]; then
-    wm=x-window-manager
-  elif [ -x "$(command -v x-terminal-emulator)" ]; then
-    wm=x-terminal-emulator
-  fi
-fi
+[ -n "$wm" ] || wm=$(first_cmd x-window-manager x-terminal-emulator)
 
-if wmpath=$(which "$wm" 2>/dev/null); then :; else
-  abort "Unable to find $wm in \$PATH" 2
-fi
-
+wmpath=$(cmd_path "$wm") || abort "$wm: command not found" 2
+cmd=()
 # HACK: startx on ubuntu still unsets DBUS_SESSION_BUS_ADDRESS (even though it's fixed in upstream)
 # IF this is the case, call it again with *this* script as the wm.
-if [ -n "${__IN_VISUAL_SPAWN:-}" ]; then
-  cmd=("$wmpath")
-elif grep -q 'unset DBUS_SESSION_BUS_ADDRESS' "$(which startx)"; then
-  export __IN_VISUAL_SPAWN=1
-  cmd=(startx "$0" "$wmpath")
-else
-  cmd=(startx "$wmpath")
+if [ -z "${__IN_VISUAL_SPAWN:-}" ]; then
+  startx=$(cmd_path startx) || abort "startx: command not found" 1
+  cmd=("$startx")
+  if grep -q 'unset DBUS_SESSION_BUS_ADDRESS' "$startx"; then
+    export __IN_VISUAL_SPAWN=1
+    cmd+=("${BASH_SOURCE[0]}")
+  fi
 fi
+cmd+=("$wmpath")
 
 # if server is defined
-if [[ "$server" =~ $disp_regex ]]; then
-  cmd+=(--)
-fi
+if is_display "$server"; then cmd+=(--); fi
 if [ -n "$server" ]; then cmd+=("$server"); fi
 cmd+=("${rest[@]}")
 
@@ -105,8 +97,7 @@ fi
 if [ -z "${XAUTHORITY:-}" ] && [ -d "${XDG_RUNTIME_DIR:-}" ]; then
   # NOTE: this path was chosen because in Ubuntu, it is permitted in the AppArmor config. See /etc/apparmor.d/abstractions/X.
   export XAUTHORITY="$XDG_RUNTIME_DIR/X11/Xauthority"
-  mkdir -p "$(dirname "$XAUTHORITY")" # Ensure the directory exists
+  mkdir -p -- "$(dirname "$XAUTHORITY")" # Ensure the directory exists
 fi
 
-# export XDG_SESSION_TYPE=x11
 verbose exec "${cmd[@]}"

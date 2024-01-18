@@ -2,37 +2,37 @@
 # This starts gdm through systemd graphical.target
 set -euC -o pipefail
 
-THIS=start-gdm
+THIS=$(basename -- "${BASH_SOURCE[0]}")
+case "$THIS" in
+stop-*) target=multi-user.target does=stops ;;
+*) target=graphical.target does=starts ;; # default to start-gdm
+esac
 
 function usage() {
-  cat <<-EOF
-usage: $THIS 
+  cat <<EOF || true
+Usage: $THIS 
+$does gdm through systemd target $target
 
-starts gdm through systemd graphical.target
-No options or arguments are accepted except --help
-
-the environment variable \`SUDO\` can be set to use a different
-program for root elevation. It will be split by the shell, so
-spaces in the program name will likely be mutilited.
-
+Options:
+  -h, --help  Show this message
 EOF
 }
-function log() { printf '%s\n' "$@"; }
-function err() { printf "$THIS: %s\n" "$@" >&2; }
+function log() { printf '%s\n' "$@" || true; }
+function err() { printf "$THIS: %s\n" "$@" >&2 || true; }
 function abort() { err "$1" && exit "${2:-1}"; }
+function verbose() { log "> ${*@Q}" && "$@"; }
 # use like `"${sudo[@]}" do_something`
 # shellcheck disable=SC2206 # Splitting is intentional.
 sudo=(${SUDO:-sudo})
 [ "$(id -u)" -eq 0 ] && sudo=()
 
 # Basic arg handling
-invalid=false
 for arg; do
   case "$arg" in
-  --help | -help | -h) usage && exit 0 ;;
-  -*) err "unrecognized option '$arg'" && invalid=true ;;
+  --help | -h) usage && exit 0 ;;
+  -*) abort "unrecognized option '$arg'" 2 ;;
   esac
 done
-if [ "$invalid" = true ]; then exit 2; fi
+
 # start the graphical system
-exec "${sudo[@]}" systemctl isolate graphical.target
+verbose exec "${sudo[@]}" systemctl isolate "$target"

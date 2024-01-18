@@ -9,38 +9,26 @@
 # No argument parsing, as it's intended to be a transparent wrapper
 set -euC -o pipefail
 
-# usage 'get_nth_line 2', 1 indexed
-function get_nth_line() {
-  local _ line i
-  declare -i end="$1"
-  for ((i = 1; i < end; i++)); do read -r _; done || return 0
-  read -r line || return 0
-  printf '%s' "$line"
+# finds the first instance of cmd in path, excluding the current script
+function find_in_path() {
+  local path cmd exclude="${2:-${BASH_SOURCE[0]}}"
+  cmd=${1%/} cmd="${1##*/}" # remove trailing slash -- then get basename
+  while read -r -d: path; do
+    path=${path:-$PWD}                         # empty path means pwd
+    [ "$path/$cmd" != "$exclude" ] || continue # skip this_file
+    [ -x "$path/$cmd" ] || continue
+    printf '%s' "$path/$cmd" || true
+    return 0
+  done < <(printf '%s' "$PATH:")
+  printf '%s\n' "$cmd: command not found" >&2 || true
+  return 127
 }
-
-if ! command -v which &>/dev/null; then
-  printf '%s\n' "ERROR: which is required for this script." >&2
-  exit 1
-fi
-
-# Check if the current script is at the top of the PATH
-if [[ "$(realpath -- "$0")" = "$(which steam)" ]]; then
-  # Finds all instances of 'steam' in PATH and returns the second line
-  next_in_path=$(which -a steam 2>/dev/null | get_nth_line 2) || true
-else
-  # Find the first instance of 'steam' in PATH
-  next_in_path=$(which steam 2>/dev/null) || true
-fi
 
 # Checks flatpak first to see if it is installed.
 if flatpak info com.valvesoftware.Steam &>/dev/null; then
-  printf 'Running steam using flatpak from %s\n' "$0"
-  # Run the flatpak if installed
-  exec flatpak run com.valvesoftware.Steam "$@"
-elif [[ -n "$next_in_path" ]]; then
-  # Runs the other steam
-  exec "$next_in_path" "$@"
-else
-  printf '%s\n' "Could not find steam using Flatpak or PATH!"
-  exit 2
+  printf '%s\n' 'Running steam using flatpak' >&2 || true
+  exec -- flatpak run com.valvesoftware.Steam "$@" || exit
 fi
+
+next_in_path=$(find_in_path steam) || exit
+exec -- "$next_in_path" "$@"

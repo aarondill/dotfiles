@@ -238,6 +238,8 @@ function get_xdg_dir() {
   if [ -t 1 ]; then printf '%s\n' "$dir"; else printf '%s' "$dir"; fi
   return 0
 }
+# Returns true if the given string is an integer value
+is_integer() { [ -n "$1" ] && case "$1" in *[!0123456789]*) return 1 ;; esac }
 
 # download -p <URL> [output] outputs to stdout if output is not specified
 # if -p is passed, the command will output progress information to stderr.

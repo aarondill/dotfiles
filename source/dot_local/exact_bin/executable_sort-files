@@ -1,17 +1,16 @@
 #!/usr/bin/env bash
 set -euC -o pipefail
 
-THIS=sort-files
+THIS=$(basename -- "${BASH_SOURCE[0]}")
 function usage() {
-  cat <<EOF
-$THIS [options] [--] [DIR...]
+  cat <<EOF || true
+Usage: $THIS [options] [--] [DIR...]
 Outputs the files in the current (or specified) directory in order of smallest to largest.
 
 Options:
--h, --help              show this message
--r, --reverse           output from largest to smallest
+  -h, --help              show this message
+  -r, --reverse           output from largest to smallest
 EOF
-  return 0
 }
 
 function log() { printf '%s\n' "$@"; }

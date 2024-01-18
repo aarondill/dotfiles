@@ -1,14 +1,8 @@
 #!/bin/sh
 # This is copied from ubuntu, and should shadow it.
 set -euC
-
 # prefix "$@" with grub-mkconfig command
 set -- grub-mkconfig -o /boot/grub/grub.cfg "$@"
-
 # prefix *that* with $SUDO if not root
-if [ "$(id -u)" -ne 0 ]; then
-  # shellcheck disable=SC2086 # Splitting is intentional.
-  set -- ${SUDO:-sudo} "$@"
-fi
-
-exec "$@"
+[ "$(id -u)" -ne 0 ] || exec "$@" || exit
+exec ${SUDO:-sudo} "$@" || exit
