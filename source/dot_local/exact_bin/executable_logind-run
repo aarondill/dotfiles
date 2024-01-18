@@ -23,7 +23,7 @@ done
 [ -n "${2:-}" ] || abort 'command must be specified' 2
 
 ttynum=${1:-34}
-ttynum=${ttynum#/dev/tty} allow /dev/tty2 to work
+ttynum=${ttynum#/dev/tty} # allow /dev/tty2 to work
 
 re='^[0-9]+$'
 [ -n "$ttynum" ] || abort "tty can't be empty" 2
