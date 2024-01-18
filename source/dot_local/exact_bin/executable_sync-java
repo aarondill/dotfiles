@@ -17,10 +17,10 @@ $THIS [options] [--] [dest] [src]
 Syncs src to dest. Note: this is a destructive operation. Any files in dest will be overwritten or deleted.
 
 Options:
-  -h, --help               Show this message
-  -y, --yes                Don't ask for confirmation
-  -k, --keep               Keep files present in dest, but not in src. This can be used to later run \`$THIS src dest\`.
   -e, --exclude=exclude    A colon separated list of file globs to exclude (defualt: $(join ":" "${exclude[@]}"))
+  -h, --help               Show this message
+  -k, --keep               Keep files present in dest, but not in src. This can be used to later run \`$THIS src dest\`.
+  -y, --yes                Don't ask for confirmation
 EOF
   return 0
 }
