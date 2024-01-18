@@ -273,7 +273,7 @@ if [ "$vmware" -eq 1 ] && cmd_available vmplayer; then # Check that vmware is al
   success
 fi
 
-if [ "$chezmoi" -eq 1 ] && has chezmoi; then
+if [ "$chezmoi" -eq 1 ] && cmd_available chezmoi; then
   log "Updating chezmoi" && seturgent
   chezmoi=$(cmd_path chezmoi)
   show_run "$chezmoi" upgrade --executable "$chezmoi"
