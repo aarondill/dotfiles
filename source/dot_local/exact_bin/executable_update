@@ -1,76 +1,64 @@
 #!/usr/bin/env bash
-
 # ~/.local/bin/update
 #
 # Updates the system, including as many possible sources as possible
 #
 set -euC -o pipefail
+shopt -s nullglob globstar # Better globs
+# Find the current file and it's directory # Source: https://stackoverflow.com/a/246128
+SOURCE="${BASH_SOURCE[0]:-}" DIR=''
+while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$(builtin cd -P -- "$(command dirname -- "$SOURCE")" &>/dev/null && builtin pwd)" || true
+  SOURCE="$(command readlink -- "$SOURCE")" || true
+  [[ "$SOURCE" == /* ]] || SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+DIR="$(builtin cd -P -- "$(command dirname -- "$SOURCE")" &>/dev/null && builtin pwd)" || true
+DIR="${DIR:-"$PWD"}" utils="$DIR/script_utils.sh"
+[ -f "$utils" ] || utils="$(basename -- "$utils")" || true # If utils is not a file, search for it in "$PATH" instead.
+# shellcheck source=./script_utils.sh
+. "$utils"             # Note: this may error. I can't use it in a conditional or bashls fails.
+[ "$?" -eq 0 ] || exit # set -e means that this line should be irrelevant, but just in case.
 
-THIS=update
+USE_COLOR=1 # Colorize output
+THIS=$(basename -- "${BASH_SOURCE[0]}")
 function usage() {
   cat <<EOF
-$THIS [OPTIONS]... -- [METHOD]...
-Update system packages and third party packages
+$THIS [opts] [METHODS]
+Update system and third party packages
 If no method is specified, all packages will be updated
-This is meant to help avoid forgetting a method,
-not to force yes, or any other convience
+use 'method' to enable or '+method' to disable. ORDER MATTERS!
 
-the environment variable \`SUDO\` can be set to use a different
-program for root elevation. It will be split by the shell, so
-spaces in the program name will likely be mutilited.
-
-METHOD_ARGS to pass additional options to each command. (IE, NATIVE_ARGS)
-Currently supported methods are: native, snap, flatpak, pnpm, npm, cargo, vmware
-use 'native' to enable or '+native' to disable. ORDER MATTERS!
 Options:
---as-root: allow running as root (Discouraged!)
+  -h, --help     Show this help message.
+  -l, --list     List all methods
+  --as-root      Allow running as root (Discouraged!)
 EOF
   return 0
 }
 
-# COLOR vars to keep from branching to tput repeatedly
-RED_COLOR="$(tput setaf 1 2>/dev/null || printf '')"
-YELLOW_COLOR="$(tput setaf 11 2>/dev/null || printf '')"
-GREEN_COLOR="$(tput setaf 2 2>/dev/null || printf '')"
-BOLD_COLOR="$(tput bold 2>/dev/null || printf '')"
-RESET_COLOR="$(tput sgr0 2>/dev/null || printf '')"
-
-function log() { printf "$YELLOW_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@"; }
-function show_run() {
-  log "running: $*"
-  "$@"
-}
-function err() { printf "${THIS:+$THIS:}$RED_COLOR$BOLD_COLOR%s\n$RESET_COLOR" "$@" >&2; }
-function success() { printf "$GREEN_COLOR$BOLD_COLOR%s$RESET_COLOR\n" "Success!" && printf '\n'; }
-function abort() { err "$1" && exit "${2:-1}"; }
-
-WID=$(xdotool getwindowfocus 2>/dev/null) || true
-function seturgent() {
-  [ -n "$WID" ] || return 0
-  wmctrl -i -r "$WID" -b add,demands_attention
-}
-
-# Returns a string that should be 'eval'ed to set the positional arguments
-# Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
-# Input: $LONGOPTS,$SHORTOPTS
-# eval "$(parse_args "$@")"
-function parse_args() {
-  local parsed
-  local code=0 && getopt --test &>/dev/null || code=$?
-  if [ "$code" -ne 4 ]; then abort "Enhanced getopt is required for this script to work. Please install it." 1; fi
-  parsed=$(getopt --options="$SHORTOPTS" --longoptions="$LONGOPTS" --name "${THIS:-$0}" -- "$@") ||
-    exit 2                     # getopt has already complained about wrong arguments to stdout - Exit script
-  printf '%s' "set -- $parsed" # output getopt’s output this way to handle the quoting right
-}
-
 LONGOPTS=help,as-root,list SHORTOPTS=h,l
-ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
+eval "$(parse_args "$@")" || exit
 
+declare -A methods=(
+  [native]=0
+  [flatpak]=0
+  [snap]=0
+  [pnpm]=0
+  [npm]=0
+  [cargo]=0
+  [vmware]=0
+  [chezmoi]=0
+)
 allow_root=0
 while true; do
   case "$1" in
   -h | --help) usage && exit 0 ;;
   --as-root) allow_root=1 && shift 1 ;;
+  -l | --list)
+    log "Available methods are: "
+    printf "%s\n" "${!methods[@]}" | sort
+    exit 0
+    ;;
   --) shift && break ;;
   *) abort "This is a bug" 3 ;;
   esac
@@ -86,195 +74,148 @@ fi
 all_exclude=1 # If all are exclude, enable all by default
 for arg; do
   case "$arg" in
-  +*) true ;;         # Nothing
+  +*) trude ;;        # Nothing
   *) all_exclude=0 ;; # Not an exlude.
   esac
 done
 
-native=0 flatpak=0 snap=0 pnpm=0 npm=0 cargo=0 vmware=0 chezmoi=0
+# by default, or if all given are exclude patterns, enable all methods
 if [ "$#" -eq 0 ] || [ "$all_exclude" -eq 1 ]; then
-  native=1 flatpak=1 snap=1 pnpm=1 npm=1 cargo=1 vmware=1 chezmoi=1
+  for m in "${!methods[@]}"; do methods["$m"]=1; done
 fi
 
-for arg; do          # Doesn't do anything if $# is zero
-  case "${arg,,}" in # Allow `native` to enable or `native-` to disable. ORDER MATTERS!
-  apt | nala | pacman | native) native=1 ;;
-  +apt | +nala | +pacman | +native) native=0 ;;
-  flatpak) flatpak=1 ;; +flatpak) flatpak=0 ;;
-  snap) snap=1 ;; +snap) snap=0 ;;
-  pnpm) pnpm=1 ;; +pnpm) pnpm=0 ;;
-  npm) npm=1 ;; +npm) npm=0 ;;
-  cargo) cargo=1 ;; +cargo) cargo=0 ;;
-  vmware) vmware=1 ;; +vmware) vmware=0 ;;
-  chezmoi) chezmoi=1 ;; +chezmoi) chezmoi=0 ;;
-  all) native=1 flatpak=1 snap=1 pnpm=1 npm=1 ;;
-  +all) native=0 flatpak=0 snap=0 pnpm=0 npm=0 ;;
+for arg; do # Doesn't do anything if $# is zero
+  method="${arg,,}"
+  case "$method" in # Allow `native` to enable or `native-` to disable. ORDER MATTERS!
+  all) for m in "${!methods[@]}"; do methods["$m"]=1; done ;;
+  +all) for m in "${!methods[@]}"; do methods["$m"]=0; done ;;
+  +*) # disable pattern
+    [ -n "${methods["$method"]:-}" ] || abort "Unknown method: $method" 2
+    methods["$method"]=0
+    ;;
+  *) #enable pattern
+    [ -n "${methods["$method"]:-}" ] || abort "Unknown method: $method" 2
+    methods["$method"]=1
+    ;;
   esac
 done
 
-# Environment variables
-# shellcheck disable=SC2206 # Splitting is intentional.
-sudo=(${SUDO:-sudo})
-[ "$(id -u)" -eq 0 ] && sudo=()
-# shellcheck disable=SC2206 # Splitting would otherwise happen on the command line, so this is not *my* problem.
-{
-  NATIVE_ARGS=(${NATIVE_ARGS:-})
-  FLATPAK_ARGS=(${FLATPAK_ARGS:-})
-  SNAP_ARGS=(${SNAP_ARGS:-})
-  PNPM_ARGS=(${PNPM_ARGS:-})
-  NPM_ARGS=(${NPM_ARGS:-})
-  CARGO_ARGS=(${CARGO_ARGS:-})
-  VMWARE_ARGS=(${VMWARE_ARGS:-})
-}
-
-function cmd_available() { command -v "$@" &>/dev/null; }
-function cmd_path() { command -v "$@"; }
-
-is_something_to_do=0
-for i in "$native" "$flatpak" "$snap" "$pnpm" "$npm" "$cargo" "$vmware" "$chezmoi"; do
-  [ "$i" -eq 1 ] || continue # only if something is activated
-  is_something_to_do=1
-  break
+to_update=()
+for m in "${!methods[@]}"; do
+  [ "${methods[$m]}" -eq 1 ] || continue
+  to_update+=("$m")
 done
+if [ "${#to_update}" -eq 0 ]; then log "Nothing to do" && exit 0; fi
 
-if [ "$is_something_to_do" -eq 0 ]; then
-  log "Nothing to do"
-  exit 0
-fi
-
-if [ "$native" -eq 1 ]; then
-  log "Updating native packages!"
-  seturgent
-  if cmd_available nala; then
-    log "Using nala"
-    show_run "${sudo[@]}" "$(cmd_path nala)" upgrade "${NATIVE_ARGS[@]}"
-  elif cmd_available apt; then
-    log "Using apt"
-    show_run "${sudo[@]}" "$(cmd_path apt)" update "${NATIVE_ARGS[@]}" && "${sudo[@]}" apt upgrade "${NATIVE_ARGS[@]}"
-  elif cmd_available yay; then
-    log "Using yay"
-    show_run "$(cmd_path yay)" -Syu "${NATIVE_ARGS[@]}" # READ THIS!
-  elif cmd_available pacman; then
-    log "Using pacman"
-    show_run "${sudo[@]}" "$(cmd_path pacman)" -Syu "${NATIVE_ARGS[@]}" # READ THIS!
-  elif cmd_available dnf; then
-    log "Using dnf"
-    show_run "${sudo[@]}" "$(cmd_path dnf)" upgrade "${NATIVE_ARGS[@]}"
-  else
-    log "Could not find a command to update native packages."
-  fi
-  success
-fi
-
-if [ "$snap" -eq 1 ] && cmd_available snap; then
-  log "Updating snap packages!"
-  log
-  seturgent
-  show_run "${sudo[@]}" "$(cmd_path snap)" refresh "${SNAP_ARGS[@]}"
-  success
-fi
-
-if [ "$snap" -eq 1 ] && cmd_available snap && cmd_available snap-cleanup; then
-  log "Cleaning up snap packages"
-  log
-  show_run "${sudo[@]}" "$(cmd_path snap-cleanup)" -y
-  success
-fi
-
-if [ "$flatpak" -eq 1 ] && cmd_available flatpak; then
-  log "Updating flatpak packages!"
-  log
-  seturgent
-  show_run "$(cmd_path flatpak)" update "${FLATPAK_ARGS[@]}" # NOT as root!
-  success
-fi
-
-if [ "$npm" -eq 1 ] && cmd_available n; then
-  log "Updating npm!"
-  log
-  show_run "${sudo[@]}" "$(cmd_path n)" -d lts       # download
-  show_run "${sudo[@]}" "$(cmd_path n)" -d latest    # download
-  node_latest=$(n ls-remote latest)                  # 1.1.1
-  node_current=$(node --version 2>/dev/null || true) # v1.1.1
-  if [ "v$node_latest" != "$node_current" ]; then    # only if not already active
-    show_run "${sudo[@]}" "$(cmd_path n)" latest     # activate latest
-  fi
-  success
-fi
-
-if [ "$npm" -eq 1 ] && cmd_available npm; then
-  log "Updating npm packages!"
-  log
-  if cmd_available ncu; then
-    show_run "$(cmd_path ncu)" -p npm -g # get them to latest
-  else
-    log "install 'ncu' to improve this experience"
-  fi
-  show_run "$(cmd_path npm)" upgrade -g "${NPM_ARGS[@]}" # NOT as root!
-  success
-fi
-
-# NOTE: nodejs < 20.x.x is broken on my machine, as this corepack can't access npm.org
-#This is fixed by updating to latest before updating pnpm - see above.
-if [ "$pnpm" -eq 1 ] && cmd_available corepack; then
-  log "Updating pnpm!"
-  log
-  seturgent
-  show_run "$(cmd_path corepack)" prepare pnpm@latest --activate
-  success
-fi
-
-if [ "$pnpm" -eq 1 ] && cmd_available pnpm; then
-  log "Updating pnpm packages!"
-  log
-  show_run "$(cmd_path pnpm)" upgrade -g --latest # NOT as root!
-  pnpm_root=0
-  for f in /root/.local/share/pnpm/global/*/package.json; do
-    if [ -f "$f" ]; then pnpm_root=true && break; fi
-  done
-  [ "$pnpm_root" -eq 1 ] && show_run "${sudo[@]}" "$(cmd_path pnpm)" update -g --latest "${PNPM_ARGS[@]}"
-  success
-fi
-
-if [ "$cargo" -eq 1 ] && cmd_available rustup; then
-  log "Updating cargo and rustc!"
-  log
-  seturgent
-  show_run "$(cmd_path rustup)" update
-  success
-fi
-
-if [ "$cargo" -eq 1 ] && cmd_available cargo && cmd_available cargo-install-update; then
-
-  CPUMODE_BEFORE='' && if cmd_available cpumode; then
-    CPUMODE_BEFORE=$(cpumode -c) || err "Failed to get the CPU mode."
-    cpumode -q -- 'performance' 2>/dev/null || err "Failed to set the CPU mode to performance."
-  fi
-  {
-    log "Updating cargo installed packages!"
-    log
-    seturgent
-    show_run "$(cmd_path cargo)" install-update --all --git "${CARGO_ARGS[@]}"
+for m in "${to_update[@]}"; do
+  case "$m" in
+  native)
+    native_cmd=$(first_cmd nala apt yay pacman dnf) || { err "Could not find a command to update native packages." && continue; }
+    log "Using $native_cmd to update native packages"
+    case "$native_cmd" in
+    nala) verbose sudo_cmd nala upgrade ;;
+    apt) verbose sudo_cmd apt update && verbose sudo_cmd apt upgrade ;;
+    yay) verbose yay -Syu ;;
+    pacman) verbose sudo_cmd pacman -Syu ;;
+    dnf) verbose sudo_cmd dnf upgrade ;;
+    esac
+    ;;
+  snap)
+    has_cmd snap || contine
+    log "Updating snap packages!"
+    verbose sudo_cmd "$(cmdpath snap)" refresh
     success
-  } || true # || true to ensure that the cpumode can be restored
-  if [ -n "$CPUMODE_BEFORE" ]; then cpumode -q -- "$CPUMODE_BEFORE" 2>/dev/null || err "Failed to restore the CPU mode."; fi
-fi
 
-if [ "$vmware" -eq 1 ] && cmd_available vmplayer; then # Check that vmware is already installed
-  # log "updating vmware using vmware-installer!"
-  # seturgent
-  # show_run "${sudo[@]}" "$(cmd_path vmware-installer)" --console --eulas-agreed "${VMWARE_ARGS[@]}"
-  # success
+    has_cmd snap-cleanup || contine
+    log "Cleaning up snap packages"
+    verbose sudo_cmd "$(cmdpath snap-cleanup)" -y
+    success
+    ;;
+  flatpak)
+    has_cmd flatpak || continue
+    log "Updating flatpak packages!"
+    verbose "$(cmdpath flatpak)" update # NOT as root!
+    success
+    ;;
+  npm)
+    if has_cmd n; then # Note: n is optional
+      log "Updating npm!"
+      verbose sudo_cmd "$(cmdpath n)" -d lts             # download
+      verbose sudo_cmd "$(cmdpath n)" -d latest          # download
+      node_latest=$(n ls-remote latest)                  # 1.1.1
+      node_current=$(node --version 2>/dev/null || true) # v1.1.1
+      if [ "v$node_latest" != "$node_current" ]; then    # only if not already active
+        verbose sudo_cmd "$(cmdpath n)" latest           # activate latest
+      fi
+      success
+    fi
 
-  # These need to be updated because they break randomly otherwise
-  log "updating vmware modconfig!"
-  seturgent
-  show_run "${sudo[@]}" "$(cmd_path vmware-modconfig)" --console --install-all
-  success
-fi
+    has_cmd npm || continue
+    log "Updating npm packages!"
+    if has_cmd ncu; then
+      verbose "$(cmdpath ncu)" -p npm -g # get them to latest
+    else
+      log "install 'ncu' to improve this experience"
+    fi
+    verbose "$(cmdpath npm)" upgrade -g # NOT as root!
+    success
+    ;;
+  pnpm)
+    # NOTE: nodejs < 20.x.x is broken on my machine, as this corepack can't access npm.org
+    #This is fixed by updating to latest before updating pnpm - see above.
+    if has_cmd corepack; then
+      log "Updating pnpm!"
+      verbose "$(cmdpath corepack)" prepare pnpm@latest --activate
+      success
+    fi
 
-if [ "$chezmoi" -eq 1 ] && cmd_available chezmoi; then
-  log "Updating chezmoi" && seturgent
-  chezmoi=$(cmd_path chezmoi)
-  show_run "$chezmoi" upgrade --executable "$chezmoi"
-fi
+    has_cmd pnpm || continue
+    log "Updating pnpm packages!"
+    verbose "$(cmdpath pnpm)" upgrade -g --latest # NOT as root!
+    pnpm_root=0
+    for f in /root/.local/share/pnpm/global/*/package.json; do
+      if [ -f "$f" ]; then pnpm_root=1 && break; fi
+    done
+    [ "$pnpm_root" -eq 0 ] || verbose sudo_cmd "$(cmdpath pnpm)" update -g --latest
+    success
+    ;;
+
+  cargo)
+    if has_cmd rustup; then
+      log "Updating cargo and rustc!"
+      verbose "$(cmdpath rustup)" update
+      success
+    fi
+
+    has_cmd cargo cargo-install-update || continue
+    cpumode_before=''
+    if has_cmd cpumode; then
+      cpumode_before=$(cpumode -c) || err "Failed to get the CPU mode."
+      cpumode -q -- 'performance' 2>/dev/null || err "Failed to set the CPU mode to performance."
+    fi
+    log "Updating cargo installed packages!"
+    verbose "$(cmdpath cargo)" install-update --all --git || true # || true to ensure that the cpumode can be restored
+    if [ -n "$cpumode_before" ]; then cpumode -q -- "$cpumode_before" 2>/dev/null || err "Failed to restore the CPU mode."; fi
+    success
+    ;;
+  vmware)
+    has_cmd vmplayer || continue
+    # log "updating vmware using vmware-installer!"
+    # verbose sudo_cmd "$(cmdpath vmware-installer)" --console --eulas-agreed
+    # success
+
+    # These need to be updated because they break randomly otherwise
+    log "updating vmware modconfig!"
+    verbose sudo_cmd "$(cmdpath vmware-modconfig)" --console --install-all
+    success
+    ;;
+
+  chezmoi)
+    has_cmd chezmoi || continue
+    log "Updating chezmoi"
+    chezmoi=$(cmdpath chezmoi)
+    verbose "$chezmoi" upgrade --executable "$chezmoi"
+    ;;
+  *) abort "This is a bug! Found unknown method: $m" 3 ;;
+  esac
+done

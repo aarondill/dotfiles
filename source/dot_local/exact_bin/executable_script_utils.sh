@@ -69,6 +69,7 @@ if has_cmd tput; then
   GREEN_COLOR="$(tput setaf 2 2>/dev/null || printf '')"  # Used for verbose commands
   RED_COLOR="$(tput setaf 1 2>/dev/null || printf '')"    # Used for error
   PINK_COLOR="$(tput setaf 5 2>/dev/null || printf '')"   # Used for debug
+  BOLD_COLOR="$(tput bold 2>/dev/null || printf '')"      # Used for success
   OFF_COLOR="$(tput sgr0 2>/dev/null || printf '')"       # Used to return to default colors
 fi
 
@@ -99,6 +100,7 @@ function debug() { [ -z "${DEBUG:-}" ] || printf_c "$PINK_COLOR" 'DEBUG: %s\n' "
 function log() { printf_c "$TEAL_COLOR" '%s\n' "$@" || true; }
 function err() { printf_c "$RED_COLOR" "%s\n" "$@" >&2 || true; }
 function warn() { printf_c "$YELLOW_COLOR" "%s\n" "$@" >&2 || true; }
+function success() { printf_c "$GREEN_COLOR$BOLD_COLOR" "%s\n" "Success!" || true; }
 # prints the command and runs it
 # verbose echo do something -> echo do something\ndo something
 function verbose() {
