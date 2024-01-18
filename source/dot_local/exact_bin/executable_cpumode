@@ -28,8 +28,7 @@
 set -euC -o pipefail
 # Globs that don't match expand to empty strings
 shopt -s nullglob
-
-THIS="cpumode"
+. script_utils.sh || exit
 
 function usage() {
   cat <<-EOF
@@ -58,32 +57,7 @@ EOF
 }
 
 quiet=0
-
-# note: respects quiet!=0
-function log() {
-  if [ "$quiet" != 0 ]; then return; fi
-  printf '%s\n' "$@" || true
-}
-function err() { printf "%s\n" "$@" >&2 || true; }
-function abort() { err "$1" && exit "${2:-1}"; }
-# use like `"${sudo[@]}" do_something`
-# shellcheck disable=SC2206 # Splitting is intentional.
-sudo=(${SUDO:-sudo})
-[ "$(id -u)" -eq 0 ] && sudo=()
-
-# Returns a string that should be 'eval'ed to set the positional arguments
-# Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
-# Input: $LONGOPTS,$SHORTOPTS
-# eval "$(parse_args "$@")"
-function parse_args() {
-  local parsed
-  local code=0 && getopt --test &>/dev/null || code=$?
-  if [ "$code" -ne 4 ]; then abort "Enhanced getopt is required for this script to work. Please install it." 1; fi
-  parsed=$(getopt --options="$SHORTOPTS" --longoptions="$LONGOPTS" --name "${THIS:-$0}" -- "$@") ||
-    exit 2                     # getopt has already complained about wrong arguments to stdout - Exit script
-  printf '%s' "set -- $parsed" # output getopt’s output this way to handle the quoting right
-}
-
+function is_quiet() { [ "$quiet" -eq 1 ]; }
 LONGOPTS=help,available,current,handle-completion-options,quiet SHORTOPTS=h,a,c,q
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 
@@ -125,21 +99,25 @@ function show_output() {
   current="$(cat "$CURRENT_PATH")"
   case "$print_only" in
   '')
-    log "available options: $avail_options"
-    log "currently selected: $current"
+    if is_quiet; then
+      printf '%s\n' "$current" || true
+    else
+      log "available options: $avail_options"
+      log "currently selected: $current"
+    fi
     ;;
-  'available') printf '%s\n' "$avail_options" ;;
-  'current') printf '%s\n' "$current" ;;
+  'available') printf '%s\n' "$avail_options" || true ;;
+  'current') printf '%s\n' "$current" || true ;;
   esac
 }
 
 function set_mode() {
   mode=$1
   case " $avail_options " in
-  *" $mode "*) log "Setting mode: $mode" ;;
-  *) abort "'$mode' is not an available mode." 4 ;; # call without args to check available
+  *" $mode "*) is_quiet || log "Setting mode: $mode" ;; # no log on quiet
+  *) abort "'$mode' is not an available mode." 4 ;;     # call without args to check available
   esac
-  printf '%s' "$mode" | "${sudo[@]}" tee "${PATHS[@]}" >/dev/null
+  printf '%s' "$mode" | sudo_cmd tee "${PATHS[@]}" >/dev/null
 }
 
 avail_options=$(cat "$AVAIL_PATH")
