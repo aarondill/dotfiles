@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euC -o pipefail
-
-THIS='executables'
+shopt -s nullglob globstar extglob
+. script_utils.sh || exit
 
 function usage() {
   cat <<EOF
@@ -15,32 +15,13 @@ OPTIONS:
 EOF
   return 0
 }
-function log() { printf '%s\n' "$@"; }
-function err() { printf "$THIS: %s\n" "$@" >&2; }
-function abort() {
-  err "$1"
-  exit "${2:-1}"
-}
-# Returns a string that should be 'eval'ed to set the positional arguments
-# Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
-# Input: $LONGOPTS,$SHORTOPTS
-# eval "$(parse_args "$@")"
-function parse_args() {
-  local parsed
-  local code=0 && getopt --test &>/dev/null || code=$?
-  if [ "$code" -ne 4 ]; then abort "Enhanced getopt is required for this script to work. Please install it." 1; fi
-  parsed=$(getopt --options="$SHORTOPTS" --longoptions="$LONGOPTS" --name "${THIS:-$0}" -- "$@") ||
-    exit 2                     # getopt has already complained about wrong arguments to stdout - Exit script
-  printf '%s' "set -- $parsed" # output getopt’s output this way to handle the quoting right
-}
-
-path=$PATH
 LONGOPTS=help,path: SHORTOPTS=h,p:
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 
+path="${PATH:-}"
 while true; do
   case "$1" in
-  --help | -h) usage && exit 0 ;;
+  -h | --help) usage && exit 0 ;;
   -p | --path) path="$2" && shift 2 ;;
   --) shift && break ;;
   *) abort "This is a bug" 3 ;;
@@ -48,15 +29,15 @@ while true; do
 done
 
 function get_execs() {
-  local d f path dirs=()
-  path="${1:-$PATH}"
-  if ! [[ $path = *: ]]; then path="$path:"; fi
-  readarray -d ':' -t dirs <<<"$path"
+  local d f dirs=()
+  local path="${1:-$PATH}"
+  path="${path#:}:" # ensure trailing colon
+  readarray -d ':' -t dirs <<<"$path" || true
   for d in "${dirs[@]}"; do
-    [ -z "$d" ] && d=.
+    [ -n "$d" ] || d=.
     for f in "$d"/.[!.]* "$d"/..?* "$d"/*; do
       if [ -f "$f" ] && [ -x "$f" ]; then
-        log "${f##*/}"
+        printf '%s\n' "${f##*/}"
       fi
     done
   done
@@ -64,13 +45,10 @@ function get_execs() {
 
 function filter() {
   # if patterns given, pass them to grep, else output stdin exactly.
-  if [ "$#" -gt 0 ]; then
-    args=()
-    for pat; do args+=(-e "$pat"); done
-    grep "${args[@]}"
-  else
-    cat
-  fi
+  [ "$#" -gt 0 ] || { cat || return && return; }
+  args=()
+  for pat; do args+=(-e "$pat"); done
+  grep "${args[@]}"
 }
 
-get_execs "$path" | sort | uniq | filter "$@"
+get_execs "$path" | sort -u | filter "$@"

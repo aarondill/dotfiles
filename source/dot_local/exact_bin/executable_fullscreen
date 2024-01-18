@@ -1,14 +1,10 @@
 #!/usr/bin/env bash
 # usage: fullscreen [Search-Term]
 set -euC -o pipefail
-THIS=fullscreen
-function log() { printf '%s\n' "$@"; }
-function err() { printf "$THIS: %s\n" "$@" >&2; }
-function abort() { err "$1" && exit "${2:-1}"; }
+. script_utils.sh || exit
 function usage() {
-  command cat <<EOF
-$THIS [options...] [--] [SEARCH] [xdotool-args...]
-
+  command cat <<EOF || true
+Usage: $THIS [options...] [--] [SEARCH] [xdotool-args...]
 if run without arguments, uses selectwindow to request a window,
 else searches window class, name, and classname for SEARCH. When
 A window is found, it is maximized and moved to the top left corner.
@@ -18,26 +14,11 @@ xdotool-args are commands for xdotool that are prepended to the
 windowsize command. Use {id} to mean the specified window id.
 
 Options:
--h, --help              Show this help message
--d, --display=display   Set the display to use (default \$DISPLAY)
+  -h, --help              Show this help message
+  -d, --display=display   Set the display to use (default \$DISPLAY)
 EOF
   return 0
 }
-
-# Returns a string that should be 'eval'ed to set the positional arguments
-# Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
-# Input: $LONGOPTS,$SHORTOPTS
-# eval "$(parse_args "$@")"
-function parse_args() {
-  local parsed
-  local code=0 && getopt --test &>/dev/null || code=$?
-  if [ "$code" -ne 4 ]; then abort "Enhanced getopt is required for this script to work. Please install it." 1; fi
-  parsed=$(getopt --options="$SHORTOPTS" --longoptions="$LONGOPTS" --name "${THIS:-$0}" -- "$@") ||
-    exit 2                     # getopt has already complained about wrong arguments to stdout - Exit script
-  printf '%s' "set -- $parsed" # output getopt’s output this way to handle the quoting right
-}
-
-# option --long/-l requires 1 argument
 LONGOPTS=help,display: SHORTOPTS=h,d:
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 
@@ -59,8 +40,7 @@ else
 fi
 id=$(DISPLAY="$display" xdotool "${find[@]}") || abort "Could not find window on display: '${display:-NONE}'"
 
-userargs=()
-# Replace {id} with the id in the user string
-for arg in "${@:2}"; do userargs+=("${arg//\{id\}/$id}"); done
+shift                         # remove the classname
+userargs=("${@//\{id\}/$id}") # Replace {id} with the id in the user string
 
 DISPLAY="$display" xdotool "${userargs[@]}" windowsize "$id" 100% 100% windowmove "$id" 0 0

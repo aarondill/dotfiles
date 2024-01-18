@@ -6,7 +6,7 @@ GNOME_TERM=/usr/bin/gnome-terminal
 if [ "${1:-}" != "--" ] && [ -x "$GNOME_TERM" ]; then
   exec "$GNOME_TERM" "$@"
 else
-  if [ "${1:-1}" == "--" ]; then shift; fi
+  if [ "${1:-}" == "--" ]; then shift; fi
   for t in "${terms[@]}"; do # Find first installed terminal application in $terms
     if command -v "$t" &>/dev/null; then break; fi
   done

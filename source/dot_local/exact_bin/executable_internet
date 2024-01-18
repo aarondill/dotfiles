@@ -4,41 +4,21 @@
 #
 # tests internet connection by pinging google.com
 set -euC -o pipefail
+. script_utils.sh || exit
 
 test_url=1.1.1.1
-
 function usage() {
   cat <<EOF
-internet [options] [--] [arguments]
-                  
+usage: $THIS [options] [--] [arguments]
 Returns 0 if internet connection is present, else 1
 
 Options:
--h, --help       show this message
--t, --test=url   use url/ip instead of $test_url to test internet connection
--q, --quiet      don't print a message at end of test
+  -h, --help       show this message
+  -t, --test=url   use url/ip instead of $test_url to test internet connection
+  -q, --quiet      don't print a message at end of test
 EOF
   return 0
 }
-
-function log() { printf '%s\n' "$@"; }
-function err() { printf "%s\n" "$@" >&2; }
-function abort() { err "$1" && exit "${2:-1}"; }
-
-# Returns a string that should be 'eval'ed to set the positional arguments
-# Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
-# Input: $LONGOPTS,$SHORTOPTS
-# eval "$(parse_args "$@")"
-function parse_args() {
-  local parsed
-  local code=0 && getopt --test &>/dev/null || code=$?
-  if [ "$code" -ne 4 ]; then abort "Enhanced getopt is required for this script to work. Please install it." 1; fi
-  parsed=$(getopt --options="$SHORTOPTS" --longoptions="$LONGOPTS" --name "${THIS:-$0}" -- "$@") ||
-    exit 2                     # getopt has already complained about wrong arguments to stdout - Exit script
-  printf '%s' "set -- $parsed" # output getopt’s output this way to handle the quoting right
-}
-
-# option --long/-l requires 1 argument
 LONGOPTS=help,test:,quiet SHORTOPTS=h,t:,q
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 quiet=false

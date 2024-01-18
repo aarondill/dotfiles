@@ -1,18 +1,20 @@
 #!/usr/bin/env sh
 # Literally count the number of files in the current directory
-THIS=file-count
+THIS=$(basename -- "${0:-}")
 usage() {
   cat || true <<EOF
-$THIS [opts]... [DIR]
-
+Usage: $THIS [opts]... [DIR]
 Output the number of files in DIR or the current directory on standard output.
 
 Options:
- --help, -h   show this message
+  --help, -h   show this message
 EOF
 }
-for arg; do if [ "$arg" = "--help" ] || [ "$arg" = "-h" ]; then usage && exit 0; fi; done
+for arg; do
+  case "$arg" in
+  --help | -h) usage && exit 0 ;;
+  esac
+done
 # First arg, or current directory
 dir="${1:-.}"
-
-find "$dir" -mindepth 1 -maxdepth 1 -printf '.' | wc -c
+find "$dir" -mindepth 1 -maxdepth 1 -printf '.' | exec wc -c

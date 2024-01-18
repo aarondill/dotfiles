@@ -4,14 +4,15 @@
 # Sets to isotope.dark (from terminal.sexy)
 set -euC -o pipefail
 
-THIS=isotope.dark
+THIS=$(basename -- "${BASH_SOURCE[0]}")
 
-function log() { printf '%s\n' "$@"; }
-function err() { printf "$THIS: %s\n" "$@" >&2; }
+function log() { printf '%s\n' "$@" || true; }
+function err() { printf "%s\n" "$@" >&2 || true; }
 function abort() { err "$1" && exit "${2:-1}"; }
+function has_cmd() { [ -x "$(command -v "$1")" ]; }
 function usage() {
-  cat <<EOF
-$THIS [-h|--help]
+  cat <<EOF || true
+usage: $THIS [-h|--help]
 Sets the color of tty using setcolors (EvanPurkhiser/linux-vt-setcolors)
 Sets to isotope.dark (from terminal.sexy)
 Requires setcolors to be in the \$PATH
@@ -30,7 +31,7 @@ for arg in "$@"; do
   esac
 done
 
-if ! command -v setcolors &>/dev/null; then abort 'setcolors is required for this script to work' 2; fi
+has_cmd setcolors || abort 'setcolors is required for this script to work' 2
 setcolors <<<'
 0#000000
 1#ff0000
