@@ -25,7 +25,9 @@ if false; then
   [ "$?" -eq 0 ] || exit # set -e means that this line should be irrelevant, but just in case.
 fi
 
-THIS="$(basename -- "$0")" # This script is designed to be sourced. $0 should be the name of the parent script.
+# This script is designed to be sourced. $0 should be the name of the parent script.
+# If $0 is not defined, defaults to ${BASH_SOURCE[1]} (the calling script)
+THIS="$(basename -- "${0:-${BASH_SOURCE[1]}}")"
 function usage() {
   cat <<-EOF || return 0
 $THIS [options] [--] [arguments]
@@ -61,6 +63,8 @@ function has() { has_cmd "$@"; } # Fix a common error.
 
 # If this variable is set to 1, color will be turned on when stdout is a terminal (unless NO_COLOR is set)
 USE_COLOR=0
+# If this variable is set to 0, the verbose() function will not output anything, and just calls the arguments
+USE_VERBOSE=1
 
 YELLOW_COLOR='' TEAL_COLOR='' RED_COLOR='' PINK_COLOR='' OFF_COLOR=''
 if has_cmd tput; then
@@ -114,8 +118,13 @@ function verbose() {
   # ${var@Q} will quote it.
   # Q The expansion is a string that is the value of parameter quoted in a
   # format that can be reused as input.
-  local output="> ${*@Q}"
-  printf_c "$GREEN_COLOR" '%s\n' "$output" || true
+  # if USE_VERBOSE != 0, then output current command to stdout
+  if [ "${USE_VERBOSE:-0}" -ne 0 ]; then
+    local output='>'                   # use > for prompt
+    [ "$(id -u)" -ne 0 ] || output='$' # if root, use $ for prompt
+    output+=" ${*@Q}"                  # add quoted command line to output
+    printf_c "$GREEN_COLOR" '%s\n' "$output" || true
+  fi
   "$@"
 }
 
