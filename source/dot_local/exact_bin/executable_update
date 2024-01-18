@@ -39,6 +39,8 @@ EOF
 LONGOPTS=help,as-root,list SHORTOPTS=h,l
 eval "$(parse_args "$@")" || exit
 
+# This is the main driver for available methods!
+# To add a method, add it here, then add it to the case statement below
 declare -A methods=(
   [native]=0
   [flatpak]=0
@@ -49,6 +51,7 @@ declare -A methods=(
   [vmware]=0
   [chezmoi]=0
 )
+
 allow_root=0
 while true; do
   case "$1" in
