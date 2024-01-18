@@ -91,9 +91,9 @@ for arg; do
   esac
 done
 
-native=0 flatpak=0 snap=0 pnpm=0 npm=0 cargo=0 vmware=0
+native=0 flatpak=0 snap=0 pnpm=0 npm=0 cargo=0 vmware=0 chezmoi=0
 if [ "$#" -eq 0 ] || [ "$all_exclude" -eq 1 ]; then
-  native=1 flatpak=1 snap=1 pnpm=1 npm=1 cargo=1 vmware=1
+  native=1 flatpak=1 snap=1 pnpm=1 npm=1 cargo=1 vmware=1 chezmoi=1
 fi
 
 for arg; do          # Doesn't do anything if $# is zero
@@ -106,6 +106,7 @@ for arg; do          # Doesn't do anything if $# is zero
   npm) npm=1 ;; +npm) npm=0 ;;
   cargo) cargo=1 ;; +cargo) cargo=0 ;;
   vmware) vmware=1 ;; +vmware) vmware=0 ;;
+  chezmoi) chezmoi=1 ;; +chezmoi) chezmoi=0 ;;
   all) native=1 flatpak=1 snap=1 pnpm=1 npm=1 ;;
   +all) native=0 flatpak=0 snap=0 pnpm=0 npm=0 ;;
   esac
@@ -270,4 +271,10 @@ if [ "$vmware" -eq 1 ] && cmd_available vmplayer; then # Check that vmware is al
   seturgent
   show_run "${sudo[@]}" "$(cmd_path vmware-modconfig)" --console --install-all
   success
+fi
+
+if [ "$chezmoi" -eq 1 ] && has chezmoi; then
+  log "Updating chezmoi" && seturgent
+  chezmoi=$(cmd_path chezmoi)
+  show_run "$chezmoi" upgrade --executable "$chezmoi"
 fi
