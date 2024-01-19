@@ -19,7 +19,7 @@ Options:
   -h, --help         Show this help message.
   -r, --remove       Remove the most recently downloaded file (incompatable with -c or -p)
   -c, --copy         Copy the most recently downloaded file to DEST (incompatable with -r or -p)
-  -p, --print        Print the most recently downloaded file (incompatable with -r or -p)
+  -p, --print        Print the most recently downloaded file (incompatable with -c or -r)
   -n, --num=n        Operate on the nth most recent file, instead of the first
 EOF
 }
