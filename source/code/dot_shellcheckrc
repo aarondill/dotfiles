@@ -1,6 +1,6 @@
 # SC1091: Not following <file>
 # https://github.com/koalaman/shellcheck/wiki/SC1091
-disable=SC1091
+# disable=SC1091
 
 # SC2119: Use foo "$@" if function's $1 should mean script's $1.
 # https://github.com/koalaman/shellcheck/wiki/SC2119
