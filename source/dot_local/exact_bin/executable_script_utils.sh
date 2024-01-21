@@ -8,9 +8,11 @@
 
 # Include this section in any scripts that intend to import this utility module.
 if false; then
-  set -euC -o pipefail
-  shopt -s nullglob globstar # Better globs
-  . script_utils.sh || exit
+  set -euC -o pipefail && shopt -s nullglob globstar
+  utils=script_utils.sh dir=$(dirname -- "${BASH_SOURCE[0]}") || true
+  if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
+  # shellcheck source=./script_utils.sh
+  . "$utils" || exit
 fi
 
 # The name of the currently running script. Override this if the current filename's basename is not satisfactory.

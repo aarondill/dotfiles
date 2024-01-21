@@ -23,6 +23,7 @@ LONGOPTS=help,verbose,yes,force,interactive,recursive SHORTOPTS=h,v,y,f,i,r
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 
 declare -i yes=0 force=0
+USE_VERBOSE=0 # default to non-verbose output
 for arg in "$@"; do
   case "$arg" in
   -h | --help) usage && exit 0 ;;
@@ -41,40 +42,26 @@ done
 # returns success if the repo is clean
 function check_status() {
   local dir="${1:-.}"
-  [ -n "$(git -C "$dir" status --porcelain)" ] || return 1
+  [ -z "$(git -C "$dir" status --porcelain)" ] || return 1
 }
-
-# The final exit code.
-exit_code=0
-# like exit, but sets the exit_code variable instead of exiting. always returns 0.
-function _exit() {
-  local code=${1:-$?}                               # first arg, or last code (like exit)
-  [ "$code" -le "$exit_code" ] || exit_code="$code" # exit=max(exit, code)
-  return 0
-}
-# like abort(), but doesn't actually exit! always returns 0
-function _abort() { err "$1" && _exit "${2:-1}"; }
 
 for repo in "$@"; do
-  [ -z "$repo" ] || { _abort "Refusing to remove empty string. (repo is required)" 2 && continue; }
-  { [ -d "$repo" ] && [ -d "$repo/.git" ]; } || { _abort "$repo is not a git repository" 1 && continue; }
+  [ -n "$repo" ] || abort "Refusing to remove empty string. (repo is required)" 2
+  { [ -d "$repo" ] && [ -d "$repo/.git" ]; } || abort "$repo is not a git repository" 1
 
   # Only run it if the repo still is not corrupted (from previous rm -r)
   if git -C "$repo" rev-parse &>/dev/null; then
-    check_status "$repo" || { _abort "Refusing to remove dirty repo $repo" 1 && continue; }
+    check_status "$repo" || abort "Refusing to remove dirty repo $repo" 1
   fi
 
   # only confirm if yes is not 1
-  [ "$yes" -eq 1 ] ||
-    confirm "$THIS: remove git repository '$repo'?" || { _exit 1 && continue; }
+  [ "$yes" -eq 1 ] || confirm "$THIS: remove git repository '$repo'?" || continue
 
   base_args=(--recursive)
   [ "$force" -eq 0 ] || base_args+=(--force)
   [ "$USE_VERBOSE" -eq 0 ] || base_args+=(--verbose)
 
   # Force rm .git
-  { verbose rm --force --recursive -- "$repo/.git" &&
-    verbose rm "${base_args[@]}" -- "$repo/"; } || _exit "$?"
+  verbose rm --force --recursive -- "$repo/.git"
+  verbose rm "${base_args[@]}" -- "$repo/"
 done
-
-exit "$exit_code"
