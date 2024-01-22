@@ -67,7 +67,7 @@ fi
 all_exclude=1 # If all are exclude, enable all by default
 for arg; do
   case "$arg" in
-  +*) trude ;;        # Nothing
+  +*) ;;              # Nothing
   *) all_exclude=0 ;; # Not an exlude.
   esac
 done

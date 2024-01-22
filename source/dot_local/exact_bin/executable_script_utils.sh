@@ -72,6 +72,50 @@ function has_cmd() {
 # an alias for has_cmd
 function has() { has_cmd "$@"; }
 
+# Note: each value should be the same as the key
+declare -A FILE_TYPES=(
+  [symlink]="symlink"     # -L
+  [directory]="directory" # -d
+  [file]="file"           # -f
+  [chardev]="chardev"     # -c
+  [blockdev]="blockdev"   # -b
+  [fifo]="fifo"           # -f
+  [socket]="socket"       # -S
+)
+
+# Usage: file_type ./some_file [-s]
+# if -s is given, returns 'symbolic link' for all symlinks, whether broken or not
+# if -s is not given, returns 'symbolic link' only for broken symlinks
+# return values are the values of ${FILE_TYPES[@]}
+function file_type() {
+  local type deref=1              # dereference by default
+  [ "${2:-}" != '-s' ] || deref=0 # caller has asked not to dereference
+
+  if ! [ -e "$1" ]; then
+    [ -L "$1" ] || return 1     # The file doesn't exist
+    type=${FILE_TYPES[symlink]} # broken link
+  elif [ "$deref" -eq 0 ] && [ -L "$1" ]; then
+    type=${FILE_TYPES[symlink]} # non-broken link, but the caller wants links
+  elif [ -f "$1" ]; then
+    type=${FILE_TYPES[file]}
+  elif [ -d "$1" ]; then
+    type=${FILE_TYPES[directory]}
+  elif [ -c "$1" ]; then
+    type=${FILE_TYPES[chardev]}
+  elif [ -b "$1" ]; then
+    type=${FILE_TYPES[blockdev]}
+  elif [ -p "$1" ]; then
+    type=${FILE_TYPES[fifo]}
+  elif [ -S "$1" ]; then
+    type=${FILE_TYPES[socket]}
+  else
+    err "Unknown file type: $1. This is a bug!"
+    return 3
+  fi
+
+  printf '%s\n' "$type" || true
+}
+
 # Find the absolute path of the calling file
 # note: relies on dirname, basename, and readlink
 # Source: https://stackoverflow.com/a/246128
@@ -92,18 +136,18 @@ function get_script_path() {
 }
 
 # If this variable is set to 1, color will be turned on when stdout is a terminal (unless NO_COLOR is set)
-declare -i USE_COLOR=0
+declare -i USE_COLOR="${USE_COLOR:-0}"
 # If this variable is set to 0, the verbose() function will not output anything, and just calls the arguments
-declare -i USE_VERBOSE=1
+declare -i USE_VERBOSE="${USE_VERBOSE:-1}"
 YELLOW_COLOR='' TEAL_COLOR='' RED_COLOR='' PINK_COLOR='' OFF_COLOR=''
 if has_cmd tput; then
-  YELLOW_COLOR="$(tput setaf 3 2>/dev/null || printf '')" # Used for warn
-  TEAL_COLOR="$(tput setaf 6 2>/dev/null || printf '')"   # Used for log
-  GREEN_COLOR="$(tput setaf 2 2>/dev/null || printf '')"  # Used for verbose commands
-  RED_COLOR="$(tput setaf 1 2>/dev/null || printf '')"    # Used for error
-  PINK_COLOR="$(tput setaf 5 2>/dev/null || printf '')"   # Used for debug
-  BOLD_COLOR="$(tput bold 2>/dev/null || printf '')"      # Used for success
-  OFF_COLOR="$(tput sgr0 2>/dev/null || printf '')"       # Used to return to default colors
+  YELLOW_COLOR="$(tput setaf 3 2>/dev/null)" || true # Used for warn
+  TEAL_COLOR="$(tput setaf 6 2>/dev/null)" || true   # Used for log
+  GREEN_COLOR="$(tput setaf 2 2>/dev/null)" || true  # Used for verbose commands
+  RED_COLOR="$(tput setaf 1 2>/dev/null)" || true    # Used for error
+  PINK_COLOR="$(tput setaf 5 2>/dev/null)" || true   # Used for debug
+  BOLD_COLOR="$(tput bold 2>/dev/null)" || true      # Used for success
+  OFF_COLOR="$(tput sgr0 2>/dev/null)" || true       # Used to return to default colors
 fi
 
 # Usage: color "$(tput setaf 3)"
@@ -265,6 +309,9 @@ function get_xdg_dir() {
 }
 # Returns true if the given string is an integer value
 is_integer() { [ -n "$1" ] && case "$1" in *[!0123456789]*) return 1 ;; esac }
+# returns the number of arguments passed to it.
+# this can be especially useful with globs
+count() { printf '%d\n' "$#" || true; }
 
 # download -p <URL> [output] outputs to stdout if output is not specified
 # if -p is passed, the command will output progress information to stderr.
