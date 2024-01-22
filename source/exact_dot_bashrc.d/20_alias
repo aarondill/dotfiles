@@ -22,7 +22,7 @@ else
   alias fd="fd -uu"
 fi
 alias rg="rg -uu -i"
-alias rd='ripdrag -xr'
+alias rd='ripdrag -r'
 alias rdt='ripdrag -ktr'
 # Show progress pls
 alias dd="dd status=progress"
