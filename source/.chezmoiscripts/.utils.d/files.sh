@@ -80,7 +80,7 @@ function mklink() {
   else
     relative_content="$(relpath "./$(basename -- "$linkcontent")" "$linkcontent")"
   fi
-  mklink_abs "$relative_content" "$linkname"
+  mklink_abs "${relative_content:-$linkcontent}" "$linkname"
 }
 
 # usage: _test_all OP files...
