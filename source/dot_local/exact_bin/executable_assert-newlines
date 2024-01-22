@@ -6,8 +6,12 @@
 # and appends a newline '\n' if it doesn't already
 # end in a newline.
 #
-set -euC -o pipefail
-. script_utils.sh || exit
+set -euC -o pipefail && shopt -s nullglob globstar
+utils=script_utils.sh dir=$(dirname -- "${BASH_SOURCE[0]}") || true
+if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
+# shellcheck source=./script_utils.sh
+. "$utils" || exit
+
 function usage() {
   cat <<EOF
 Usage: $THIS DIR...

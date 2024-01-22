@@ -7,10 +7,13 @@ export BASH_TPL_TEXT_DELIM=
 export BASH_TPL_DIR_DELIM=":"
 export BASH_TPL_CMT_DELIM="%#"
 
-# don't match -> empty string. Include dotfiles. Allow double star
-shopt -s nullglob dotglob globstar
-set -euC -o pipefail
-. script_utils.sh || exit
+set -euC -o pipefail && shopt -s nullglob globstar
+utils=script_utils.sh dir=$(dirname -- "${BASH_SOURCE[0]}") || true
+if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
+# shellcheck source=./script_utils.sh
+. "$utils" || exit
+# Include dotfiles in globs
+shopt -s dotstar
 
 template_parent_dir=("$HOME/code" "$HOME/Templates")
 

@@ -5,9 +5,13 @@
 # Read the contents of a file or executable
 # *Follows Symlinks*
 #
-set -euC -o pipefail
-shopt -s nullglob dotglob globstar
-. script_utils.sh || exit
+set -euC -o pipefail && shopt -s nullglob globstar
+utils=script_utils.sh dir=$(dirname -- "${BASH_SOURCE[0]}") || true
+if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
+# shellcheck source=./script_utils.sh
+. "$utils" || exit
+
+shopt -s dotglob # we need these to find all the files
 function usage() {
   cat <<EOF || true
 Usage: $THIS PATTERN...

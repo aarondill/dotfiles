@@ -5,8 +5,11 @@
 # Read the contents of a file or executable
 # *Follows Symlinks*
 #
-set -euC -o pipefail
-. script_utils.sh || exit
+set -euC -o pipefail && shopt -s nullglob globstar
+utils=script_utils.sh dir=$(dirname -- "${BASH_SOURCE[0]}") || true
+if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
+# shellcheck source=./script_utils.sh
+. "$utils" || exit
 
 save_file="$HOME/.config/emacs/games/dunnet.save"
 function usage() {
