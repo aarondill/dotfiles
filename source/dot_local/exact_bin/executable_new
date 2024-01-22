@@ -13,7 +13,7 @@ if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
 # shellcheck source=./script_utils.sh
 . "$utils"
 # Include dotfiles in globs
-shopt -s dotstar
+shopt -s dotglob
 
 template_parent_dir=("$HOME/code" "$HOME/Templates")
 
