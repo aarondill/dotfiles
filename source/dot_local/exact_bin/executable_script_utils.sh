@@ -11,8 +11,7 @@ if false; then
   set -euC -o pipefail && shopt -s nullglob globstar
   utils=script_utils.sh dir=$(dirname -- "${BASH_SOURCE[0]}") || true
   if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
-  # shellcheck source=./script_utils.sh
-  . "$utils" || exit
+  . "$utils"
 fi
 
 # The name of the currently running script. Override this if the current filename's basename is not satisfactory.
@@ -41,7 +40,8 @@ function join() {
 function split() {
   local delim="$2" str="$3" elem ends_with_delim=0
   [ -n "$delim" ] || abort "Invalid delimiter" 2
-  case "$str" in *"$delim") ends_with_delim=1 ;; esac
+  case "$str" in # Bash-ls chokes if this is on one line!
+  *"$delim") ends_with_delim=1 ;; esac
   # shellcheck disable=SC2178 # It's not being treated as a string, declare -n is special
   declare -n __out_arr="$1"  # we can now use __out_arr to assign to outside variable
   __out_arr=()               # clear the output array
@@ -183,6 +183,11 @@ function printf_c() {
 
 # Outputs only if $DEBUG is set
 function debug() { [ -z "${DEBUG:-}" ] || printf_c "$PINK_COLOR" 'DEBUG: %s\n' "$@" >&2 || true; }
+
+# usage: log something
+function log() { printf "${BLUE_COLOR}${BOLD_COLOR}%s\n${RESET_COLOR}" "$@" || true; }
+
+# A message
 function log() { printf_c "$TEAL_COLOR" '%s\n' "$@" || true; }
 function err() { printf_c "$RED_COLOR" "%s\n" "$@" >&2 || true; }
 function warn() { printf_c "$YELLOW_COLOR" "%s\n" "$@" >&2 || true; }

@@ -3,7 +3,7 @@ set -euC -o pipefail && shopt -s nullglob globstar
 utils=script_utils.sh dir=$(dirname -- "${BASH_SOURCE[0]}") || true
 if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
 # shellcheck source=./script_utils.sh
-. "$utils" || exit
+. "$utils"
 
 USE_COLOR=1 # We want color in logs here
 
