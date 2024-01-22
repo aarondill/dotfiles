@@ -72,6 +72,6 @@ check_dependencies "${deps[@]}" || exit
 rsync_args=(-varuP)
 [ "$keep" -eq 1 ] || rsync+=(--delete) # if not keep, then delete files not present in src
 for e in "${exclude[@]}"; do rsync_args+=(--exclude "$e"); done
-verbose rsync "${rsync_args[@]}" -- "$java/" "$dest/"
+verbose rsync "${rsync_args[@]}" -- "$src/" "$dest/"
 
 verbose diff -r -- "$dest" "$src" || err "warning: source and destination differ!"
