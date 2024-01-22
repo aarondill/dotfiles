@@ -87,6 +87,8 @@ declare -A FILE_TYPES=(
 # if -s is given, returns 'symbolic link' for all symlinks, whether broken or not
 # if -s is not given, returns 'symbolic link' only for broken symlinks
 # return values are the values of ${FILE_TYPES[@]}
+# NOTE: this may be a very expesive operation, as it has to do several file system operations
+# Bash doesn't provide a way to get the file type in a single operation :(
 function file_type() {
   local type deref=1              # dereference by default
   [ "${2:-}" != '-s' ] || deref=0 # caller has asked not to dereference

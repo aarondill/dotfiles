@@ -35,13 +35,21 @@ while true; do
   case "$1" in
   -h | --help) usage && exit 0 ;;
   -e | --exclude)
-    [ -n "${show_types["$2"]:-}" ] || abort "Unknown type: $2" 2
-    show_types["$2"]=0 && shift 2
+    types=() && split types : "$2" && shift 2
+    for t in "${types[@]}"; do
+      [ -n "$t" ] || continue # ignore empty elements
+      [ -n "${show_types["$t"]:-}" ] || abort "Unknown type: $t" 2
+      show_types["$t"]=0
+    done
     ;;
   -i | --include)
-    [ -n "${show_types["$2"]:-}" ] || abort "Unknown type: $2" 2
     for key in "${!show_types[@]}"; do show_types[$key]=0; done # set all others to not count
-    show_types["$2"]=1 && shift 2
+    types=() && split types : "$2" && shift 2
+    for t in "${types[@]}"; do
+      [ -n "$t" ] || continue # ignore empty elements
+      [ -n "${show_types["$t"]:-}" ] || abort "Unknown type: $t" 2
+      show_types["$t"]=1
+    done
     ;;
   -v | --verbose) verbose=1 && shift ;;
   --) shift && break ;;
@@ -58,13 +66,18 @@ unset "show_types[dotfile]" # we already handled dotfile
 # PERF: Calculate these once, since they can't change
 show_all=1 show_any=0 &&
   for val in "${show_types[@]}"; do
-    if [ "$val" -eq 1 ]; then show_any=1; else show_all=0 && break; fi
+    case "$val" in
+    1) show_any=1 ;; 0) show_all=0 ;;
+    esac
   done
 _file_count() {
+  # PERF: No need to calculate, since nothing will be returned
   if [ "$show_any" -eq 0 ]; then
     printf '%s\n' 0 || true
     return 0
   fi
+
+  local files=("$1"/*)
   # PERF: if all files are counted, don't fetch the file type
   if [ "$show_all" -eq 1 ]; then
     printf '%s\n' "${#files[@]}" || true
@@ -73,20 +86,18 @@ _file_count() {
 
   count=0
   for file in "${files[@]}"; do
-    type=$(file_type "$file" -s)
-    if [ "${show_types["$type"]}" -eq 1 ]; then
-      count=$((count + 1))
-    fi
+    type=$(file_type "$file" -s) || continue
+    [ "${show_types["$type"]}" -ne 1 ] || count=$((count + 1))
   done
-  printf '%s\n' "$count"
+  printf '%s\n' "$count" || true
 }
-for dir; do
+
+for dir in "$@"; do
   [ -d "$dir" ] || abort "$dir is not a directory" 1
   declare -i count=0
-  count=$(_file_count "$dir"/*)
-  if [ "$verbose" -eq 1 ]; then
-    log "$dir: $count"
-  else
-    log "$count"
-  fi
+  count=$(_file_count "$dir")
+  case "$verbose" in
+  0) log "$count" ;;
+  *) log "$dir: $count" ;;
+  esac
 done
