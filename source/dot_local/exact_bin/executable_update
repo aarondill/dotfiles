@@ -136,7 +136,7 @@ for m in "${to_update[@]}"; do
       verbose sudo_cmd "$(cmdpath n)" -d lts             # download
       verbose sudo_cmd "$(cmdpath n)" -d latest          # download
       node_latest=$(n ls-remote latest)                  # 1.1.1
-      node_current=$(node --version 2>/dev/null || true) # v1.1.1
+      node_current=$(node --version 2>/dev/null) || true # v1.1.1
       if [ "v$node_latest" != "$node_current" ]; then    # only if not already active
         verbose sudo_cmd "$(cmdpath n)" latest           # activate latest
       fi

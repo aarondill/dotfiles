@@ -59,19 +59,29 @@ src="${2:-$default_src}"
 [ -d "$dest" ] || abort "dest: $dest is not a directory!" 1
 [ -d "$src" ] || abort "src: $src is not a directory!" 1
 
+diff_args=(-r) # recursive
+# diff supports exclude patterns, add them
+if diff --help 2>&1 | grep -q -- '--exclude'; then
+  for e in "${exclude[@]}"; do diff_args+=(--exclude "$e"); done
+fi
+
 if [ "$diff_only" -eq 1 ]; then
   check_dependencies diff || exit
-  verbose diff -r -- "$dest" "$src"
+  verbose diff "${diff_args[@]}" -- "$dest" "$src"
   exit 0 # Stop here. they don't want to sync.
 fi
 
 check_dependencies "${deps[@]}" || exit
 # note: diff dest src to show what copying *will do*
-[ "$yes" -eq 1 ] || verbose diff -r -- "$dest" "$src" || confirm "source and destination differ. Do you want to override destination?" || abort 'aborting' 1
+[ "$yes" -eq 1 ] || verbose diff "${diff_args[@]}" -- "$dest" "$src" || confirm "source and destination differ. Do you want to override destination?" || abort 'aborting' 1
+
 # verbose, archive, recursive, update, progress
 rsync_args=(-varuP)
-[ "$keep" -eq 1 ] || rsync+=(--delete) # if not keep, then delete files not present in src
+[ "$keep" -eq 1 ] || rsync_args+=(--delete) # if not keep, then delete files not present in src
 for e in "${exclude[@]}"; do rsync_args+=(--exclude "$e"); done
 verbose rsync "${rsync_args[@]}" -- "$src/" "$dest/"
 
-verbose diff -r -- "$dest" "$src" || err "warning: source and destination differ!"
+verbose diff "${diff_args[@]}" -- "$dest" "$src" || err "warning: source and destination differ!"
+
+sysvol="$dest/System Volume Information"
+if [ -d "$sysvol" ]; then verbose rm -rf -- "$sysvol"; fi
