@@ -118,6 +118,38 @@ function file_type() {
   printf '%s\n' "$type" || true
 }
 
+# Adds a numerical suffix to a file until a filename is found that doesn't exist
+# Note: if used in a subshell, bash will trim the trailing newline:
+# for this usecase, provide an outvar. If an outvar is provided, no output will be generated
+# usage: get_valid_file FILE [suffix] [outvar]
+# If file doesn't end in suffix, then suffix will be ignored.
+# Ex: get_unique_filename "file.jpg" ".jpg" -> file-9999.jpg OR file.jpg
+# Ex: get_unique_filename "file.ext" -> file.ext-9999 OR file.ext
+# Ex: get_unique_filename "file.ext" ".jpg" -> file.ext-9999 OR file.ext
+function get_unique_filename() {
+  # suffix may be empty
+  local original_file="$1" suffix="${2:-}"
+  local file_start="${original_file%"$suffix"}"
+  [ "$file_start" != "$original_file" ] || suffix='' # ignore suffix if not present
+  local _output="$file_start$suffix"
+
+  declare -i i=1
+  # broken symlinks fail the -e check, but still exist
+  while [ -e "$_output" ] || [ -L "$_output" ]; do
+    _output="$file_start-$i$suffix"
+    i=$((i + 1))
+  done
+
+  local outvar="${3:-}"
+  if [ -n "$outvar" ]; then
+    unset original_file suffix file_start # Ensure these can't be changed by outvar
+    declare -n outvar                     # assignment to outvar goes to named variable
+    outvar="$_output"
+  else
+    printf '%s' "$_output" || true
+  fi
+}
+
 # Find the absolute path of the calling file
 # note: relies on dirname, basename, and readlink
 # Source: https://stackoverflow.com/a/246128

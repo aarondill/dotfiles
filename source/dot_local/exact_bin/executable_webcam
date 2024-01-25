@@ -1,0 +1,129 @@
+#!/usr/bin/env bash
+set -euC -o pipefail && shopt -s nullglob globstar
+utils=script_utils.sh dir=$(dirname -- "${BASH_SOURCE[0]}") || true
+if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
+# shellcheck source=./script_utils.sh
+. "$utils"
+
+USE_COLOR=1 # Output using color
+
+# Used for default file output
+resolution='640x480' videodev=/dev/video0
+# First Char decides the type, rest is value
+# Example: F1 = 1 frame, D2 = 2 seconds, C = continuous
+record_for=F1
+file_extension='' # detect based on frames/duration after processing
+loglevel=warning
+
+function usage() {
+  cat <<EOF || true
+usage: $THIS [OPTS]... [OUTFILE] [FFMPEG_OPTS]
+saves a capture of the webcam to the given file
+
+The default behavior saves the file under the pictures directory if frames is 1, or else the videos directory
+FFMPEG_OPTS are passed before -i, to insert args after -i, place a "--" in between. IE: "-before 1 -- -after 2"
+to provide FFMPEG_OPTS without OUTFILE, supply an empty string for OUTFILE. 
+
+Options:
+  -h, --help           Show this help message.
+  -r, --resolution=res Use the given resolution [default: $resolution]
+  -f, --frames=frames  Capture given number of frames [default: 1]
+  -d, --duration=dur   Capture given duration: seconds or hh:mm:ss[.xxx].
+  -c, --continuous     Capture video until q is pressed.
+  -e, --extension=ext  Use given default extension (no '.') [default: jpg (frames=1), else mp4]
+  -v, --video=dev      Use the video device [default: $videodev]
+  -l, --loglevel=level Pass level to ffmpeg as the log level [default: $loglevel]
+
+
+The last provided of --frames, --duration, and --continuous will be used
+Note: ultimately all arguments are processed by ffmpeg, so they must be acceptable combinations according to ffmpeg.
+For example: this means that saving several frames as "file.jpg" may fail.
+EOF
+}
+
+LONGOPTS=help,resolution:,frames:,duration:,extension:,video:,loglevel:,continuous
+SHORTOPTS=h,r:,f:,d:,e:,v:,l:,-c
+ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
+
+while true; do
+  case "$1" in
+  -h | --help) usage && exit 0 ;;
+  -r | --resolution) resolution=$2 && shift 2 ;;
+  -f | --frames) record_for="F$2" && shift 2 ;;   # mutually exclusive with -d and -c
+  -c | --continuous) record_for="C" && shift 1 ;; # mutually exclusive with -d and -f
+  -d | --duration) record_for="D$2" && shift 2 ;; # mutually exclusive with -c and -f
+  -e | --extension) file_extension=$2 && shift 2 ;;
+  -v | --video) videodev=$2 && shift 2 ;;
+  -l | --loglevel) loglevel=$2 && shift 2 ;;
+  --) shift && break ;;
+  *) abort "This is a bug" 3 ;;
+  esac
+done
+output=${1:-}
+[ "$#" -eq 0 ] || shift 1   # After this, "$@" is FFMPEG_OPTS
+check_dependencies "ffmpeg" # This script (obviously) requires ffmpeg
+
+# don't override user's choice
+[ -n "$file_extension" ] ||
+  file_extension="mp4" && [ "$record_for" != "F1" ] || file_extension="jpg" # only if frames=1, default to jpg
+
+[ -c "$videodev" ] || abort "$videodev is not a valid character device! Please check your video device and try again." 1
+
+outputdir=''
+if [ -n "$output" ]; then
+  outputdir=$(dirname -- "$output")
+  [ -d "$outputdir" ] || abort "$outputdir: No such directory" 1
+else                             # create a default output file
+  date=$(date '+%Y-%m-%d_%H-%M') # yyyy-mm-dd_hh-mm
+
+  if has_cmd xdg-user-dir; then
+    type=VIDEOS && [ "$record_for" != "F1" ] || type=PICTURES
+    outputdir="$(xdg-user-dir "$type" 2>/dev/null)" || true
+  fi
+
+  if [ -n "$outputdir" ]; then
+    # Ensure our new output directory exists
+    [ -d "$outputdir" ] || mkdir -p -- "$outputdir" || return 1
+    if [ -d "$outputdir/Webcam" ]; then
+      outputdir="$outputdir/Webcam" # default to /pictures/Webcam if folder exists
+    fi
+  fi
+
+  # Output is output directory (or current) followed by date and format
+  output="${outputdir:-.}/${date}.${file_extension}"
+  get_unique_filename "$output" ".$file_extension" output # saves to output
+fi
+
+before_ffmpeg_opts=()
+while [ "$#" -gt 0 ]; do
+  f_opt="$1" && shift
+  [ "$f_opt" != "--" ] || break  # break at --
+  before_ffmpeg_opts+=("$f_opt") # add the found opt to before
+done
+after_ffmpeg_opts=("$@") # remaining is after (may be empty)
+
+ffmpeg_args=(
+  -hide_banner          # pls be quieter
+  -loglevel "$loglevel" # pretty please
+  -stats                # show statistics/progress
+
+  -f video4linux2            # use the video4linux2 driver
+  -s "$resolution"           # set the resolution
+  "${before_ffmpeg_opts[@]}" # Pass arguments for before -i
+  -i "$videodev"             # read from /dev/video0
+  "${after_ffmpeg_opts[@]}"  # Pass arguments for after -i
+)
+
+# Log before case so the press q message appears after
+log "Saving capture to $output at resolution $resolution"
+case "$record_for" in
+# Add -frames to specify the number of frames
+F*) ffmpeg_args+=(-frames "${record_for#F}") ;;
+# Restrict the transcoded/captured video sequence to the duration specified in seconds. hh:mm:ss[.xxx] syntax is also supported.
+D*) ffmpeg_args+=(-t "${record_for#D}") ;;
+# Default ffmpeg behavior is continuous capture
+C) log "Press q to stop recording" ;; # ctrl-c also works, but exits weird.
+*) abort "Unrecognized record_for prefix: $record_for. This is a bug!" 3 ;;
+esac
+
+ffmpeg "${ffmpeg_args[@]}" -- "$output" || abort "ffmpeg failed!" "$?"
