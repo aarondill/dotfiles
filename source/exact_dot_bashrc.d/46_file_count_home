@@ -6,6 +6,7 @@
 # This should be after neofetch
 #
 [ "$SHLVL" -eq 1 ] || return 0
+# function wrapper so we can use local
 function _home_count() {
   unset -f "${FUNCNAME[0]}" # self destruct
   local dotglob=-s
@@ -23,10 +24,8 @@ function _home_count() {
     return 0
   fi
 
-  declare -A prevfiles=()
-  local filename && while IFS= read -r -d $'\0' filename <&3; do
-    prevfiles["$filename"]=1 # Add to prevfiles array
-  done 3<"$countfile"
+  local filename && declare -A prevfiles=()
+  while IFS= read -r -d $'\0' filename <&3; do prevfiles["$filename"]=1; done 3<"$countfile"
 
   local found=0
   local file && for file in "${!prevfiles[@]}"; do
