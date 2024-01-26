@@ -15,7 +15,6 @@ shopt -s dotglob # we need these to find all the files
 function usage() {
   cat <<EOF || true
 Usage: $THIS PATTERN...
-                  
 Finds the path of a .desktop file based on the grep pattern (Searches the Exec=line)
 If passed a program, it will automatically check the executable path
 Options:

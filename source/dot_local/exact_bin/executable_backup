@@ -149,23 +149,29 @@ REMOVE_OLDER_THAN=3M
 # ----------------------------------------------------------------
 # ----------------------------------------------------------------
 
+THIS="$(basename -- "${BASH_SOURCE[0]}")"
 function usage() {
-  cat <<-EOF
-backup [opts]...
-
+  cat <<EOF || true
+Usage: $THIS [opts]...
 Run a system backup using duplicity.
 Pass --full to specify full backup or --incr to specify incremental backup
 If neither argument is passed, a full will be made if the most recent full backup is $FULL_IF_OLDER old
 
-Flags:
---full,--incr   passed to duplicity to force a full or incremental backup
---print,-p      print the location of the backup (note: hardcoded within the script)
---help          show this message
---cleanup,-c    cleanup old backups
---status,-s     get the collection-status
---info,-i       a synonym for --status
---dry-run,-n    do not run any duplicity commands, just show them (set BACKUP_DRY_RUN to set this)
---verbose,-v    show all duplicity commands before running them (set BACKUP_VERBOSE to set this)
+Options:
+  --incr           Force a incremental backup
+  --full           Force a full backup
+  -h, --help       Show this message
+  -c, --cleanup    Cleanup old backups
+  -i, --info       A synonym for --status
+  -n, --dry-run    Do not run any duplicity commands, just show them
+  -p, --print      Print information about the backup without querying it
+  -s, --status     Get the collection-status
+  -v, --verbose    Show all duplicity commands before running them
+
+Environment Variables:
+  BACKUP_VERBOSE: causes the script to act as if --verbose was passed
+  BACKUP_DRY_RUN: causes the script to act as if --dry-run was passed
+  DUPLICITY: The path to the duplicity executable
 EOF
 }
 function log() { printf '%s\n' "$@" || true; }

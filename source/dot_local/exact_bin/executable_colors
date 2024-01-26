@@ -11,7 +11,7 @@ set -euC -o pipefail
 ## UTILS ##################################
 THIS=${BASH_SOURCE[0]##*/}
 function usage() {
-  cat <<EOF
+  cat <<EOF || true
 Usage: $THIS [options]
 Echoes all the color codes to the terminal to demonstrate what's
 available. Each line is the color code of one forground color,

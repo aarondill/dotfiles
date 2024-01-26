@@ -12,7 +12,7 @@ if [ "$(id -u)" -ne 0 ]; then abort "This program must be run as root" 1; fi
 
 function usage() {
   cat <<EOF || true
-$THIS [options] [--] [arguments]
+Usage: $THIS [options] [--] [arguments]
 Cleans up the excess snap revisions and files. 
 
 Options:

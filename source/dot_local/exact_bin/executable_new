@@ -57,7 +57,7 @@ function get_bash_tpl() {
 } && get_bash_tpl
 
 function usage() {
-  cat <<EOF
+  cat <<EOF || true
 Usage: $THIS [LANG] [--] <DIR>...
 Creates a new project in the given language. 
 

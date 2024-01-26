@@ -11,8 +11,8 @@ if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
 
 test_url=1.1.1.1
 function usage() {
-  cat <<EOF
-usage: $THIS [options] [--] [arguments]
+  cat <<EOF || true
+Usage: $THIS [options] [--] [arguments]
 Returns 0 if internet connection is present, else 1
 
 Options:

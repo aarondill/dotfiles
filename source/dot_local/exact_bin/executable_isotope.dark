@@ -12,7 +12,7 @@ function abort() { err "$1" && exit "${2:-1}"; }
 function has_cmd() { [ -x "$(command -v "$1")" ]; }
 function usage() {
   cat <<EOF || true
-usage: $THIS [-h|--help]
+Usage: $THIS [-h|--help]
 Sets the color of tty using setcolors (EvanPurkhiser/linux-vt-setcolors)
 Sets to isotope.dark (from terminal.sexy)
 Requires setcolors to be in the \$PATH

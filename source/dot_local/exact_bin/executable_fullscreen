@@ -7,7 +7,7 @@ if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
 . "$utils"
 
 function usage() {
-  command cat <<EOF || true
+  cat <<EOF || true
 Usage: $THIS [options...] [--] [SEARCH] [xdotool-args...]
 if run without arguments, uses selectwindow to request a window,
 else searches window class, name, and classname for SEARCH. When

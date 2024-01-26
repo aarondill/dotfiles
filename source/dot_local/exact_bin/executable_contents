@@ -12,7 +12,7 @@ if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
 . "$utils"
 
 function usage() {
-  cat <<EOF
+  cat <<EOF || true
 Usage: $THIS [file|executable...]
 Outputs the contents of a file using \$PAGER, calls \`command -v\` if file is not found
 

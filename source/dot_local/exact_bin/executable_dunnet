@@ -13,7 +13,7 @@ if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
 
 save_file="$HOME/.config/emacs/games/dunnet.save"
 function usage() {
-  cat <<EOF
+  cat <<EOF || true
 Usage: $THIS [options] [--] [emacs-options]
 Opens dunnet automatically loading the save file
 Depends on emacs being installed.

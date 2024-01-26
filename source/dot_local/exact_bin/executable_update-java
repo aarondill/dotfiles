@@ -12,7 +12,7 @@ if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
 
 function usage() {
   cat <<EOF || true
-$THIS [-y | --yes] <JAVADIR> [priority = 1112] [JVM_VERS_DIR]
+Usage: $THIS [-y | --yes] <JAVADIR> [priority = 1112] [JVM_VERS_DIR]
 Updates java symlinks to the path specified using update-alternatives.
 Do not include /bin on JAVADIR.
 JVM_VERS_DIR will be determined by JAVA_HOME if set, or else default to /usr/lib/jvm

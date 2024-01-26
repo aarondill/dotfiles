@@ -6,15 +6,11 @@ if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
 . "$utils"
 
 function usage() {
-  cat || true <<-EOF
-usage: $THIS [OPTS]... [percent]
+  cat <<EOF || true
+Usage: $THIS [OPTS]... [percent]
 Sets the brightness to the specified integer percentage. Use n{+,-} to increment the brightness.
 Without a percentage, outputs the current brightness percentage
 NOTE: 1 is the minimum brightness, while 100 is the maximum brightness
-
-the environment variable \`SUDO\` can be set to use a different
-program for root elevation. It will be split by the shell, so
-spaces in the program name will likely be mutilited.
 
 Options:
   -h, --help         Show this help message.

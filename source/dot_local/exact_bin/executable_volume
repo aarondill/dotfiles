@@ -7,7 +7,7 @@ if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
 
 sink='@DEFAULT_SINK@'
 function usage() {
-  cat <<-EOF
+  cat <<EOF || true
 Usage: $THIS [OPTS]... [PERCENT|'mute']
 Sets the volume to the specified PERCENT. Use n{+,-} to incremenet the volume.
 Call with no positional arguments to output the current volume.

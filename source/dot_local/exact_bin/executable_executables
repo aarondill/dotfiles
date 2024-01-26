@@ -6,7 +6,7 @@ if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
 . "$utils"
 
 function usage() {
-  cat <<EOF
+  cat <<EOF || true
 Usage: $THIS [PATTERN]...
 Lists executables present in \$PATH
 If PATTERN is specified, it will be passed to grep to filter the executables (OR)
@@ -15,7 +15,6 @@ OPTIONS:
   -h, --help      display this help message
   -p, --path      <path> use <path> instead of \$PATH
 EOF
-  return 0
 }
 LONGOPTS=help,path: SHORTOPTS=h,p:
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit

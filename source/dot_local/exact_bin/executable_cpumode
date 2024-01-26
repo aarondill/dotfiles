@@ -32,15 +32,11 @@ if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
 . "$utils"
 
 function usage() {
-  cat <<-EOF
-usage: $THIS [OPTS]... [newmode]
+  cat <<EOF || true
+Usage: $THIS [OPTS]... [newmode]
 Sets the kernal power saving/performance mode
 Call without arguments to show the current and available modes
 in a human-readable format.
-
-the environment variable \`SUDO\` can be set to use a different
-program for root elevation. It will be split by the shell, so
-spaces in the program name will likely be mutilited.
 
 Options:
   -h, --help         Show this help message.

@@ -18,13 +18,12 @@ fi
 # If $0 is not defined, defaults to ${BASH_SOURCE[1]} (the calling script)
 THIS="$(basename -- "${0:-${BASH_SOURCE[1]}}")" # This script is designed to be sourced. $0 should be the name of the parent script.
 function usage() {
-  cat <<-EOF || return 0
-$THIS [options] [--] [arguments]
-                  
+  cat <<EOF || true
+Usage: $THIS [options] [--] [arguments]
 This does SOMETHING. The program using this script should set it's own usage message by overriding the usage function!
 
 Options:
--h, --help        show this message
+  -h, --help        show this message
 EOF
 }
 # joins arguments by first argument.

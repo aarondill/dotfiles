@@ -12,8 +12,8 @@ if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
 USE_COLOR=1 # Colorize output
 THIS=$(basename -- "${BASH_SOURCE[0]}")
 function usage() {
-  cat <<EOF
-$THIS [opts] [METHODS]
+  cat <<EOF || true
+Usage: $THIS [opts] [METHODS]
 Update system and third party packages
 If no method is specified, all packages will be updated
 use 'method' to enable or '+method' to disable. ORDER MATTERS!

@@ -16,7 +16,7 @@ deps=(rsync diff) exclude=('*.class' 'System Volume Information')
 default_dest="/media/$USER/AARONDILL" default_src="${java:-$HOME/code/java}"
 
 function usage() {
-  cat <<EOF
+  cat <<EOF || true
 Usage: $THIS [options] [--] [dest] [src]
 Syncs src to dest. Note: this is a destructive operation. Any files in dest will be overwritten or deleted.
 

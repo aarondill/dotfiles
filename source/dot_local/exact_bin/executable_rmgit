@@ -6,7 +6,7 @@ if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
 . "$utils"
 
 function usage() {
-  cat <<-EOF
+  cat <<EOF || true
 Usage: $THIS [OPTS] REPO...
 
 Options:
