@@ -25,7 +25,7 @@ function _home_count() {
   fi
 
   local filename && declare -A prevfiles=()
-  while IFS= read -r -d $'\0' filename <&3; do prevfiles["$filename"]=1; done 3<"$countfile"
+  while IFS= read -r -d '' filename <&3; do prevfiles["$filename"]=1; done 3<"$countfile"
 
   local found=0
   local file && for file in "${!prevfiles[@]}"; do
