@@ -92,9 +92,13 @@ function installed_or_log() {
 # has_cmd apt ls git
 function has_cmd() {
   declare -i failed=0 # declare=local
-  for cmd; do command -v "$cmd" &>/dev/null || failed=1; done
+  local cmd &&
+    for cmd; do command -v -- "$cmd" &>/dev/null || failed=1; done
   return "$failed"
 }
+
+# returns the path of the command given
+function cmd_path() { command -v -- "$1"; }
 
 # usage: has_cmd <cmds>...
 # Find the first available command in a list and print it.
