@@ -24,20 +24,45 @@ fi
 
 # abort "something went wrong!" 1
 function abort() { err "$1" && exit "${2:-2}"; }
-# confirm "do you really want to do %s?" "that" --> ...do that? (Y/n)
-# Strings are evaluated using printf
-function confirm() {
-  local prompt confirmation
-  # shellcheck disable=SC2059 # I know this is *generally* wrong, but this is intentional.
-  prompt="$(printf "$1" "${@:2}")"
-  read -rep "$prompt (Y/n) " confirmation </dev/tty
-  if [ -z "$confirmation" ] || [[ "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
-    return 0
-  fi
-  return 1
+# trims leading and trailing whitespace
+function trim() {
+  local orig="$1" trmd=""
+  while true; do
+    trmd="${orig#[[:space:]]}" trmd="${trmd%[[:space:]]}"
+    [ "$trmd" != "$orig" ] || break
+    orig="$trmd"
+  done
+  printf '%s' "$trmd"
 }
-# confirm_exact "Type '%s' to confirm?" "exact confirmation"
-# Strings are evaluated using printf
+
+# confirm "do you really want to do that?"
+# Case insensitive matching!
+# Accepts: 'y', 'yes', 'Y', and 'Yes' as true (exit 0)
+# Accepts: 'n', 'no', 'N', and 'No' as false (exit 1)
+# Unrecognized values are considered false (exit 3)
+# The second argument can be either y or n (default 'y') to choose the default value (given a blank answer)
+function confirm() {
+  local confirmation colorized_prompt
+  local prompt="$1" default=${2:-y}
+  default=${default:0:1} default=${default,,} # lowercase first char of argument
+  case "$default" in                          # Set the prompt to have the right default value
+  y) prompt+=' [Y/n]' ;; n) prompt+=' [y/N]' ;;
+  esac
+  colorized_prompt="$(color "$TEAL_COLOR")$prompt$(color "$OFF_COLOR") "
+  read -rep "$colorized_prompt" confirmation </dev/tty
+  # toLowerCase, then trim
+  case "$(trim "${confirmation,,}")" in
+  y | yes) return 0 ;;
+  n | no) return 1 ;;
+  "")                                 # no response
+    [ "$default" == 'y' ] || return 1 # default is no, return false
+    return 0                          # default is yes, return true
+    ;;
+  *) return 3 ;;
+  esac
+}
+
+# confirm_exact "Type 'exact confirmation' to confirm?" "exact confirmation"
 function confirm_exact() {
   local prompt confirmation
   local confirm_string=$2
