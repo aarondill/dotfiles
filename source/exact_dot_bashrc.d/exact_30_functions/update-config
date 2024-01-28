@@ -62,7 +62,7 @@ function update-config() (
     printf 'Updating dconf backup\n'
     chezmoi encrypt "$local_dest" -o "$dconf_path"
     chezmoi git -- add "$dconf_path" &&
-      chezmoi git -- commit --quiet -m 'update dconf-backup.ini' &&
+      chezmoi git -- commit --quiet -m "Update $(basename -- "$local_dest")" &&
       chezmoi git -- push --quiet
   fi
 
