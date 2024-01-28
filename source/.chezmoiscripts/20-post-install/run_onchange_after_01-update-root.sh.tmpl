@@ -34,7 +34,7 @@ TARDESTFILE="$(mktemp)"
 rm_exit "$TARDESTFILE"
 
 confirm_message="yes, I would"
-if ! confirm_exact "Would you like to update / with the contents of $ROOTBACKUP? (type '%s' to confirm)" "$confirm_message"; then
+if ! confirm_exact "Would you like to update / with the contents of $ROOTBACKUP? (type '$confirm_message' to confirm)" "$confirm_message"; then
   abort "Aborting" 0
 fi
 
@@ -47,8 +47,8 @@ while [ -d "$BACKUPDIR" ]; do
   I=$((I + 1))
 done
 
-declare -i BACKUP=0
-if confirm 'Would you like to keep backups of overwritten files in / in %s?' "$BACKUPDIR"; then BACKUP=1; fi
+declare -i BACKUP=1
+confirm "Would you like to keep backups of overwritten files in / in $BACKUP_DIR?" || BACKUP=0
 
 # Don't record /home/$USER/.root/, instead start at subdirs
 find "$ROOTBACKUP/" -maxdepth 1 -mindepth 1 -type d -printf '%f\0' |
