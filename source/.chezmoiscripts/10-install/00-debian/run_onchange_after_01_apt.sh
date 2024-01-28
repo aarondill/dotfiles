@@ -85,14 +85,16 @@ function install_graphical_packages() {
   install_if_available "${graphical_packages[@]}"
 }
 
-if [ "$OS" = "Ubuntu" ]; then
-  if ! file_exists /etc/apt/sources.list.d/neovim-ppa-ubuntu-unstable-*.list; then
-    log_and_run 'installing neovim nightly ppa' sudo_cmd add-apt-repository --no-update -y ppa:neovim-ppa/unstable
-  fi
-  # if ! file_exists /etc/apt/sources.list.d/deki-ubuntu-firejail-*.list; then
-  #   log_and_run 'installing firejail ppa' sudo_cmd add-apt-repository --no-update -y ppa:deki/firejail
-  # fi
-fi
+# if [ "$OS" = "Ubuntu" ]; then
+# # Disabled because I'm not using a local repo
+# if ! file_exists /etc/apt/sources.list.d/neovim-ppa-ubuntu-unstable-*.list; then
+#   log_and_run 'installing neovim nightly ppa' sudo_cmd add-apt-repository --no-update -y ppa:neovim-ppa/unstable
+# fi
+# # Disabled to increase stability
+# if ! file_exists /etc/apt/sources.list.d/deki-ubuntu-firejail-*.list; then
+#   log_and_run 'installing firejail ppa' sudo_cmd add-apt-repository --no-update -y ppa:deki/firejail
+# fi
+# fi
 
 log_and_run 'Updating sources' apt_update
 log_and_run 'Installing packages' install_packages
@@ -101,5 +103,5 @@ log_and_run 'Installing graphical packages' install_graphical_packages
 if apt_is_installed gnome-characters; then apt_remove gnome-characters; fi
 # Install vim symlink to nvim
 if has_cmd update-alternatives && has_cmd nvim && ! [ "$(readlink -e /usr/bin/vim)" = "$(which nvim)" ]; then
-  sudo_cmd update-alternatives --install /usr/bin/vim vim "$(which nvim)" 100 || true
+  sudo_cmd update-alternatives --install /usr/bin/vim vim "$(cmd_path nvim)" 100 || true
 fi
