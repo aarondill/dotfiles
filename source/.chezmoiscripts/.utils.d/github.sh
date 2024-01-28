@@ -55,25 +55,15 @@ function get_latest_version_gitlab() (
 function install_from_github() (
   set -e # runs in subshell, so doesn't affect outside
   local github_repo=$1 version=$2 asset=$3 destination=$4
-  if [[ -z "$github_repo" ]]; then
-    err "GitHub repo can not be an empty string"
-    return 2
-  elif [[ -z "$asset" ]]; then
-    err "asset can not be an empty string"
-    return 2
-  elif [[ -z "$destination" ]]; then
-    err "destination can not be an empty string"
-    return 2
-  fi
+  if [ -z "$github_repo" ]; then err "GitHub repo can not be an empty string" && return 2; fi
+  if [ -z "$asset" ]; then err "asset can not be an empty string" && return 2; fi
+  if [ -z "$destination" ]; then err "destination can not be an empty string" && return 2; fi
 
   local url="https://github.com/$github_repo"
-  if [ "$version" = "latest" ]; then
-    # Skip the version lookup using the static 'latest' url
-    url+="/releases/latest/download/$asset"
-  else
-    # download from the given version
-    url+="/releases/download/$version/$asset"
-  fi
+  case "$version" in
+  latest) url+="/releases/latest/download/$asset" ;; # Skip the version lookup using the static 'latest' url
+  *) url+="/releases/download/$version/$asset" ;;    # download from the given version
+  esac
 
   log_github_install "$github_repo" "$version" "$asset" "$destination"
   download_file "$url" "$destination" +x
@@ -83,8 +73,8 @@ function install_from_github() (
 function log_github_install() {
   local github_repo="$1" version="$2" asset="${3:-}" destination="${4:-}"
   local msg="Installing $github_repo version $version"
-  if [ -n "$asset" ]; then msg+=" ($asset)"; fi
-  if [ -n "$destination" ]; then msg+=" to $destination"; fi
+  [ -z "$asset" ] || msg+=" ($asset)"
+  [ -z "$destination" ] || msg+=" to $destination"
   log "$msg"
 }
 
@@ -93,10 +83,8 @@ function git_clone() {
   local repo=$1 dest=${2:-} branch=${3:-} opts args
   # opts=(--depth=1 --filter=tree:0 --single-branch)
   opts=(--depth=1 --single-branch) # fastest/least storage possible
-  if [ -n "$branch" ]; then opts+=("--branch=$branch"); fi
-
+  [ -z "$branch" ] || opts+=("--branch=$branch")
   args=("$repo")
-  if [ -n "$dest" ]; then args+=("$dest"); fi
-
+  [ -z "$dest" ] || args+=("$dest")
   git clone "${opts[@]}" -- "${args[@]}"
 }

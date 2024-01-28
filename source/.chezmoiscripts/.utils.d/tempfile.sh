@@ -55,7 +55,7 @@ function rm_exit_cleanup() {
   for file_to_rm; do
 
     for i in "${!_TEMPFILES[@]}"; do
-      if [[ "${_TEMPFILES[$i]}" = "$file_to_rm" ]]; then
+      if [ "${_TEMPFILES[$i]}" = "$file_to_rm" ]; then
         unset "_TEMPFILES[$i]" # remove from array (won't expand into empty, so okay)
       fi
     done
