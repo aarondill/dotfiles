@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# ~/.local/bin/steam
+#
+# Wrapper for steam, allowing calling if it is installed with flatpak, or is
+# just in the current PATH. Considers it's position in the PATH to avoid Stack
+# Overflow issues.
+#
+# No argument parsing, as it's intended to be a transparent wrapper
+set -euC -o pipefail
+
+# finds the first instance of cmd in path, excluding the current script
+function find_in_path() {
+  local path cmd exclude="${2:-${BASH_SOURCE[0]}}"
+  cmd=${1%/} cmd="${1##*/}" # remove trailing slash -- then get basename
+  while read -r -d: path; do
+    path=${path:-$PWD}                         # empty path means pwd
+    [ "$path/$cmd" != "$exclude" ] || continue # skip this_file
+    [ -x "$path/$cmd" ] || continue
+    printf '%s' "$path/$cmd" || true
+    return 0
+  done < <(printf '%s' "$PATH:")
+  printf '%s\n' "$cmd: command not found" >&2 || true
+  return 127
+}
+
+is_help=0
+for arg; do
+  case "$arg" in
+  --help | --manual | --version) is_help=1 ;;
+  esac
+done
+
+# Find open, or xdg-open, or else exit
+next_in_path=$(find_in_path open 2>/dev/null) || next_in_path=$(find_in_path xdg-open) || exit 127
+
+if [ "$is_help" -eq 1 ]; then
+  exec -- "$next_in_path" "$@" || exit
+fi
+
+# xdg-open only handles one argument at a time (note: -- is *not* supported)
+# Note: open does *not* block, so we don't need to background it.
+for arg; do
+  "$next_in_path" "$arg" || exit
+done
