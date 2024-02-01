@@ -215,9 +215,6 @@ function printf_c() {
 # Outputs only if $DEBUG is set
 function debug() { [ -z "${DEBUG:-}" ] || printf_c "$PINK_COLOR" 'DEBUG: %s\n' "$@" >&2 || true; }
 
-# usage: log something
-function log() { printf "${BLUE_COLOR}${BOLD_COLOR}%s\n${RESET_COLOR}" "$@" || true; }
-
 # A message
 function log() { printf_c "$TEAL_COLOR" '%s\n' "$@" || true; }
 function err() { printf_c "$RED_COLOR" "%s\n" "$@" >&2 || true; }
@@ -239,6 +236,17 @@ function verbose() {
   "$@"
 }
 
+# trims leading and trailing whitespace
+function trim() {
+  local orig="$1" trmd=""
+  while true; do
+    trmd="${orig#[[:space:]]}" trmd="${trmd%[[:space:]]}"
+    [ "$trmd" != "$orig" ] || break
+    orig="$trmd"
+  done
+  printf '%s' "$trmd"
+}
+
 # confirm "do you really want to do that?"
 # Case insensitive matching!
 # Accepts: 'y', 'yes', 'Y', and 'Yes' as true (exit 0)
@@ -254,16 +262,14 @@ function confirm() {
   esac
   colorized_prompt="$(color "$TEAL_COLOR")$prompt$(color "$OFF_COLOR") "
   read -rep "$colorized_prompt" confirmation </dev/tty
-  if [ -z "$confirmation" ]; then     # no response
-    [ "$default" == 'y' ] || return 1 # default is no, return false
-    return 0                          # default is yes, return true
-  fi
-
-  local trimed=${confirmation,,}
-  trimed=${trimed# *}
-  case "${confirmation,,}" in
+  # toLowerCase, then trim
+  case "$(trim "${confirmation,,}")" in
   y | yes) return 0 ;;
   n | no) return 1 ;;
+  "")                                 # no response
+    [ "$default" == 'y' ] || return 1 # default is no, return false
+    return 0                          # default is yes, return true
+    ;;
   *) return 3 ;;
   esac
 }

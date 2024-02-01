@@ -57,12 +57,12 @@ log "Cleaning browser cache"
 NO_MEASURE_DISK_DIFF=1 verbose clean-google-cache || true
 
 log "Cleaning up cache files"
-rm -rf -- ~/.cache/node/corepack/ || true
-rmdir --ignore-fail-on-non-empty -- ~/.cache/node/ || true
-rm -rf -- ~/.cache/npm/ || true
-rm -rf -- ~/.cache/yarn/ || true
-rm -rf -- ~/.cache/gnome-desktop-thumbnailer/ || true
-rm -rf -- ~/.cache/mesa_shader_cache/ || true
+verbose rm -rf -- ~/.cache/node/corepack/ || true
+verbose rmdir --ignore-fail-on-non-empty -- ~/.cache/node/ || true
+verbose rm -rf -- ~/.cache/npm/ || true
+verbose rm -rf -- ~/.cache/yarn/ || true
+verbose rm -rf -- ~/.cache/gnome-desktop-thumbnailer/ || true
+verbose rm -rf -- ~/.cache/mesa_shader_cache/ || true
 
 log "Cleaning the trash"
 if has_cmd trash-empty; then
@@ -83,32 +83,32 @@ fi
 if [ "$has_root" -eq 1 ]; then
   if has_cmd snap; then
     log "Cleaning up snap packages"
-    sudo_cmd "$(cmdpath snap-cleanup)" -y || true
+    verbose sudo_cmd "$(cmdpath snap-cleanup)" -y || true
   fi
   log "Cleaning package manager cache"
   if has_cmd nala; then
-    sudo_cmd nala clean || true
+    verbose sudo_cmd nala clean || true
   elif has_cmd apt; then
-    { sudo_cmd apt-get clean && sudo_cmd apt-get autoclean; } || true
+    { verbose sudo_cmd apt-get clean && verbose sudo_cmd apt-get autoclean; } || true
   elif has_cmd yay; then
-    yay -Sc || true
+    verbose yay -Sc || true
   elif has_cmd pacman; then
-    sudo_cmd pacman -Sc || true
+    verbose sudo_cmd pacman -Sc || true
   else
     err "Could not find a package manager to clean up"
   fi
 
   if has_cmd flatpak; then
     log "Repairing flatpak repo"
-    sudo_cmd flatpak repair || true
+    verbose sudo_cmd flatpak repair || true
   fi
 
   log "Cleaning old logs >1G"
-  sudo_cmd journalctl --vacuum-size=1G || true
+  verbose sudo_cmd journalctl --vacuum-size=1G || true
 
   # This should be done last. It will (likely) not free any space, but should still be regularly done
   log "Running TRIM on mounted partitions"
-  sudo_cmd fstrim -av || true # this may fail (ex: in container or unsupported fs)
+  verbose sudo_cmd fstrim -av || true # this may fail (ex: in container or unsupported fs)
 fi
 
 # Size stats
