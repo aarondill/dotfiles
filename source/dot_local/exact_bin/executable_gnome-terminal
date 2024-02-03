@@ -1,21 +1,26 @@
 #!/usr/bin/env bash
 # this is a hack to make desktop files with Terminal=true open in the right application
 set -euC -o pipefail
+verbose() { log "> ${*@Q}" && "$@"; }
+log() { printf '%s\n' "$@" || true; }
+err() { printf '%s\n' "$@" >&2 || true; }
+abort() { err "$1" && exit "${2:-1}"; }
+has_cmd() { command -v -- "$@" &>/dev/null; }
+
 terms=(xdg-terminal-exec x-terminal-emulator wezterm gnome-terminal xterm)
 GNOME_TERM=/usr/bin/gnome-terminal
 if [ "${1:-}" != "--" ] && [ -x "$GNOME_TERM" ]; then
-  exec "$GNOME_TERM" "$@"
-else
-  if [ "${1:-}" == "--" ]; then shift; fi
-  for t in "${terms[@]}"; do # Find first installed terminal application in $terms
-    if command -v "$t" &>/dev/null; then break; fi
-  done
-  if [ -z "$t" ]; then
-    echo "Could not find a terminal to run" >&2
-    exit 1
-  fi
-  case "$t" in
-  xdg-terminal-exec) exec "$t" "${@:2}" ;;
-  *) exec "$t" -e "${@:2}" ;;
-  esac
+  exec "$GNOME_TERM" "$@" || exit
 fi
+
+if [ "${1:-}" == "--" ]; then shift; fi # remove potentially leading '--'
+# Find first installed terminal application in $terms
+t='' && for t in "${terms[@]}"; do
+  has_cmd "$t" || continue
+  break
+done
+[ -n "$t" ] || abort "Could not find a terminal to run" 1
+case "$t" in
+xdg-terminal-exec) exec "$t" "$@" ;;
+*) exec "$t" -e "$@" ;;
+esac
