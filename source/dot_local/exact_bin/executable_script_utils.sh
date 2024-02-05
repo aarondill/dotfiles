@@ -54,11 +54,33 @@ function split() {
   [ "$ends_with_delim" -eq 0 ] || __out_arr+=("")
 }
 
+# Usage: find_in_path cmdname ["$0"]
+# Finds the (basename of) cmdname in $PATH, optionally excluding the current file
+function find_in_path() {
+  [ -n "${PATH:-}" ] || return 1
+  local path cmd exclude="${2:-}"
+  cmd=${1%/} cmd="${1##*/}" # remove trailing slash -- then get basename
+  while read -r -d: path; do
+    path=${path:-$PWD} # empty path means pwd
+
+    [ -z "$exclude" ] || [ "$path/$cmd" != "$exclude" ] || continue # skip this_file
+    [ -x "$path/$cmd" ] || continue                                 # Only executables
+    printf '%s' "$path/$cmd" || true
+    return 0
+  done < <(printf '%s' "$PATH:")
+  return 1
+}
+
 # Return the path of each command passed, if found
+# Always returns an executable file.
 function cmdpath() {
-  local e=0
+  declare -i e=0
+  local path=''
   local c && for c in "$@"; do
-    command -v -- "$c" || e="$?"
+    path="$(command -v -- "$c")" || true
+    [ -x "$path" ] || path=$(find_in_path "$c") || e=1
+    [ -n "$path" ] || continue # Skip not found
+    printf '%s\n' "$path" || true
   done
   return "$e"
 }
