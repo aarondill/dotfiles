@@ -57,12 +57,19 @@ log "Cleaning browser cache"
 NO_MEASURE_DISK_DIFF=1 verbose clean-google-cache || true
 
 log "Cleaning up cache files"
-verbose rm -rf -- ~/.cache/node/corepack/ || true
-verbose rmdir --ignore-fail-on-non-empty -- ~/.cache/node/ || true
-verbose rm -rf -- ~/.cache/npm/ || true
-verbose rm -rf -- ~/.cache/yarn/ || true
-verbose rm -rf -- ~/.cache/gnome-desktop-thumbnailer/ || true
-verbose rm -rf -- ~/.cache/mesa_shader_cache/ || true
+dirs=(
+  ~/.cache/node/corepack/
+  ~/.cache/node/corepack/
+  ~/.cache/npm/
+  ~/.cache/yarn/
+  ~/.cache/gnome-desktop-thumbnailer/
+  ~/.cache/mesa_shader_cache/
+  ~/.cache/node/
+)
+for d in "${dirs[@]}"; do
+  [ -d "$d" ] || continue
+  verbose rm -rf -- "$d"
+done
 
 log "Cleaning the trash"
 if has_cmd trash-empty; then
