@@ -19,11 +19,15 @@ fi
 ## --------------------------------------------------------------------------------------------------
 
 # COLOR vars to keep from branching to tput repeatedly
-RED_COLOR="$(tput setaf 1 2>/dev/null)"
-BLUE_COLOR="$(tput setaf 6 2>/dev/null)"
-GREEN_COLOR="$(tput setaf 2 2>/dev/null)"
-BOLD_COLOR="$(tput bold 2>/dev/null)"
-RESET_COLOR="$(tput sgr0 2>/dev/null)"
+RED_COLOR="$(tput setaf 1 2>/dev/null)" || true
+BLUE_COLOR="$(tput setaf 6 2>/dev/null)" || true
+GREEN_COLOR="$(tput setaf 2 2>/dev/null)" || true
+BOLD_COLOR="$(tput bold 2>/dev/null)" || true
+RESET_COLOR="$(tput sgr0 2>/dev/null)" || true
+TEAL_COLOR="$(tput setaf 6 2>/dev/null)" || true
+YELLOW_COLOR="$(tput setaf 3 2>/dev/null)" || true
+PINK_COLOR="$(tput setaf 5 2>/dev/null)" || true
+export RED_COLOR BLUE_COLOR GREEN_COLOR BOLD_COLOR RESET_COLOR TEAL_COLOR YELLOW_COLOR PINK_COLOR
 
 # log "hello world"
 function log() { printf "${BLUE_COLOR}${BOLD_COLOR}%s\n${RESET_COLOR}" "$@" || true; }

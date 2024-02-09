@@ -48,7 +48,7 @@ function confirm() {
   case "$default" in                          # Set the prompt to have the right default value
   y) prompt+=' [Y/n]' ;; n) prompt+=' [y/N]' ;;
   esac
-  colorized_prompt="$(color "$TEAL_COLOR")$prompt$(color "$OFF_COLOR") "
+  colorized_prompt="$(color "$TEAL_COLOR")$prompt$(color "$RESET_COLOR") "
   read -rep "$colorized_prompt" confirmation </dev/tty
   # toLowerCase, then trim
   case "$(trim "${confirmation,,}")" in
