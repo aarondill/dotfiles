@@ -48,7 +48,7 @@ while [ -d "$BACKUPDIR" ]; do
 done
 
 declare -i BACKUP=1
-confirm "Would you like to keep backups of overwritten files in / in $BACKUP_DIR?" || BACKUP=0
+confirm "Would you like to keep backups of overwritten files in / in $BACKUPDIR?" || BACKUP=0
 
 # Don't record /home/$USER/.root/, instead start at subdirs
 find "$ROOTBACKUP/" -maxdepth 1 -mindepth 1 -type d -printf '%f\0' |
