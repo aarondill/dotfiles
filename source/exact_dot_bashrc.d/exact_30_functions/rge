@@ -2,12 +2,10 @@
 
 # ~/.bashrc.d/30_functions/rge
 #
-# Sets up bde function for editing all results of rg
+# Sets up rge function for editing all results of rg
 
 function rge() {
   local rg=(rg -l)
-  if ! command -v rg &>/dev/null; then
-    rg=(grep -r -l) # Closest to rg available
-  fi
+  command -v rg &>/dev/null || rg=(grep -r -l) # Closest to rg available
   "${rg[@]}" "$@" | xargs -- "${EDITOR:-editor}"
 }

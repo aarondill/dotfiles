@@ -196,6 +196,8 @@ if has git; then
   fi
 fi
 
+alias gsudo='pkexec env DISPLAY="$DISPLAY" XAUTHORITY="$XAUTHORITY" '
+
 IBus="org.freedesktop.IBus.session.GNOME.service"
 # If it's enabled in the first place
 if systemctl list-unit-files --quiet --all --type=service --user --state=enabled "$IBus" &>/dev/null; then

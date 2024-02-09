@@ -22,9 +22,7 @@ function npm() {
   fi
 
   printf "%b\n" "no-npm: ${RED}Perhaps you meant pnpm?${NONE}" >"$output"
-  # Defaults to no
-  read -rep "Are you sure you want to use NPM? (y/N) " confirmation
-  if [[ -n "$confirmation" && "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]]; then
-    command npm "$@"
-  fi
+  read -rep "Are you sure you want to use NPM? (Y/n) " confirmation # Defaults to yes
+  [ -z "$confirmation" ] || [[ "${confirmation,,}" =~ ^\s*y(es)?\s*$ ]] || return 1
+  command npm "$@"
 }
