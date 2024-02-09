@@ -25,7 +25,7 @@ function install_grub_editor() (
   log_github_install "$REPO" "$version" "$asset"
   temp=$(mktemp -d)
   download_file "https://github.com/$REPO/releases/download/$version/$asset" "$temp/grub-editor.deb" # Download the .deb
-  rm_exit "$temp"
+  # rm_exit "$temp"
   apt_install "$temp/grub-editor.deb"
   rm_exit_cleanup "$temp" # cleanup
 )
