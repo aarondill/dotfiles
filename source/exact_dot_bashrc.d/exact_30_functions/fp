@@ -60,10 +60,12 @@ fi
 function FZF_FILE_PREVIEW() {
   local file="$1"
   local ext=${file##*.}
-  if [ "$ext" != 'json' ] && [ "$ext" != 'json5' ]; then
+  case "$ext" in
+  json | json5 | jsonc) ;; *)
     FZF_CAT_CMD "$file"
     return 0
-  fi
+    ;;
+  esac
 
   local json
   # Attempt to prettify json before display
