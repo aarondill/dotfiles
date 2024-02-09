@@ -182,6 +182,7 @@ if has lazygit; then alias lg='lazygit'; fi
 
 # Shorter git
 if has git; then
+  alias gitroot='cd "$(git rev-parse --show-toplevel)"'
   alias g='git'
   # Reuse git completion if present (overwritten already), else default to directories
   complete=$(complete -p git 2>/dev/null || printf '%s ' complete -o bashdefault -o default -o nospace -F __git_wrap__git_main git)

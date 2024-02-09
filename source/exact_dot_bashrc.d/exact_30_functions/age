@@ -24,13 +24,14 @@ function age() {
   local file
   for file; do
     [ -L "$file" ] || [ -f "$file" ] || {
-      printf "%s\n" "${FUNCNAME[0]}: cannot stat '$file': No such file or directory" >&2
+      printf "%s\n" "${FUNCNAME[0]}: cannot stat '$file': No such file or directory" >&2 || true
       continue
     }
-    local current=$(date +%s)
-    local birthdate=$(stat -c "%W" -- "$file")
-    local access_date=$(stat -c "%X" -- "$file")
-    local mod_date=$(stat -c "%Y" -- "$file")
+    local current birthdate access_date mod_date
+    current=$(date +%s)
+    birthdate=$(stat -c "%W" -- "$file")
+    access_date=$(stat -c "%X" -- "$file")
+    mod_date=$(stat -c "%Y" -- "$file")
     local since_birth=$(("$current" - "$birthdate"))
     local since_access=$(("$current" - "$access_date"))
     local since_mod=$(("$current" - "$mod_date"))
@@ -42,6 +43,6 @@ function age() {
       since_access="$(_age_displaytime "$since_access")"
     fi
     # shellcheck disable=SC2059 # The variable *is* the format string.
-    printf "$format" "$file" "$since_birth" "$since_mod" "$since_access"
+    printf "$format" "$file" "$since_birth" "$since_mod" "$since_access" || true
   done
 }
