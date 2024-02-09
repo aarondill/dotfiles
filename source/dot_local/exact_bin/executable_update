@@ -114,12 +114,12 @@ for m in "${to_update[@]}"; do
     esac
     ;;
   snap)
-    has_cmd snap || contine
+    has_cmd snap || continue
     log "Updating snap packages!"
     verbose sudo_cmd "$(cmdpath snap)" refresh
     success
 
-    has_cmd snap-cleanup || contine
+    has_cmd snap-cleanup || continue
     log "Cleaning up snap packages"
     verbose sudo_cmd "$(cmdpath snap-cleanup)" -y
     success
