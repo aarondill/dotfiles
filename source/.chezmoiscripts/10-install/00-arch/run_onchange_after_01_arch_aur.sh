@@ -52,11 +52,6 @@ else err "yay is already installed, skipping installation"; fi
 #   aur_install "google-chrome"
 # else err "google-chrome is already installed, skipping installation"; fi
 
-# grub-editor
-if ! [ -x /opt/grub-editor/grub-editor.py ]; then
-  aur_install "grub-editor"
-else err "grub-editor is already installed, skipping installation"; fi
-
 # informant for pacman/yay
 if ! has_cmd informant; then
   aur_install "informant"
