@@ -184,7 +184,11 @@ if will_startx; then
   [ -f "$LOG_FILE" ] && \mv -f -- "$LOG_FILE" "$LOG_FILE.old"
 
   if command -v visual &>/dev/null; then
-    exec visual "${startx_command[@]}" >|"$LOG_FILE" 2>&1 || true
+    # note: visual -t will complain to stderr if something is wrong.
+    # If we can't start an x server, then at least give me a shell!
+    if visual -t "${startx_command[@]}"; then
+      exec visual "${startx_command[@]}" >|"$LOG_FILE" 2>&1 || true
+    fi
   else
     exec startx "${startx_command[@]}" >|"$LOG_FILE" 2>&1 || true
   fi
