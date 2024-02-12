@@ -4,13 +4,16 @@ set -euC -o pipefail
 THIS=visual
 function usage() {
   cat <<EOF || true
-Usage: $THIS [client] [client-args --] [:display] 
+Usage: $THIS [-t|-h] [client] [client-args --] [:display] 
 Run an X server and a client.
 
 if run without arguments, x-window-manager will be used
 server will be found in the \$PATH. 
 if \$2 is not a valid server and a client is provided,
 the arguments will be passed directly to the startx script
+
+If -t is passed as the first argument, the server will be detected but not started.
+This can be used to determine if a subsequent run will succeed.
 EOF
 }
 
@@ -35,11 +38,11 @@ function verbose() {
 has_cmd which || abort "which is required for this script" 1
 has_cmd startx || abort "startx is required for this script" 1
 
-for arg in "$@"; do
-  case "$arg" in
-  -h | --help) usage && exit 0 ;;
-  esac
-done
+dry_run=0
+case "${1:-}" in
+-h | --help) usage && exit 0 ;;
+-t) dry_run=1 && shift ;;
+esac
 
 wm=${1:-}
 server=${2-}
@@ -59,7 +62,7 @@ fi
 if [ -z "$server" ] && is_display "$wm"; then server="$wm" wm=''; fi
 
 # visual :3 OR visual awesome
-[ -n "$wm" ] || wm=$(first_cmd x-window-manager x-terminal-emulator)
+[ -n "$wm" ] || wm=$(first_cmd x-window-manager x-terminal-emulator) || abort "Could not find a default window manager!"
 
 wmpath=$(cmd_path "$wm") || abort "$wm: command not found" 2
 cmd=()
@@ -79,6 +82,10 @@ cmd+=("$wmpath")
 if is_display "$server"; then cmd+=(--); fi
 if [ -n "$server" ]; then cmd+=("$server"); fi
 cmd+=("${rest[@]}")
+
+# If this is a dry run, exit here because we don't need to do anything else
+# If something went wrong, we would have already exited
+[ "$dry_run" -eq 0 ] || exit 0
 
 # from /etc/X11/Xsession.d/20dbus_xdg-runtime
 if [ -z "${DBUS_SESSION_BUS_ADDRESS:-}" ] && [ -n "${XDG_RUNTIME_DIR:-}" ] &&
