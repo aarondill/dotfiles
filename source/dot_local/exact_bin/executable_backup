@@ -201,10 +201,12 @@ done
 
 DUPLICITY="${DUPLICITY:-"$(command -v duplicity 2>/dev/null || true)"}"
 # Ensure duplicity can be accessed
-if [ -z "$DUPLICITY" ]; then
-  abort "Could not find duplicity. Please ensure it is installed" 1
-elif ! [ -x "$DUPLICITY" ]; then
-  abort "Could not run '$DUPLICITY'. Please ensure it is executable." 3
+if [ "$mode" != "print" ]; then # This is a special case. We don't want to error out!
+  if [ -z "$DUPLICITY" ]; then
+    abort "Could not find duplicity. Please ensure it is installed" 1
+  elif ! [ -x "$DUPLICITY" ]; then
+    abort "Could not run '$DUPLICITY'. Please ensure it is executable." 3
+  fi
 fi
 
 # include/exclude
