@@ -1,6 +1,7 @@
 # min hour day month weekday exec
 # Run anacron on the hour - anacron will handle timing
-0 * * * * anacron -t ${HOME}/.local/etc/anacrontab -S ${HOME}/.var/spool/anacron
+0 * * * * mkdir -p ${HOME}/.local/etc/anacrontab ${HOME}/.var/spool/anacron
+1 * * * * anacron -t ${HOME}/.local/etc/anacrontab -S ${HOME}/.var/spool/anacron
 # run chrome sync every hour (just for safety) -- only when booted already
 0 * * * * ${HOME}/.local/bin/chrome-sync.sh
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ luckybackup entries ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
