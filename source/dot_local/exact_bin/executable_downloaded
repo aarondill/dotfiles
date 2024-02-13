@@ -17,17 +17,16 @@ usage() {
 usage: $THIS [opts]... [--] [DEST]
 Manipulate the most recently downloaded (modified) file
 
-Options (Options marked with a * are incompatible with):
+Options:
   -h, --help         Show this help message.
+  -r, --remove       Remove the most recently downloaded file (incompatable with -c or -p)
+  -c, --copy         Copy the most recently downloaded file to DEST (incompatable with -r or -p)
+  -p, --print        Print the most recently downloaded file (incompatable with -c or -r)
   -n, --num=n        Operate on the nth most recent file, instead of the first
-  -r, --remove       Remove the most recently downloaded file*
-  -c, --copy         Copy the most recently downloaded file to DEST*
-  -p, --print        Print the most recently downloaded file*
-  -o, --open         Open the most recently downloaded file*
 EOF
 }
 
-LONGOPTS="help,remove,copy,print,open,num:" SHORTOPTS="h,r,c,p,n:,o"
+LONGOPTS="help,remove,copy,print,num:" SHORTOPTS="h,r,c,p,n:"
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 
 do=copy num=1 # 1=most recent
@@ -37,7 +36,6 @@ while true; do
   -r | --remove) do=remove && shift ;;
   -c | --copy) do=copy && shift ;; # default
   -p | --print) do=print && shift ;;
-  -o | --open) do=open && shift ;;
   -n | --num)
     num="$2" && shift 2
     case "$num" in *[!0-9]* | '') abort "Invalid number: $num" 2 ;; esac
@@ -55,13 +53,12 @@ case "$do" in
 remove)
   log "Removing '$file'"
   confirm "remove '$file'?" || abort "aborting" 1
-  exec rm -rf -- "$file"
+  rm -rf -- "$file"
   ;;
 copy)
   log "Copying '$file' to '$dest'"
   # cp -Pp -R is posix for cp --archive
-  exec cp -pP -R -i -- "$file" "$dest"
+  cp -pP -R -i -- "$file" "$dest"
   ;;
 print) printf '%s\n' "$file" ;;
-open) exec "$(first_cmd xdg-open open)" "$file" ;;
 esac
