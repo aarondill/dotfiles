@@ -67,11 +67,9 @@ code/.release-it.json
 code/.shellcheckrc
 code/c/.clang-format
 code/c/template
-code/config
 code/java/UIL/template
 code/java/java-format.xml
 code/java/template
-code/js/.gitignore
 code/js/EslintTests.js
 code/repos/.awesome-scripts
 .config/autorandr
