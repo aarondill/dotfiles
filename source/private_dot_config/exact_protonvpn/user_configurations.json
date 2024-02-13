@@ -1,5 +1,5 @@
 {
-    "default_protocol": "udp",
+    "default_protocol": "tcp",
     "killswitch": 0,
     "dns": {
         "dns_status": 1,
