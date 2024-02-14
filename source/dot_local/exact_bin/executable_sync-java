@@ -13,7 +13,16 @@ if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
 
 USE_COLOR=1 # Enable color
 deps=(rsync diff) exclude=('*.class' 'System Volume Information')
-default_dest="/media/$USER/AARONDILL" default_src="${java:-$HOME/code/java}"
+
+mount_dirs=("/run/media/$USER" "/media/$USER")
+# Default to something so we can display it
+default_dest="${mount_dirs[0]}/AARONDILL"
+for dir in "${mount_dirs[@]}"; do
+  [ -d "$dir/AARONDILL" ] || continue
+  default_dest="$dir/AARONDILL"
+done
+
+default_src="${java:-$HOME/code/java}"
 
 function usage() {
   cat <<EOF || true

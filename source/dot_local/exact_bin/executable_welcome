@@ -45,21 +45,21 @@ function getLastLogin() {
   lastlogin=$(lastlog -u "$(whoami)" | tail -n 1 | cut -c44- | cut -d' ' -f1-4) # hardcoded parsing of lastlog
   printf 'Last login at: %s' "$lastlogin"
 }
+# Usage: getSuccessfulLogins user count
 function getSuccessfulLogins() {
-  # Usage: getSuccessfulLogins user count
   last "${1:-$(whoami)}" -n "${2:-5}" |
-    # Remove the "wtmp begins..." message
-    head -n -2 |
-    # Cut to just the date (hard coded length + username length)
-    perl -pe 's|^.+? +(.+?) +.+? +(.+)|\1 - \2|'
+    head -n -2 |                                 # Remove the "wtmp begins..." message
+    perl -pe 's|^.+? +(.+?) +.+? +(.+)|\1 - \2|' # Cut to just the date
 }
+# Usage: getFailedAttempts user count
 function getFailedAttempts() {
-  # Usage: getFailedAttempts user count
-  grep -a "pam_unix(gdm-password:auth): authentication failure;.* user=${1:-$(whoami)}" /var/log/auth.log |
-    tail -n "${2:-5}" |
-    awk '{print $12" - ",$1,$2,$3}' |
-    perl -pe 's|^tty=/dev/(.+?)|\1|' |
-    tac
+  [ -r /var/log/btmp ] || {
+    printf '%s\n' "Couldn't read btmp!"
+    return 1
+  }
+  lastb "${1:-$(whoami)}" -n "${2:-5}" |
+    head -n -2 |                                 # Remove the "wtmp begins..." message
+    perl -pe 's|^.+? +(.+?) +.+? +(.+)|\1 - \2|' # Cut to just the date
 }
 function getPackageCount() {
   local result
