@@ -40,6 +40,7 @@ log 'Changed files:'
 [ -z "$changed_dirs" ] || log "$changed_dirs"
 
 # HACK: don't force a tty prompt, instead just take my no.
+# Note: yes will get killed by sigpipe
 { yes no || true; } | {
   chezmoi add --secrets ignore --exact --no-tty -- "${dirs[@]}" >/dev/null
   chezmoi add --secrets ignore --no-tty -- "${files[@]}" >/dev/null
