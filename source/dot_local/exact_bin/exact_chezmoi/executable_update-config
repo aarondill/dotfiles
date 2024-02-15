@@ -43,7 +43,7 @@ log 'Changed files:'
 yes no | {
   chezmoi add --secrets ignore --exact --no-tty -- "${dirs[@]}" >/dev/null
   chezmoi add --secrets ignore --no-tty -- "${files[@]}" >/dev/null
-}
+} || true
 
 chezmoi re-add # Ensure everything else is updated
 
