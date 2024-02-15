@@ -1,5 +1,9 @@
-# ~/.config/chezmoi/autoupdate
-# A list of files to backup. Lines starting with '#' are ignored
+# ~/.local/share/chezmoi/autoupdate
+# A list of files to automatically update from the target directory
+# Used by the update-config program.
+# Lines starting with '#' are ignored
+# Each line is a seperate file. Spaces before and after are trimmed
+# These paths should be relative to the target directory
 .bash_logout
 .bashrc
 .bashrc.d
