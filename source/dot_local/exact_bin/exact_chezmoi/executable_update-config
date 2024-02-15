@@ -51,10 +51,12 @@ if [ "${#files[@]}" -gt 0 ] || [ "${#dirs[@]}" -gt 0 ]; then
 
   # HACK: don't force a tty prompt, instead just take my no.
   # Note: yes will get killed by sigpipe
-  { yes no || true; } | {
-    chezmoi add --secrets ignore --exact --no-tty -- "${dirs[@]}" >/dev/null
-    chezmoi add --secrets ignore --no-tty -- "${files[@]}" >/dev/null
-  }
+  if [ "${#dirs[@]}" -gt 0 ]; then
+    { yes no || true; } | chezmoi add --secrets ignore --exact --no-tty -- "${dirs[@]}" >/dev/null
+  fi
+  if [ "${#files[@]}" -gt 0 ]; then
+    { yes no || true; } | chezmoi add --secrets ignore --no-tty -- "${files[@]}" >/dev/null
+  fi
 fi
 chezmoi re-add # Ensure everything else is updated
 if [ "${#add[@]}" -gt 0 ]; then
