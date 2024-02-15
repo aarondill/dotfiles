@@ -11,54 +11,46 @@ if ! has_pacman; then
 fi
 
 pacman_install_aur_deps() {
-  # check first to avoid message every time
-  if ! pacman_is_installed git base-devl; then pacman_install git base-devel; fi
+  local deps=(git base-devel)
+  pacman_is_installed "${deps[@]}" || pacman_install "${deps[@]}"
 }
 
 aur_install() {
-  if has_cmd yay; then
-    yay_install "$1"
-  else
-    pacman_install_aur_deps # should already be installed if yay is.
-    aur_install_makepkg "$1"
-  fi
+  pacman_install_aur_deps # should already be installed if yay is.
+  local cmd=yay_install
+  has_cmd yay || cmd=aur_install_makepkg
+  local p && for p; do "$cmd" "$p"; done
 }
 
 aur_install_makepkg() {
   local tmpdir REPO="https://aur.archlinux.org/$1.git"
-  tmpdir="$(mktemp -d)"
-  rm_exit "$tmpdir"
+  tmpdir="$(mktemp -d)" && rm_exit "$tmpdir"
   git_clone "$REPO" "$tmpdir"
-  pushd "$tmpdir" >/dev/null
-  (export -n SHELLOPTS && makepkg -sirc)
-  popd >/dev/null
+  (cd "$tmpdir" && export -n SHELLOPTS && makepkg -sirc)
   rm_exit_cleanup "$tmpdir"
 }
 
+# Note: this should be done before installing other packages
 if ! has_cmd yay; then
   aur_install yay-bin
   yay -Y --gendb # Check the cache on first install
-else err "yay is already installed, skipping installation"; fi
+fi
 
-## Zeal -- I don't like the qt5-webkit package. It's too big.
-# if ! has_cmd zeal; then
-#   # Dependancy that's no longer supplied by pacman
-#   sudo_cmd pacman -U https://archive.archlinux.org/packages/q/qt5-webkit/qt5-webkit-5.212.0alpha4-18-x86_64.pkg.tar.zst
-#   aur_install "zeal"
-# else err "Zeal is already installed, skipping installation"; fi
+packages=(
+  zeal
+  # google-chrome      # Replaced with vivaldi
+  consolation          # cursor in tty
+  informant            # arch news through pacman
+  isomaster            # unpack/edit .isos
+  protonvpn            # protonvpn cli and gui
+  ripdrag              # Drag and drop from terminal
+  simplescreenrecorder # screen recording
+)
+for p in "${packages[@]}"; do
+  ! pacman_is_installed "$p" || continue
+  aur_install "$p"
+done
 
-## Google chrome -- Replaced with vivaldi
-# if ! has_cmd google-chrome-stable; then
-#   aur_install "google-chrome"
-# else err "google-chrome is already installed, skipping installation"; fi
-
-# informant for pacman/yay
-if ! has_cmd informant; then
-  aur_install "informant"
-else err "informant is already installed, skipping installation"; fi
-
-# consolation for a cursor in the tty!
-if ! has_cmd consolation; then
-  aur_install "consolation"
+if pacman_is_installed "consolation"; then
   sudo_cmd systemctl enable consolation.service # This is not enabled by default
-else err "consolation is already installed, skipping installation"; fi
+fi

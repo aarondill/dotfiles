@@ -28,7 +28,7 @@ PACKAGES=(
   pactl pulseaudio
   posix reflector
   openssh duplicity os-prober
-  imagemagick networkmanager-openvpn protonvpn-cli
+  imagemagick networkmanager-openvpn
   plocate gdb lua
 )
 VIRTUAL_MACHINE_PACKAGES=(
@@ -42,29 +42,23 @@ VIRTUAL_MACHINE_PACKAGES=(
 GRAPHICAL_PACKAGES=(
   dconf-editor gparted gucharmap spotify-launcher
   wmctrl xdotool xclip xdg-utils xorg-xinit
-  arandr thunderbird firefox firejail gimp hplip isomaster libreoffice-fresh
+  arandr thunderbird firefox firejail gimp hplip libreoffice-fresh
   okular onboard gnome-calculator gnome-calendar eog evince nautilus seahorse
   totem file-roller zeal pavucontrol qtqr rhythmbox screenkey simple-scan
-  simplescreenrecorder gnome-font-viewer sqlitebrowser transmission-gtk
-  xdg-desktop-portal-gnome xdg-desktop-portal-gtk protonvpn-gui ripdrag
+  gnome-font-viewer sqlitebrowser transmission-gtk
+  xdg-desktop-portal-gnome xdg-desktop-portal-gtk
 )
 GNOME_PACKAGES=(gnome-shell-extension-manager gnome-tweaks gnome-software gnome-software-plugin-flatpak)
 
 function install_if_available() {
-  local packages=() package
-  for package; do
-    if pacman_is_available "$package"; then
-      packages+=("$package")
-    else
-      err "Could not find '$package'"
-    fi
+  local packages=()
+  local package && for package; do
+    pacman_is_available "$package" || { err "Could not find '$package'" && continue; }
+    packages+=("$package")
   done
-  if [ ${#packages[@]} -eq 0 ]; then return 0; fi
-  # The user still has to confirm, but that's good here
+  [ ${#packages[@]} -gt 0 ] || return 0
   pacman_install "${packages[@]}"
 }
-
-function install_packages() { install_if_available "${PACKAGES[@]}"; }
 
 function install_graphical_packages() {
   local graphical_packages=("${GRAPHICAL_PACKAGES[@]}")
@@ -84,9 +78,7 @@ function install_graphical_packages() {
 
 # no install neovim latest, bc should already be
 log_and_run 'Updating sources/packages' pacman_update
-log_and_run 'Installing packages' install_packages
+log_and_run 'Installing packages' install_if_available "${PACKAGES[@]}"
 log_and_run 'Installing graphical packages' install_graphical_packages
-# Gnome comes with it, but I don't want it.
-if pacman_is_installed gnome-characters; then pacman_remove gnome-characters; fi
-# Install vim symlink to nvim - throws is /usr/bin/vim is defined.
-if ! [ -f /usr/bin/vim ] && which nvim &>/dev/null; then sudo_cmd ln -s -T "$(which nvim)" /usr/bin/vim; fi
+
+[ -e /usr/bin/vim ] || ! has_cmd nvim || mklink "$(cmd_path nvim)" /usr/bin/vim
