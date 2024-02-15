@@ -19,17 +19,19 @@ for file in "$@"; do
   # add to the array so i can update all at once
   file="$(resolve_path "$file" -s)"
   case "$file" in
-  "$source"/*) files+=("$file") ;;
-  *) err "$file is not under source directory: $source" ;;
+  "$target"/*) files+=("$file") ;;
+  *) err "$file is not under target directory: $target" ;;
   esac
 done
+
+[ "${#files[@]}" -gt 0 ] || abort "No files found" 1
 
 # Add all files to chezmoi repo
 chezmoi add --exact -- "${files[@]}"
 
 # Add files to the _update-config file
 for file in "${files[@]}"; do
-  short_file=${file#"$source/"} # make relative to source
+  short_file=${file#"$target/"} # make relative to target
   ! grep -Fxq "$short_file" "$CONFIG_FILES" || continue
   printf '%s\n' "$short_file" >>"$CONFIG_FILES"
 done

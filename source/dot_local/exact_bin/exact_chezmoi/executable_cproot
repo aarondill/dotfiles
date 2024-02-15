@@ -28,4 +28,4 @@ _cproot() {
 declare -i exit_code=0
 for file in "$@"; do _cproot "$file" || exit_code="$?"; done
 # Exit with the saved code
-return "$exit_code"
+exit "$exit_code"
