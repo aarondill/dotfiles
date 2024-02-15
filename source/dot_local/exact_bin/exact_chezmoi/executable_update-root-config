@@ -12,8 +12,6 @@ this=$(get_script_path) || abort "Could not find current script path" 3
 . "$(dirname -- "$this")/common.sh"
 cd "$target" # add from target so files are relative to target
 
-root_source=$(chezmoi source-path -- "$ROOT_FOLDER") || abort "Could not find source path for $ROOT_FOLDER. Ensure it's managed by chezmoi!"
-
 is_encrypted() { [ -n "$(chezmoi list --include=encrypted -- "$1")" ]; }
 
 encrypted_files=() add_files=() add_dirs=() add_exact_dirs=()
@@ -37,16 +35,18 @@ done
 
 for dir in "$ROOT_FOLDER"/**/; do
   [ -d "$dir" ] || continue
+  [ "$dir" != "$ROOT_FOLDER/" ] || continue
   dir_source="$(chezmoi source-path "$dir")" || { err "Could not find source for directory: $dir" && continue; }
   rootpath="/${dir#"$ROOT_FOLDER"}" # The path, without the root directory, under /
   # Hasn't yet been copied to root (or deleted, but that's up to the user), so ignore it.
   [ -d "$rootpath" ] || continue
   # Change permissions to match the root
   sudo_cmd chmod --reference="$rootpath" "$dir"
+  dirname=$(basename -- "$dir") # The name of dir
   case "$dir_source" in
-  "$root_source/exact_$dir") add_exact_dirs+=("$dir") ;;
-  "$root_source/$dir") add_dirs+=("$dir") ;;
-  *) err "Something went wrong processing: $dir" ;;
+  *"/exact_$dirname") add_exact_dirs+=("$dir") ;;
+  *"/$dirname") add_dirs+=("$dir") ;;
+  *) err "Could not find source dir type to $dir" ;;
   esac
 done
 
