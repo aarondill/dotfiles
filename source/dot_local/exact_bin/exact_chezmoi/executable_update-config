@@ -60,8 +60,8 @@ if [ "${#files[@]}" -gt 0 ] || [ "${#dirs[@]}" -gt 0 ]; then
 fi
 chezmoi re-add # Ensure everything else is updated
 if [ "${#add[@]}" -gt 0 ]; then
-  log "You have included files in the list which are not managed."
-  log "Run the following command to manage them:"
+  warn "You have included files in the list which are not managed."
+  warn "Run the following command to manage them:"
   print_cmd chezmoi add --exact -- "${add[@]}"
 fi
 
