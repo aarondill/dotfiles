@@ -40,10 +40,10 @@ log 'Changed files:'
 [ -z "$changed_dirs" ] || log "$changed_dirs"
 
 # HACK: don't force a tty prompt, instead just take my no.
-yes no | {
+{ yes no || true; } | {
   chezmoi add --secrets ignore --exact --no-tty -- "${dirs[@]}" >/dev/null
   chezmoi add --secrets ignore --no-tty -- "${files[@]}" >/dev/null
-} || true
+}
 
 chezmoi re-add # Ensure everything else is updated
 
