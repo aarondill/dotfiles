@@ -83,4 +83,5 @@ if ! cmp -s "$DCONF_BACKUP" <(chezmoi decrypt -- "$dconf_path"); then
   chezmoi git -- push --quiet
 fi
 
+log "Final chezmoi status: "
 verbose chezmoi status
