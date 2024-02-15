@@ -10,7 +10,7 @@ USE_COLOR=1 # Enable color
 this=$(get_script_path) || abort "Could not find current script path" 3
 # shellcheck source=./common.sh
 . "$(dirname -- "$this")/common.sh"
-cd "$target" # add from target so files are relative to target
+# cd "$target" # add from target so files are relative to target
 check_dependencies chezmoi yes basename
 
 if has_cmd crontab; then # Update crontab backup
@@ -25,6 +25,7 @@ while IFS= read -r file || [ -n "$file" ]; do
   file=$(trim "$file")                 # Strip leading and trailing whitespace
   [ -n "$file" ] || continue           # ignore empty lines
   [ "${file:0:1}" != "#" ] || continue # ignore lines starting with #
+  file="$target/$file"
 
   is_managed "$file" || { add+=("$file") && continue; }
   has_changed "$file" || continue
