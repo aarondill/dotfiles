@@ -16,17 +16,17 @@ check_dependencies chezmoi yes basename
 if has_cmd crontab; then # Update crontab backup
   crontab -l >|"$CRONTAB_FILE"
 fi
-# returns 0 for not-managed files
-has_changed() { [ -n "$(chezmoi status -- "$file" 2>/dev/null)" ]; }
 
 # Finds files line-by-line
 files=() dirs=()
+add=()
 [ -r "$CONFIG_FILES" ] || abort "Could not find config file list: ${CONFIG_FILES}"
 while IFS= read -r file || [ -n "$file" ]; do
   file=$(trim "$file")                 # Strip leading and trailing whitespace
   [ -n "$file" ] || continue           # ignore empty lines
   [ "${file:0:1}" != "#" ] || continue # ignore lines starting with #
 
+  is_managed "$file" || { add+=("$file") && continue; }
   has_changed "$file" || continue
 
   type=$(file_type "$file" -s) || { err "$file is not a file!" && continue; }
@@ -54,6 +54,11 @@ if [ "${#files[@]}" -gt 0 ] || [ "${#dirs[@]}" -gt 0 ]; then
   }
 fi
 chezmoi re-add # Ensure everything else is updated
+if [ "${#add[@]}" -gt 0 ]; then
+  log "You have included files in the list which are not managed."
+  log "Run the following command to manage them:"
+  print_cmd chezmoi add --exact -- "${add[@]}"
+fi
 
 # --------------------------------------------
 # --------------------------------------------
@@ -72,3 +77,5 @@ if ! cmp -s "$DCONF_BACKUP" <(chezmoi decrypt -- "$dconf_path"); then
   chezmoi git -- commit --quiet -m "$commit_msg"
   chezmoi git -- push --quiet
 fi
+
+verbose chezmoi status

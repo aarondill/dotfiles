@@ -250,19 +250,20 @@ function log() { printf_c "$TEAL_COLOR" '%s\n' "$@" || true; }
 function err() { printf_c "$RED_COLOR" "%s\n" "$@" >&2 || true; }
 function warn() { printf_c "$YELLOW_COLOR" "%s\n" "$@" >&2 || true; }
 function success() { printf_c "$GREEN_COLOR$BOLD_COLOR" "%s\n" "Success!" || true; }
-# prints the command and runs it
-# verbose echo do something -> echo do something\ndo something
-function verbose() {
+function print_cmd() {
   # ${var@Q} will quote it.
   # Q The expansion is a string that is the value of parameter quoted in a
   # format that can be reused as input.
+  local output='>'                   # use > for prompt
+  [ "$(id -u)" -ne 0 ] || output='$' # if root, use $ for prompt
+  output+=" ${*@Q}"                  # add quoted command line to output
+  printf_c "$GREEN_COLOR" '%s\n' "$output" || true
+}
+# prints the command and runs it
+# verbose echo do something -> echo do something\ndo something
+function verbose() {
   # if USE_VERBOSE != 0, then output current command to stdout
-  if [ "${USE_VERBOSE:-0}" -ne 0 ]; then
-    local output='>'                   # use > for prompt
-    [ "$(id -u)" -ne 0 ] || output='$' # if root, use $ for prompt
-    output+=" ${*@Q}"                  # add quoted command line to output
-    printf_c "$GREEN_COLOR" '%s\n' "$output" || true
-  fi
+  [ "${USE_VERBOSE:-0}" -eq 0 ] || print_cmd "$@"
   "$@"
 }
 

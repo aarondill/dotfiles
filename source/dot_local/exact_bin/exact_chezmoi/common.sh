@@ -22,3 +22,8 @@ export DCONF_BACKUP=~/.config/dconf/dconf-backup.ini
 # The directory under $source where files from / are stored
 # This directory should be in a location that is backed up by chezmoi
 export ROOT_FOLDER=~/.root
+
+# returns 0 for not-managed files
+has_changed() { [ -n "$(chezmoi status -- "$1" 2>/dev/null)" ]; }
+is_managed() { [ -n "$(chezmoi source-path -- "$1" 2>/dev/null)" ]; }
+is_encrypted() { [ -n "$(chezmoi list --include=encrypted -- "$1")" ]; }
