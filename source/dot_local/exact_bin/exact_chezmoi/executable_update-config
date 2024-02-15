@@ -39,14 +39,15 @@ done <"$CONFIG_FILES"
 if [ "${#files[@]}" -gt 0 ] || [ "${#dirs[@]}" -gt 0 ]; then
 
   # Output a detail of which files are changing
-  changed_files=$(chezmoi status -- "${files[@]}")
-  changed_dirs=$(chezmoi status -- "${dirs[@]}")
+  changed_files=$(
+    {
+      chezmoi status -- "${files[@]}"
+      chezmoi status -- "${dirs[@]}"
+    } | sort -u
+  )
 
   log 'Changed files:'
-  {
-    [ -z "$changed_files" ] || log "$changed_files"
-    [ -z "$changed_dirs" ] || log "$changed_dirs"
-  } | sort -u
+  [ -z "$changed_files" ] || log "$changed_files"
 
   # HACK: don't force a tty prompt, instead just take my no.
   # Note: yes will get killed by sigpipe
