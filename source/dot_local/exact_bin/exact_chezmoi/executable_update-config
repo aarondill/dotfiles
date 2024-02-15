@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+set -euC -o pipefail && shopt -s nullglob globstar
+utils=script_utils.sh dir=$(dirname -- "${BASH_SOURCE[0]}") || true
+if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
+# shellcheck source=./script_utils.sh
+. "$utils"
+
+USE_COLOR=1 # Enable color
+# The file containing files to auto update
+CONFIG_FILES=~/.config/chezmoi/autoupdate
+# A stored copy of the crontab
+CRONTAB_FILE=~/.config/crontab
+# A stored copy of the dconf settings
+DCONF_BACKUP=~/.config/dconf/dconf-backup.ini
+
+check_dependencies chezmoi yes basename
+target=$(chezmoi target-path) || abort "Could not find target-path"
+[ -d "$target" ] || abort "target-path is not a directory: ${target}"
+source=$(chezmoi source-path) || abort "Could not find source-path"
+[ -d "$source" ] || abort "source-path is not a directory: ${source}"
+
+cd "$target" # add from target so files are relative to target
+
+if has_cmd crontab; then # Update crontab backup
+  crontab -l >|"$CRONTAB_FILE"
+fi
+
+# Finds files line-by-line
+files=() dirs=()
+[ -r "$CONFIG_FILES" ] || abort "Could not find config file list: ${CONFIG_FILES}"
+while IFS= read -r file || [ -n "$file" ]; do
+  file=$(trim "$file")                 # Strip leading and trailing whitespace
+  [ -n "$file" ] || continue           # ignore empty lines
+  [ "${file:0:1}" != "#" ] || continue # ignore lines starting with #
+  type=$(file_type "$file" -s) || { err "$file is not a file!" && continue; }
+  case "$type" in
+  directory) dirs+=("$file") ;;
+  *) files+=("$file") ;;
+  esac
+done <"$CONFIG_FILES"
+
+# Output a detail of which files are changing -- sed command to remove the status
+changed_files=$(chezmoi status -- "${files[@]}" | sed 's/^\s*\S\+\s\(.*\)$/\1/')
+changed_dirs=$(chezmoi status -- "${dirs[@]}" | sed 's/^\s*\S\+\s\(.*\)$/\1/')
+
+log 'Changed files:'
+[ -z "$changed_files" ] || log "$changed_files"
+[ -z "$changed_dirs" ] || log "$changed_dirs"
+
+# HACK: don't force a tty prompt, instead just take my no.
+yes no | {
+  chezmoi add --secrets ignore --exact --no-tty -- "${dirs[@]}" >/dev/null
+  chezmoi add --secrets ignore --no-tty -- "${files[@]}" >/dev/null
+}
+
+chezmoi re-add # Ensure everything else is updated
+
+# --------------------------------------------
+# --------------------------------------------
+# --------------- Update dconf ---------------
+# --------------------------------------------
+# --------------------------------------------
+
+dconf dump / >|"$DCONF_BACKUP"
+# Save to chezmoi
+dconf_path="$source/encrypted_dconf-backup.ini"
+commit_msg="Update $(basename -- "$DCONF_BACKUP")"
+if ! cmp -s "$DCONF_BACKUP" <(chezmoi decrypt -- "$dconf_path"); then
+  log 'Updating dconf backup'
+  chezmoi encrypt "$DCONF_BACKUP" -o "$dconf_path"
+  chezmoi git -- add "$dconf_path"
+  chezmoi git -- commit --quiet -m "$commit_msg"
+  chezmoi git -- push --quiet
+fi
