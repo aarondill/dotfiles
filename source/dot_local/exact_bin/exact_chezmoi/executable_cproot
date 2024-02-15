@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Copies the files to ~/.root/FILEPATH. `.root` should be backed up
+
+set -euC -o pipefail && shopt -s nullglob globstar
+utils=script_utils.sh dir=$(dirname -- "${BASH_SOURCE[0]}") || true
+if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
+# shellcheck source=../script_utils.sh
+. "$utils"
+USE_COLOR=1 # Enable color
+
+this=$(get_script_path) || abort "Could not find current script path" 3
+# shellcheck source=./common.sh
+. "$(dirname -- "$this")/common.sh"
+
+_cproot() {
+  [ -e "$file" ] || [ -L "$file" ] || { err "$file is not a file" && return 1; }
+  old_path="$(resolve_path "$file" -s)"
+  new_path="$ROOT_FOLDER$old_path" # old_path starts with /
+
+  # cp to home, so files are relative to home.
+  mkdir -p -- "$(dirname -- "$new_path")" # ensure destination exists
+  sudo_cmd cp -rf -T -- "$file" "$new_path"
+  sudo_cmd chown --preserve-root -hR -- "$USER" "$new_path"
+
+  log "Copied $old_path to $new_path"
+}
+
+declare -i exit_code=0
+for file in "$@"; do _cproot "$file" || exit_code="$?"; done
+# Exit with the saved code
+return "$exit_code"

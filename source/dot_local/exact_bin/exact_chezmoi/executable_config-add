@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Adds to chezmoi and adds to ~/.bashrc.d/30_functions/_update-config
+# Imitates config add (without dash)
+
+set -euC -o pipefail && shopt -s nullglob globstar
+utils=script_utils.sh dir=$(dirname -- "${BASH_SOURCE[0]}") || true
+if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
+# shellcheck source=../script_utils.sh
+. "$utils"
+USE_COLOR=1 # Enable color
+this=$(get_script_path) || abort "Could not find current script path" 3
+# shellcheck source=./common.sh
+. "$(dirname -- "$this")/common.sh"
+
+files=()
+for file in "$@"; do
+  [ -e "$file" ] || { err "$file is not a file" && continue; }
+  [ -r "$file" ] || { err "$file is not readable (try cproot instead)" && continue; }
+  # add to the array so i can update all at once
+  file="$(resolve_path "$file" -s)"
+  case "$file" in
+  "$source"/*) files+=("$file") ;;
+  *) err "$file is not under source directory: $source" ;;
+  esac
+done
+
+# Add all files to chezmoi repo
+chezmoi add --exact -- "${files[@]}"
+
+# Add files to the _update-config file
+for file in "${files[@]}"; do
+  short_file=${file#"$source/"} # make relative to source
+  ! grep -Fxq "$short_file" "$CONFIG_FILES" || continue
+  printf '%s\n' "$short_file" >>"$CONFIG_FILES"
+done

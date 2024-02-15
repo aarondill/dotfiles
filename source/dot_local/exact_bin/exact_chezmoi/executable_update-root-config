@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+set -euC -o pipefail && shopt -s nullglob globstar
+utils=script_utils.sh dir=$(dirname -- "${BASH_SOURCE[0]}") || true
+if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
+# shellcheck source=../script_utils.sh
+. "$utils"
+
+USE_COLOR=1 # Enable color
+
+this=$(get_script_path) || abort "Could not find current script path" 3
+# shellcheck source=./common.sh
+. "$(dirname -- "$this")/common.sh"
+cd "$target" # add from target so files are relative to target
+
+root_source=$(chezmoi source-path -- "$ROOT_FOLDER") || abort "Could not find source path for $ROOT_FOLDER. Ensure it's managed by chezmoi!"
+
+is_encrypted() { [ -n "$(chezmoi list --include=encrypted -- "$1")" ]; }
+
+encrypted_files=() add_files=() add_dirs=() add_exact_dirs=()
+for file in "$ROOT_FOLDER"/**; do
+  [ -f "$dir" ] || continue
+  rootpath="/${file#"$ROOT_FOLDER"}" # The path, without the root directory, under /
+  # Hasn't yet been copied to root (or deleted, but that's up to the user), so ignore it.
+  [ -f "$rootpath" ] || continue
+  # Change permissions to match the root
+  perms=$(sudo_cmd chmod --changes --reference="$rootpath" "$file")
+  { [ -n "$perms" ] &&                                        # permissions are same
+    ! sudo_cmd cmp --quiet "$rootpath" "$file"; } || continue # the contents are same
+
+  # Doesn't need to be recursive bc only includes files, not dirs.
+  sudo_cmd cp -f -- "$rootpath" "$file"
+  sudo_cmd chown -h -- "$USER" "$file"
+
+  is_encrypted "$file" &&
+    encrypted_files+=("$file") || add_files+=("$file")
+done
+
+for dir in "$ROOT_FOLDER"/**/; do
+  [ -d "$dir" ] || continue
+  dir_source="$(chezmoi source-path "$dir")" || { err "Could not find source for directory: $dir" && continue; }
+  rootpath="/${dir#"$ROOT_FOLDER"}" # The path, without the root directory, under /
+  # Hasn't yet been copied to root (or deleted, but that's up to the user), so ignore it.
+  [ -d "$rootpath" ] || continue
+  # Change permissions to match the root
+  sudo_cmd chmod --reference="$rootpath" "$dir"
+  case "$dir_source" in
+  "$root_source/exact_$dir") add_exact_dirs+=("$dir") ;;
+  "$root_source/$dir") add_dirs+=("$dir") ;;
+  *) err "Something went wrong processing: $dir" ;;
+  esac
+done
+
+did_something=0
+function __chezmoi_add() { did_something=1 && chezmoi add "$@"; }
+[ "${#add_files[@]}" -eq 0 ] || __chezmoi_add -- "${add_files[@]}"
+[ "${#encrypted_files[@]}" -eq 0 ] || __chezmoi_add --encrypt -- "${encrypted_files[@]}"
+[ "${#add_dirs[@]}" -eq 0 ] || __chezmoi_add -i dirs --recursive=false -- "${add_dirs[@]}"
+[ "${#add_exact_dirs[@]}" -eq 0 ] || __chezmoi_add -i dirs --recursive=false --exact -- "${add_exact_dirs[@]}"
+
+[ "$did_something" -eq 1 ] || err "No files have changed. Directories aren't recursively checked."

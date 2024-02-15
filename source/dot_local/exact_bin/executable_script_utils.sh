@@ -171,24 +171,32 @@ function get_unique_filename() {
   fi
 }
 
-# Find the absolute path of the calling file
+# Usage: resolve_path path [-s]
+# Find the absolute path of a file or directory. If -s is given, doesn't resolve symlinks.
+# All but the last component must exist.
 # note: relies on dirname, basename, and readlink
 # Source: https://stackoverflow.com/a/246128
-function get_script_path() {
+function resolve_path() {
   local CDPATH='' OLDPWD=''
-  # note: ${1-other}, no colon. if given empty string, fail fast
-  local source="${1-${BASH_SOURCE[1]:-}}" dir=''
+  local source="${1:-}" dir=''
   [ -n "$source" ] || return 1
-  while [ -L "$source" ]; do # resolve $source until the file is no longer a symlink
+  if [ "${2:-}" != '-s' ]; then
+    while [ -L "$source" ]; do # resolve $source until the file is no longer a symlink
+      dir="$(builtin cd -P -- "$(dirname -- "$source")" &>/dev/null && builtin pwd)"
+      source="$(readlink -- "$source")"
+      [[ "$source" == /* ]] || source="$dir/$source" # if $source was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+    done
     dir="$(builtin cd -P -- "$(dirname -- "$source")" &>/dev/null && builtin pwd)"
-    source="$(readlink -- "$source")"
-    [[ "$source" == /* ]] || source="$dir/$source" # if $source was a relative symlink, we need to resolve it relative to the path where the symlink file was located
-  done
-  dir="$(builtin cd -P -- "$(dirname -- "$source")" &>/dev/null && builtin pwd)"
+  else
+    dir="$(builtin cd -- "$(dirname -- "$source")" &>/dev/null && builtin pwd)"
+  fi
   dir="${dir:-"$PWD"}"
   source="$dir/$(basename -- "$source")"
   printf '%s' "$source"
 }
+
+# Find the absolute path of the calling file
+function get_script_path() { resolve_path "${1-${BASH_SOURCE[1]:-}}"; }
 
 # If this variable is set to 1, color will be turned on when stdout is a terminal (unless NO_COLOR is set)
 declare -i USE_COLOR="${USE_COLOR:-0}"
