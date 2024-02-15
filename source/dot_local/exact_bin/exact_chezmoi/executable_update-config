@@ -43,8 +43,10 @@ if [ "${#files[@]}" -gt 0 ] || [ "${#dirs[@]}" -gt 0 ]; then
   changed_dirs=$(chezmoi status -- "${dirs[@]}")
 
   log 'Changed files:'
-  [ -z "$changed_files" ] || log "$changed_files"
-  [ -z "$changed_dirs" ] || log "$changed_dirs"
+  {
+    [ -z "$changed_files" ] || log "$changed_files"
+    [ -z "$changed_dirs" ] || log "$changed_dirs"
+  } | sort -u
 
   # HACK: don't force a tty prompt, instead just take my no.
   # Note: yes will get killed by sigpipe
