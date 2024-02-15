@@ -36,21 +36,23 @@ while IFS= read -r file || [ -n "$file" ]; do
   esac
 done <"$CONFIG_FILES"
 
-# Output a detail of which files are changing -- sed command to remove the status
-changed_files=$(chezmoi status -- "${files[@]}" | sed 's/^\s*\S\+\s\(.*\)$/\1/')
-changed_dirs=$(chezmoi status -- "${dirs[@]}" | sed 's/^\s*\S\+\s\(.*\)$/\1/')
+if [ "${#files[@]}" -gt 0 ] || [ "${#dirs[@]}" -gt 0 ]; then
 
-log 'Changed files:'
-[ -z "$changed_files" ] || log "$changed_files"
-[ -z "$changed_dirs" ] || log "$changed_dirs"
+  # Output a detail of which files are changing
+  changed_files=$(chezmoi status -- "${files[@]}")
+  changed_dirs=$(chezmoi status -- "${dirs[@]}")
 
-# HACK: don't force a tty prompt, instead just take my no.
-# Note: yes will get killed by sigpipe
-{ yes no || true; } | {
-  chezmoi add --secrets ignore --exact --no-tty -- "${dirs[@]}" >/dev/null
-  chezmoi add --secrets ignore --no-tty -- "${files[@]}" >/dev/null
-}
+  log 'Changed files:'
+  [ -z "$changed_files" ] || log "$changed_files"
+  [ -z "$changed_dirs" ] || log "$changed_dirs"
 
+  # HACK: don't force a tty prompt, instead just take my no.
+  # Note: yes will get killed by sigpipe
+  { yes no || true; } | {
+    chezmoi add --secrets ignore --exact --no-tty -- "${dirs[@]}" >/dev/null
+    chezmoi add --secrets ignore --no-tty -- "${files[@]}" >/dev/null
+  }
+fi
 chezmoi re-add # Ensure everything else is updated
 
 # --------------------------------------------
