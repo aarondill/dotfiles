@@ -36,7 +36,11 @@ application/x-python=nvim.desktop;
 application/x-shellscript=nvim.desktop;
 application/xml=nvim.desktop;
 application/xml-dtd=nvim.desktop;
-image/png=org.gnome.eog.desktop
+image/png=org.gnome.eog.desktop;
+image/jpeg=org.gnome.eog.desktop;
+image/webp=org.gnome.eog.desktop;
+image/heif=org.gnome.eog.desktop;
+image/png=org.gnome.eog.desktop;
 
 [Added Associations]
 image/webp=gimp.desktop;
