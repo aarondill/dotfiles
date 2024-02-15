@@ -7,6 +7,11 @@
 #
 #
 
-if [ -f /usr/share/doc/find-the-command/ftc.bash ]; then
-  source /usr/share/doc/find-the-command/ftc.bash
-fi
+cnf=(/usr/share/doc/pkgfile/command-not-found.bash /usr/share/doc/find-the-command/ftc.bash)
+for file in "${cnf[@]}"; do
+  [ -r "$file" ] || continue
+  # shellcheck disable=SC1090
+  source "$file"
+  break
+done
+unset file cnf

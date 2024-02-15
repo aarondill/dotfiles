@@ -14,6 +14,7 @@ resolution='640x480' videodev=/dev/video0
 record_for=I
 file_extension='' # detect based on frames/duration after processing
 loglevel=warning
+delay=1
 
 function usage() {
   cat <<EOF || true
@@ -31,6 +32,7 @@ Options:
   -l, --loglevel=level Pass level to ffmpeg as the log level [default: $loglevel]
   -r, --resolution=res Use the given resolution [default: $resolution]
   -v, --video=dev      Use the video device [default: $videodev]
+  -w, --delay=delay    Wait delay seconds before capture [default: $delay]
 
 
 The last provided of --frames, --duration, --continuous, and --image will be used
@@ -39,8 +41,8 @@ For example: this means that saving several frames as "file.jpg" may fail.
 EOF
 }
 
-LONGOPTS=help,resolution:,frames:,duration:,extension:,video:,loglevel:,continuous,image
-SHORTOPTS=h,r:,f:,d:,e:,v:,l:,c,i
+LONGOPTS=help,resolution:,frames:,duration:,extension:,video:,loglevel:,continuous,image,delay:
+SHORTOPTS=h,r:,f:,d:,e:,v:,l:,c,i,w:
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 
 while true; do
@@ -54,6 +56,7 @@ while true; do
   -l | --loglevel) loglevel=$2 && shift 2 ;;
   -r | --resolution) resolution=$2 && shift 2 ;;
   -v | --video) videodev=$2 && shift 2 ;;
+  -w | --delay) delay=$2 && shift 2 ;;
   --) shift && break ;;
   *) abort "This is a bug" 3 ;;
   esac
@@ -96,6 +99,7 @@ ffmpeg_args=(
   -hide_banner          # pls be quieter
   -loglevel "$loglevel" # pretty please
   -stats                # show statistics/progress
+  -ss "$delay"          # Delay
 )
 
 if [ "$record_for" != 'I' ]; then # not an image!
