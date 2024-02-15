@@ -52,6 +52,8 @@ export LESS="-I"
 export LESSUTFCHARDEF='E000-F8FF:p,F0000-FFFFD:p,100000-10FFFD:p'
 # Move some files from my $HOME directory
 export LESSKEY="$XDG_CONFIG_HOME/less/lesskey"
+# Allow mouse scolling in journalctl
+export SYSTEMD_LESS=RSMK
 export GNUPGHOME="$XDG_CONFIG_HOME"/gnupg
 export NODE_REPL_HISTORY="$XDG_STATE_HOME"/node/node_repl_history
 export NPM_CONFIG_USERCONFIG="$XDG_CONFIG_HOME"/npm/npmrc
