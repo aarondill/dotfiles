@@ -126,3 +126,5 @@
 	rg = grep
 	sync-tags = alias-wrapper sync-tags
 	get-remote = alias-wrapper get-remote
+[branch]
+	sort = -committerdate
