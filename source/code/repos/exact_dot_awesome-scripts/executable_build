@@ -2,36 +2,38 @@
 set -euC -o pipefail
 function err() { printf '%s\n' "$@" >&2; }
 function abort() { err "$1" && exit "${2:-1}"; }
-this_dir=
-if [ -f "$0" ]; then
-  this_dir=$(dirname -- "$0")
-fi
-if ! [ -d "$this_dir" ]; then
-  abort "Could not find directory of this script." 2
-fi
+function has() { command -v "$1" &>/dev/null; }
+# shellcheck disable=SC2206
+sudo=() && if [ "$(id -u)" -ne 0 ]; then sudo=(${SUDO:-sudo}); fi
+
+this_dir=$(dirname -- "$0") || abort "Could not find current script filepath"
+[ -d "$this_dir" ] || abort "Could not find directory of this script."
+
 DEST=$(dirname -- "$this_dir")
 
-install_deps() {                                                 # {{{ 1
+if has pacman; then exec "$this_dir/arch/makepkg.sh" "$DEST"; fi
+
+install_deps() {
   if [ -f "$DEST/build/.has_installed_deps" ]; then return 0; fi # already did it :)
   if ! [ -d "$this_dir" ]; then err "Couldn't find script dir" && return 1; fi
 
-  names=(deps packages pkgs) exts=('-apt' '-APT' '') pkg_file=
-  for f in "${names[@]}"; do
-    for ext in "${exts[@]}"; do
-      if [ -f "$this_dir/$f$ext" ]; then pkg_file="$this_dir/$f$ext" && break; fi
-    done
-  done
+  pkg_manager=
+  pkg_manager_exec=()
+  if has nala; then
+    pkg_manager=apt pkg_manager_exec=("${sudo[@]}" nala install)
+  elif has apt; then
+    pkg_manager=apt pkg_manager_exec=("${sudo[@]}" apt install --mark-auto)
+  fi
+  [ -n "$pkg_manager" ] || { err "Couldn't find suitable package manager" && return 1; }
 
-  if ! [ -f "$pkg_file" ]; then err "couldn't find a list of packages in script dir" && return 1; fi
+  pkg_file="deps.$pkg_manager"
+  [ -f "$pkg_file" ] || { err "Couldn't find a list of package to install" && return 1; }
 
-  # shellcheck disable=SC2206
-  sudo=() && if [ "$(id -u)" -ne 0 ]; then sudo=(${SUDO:-sudo}); fi
-
-  xargs -d$'\n' -r -a "$pkg_file" -- "${sudo[@]}" apt install --mark-auto
+  xargs -d$'\n' -r -a "$pkg_file" -- "${pkg_manager_exec[@]}"
   mkdir -p "$DEST/build"
   touch "$DEST/build/.has_installed_deps"
-} # }}}
-install_deps
+}
+install_deps || { err "Warning: could not install dependencies. Continuing will likely fail!" && sleep 2; }
 
 export LUA_DIR=/usr/include/lua5.3/
 export CPATH="$LUA_DIR"
