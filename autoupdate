@@ -68,9 +68,6 @@ code/.release-it.json
 code/.shellcheckrc
 code/c/.clang-format
 code/c/template/
-code/java/UIL/template/
-code/java/java-format.xml
-code/java/template/
 code/js/EslintTests.js
 code/repos/.awesome-scripts/
 code/repos/.nvim/
