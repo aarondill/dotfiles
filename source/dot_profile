@@ -46,8 +46,8 @@ unset dir
 
 # Stop less from saving it's history
 export LESSHISTFILE=-
-# Make search case insensitive
-export LESS="-I"
+# Make search case insensitive -- Support colors
+export LESS="-IR"
 # Make less show icons in PUA areas
 export LESSUTFCHARDEF='E000-F8FF:p,F0000-FFFFD:p,100000-10FFFD:p'
 # Move some files from my $HOME directory
