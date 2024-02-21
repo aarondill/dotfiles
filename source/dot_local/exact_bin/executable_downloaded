@@ -46,7 +46,7 @@ while true; do
 done
 dest=${1:-.}
 downloads=$(get_xdg_dir "DOWNLOAD") || true
-downloads="${downloads:-~/Downloads/}" # We still haven't found something? use ~/Downloads/
+downloads="${downloads:-$HOME/Downloads/}" # We still haven't found something? use ~/Downloads/
 
 file="$(get_latest "$downloads" "$num" | head -n 1)"
 case "$do" in
