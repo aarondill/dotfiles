@@ -21,25 +21,34 @@ Options:
   -h, --help         Show this help message.
   -n, --num=n        Operate on the nth most recent file, instead of the first
 Operations (Only use one at a time):
-  -r, --remove       Remove the most recently downloaded file
-  -c, --copy         Copy the most recently downloaded file to DEST
-  -m, --move         Move the most recently downloaded file to DEST
-  -e, --edit         Edit the most recently downloaded file (using \$VISUAL or \$EDITOR)
-  -p, --print        Print the most recently downloaded file
+  -r, --remove       Remove the file
+  -c, --copy         Copy the file to DEST
+  -m, --move         Move the file to DEST
+  -e, --edit         Edit the file (using \$VISUAL or \$EDITOR)
+  -p, --print        Print the file path
 EOF
 }
 
-LONGOPTS="help,remove,copy,move,print,num:" SHORTOPTS="h,r,c,m,p,n:"
+# NOTE: When updating this, update the usage and the case at the bottom!
+declare -A operations=([r]=remove [c]=copy [m]=move [p]=print [e]=edit)
+
+LONGOPTS="help,num:,$(join ',' "${operations[@]}")" SHORTOPTS="h,n:,$(join ',' "${!operations[@]}")"
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 
-do=copy num=1 # 1=most recent
+op=copy num=1 # 1=most recent
 while true; do
+  key="${1#--}" key="${key#-}" # remove --/- from the start
+  if [ -n "$key" ]; then
+    if [ -n "${operations["$key"]:-}" ]; then # check if operations' keys contain the short option
+      op="${operations["$key"]}" && shift && continue
+    fi
+    for i in "${operations[@]}"; do # check if operations' values contain the long option
+      [ "$i" == "$key" ] || continue
+      op="$i" && shift && continue 2 # continue the outer while loop
+    done
+  fi
   case "$1" in
   -h | --help) usage && exit 0 ;;
-  -r | --remove) do=remove && shift ;;
-  -c | --copy) do=copy && shift ;; # default
-  -m | --move) do=move && shift ;;
-  -p | --print) do=print && shift ;;
   -n | --num)
     num="$2" && shift 2
     case "$num" in *[!0-9]* | '') abort "Invalid number: $num" 2 ;; esac
@@ -53,7 +62,7 @@ downloads=$(get_xdg_dir "DOWNLOAD") || true
 downloads="${downloads:-$HOME/Downloads/}" # We still haven't found something? use ~/Downloads/
 
 file="$(get_latest "$downloads" "$num" | head -n 1)"
-case "$do" in
+case "$op" in
 remove)
   log "Removing '$file'"
   confirm "remove '$file'?" || abort "aborting" 1
@@ -62,6 +71,6 @@ remove)
 # cp -Pp -R is posix for cp --archive
 copy) log "Copying '$file' to '$dest'" && cp -pP -R -i -- "$file" "$dest" ;;
 move) log "Moving '$file' to '$dest'" && mv -i -- "$file" "$dest" ;;
-edit) "${VISUAL:-${EDITOR:-editor}}" -- "$file" "$dest" ;;
+edit) "${VISUAL:-${EDITOR:-editor}}" -- "$file" ;;
 print) printf '%s\n' "$file" ;;
 esac
