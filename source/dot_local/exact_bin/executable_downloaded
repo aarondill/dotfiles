@@ -24,6 +24,7 @@ Operations (Only use one at a time):
   -r, --remove       Remove the most recently downloaded file
   -c, --copy         Copy the most recently downloaded file to DEST
   -m, --move         Move the most recently downloaded file to DEST
+  -e, --edit         Edit the most recently downloaded file (using \$VISUAL or \$EDITOR)
   -p, --print        Print the most recently downloaded file
 EOF
 }
@@ -61,5 +62,6 @@ remove)
 # cp -Pp -R is posix for cp --archive
 copy) log "Copying '$file' to '$dest'" && cp -pP -R -i -- "$file" "$dest" ;;
 move) log "Moving '$file' to '$dest'" && mv -i -- "$file" "$dest" ;;
+edit) "${VISUAL:-${EDITOR:-editor}}" -- "$file" "$dest" ;;
 print) printf '%s\n' "$file" ;;
 esac
