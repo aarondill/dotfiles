@@ -103,6 +103,10 @@ fi
 export NPM_HOME="$XDG_DATA_HOME/npm"
 prepend_path "$NPM_HOME/bin"
 
+if [ -d "$XDG_DATA_HOME/gem/ruby/3.0.0/bin" ]; then
+  append_path "$XDG_DATA_HOME/gem/ruby/3.0.0/bin"
+fi
+
 # allow pnpm bin
 export PNPM_HOME="$XDG_DATA_HOME/pnpm"
 prepend_path "$PNPM_HOME"
