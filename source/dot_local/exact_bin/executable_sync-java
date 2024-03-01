@@ -12,7 +12,7 @@ if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
 . "$utils"
 
 USE_COLOR=1 # Enable color
-deps=(rsync diff) exclude=('*.class' 'System Volume Information')
+deps=(rsync diff) exclude=('*.class' 'System Volume Information' '.git')
 
 mount_dirs=("/run/media/$USER" "/media/$USER")
 # Default to something so we can display it
