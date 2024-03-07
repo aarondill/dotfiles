@@ -35,7 +35,7 @@ declare -A operations=([r]=remove [c]=copy [m]=move [p]=print [e]=edit)
 LONGOPTS="help,num:,$(join ',' "${operations[@]}")" SHORTOPTS="h,n:,$(join ',' "${!operations[@]}")"
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 
-op=copy num=1 # 1=most recent
+op=print num=1 # 1=most recent
 while true; do
   key="${1#--}" key="${key#-}" # remove --/- from the start
   if [ -n "$key" ]; then
@@ -62,6 +62,7 @@ downloads=$(get_xdg_dir "DOWNLOAD") || true
 downloads="${downloads:-$HOME/Downloads/}" # We still haven't found something? use ~/Downloads/
 
 file="$(get_latest "$downloads" "$num" | head -n 1)"
+[ -n "$file" ] || abort "No file found!" 1
 case "$op" in
 remove)
   log "Removing '$file'"
