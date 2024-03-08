@@ -14,6 +14,7 @@ manage todos.
 
 Valid actions:
 List [name]: List the current todos (default)
+Count [name]: Count the number of todos
 Add <name>: Add a new todo (opens \$EDITOR)
 Show <name>: Show the description of todo (opens a pager)
 Edit <name>: Edit todo in \$EDITOR
@@ -74,6 +75,11 @@ name="${2:-}"
 
 case "$action" in
 list) show_directory "$todo_dir/$name" ;;
+count)
+  dir="$todo_dir/$name"
+  [ -d "$dir" ] || abort "No directory: $dir"
+  count "$dir"/*
+  ;;
 add)
   [ -n "$name" ] || abort "usage: $THIS $action <name>" 2
   mkdirname "$name" || abort "Could not create directory for todo file"
