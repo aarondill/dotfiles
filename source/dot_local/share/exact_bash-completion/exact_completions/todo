@@ -2,7 +2,7 @@
 # shellcheck disable=SC2207
 _todo() {
   COMPREPLY=()
-  local todo_dir=~/.local/share/todo/
+  local todo_dir="${XDG_DATA_HOME:-~/.local/share}/todo"
   # Pointer to current completion word. By convention, it's named "cur" but this isn't strictly necessary.
   local cur=${COMP_WORDS[COMP_CWORD]}
   case "$cur" in
