@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+set -euC -o pipefail && shopt -s nullglob globstar
+utils=script_utils.sh dir=$(dirname -- "${BASH_SOURCE[0]}") || true
+if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
+# shellcheck source=./script_utils.sh
+. "$utils"
+USE_COLOR=1
+
+todo_dir="$XDG_DATA_HOME/todo"
+function usage() {
+  cat <<EOF || true
+Usage: $THIS [OPTS]... [action]
+manage todos.
+
+Valid actions:
+List [name]: List the current todos (default)
+Add <name>: Add a new todo (opens \$EDITOR)
+Show <name>: Show the description of todo (opens a pager)
+Edit <name>: Edit todo in \$EDITOR
+Remove/rm <name>: Remove todo
+Done <name>: Synonoym for Remove
+
+Options:
+  -h, --help         Show this help message.
+  -d, --dir DIR      Set a different todo dir (default: \$XDG_DATA_HOME/todo)
+EOF
+}
+
+mkdirname() { local d && for d in "$@"; do mkdir -p -- "$(dirname -- "$d")"; done; }
+# usage: show_directory DIR
+show_directory() {
+  local dir="${1%/}" # remove trailing slash
+  [ -d "$dir" ] || { err "No directory: $dir" && return 1; }
+  files=("${dir%/}/"*)
+  for f in "${files[@]}"; do # Ensure no double slashes
+    ! [ -d "$f" ] || f+=/    # trailing slash on directories
+    log "${f#"$dir/"}"       # remove the leading directory
+  done
+  [ "${#files[@]}" -gt 0 ] || log "No todos!"
+}
+
+LONGOPTS="help,handle-completion-options,dir:" SHORTOPTS="h,d:"
+ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
+
+while true; do
+  case "$1" in
+  --help | -h) usage && exit 0 ;;
+  --dir | -d) todo_dir=$2 && shift 2 ;;
+  --handle-completion-options)
+    long=() short=()
+    split long "," "$LONGOPTS" && split short "," "$SHORTOPTS"
+    for opt in "${long[@]%:}"; do      # Strip trailing colons
+      [ "--$opt" != "$1" ] || continue # skip --handle-completion-options
+      [ -n "$opt" ] || continue        # skip empty
+      printf -- '--%s ' "$opt"
+    done
+    for opt in "${short[@]%:}"; do # Strip trailing colons
+      [ -n "$opt" ] || continue    # skip empty
+      printf -- '-%s ' "$opt"
+    done
+    printf '\n'
+    exit 0
+    ;;
+  --) shift && break ;;
+  *) abort "This is a bug" 3 ;;
+  esac
+done
+
+mkdir -p -- "$todo_dir" || abort "Couldn't create the todo dir: $todo_dir"
+cd "$todo_dir" || abort "Couldn't move into the todo dir: $todo_dir"
+
+action=${1:-list} action=${action,,} # lowercase
+name="${2:-}"
+
+case "$action" in
+list) show_directory "$todo_dir/$name" ;;
+add)
+  [ -n "$name" ] || abort "usage: $THIS $action <name>" 2
+  mkdirname "$name" || abort "Could not create directory for todo file"
+  edit "$name"
+  ;;
+show)
+  [ -n "$name" ] || abort "usage: $THIS $action <name>" 2
+  [ -e "$name" ] || abort "Todo doesn't exist: $name"
+  if [ -d "$name" ]; then
+    show_directory "$name"
+  else
+    pager "$name"
+  fi
+  ;;
+edit)
+  [ -n "$name" ] || abort "usage: $THIS $action <name>" 2
+  [ -e "$name" ] || abort "Todo doesn't exitst: $name"
+  edit "$name"
+  ;;
+rm | remove | done)
+  [ -n "$name" ] || abort "usage: $THIS $action <name>" 2
+  [ -e "$name" ] || abort "Todo doesn't exitst: $name"
+  rm -ri -- "$name"
+  ;;
+*) abort "Unrecognized action: $action" 2 ;;
+esac

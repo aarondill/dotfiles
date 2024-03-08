@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# shellcheck disable=SC2207
+_todo() {
+  COMPREPLY=()
+  local todo_dir=~/.local/share/todo/
+  # Pointer to current completion word. By convention, it's named "cur" but this isn't strictly necessary.
+  local cur=${COMP_WORDS[COMP_CWORD]}
+  case "$cur" in
+  -*) COMPREPLY=($(compgen -W "$(todo --handle-completion-options)" -- "$cur")) && return 0 ;;
+  esac
+
+  # todo <action> (complete)
+  if [ "$COMP_CWORD" -eq 1 ]; then # complete the actions
+    COMPREPLY=($(compgen -W 'list add show edit remove rm done' -- "$cur")) && return 0
+  fi
+  # shellcheck disable=SC2207
+  COMPREPLY=($(compgen -f -- "$todo_dir/$cur")) # complete the todos
+  COMPREPLY=("${COMPREPLY[@]#"$todo_dir/"}")    # remove leading $todo_dir/ prefix
+}
+complete -o bashdefault -F _todo todo

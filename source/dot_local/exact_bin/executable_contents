@@ -50,22 +50,15 @@ for file in "$@"; do
 done
 [ "${#files[@]}" -gt 0 ] || exit "$exit_code" # we couldn't find any of them
 
-open=
-case "$edit" in
-0)
-  # Use pager if can, else use cat
-  if [ "$pager" = false ] || ! [ -t 1 ]; then
-    PAGER=$(first_cmd cat /bin/cat) || abort "Could not find pager" 1
-  elif [ "$pager" = true ]; then
-    PAGER=${PAGER:-$(first_cmd pager bat less cat /bin/cat)} || abort "Could not find pager" 1
-  elif [ "$pager" != true ]; then
-    PAGER="$pager"
-  fi
-  open="${PAGER:-cat}"
-  ;;
-1) open=${EDITOR:-$(first_cmd editor sensible-editor vim emacs /bin/cat)} || abort "Could not find editor" 1 ;;
-esac
+open=edit
+if [ "$edit" -eq 0 ]; then # use the pager!
+  case "$pager" in
+  false) open="cat" ;;
+  true) open="page" ;;
+  *) open="page" PAGER="$pager" ;;
+  esac
+fi
 
-# output them all -- open is expanded to allow flags
-$open -- "${files[@]}" || exit
+# output them all
+"$open" "${files[@]}" || exit
 exit "$exit_code"

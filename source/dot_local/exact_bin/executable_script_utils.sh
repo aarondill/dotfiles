@@ -14,6 +14,13 @@ if false; then
   . "$utils"
 fi
 
+# Set the XDG_*_DIR variables to defaults if not set
+XDG_DATA_HOME=${XDG_DATA_HOME:-"$HOME/.local/share"}
+XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-"$HOME/.config"}
+XDG_STATE_HOME=${XDG_STATE_HOME:-"$HOME/.local/state"}
+XDG_DATA_DIRS=${XDG_DATA_DIRS:-"/usr/local/share/:/usr/share/"}
+XDG_CONFIG_DIRS=${XDG_CONFIG_DIRS:-"/etc/xdg/"}
+
 # The name of the currently running script. Override this if the current filename's basename is not satisfactory.
 # If $0 is not defined, defaults to ${BASH_SOURCE[1]} (the calling script)
 THIS="$(basename -- "${0:-${BASH_SOURCE[1]}}")" # This script is designed to be sourced. $0 should be the name of the parent script.
@@ -35,7 +42,7 @@ function join() {
 }
 # splits arguments by delim argument.
 # Note: if string ends in a delim, an empty element will be present in the output
-# Usage: split arr | "a|b|c" -> arr=(a b c)
+# Usage: split arr '|' "a|b|c" -> arr=(a b c)
 function split() {
   local delim="$2" str="$3" elem ends_with_delim=0
   [ -n "$delim" ] || abort "Invalid delimiter" 2
@@ -387,6 +394,32 @@ is_integer() { [ -n "$1" ] && case "$1" in *[!0123456789]*) return 1 ;; esac }
 # returns the number of arguments passed to it.
 # this can be especially useful with globs
 count() { printf '%d\n' "$#" || true; }
+
+# Opens an editor with the given file(s)
+# Note: doesn't check for stdout terminality. Ensure the user expects an editor!
+# uses \$VISUAL or \$EDITOR if defined
+function edit() {
+  local editor
+  editor=${VISUAL:-${EDITOR:-}}
+  [ -n "$editor" ] || editor=$(first_cmd editor sensible-editor vim emacs nano) || abort "Could not find editor" 1
+  local cmd=()
+  split cmd " " "$editor" # split editor by spaces
+  cmd+=(-- "$@")          # add files
+  command "${cmd[@]}"     # run the editor
+}
+# Opens a pager with the given file(s)
+# Doesn't page if stdout is not a terminal
+# Uses $PAGER if defined
+function page() {
+  local pager=''
+  # Use pager if can, else use cat
+  if [ -t 1 ]; then pager=${PAGER:-$(first_cmd pager bat less)} || true; fi
+  [ -n "$pager" ] || pager=$(first_cmd cat /bin/cat) || abort "Could not find pager" 1
+  local cmd=()
+  split cmd " " "$pager" # split pager by spaces
+  cmd+=(-- "$@")         # add files
+  command "${cmd[@]}"    # run the pager
+}
 
 # download -p <URL> [output] outputs to stdout if output is not specified
 # if -p is passed, the command will output progress information to stderr.
