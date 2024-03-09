@@ -91,7 +91,7 @@ show)
   if [ -d "$name" ]; then
     show_directory "$name"
   else
-    pager "$name"
+    page "$name"
   fi
   ;;
 edit)
