@@ -6,4 +6,8 @@
 #
 
 [ "$SHLVL" -eq 1 ] || return 0
-printf '%s\n' "You have $(todo count) todos!" || true
+_count=$(todo count)
+if [ "$_count" -gt 0 ]; then
+  printf '%s\n' "You have $_count todos!" || true
+fi
+unset _count
