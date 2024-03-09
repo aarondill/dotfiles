@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2207
 _todo() {
-  COMPREPLY=()
+  local _cmd=$1 cur=$2 _pre=$3
   local todo_dir="${XDG_DATA_HOME:-~/.local/share}/todo"
-  # Pointer to current completion word. By convention, it's named "cur" but this isn't strictly necessary.
-  local cur=${COMP_WORDS[COMP_CWORD]}
+  COMPREPLY=()
+
   case "$cur" in
   -*) COMPREPLY=($(compgen -W "$(todo --handle-completion-options)" -- "$cur")) && return 0 ;;
   esac
@@ -14,7 +14,12 @@ _todo() {
     COMPREPLY=($(compgen -W 'list add show edit remove rm done count path' -- "$cur")) && return 0
   fi
   # shellcheck disable=SC2207
-  COMPREPLY=($(compgen -f -- "$todo_dir/$cur")) # complete the todos
-  COMPREPLY=("${COMPREPLY[@]#"$todo_dir/"}")    # remove leading $todo_dir/ prefix
+  local arr=($(cd "$todo_dir" && compgen -f -- "$cur")) # complete the todos
+  local file && for file in "${arr[@]}"; do
+    case "$file" in
+    .*) continue ;; esac # Skip dotfiles
+    ! [ -d "$todo_dir/$file" ] || file+=/
+    COMPREPLY+=("$file")
+  done
 }
 complete -o bashdefault -F _todo todo
