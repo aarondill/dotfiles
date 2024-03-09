@@ -5,6 +5,7 @@ if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
 # shellcheck source=./script_utils.sh
 . "$utils"
 USE_COLOR=1
+shopt -u dotglob # It's paramount that dotglob is *off*. Dot files are not considered todos and shouldn't be shown.
 
 todo_dir="$XDG_DATA_HOME/todo"
 function usage() {
@@ -20,6 +21,7 @@ Show <name>: Show the description of todo (opens a pager)
 Edit <name>: Edit todo in \$EDITOR
 Remove/rm <name>: Remove todo
 Done <name>: Synonoym for Remove
+Path [name]: Print the path of the todo (directory if no name specified)
 
 Options:
   -h, --help         Show this help message.
@@ -73,6 +75,10 @@ cd "$todo_dir" || abort "Couldn't move into the todo dir: $todo_dir"
 action=${1:-list} action=${action,,} # lowercase
 name="${2:-}"
 
+case "$name" in
+.*) abort "Name can't start with a dot (hidden files)!" 2 ;;
+esac
+
 case "$action" in
 list) show_directory "$todo_dir/$name" ;;
 count)
@@ -103,6 +109,12 @@ rm | remove | done)
   [ -n "$name" ] || abort "usage: $THIS $action <name>" 2
   [ -e "$name" ] || abort "Todo doesn't exitst: $name"
   rm -ri -- "$name"
+  ;;
+path)
+  [ -z "$name" ] || [ -e "$name" ] || abort "Todo doesn't exitst: $name"
+  ret=${todo_dir}/${name}
+  ret=${ret//\/\//\/} ret="${ret%/}" # remove double slashes and trailing slash
+  log "$ret"
   ;;
 *) abort "Unrecognized action: $action" 2 ;;
 esac
