@@ -18,7 +18,7 @@ List [name]: List the current todos (default)
 Count [name]: Count the number of todos
 Add <name>: Add a new todo (opens \$EDITOR)
 Show <name>: Show the description of todo (opens a pager)
-Edit <name>: Edit todo in \$EDITOR
+Edit <name>: Edit todo in \$EDITOR (Creates todo if not exist)
 Remove/rm <name>: Remove todo
 Done <name>: Synonoym for Remove
 Path [name]: Print the path of the todo (directory if no name specified)
@@ -80,18 +80,20 @@ case "$name" in
 esac
 
 case "$action" in
-list) show_directory "$todo_dir/$name" ;;
-count)
+list | ls) show_directory "$todo_dir/$name" ;;
+count | wc)
   dir="$todo_dir/$name"
   [ -d "$dir" ] || abort "No directory: $dir"
   count "$dir"/*
   ;;
-add)
+add | edit)
   [ -n "$name" ] || abort "usage: $THIS $action <name>" 2
+  # Add and edit are the same, EXCEPT add can not double create a todo
+  if [ "$action" == add ] && [ -e "$name" ]; then abort "Todo already exists: $name"; fi
   mkdirname "$name" || abort "Could not create directory for todo file"
   edit "$name"
   ;;
-show)
+show | cat)
   [ -n "$name" ] || abort "usage: $THIS $action <name>" 2
   [ -e "$name" ] || abort "Todo doesn't exist: $name"
   if [ -d "$name" ]; then
@@ -100,18 +102,13 @@ show)
     page "$name"
   fi
   ;;
-edit)
-  [ -n "$name" ] || abort "usage: $THIS $action <name>" 2
-  [ -e "$name" ] || abort "Todo doesn't exitst: $name"
-  edit "$name"
-  ;;
 rm | remove | done)
   [ -n "$name" ] || abort "usage: $THIS $action <name>" 2
-  [ -e "$name" ] || abort "Todo doesn't exitst: $name"
+  [ -e "$name" ] || abort "Todo doesn't exist: $name"
   rm -ri -- "$name"
   ;;
-path)
-  [ -z "$name" ] || [ -e "$name" ] || abort "Todo doesn't exitst: $name"
+path | dir)
+  [ -z "$name" ] || [ -e "$name" ] || abort "Todo doesn't exist: $name"
   ret=${todo_dir}/${name}
   ret=${ret//\/\//\/} ret="${ret%/}" # remove double slashes and trailing slash
   log "$ret"
