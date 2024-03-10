@@ -266,6 +266,8 @@ function print_cmd() {
   output+=" ${*@Q}"                  # add quoted command line to output
   printf_c "$GREEN_COLOR" '%s\n' "$output" || true
 }
+# calls log only if USE_VERBOSE is non-zero
+function vlog() { [ "${USE_VERBOSE:-0}" -eq 0 ] || log "$@"; }
 # prints the command and runs it
 # verbose echo do something -> echo do something\ndo something
 function verbose() {

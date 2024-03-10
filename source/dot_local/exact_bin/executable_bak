@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+# ~/.local/bin/bak
+# Moves $1 to $1.bak or back if it already ends in .bak
+set -euC -o pipefail && shopt -s nullglob globstar
+utils=script_utils.sh dir=$(dirname -- "${BASH_SOURCE[0]}") || true
+if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
+# shellcheck source=./script_utils.sh
+. "$utils"
+
+function usage() {
+  cat <<EOF || true
+Usage: $THIS [opts] -- FILE
+Moves FILE to FILE.bak or removes .bak extension if already present
+
+Options:
+    --help, -h    Show this message
+    --quiet, -q   Don't output the commands run
+    --force, -f   Don't swap if FILE.bak exists. \`$THIS -f file\` will ALWAYS mv file to file.bak
+
+EOF
+}
+
+LONGOPTS=help SHORTOPTS=h
+ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
+check_bak=1
+while true; do
+  case "$1" in
+  -h | --help) usage && exit 0 ;;
+  -q | --quiet) USE_VERBOSE=0 ;;
+  -f | --force) check_bak=0 ;;
+  --) shift && break ;;
+  *) abort "This is a bug" 3 ;;
+  esac
+done
+
+[ "$#" -ge 1 ] || abort "FILE is required" 2
+src="${1%/}" # remove trailing slash
+[ -n "$src" ] || abort "Empty Source filename!" 1
+
+# src doesn't exist, check src.bak. If neither exists, abort
+if ! [ -e "$src" ]; then
+  if [ "$check_bak" -ne 1 ] || ! [ -e "$src.bak" ]; then
+    abort "No such file or directory: $src" 1
+  fi
+  src="$src.bak"
+fi
+
+case "$src" in
+*.bak) dest="${src%.bak}" ;; # move back to original location
+*) dest="$src.bak" ;;
+esac
+
+if [ -e "$dest" ]; then
+  confirm "Remove '$dest'?" || exit 0
+  verbose rm -rf -- "$dest" || exit
+fi
+verbose mv -i -- "$src" "$dest"
