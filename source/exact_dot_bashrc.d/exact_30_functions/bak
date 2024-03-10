@@ -9,11 +9,19 @@ function bak() {
     printf '%s\n' "usage: ${FUNCNAME[0]} <FILE>" >&2 || true
     return 2
   }
-  local dest src="$1"
+  local dest src="${1%/}" # remove trailing slash
+  [ -n "$src" ] || {
+    printf '%s\n' 'Empty source filename!' >&2 || true
+    return 1
+  }
   case "$src" in
   *.bak) dest="${src%.bak}" ;; # move back to original location
   *) dest="$src.bak" ;;
   esac
+  [ -e "$src" ] || {
+    printf '%s\n' "No such file or directory: $src" >&2 || true
+    return 1
+  }
   ! [ -e "$dest" ] || rm -ri -- "$dest" || {
     printf '%s\n' "Aborting remove $dest!" >&2 || true
     return 1
