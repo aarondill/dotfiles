@@ -26,8 +26,8 @@ check_bak=1
 while true; do
   case "$1" in
   -h | --help) usage && exit 0 ;;
-  -q | --quiet) USE_VERBOSE=0 ;;
-  -f | --force) check_bak=0 ;;
+  -q | --quiet) USE_VERBOSE=0 && shift ;;
+  -f | --force) check_bak=0 && shift ;;
   --) shift && break ;;
   *) abort "This is a bug" 3 ;;
   esac
