@@ -19,34 +19,45 @@ Options:
   -h, --help       show this message
   -t, --test=url   use url/ip instead of $test_url to test internet connection
   -q, --quiet      don't print a message at end of test
+  -w, --wait       blocks until the system has an internet connection, then exits 0
 EOF
   return 0
 }
-LONGOPTS=help,test:,quiet SHORTOPTS=h,t:,q
+LONGOPTS=help,test:,wait,quiet SHORTOPTS=h,t:,q,w
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
-quiet=0
+quiet=0 wait=0
 while true; do
   case "$1" in
-  --help | -h) usage && exit 0 ;;
+  -h | --help) usage && exit 0 ;;
   -q | --quiet) quiet=1 && shift ;;
   -t | --test) test_url=$2 && shift 2 ;;
+  -w | --wait) wait=1 && shift ;;
   --) shift && break ;;
   *) abort "This is a bug" 3 ;;
   esac
 done
 
-exit=0
-if [ $quiet = true ]; then
-  ping -q -c 3 "$test_url" &>/dev/null || exit="$?"
-else
-  ping -c 3 "$test_url" || exit="$?"
-fi
+function check_internet() {
+  if [ "$quiet" = true ]; then
+    ping -q -c 3 "$test_url" &>/dev/null
+  else
+    ping -c 3 "$test_url"
+  fi
+}
 
 function qlog() { [ "$quiet" -eq 0 ] && log "$@" || return 0; }
 function qerr() { [ "$quiet" -eq 0 ] && err "$@" || return 0; }
 
+if [ "$wait" -eq 1 ]; then
+  until check_internet &>/dev/null; do sleep 1; done
+  exit 0
+fi
+
 qlog ''
-[ "$exit" -ne 0 ] || { qlog "You have internet!" && exit 0; }
+if check_internet; then
+  qlog "You have internet!"
+  exit 0
+fi
 
 if [ -n "${SOMMELIER_VERSION:-}" ]; then
   qerr "If running in chromeos container, try this to fix a container's connection to it's parent's internet:"
@@ -56,4 +67,4 @@ if [ -n "${SOMMELIER_VERSION:-}" ]; then
 fi
 
 qerr "Your internet connection is not functional"
-exit "$exit"
+exit 1
