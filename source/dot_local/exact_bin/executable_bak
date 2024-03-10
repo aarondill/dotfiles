@@ -20,7 +20,7 @@ Options:
 EOF
 }
 
-LONGOPTS=help SHORTOPTS=h
+LONGOPTS=help,force,quiet SHORTOPTS=h,f,q
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 check_bak=1
 while true; do
