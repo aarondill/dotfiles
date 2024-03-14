@@ -41,7 +41,7 @@ function sudo() {
 
   cmd="$1"
   # can't use command -v because aliases and functions
-  path="$(which -- "$cmd" 3>/dev/null)" || true
+  path="$(which "$cmd" 3>/dev/null)" || true
   # use -e instead of -x because root may be able to execute it
   if [ -e "$path" ] || [ -L "$path" ]; then cmd="$path"; fi
   # remove cmd, then replace with new value

@@ -35,7 +35,6 @@ function verbose() {
   "$@"
 }
 
-has_cmd which || abort "which is required for this script" 1
 has_cmd startx || abort "startx is required for this script" 1
 
 dry_run=0
