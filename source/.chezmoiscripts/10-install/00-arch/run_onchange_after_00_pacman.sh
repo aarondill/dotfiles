@@ -11,46 +11,29 @@ if ! has_pacman; then
   abort "pacman is not installed, skipping pacman installation" 0
 fi
 PACKAGES=(
-  age cronie cmake curl dconf-editor duf github-cli git
-  grep inotify-tools less make neofetch neovim net-tools
-  openvpn p7zip rsync shfmt tlp trash-cli tree util-linux
-  zip unzip zoxide speedtest-cli ripgrep hexedit fuse2
-  luajit python-pip base-devel wezterm bat bash-completion
-  git-delta vivaldi xdg-user-dirs inetutils
-  # fonts
-  ttf-nerd-fonts-symbols-mono noto-fonts-cjk noto-fonts-extra ttf-liberation
-  # icon fonts
-  noto-fonts-emoji ttf-font-awesome
-  # Storage tools
-  dosfstools exfatprogs e2fsprogs
-
-  pkgfile github-cli wget rlwrap
-  pactl pulseaudio lsof
-  posix reflector jq
-  openssh duplicity os-prober
-  imagemagick networkmanager-openvpn
-  plocate gdb lua openssh duplicity os-prober imagemagick
-  sudo pkgfile posix reflector rlwrap pacutils
+  age base-devel bash-completion bat cmake cronie curl dconf-editor dosfstools
+  duf duplicity e2fsprogs exfatprogs fuse2 gdb git git-delta github-cli grep
+  hexedit imagemagick inetutils inotify-tools jq less lsof lua luajit make
+  neofetch neovim net-tools networkmanager-openvpn noto-fonts-cjk
+  noto-fonts-emoji noto-fonts-extra openssh openvpn os-prober p7zip pactl
+  pacutils pkgfile plocate posix pulseaudio python-pip reflector ripgrep rlwrap
+  rsync shfmt speedtest-cli sudo tlp trash-cli tree ttf-font-awesome
+  ttf-liberation ttf-nerd-fonts-symbols-mono unzip util-linux vivaldi wezterm
+  wget xdg-user-dirs zip zoxide
 )
 VIRTUAL_MACHINE_PACKAGES=(
-  # VM management. Technically, only virt-manager is graphical, but they are used together
-  virt-manager qemu-desktop
-  # virsh
-  libvirt
-  # virt-clone, etc...
-  virt-install
+  virt-manager qemu-desktop # VM management. Technically, only virt-manager is graphical, but they are used together
+  libvirt                   # virsh
+  virt-install              # virt-clone, etc...
 )
 GRAPHICAL_PACKAGES=(
-  dconf-editor gparted gucharmap spotify-launcher
-  wmctrl xdotool xclip xdg-utils xorg-xinit
-  arandr thunderbird firefox firejail gimp hplip libreoffice-fresh
-  okular onboard gnome-calculator gnome-calendar eog evince nautilus seahorse
-  totem file-roller zeal pavucontrol qtqr rhythmbox screenkey simple-scan
-  gnome-font-viewer sqlitebrowser transmission-gtk hplip
-  xdg-desktop-portal-gnome xdg-desktop-portal-gtk arandr thunderbird
-  eog okular gnome-calculator gnome-calendar totem evince nautilus seahorse file-roller
-  pavucontrol qtqr rhythmbox screenkey simple-scan simplescreenrecorder
-  xdg-desktop-portal-gtk gnome-system-monitor gnome-power-manager
+  arandr dconf-editor eog evince file-roller firefox firejail gimp
+  gnome-calculator gnome-calendar gnome-font-viewer gnome-power-manager
+  gnome-system-monitor gparted gucharmap hplip libreoffice-fresh nautilus
+  okular onboard pavucontrol qtqr rhythmbox screenkey seahorse simple-scan
+  simplescreenrecorder spotify-launcher sqlitebrowser thunderbird totem
+  transmission-gtk wmctrl xclip xdg-desktop-portal-gnome xdg-desktop-portal-gtk
+  xdg-utils xdotool xorg-xinit zeal
 )
 GNOME_PACKAGES=(gnome-shell-extension-manager gnome-tweaks gnome-software gnome-software-plugin-flatpak)
 

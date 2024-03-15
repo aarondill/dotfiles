@@ -13,19 +13,11 @@ if ! has_apt; then
 fi
 
 PACKAGES=(
-  age anacron cmake command-not-found curl
-  duf gh git grep inotify-tools less make neofetch
-  neovim net-tools openvpn p7zip-full rsync tlp
-  trash-cli tree util-linux zip zoxide speedtest-cli
-  ripgrep libfuse2 hexedit luajit python3-pip
-  consolation # Literally the best thing to ever be invented
-  # fonts
-  fonts-noto-cjk fonts-noto-mono
-  # icon fonts
-  fonts-noto-color-emoji fonts-font-awesome
-  # Storage tools
-  dosfstools exfatprogs e2fsprogs
-
+  age anacron cmake command-not-found consolation curl dosfstools duf e2fsprogs
+  exfatprogs fonts-font-awesome fonts-noto-cjk fonts-noto-color-emoji
+  fonts-noto-mono gh git grep hexedit inotify-tools less libfuse2 luajit make
+  neofetch neovim net-tools openvpn p7zip-full python3-pip ripgrep rsync
+  speedtest-cli tlp trash-cli tree util-linux zip zoxide
 )
 if [ "$OS" = "Debian" ]; then
   # Different name in debian, also only available in testing

@@ -37,7 +37,6 @@ if ! has_cmd yay; then
 fi
 
 packages=(
-  zeal
   # google-chrome      # Replaced with vivaldi
   consolation          # cursor in tty
   informant            # arch news through pacman
@@ -45,6 +44,7 @@ packages=(
   protonvpn            # protonvpn cli and gui
   ripdrag              # Drag and drop from terminal
   simplescreenrecorder # screen recording
+  zeal
 )
 for p in "${packages[@]}"; do
   ! pacman_is_installed "$p" || continue
