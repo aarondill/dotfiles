@@ -1,0 +1,13 @@
+[Unit]
+Description=Google chrome profile memory cache
+
+[Install]
+WantedBy=default.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=%h/.local/bin/chrome-sync.sh
+ExecStop=%h/.local/bin/chrome-sync.sh
+# 15 mins. Just don't kill it. wait for it. (unless something extreme happens)
+TimeoutSec=900
