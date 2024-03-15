@@ -2,7 +2,7 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-Exec=/usr/local/bin/mcpe-launcher.AppImage
+Exec=/usr/local/bin/mcpe-launcher
 Name=mcpe-launcher
 Comment=Start Minecraft Bedrock (andriod) (AppImage)
 Categories=Games
