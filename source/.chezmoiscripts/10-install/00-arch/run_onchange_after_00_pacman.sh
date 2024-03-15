@@ -16,7 +16,7 @@ PACKAGES=(
   openvpn p7zip rsync shfmt tlp trash-cli tree util-linux
   zip unzip zoxide speedtest-cli ripgrep hexedit fuse2
   luajit python-pip base-devel wezterm bat bash-completion
-  git-delta vivaldi xdg-user-dirs
+  git-delta vivaldi xdg-user-dirs inetutils
   # fonts
   ttf-nerd-fonts-symbols-mono noto-fonts-cjk noto-fonts-extra ttf-liberation
   # icon fonts
@@ -24,12 +24,13 @@ PACKAGES=(
   # Storage tools
   dosfstools exfatprogs e2fsprogs
 
-  pkgfile gh wget rlwrap
-  pactl pulseaudio
-  posix reflector
+  pkgfile github-cli wget rlwrap
+  pactl pulseaudio lsof
+  posix reflector jq
   openssh duplicity os-prober
   imagemagick networkmanager-openvpn
-  plocate gdb lua
+  plocate gdb lua openssh duplicity os-prober imagemagick
+  sudo pkgfile posix reflector rlwrap pacutils
 )
 VIRTUAL_MACHINE_PACKAGES=(
   # VM management. Technically, only virt-manager is graphical, but they are used together
@@ -45,8 +46,11 @@ GRAPHICAL_PACKAGES=(
   arandr thunderbird firefox firejail gimp hplip libreoffice-fresh
   okular onboard gnome-calculator gnome-calendar eog evince nautilus seahorse
   totem file-roller zeal pavucontrol qtqr rhythmbox screenkey simple-scan
-  gnome-font-viewer sqlitebrowser transmission-gtk
-  xdg-desktop-portal-gnome xdg-desktop-portal-gtk
+  gnome-font-viewer sqlitebrowser transmission-gtk hplip
+  xdg-desktop-portal-gnome xdg-desktop-portal-gtk arandr thunderbird
+  eog okular gnome-calculator gnome-calendar totem evince nautilus seahorse file-roller
+  pavucontrol qtqr rhythmbox screenkey simple-scan simplescreenrecorder
+  xdg-desktop-portal-gtk gnome-system-monitor gnome-power-manager
 )
 GNOME_PACKAGES=(gnome-shell-extension-manager gnome-tweaks gnome-software gnome-software-plugin-flatpak)
 
