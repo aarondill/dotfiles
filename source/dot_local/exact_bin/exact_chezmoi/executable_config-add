@@ -26,12 +26,19 @@ done
 
 [ "${#files[@]}" -gt 0 ] || abort "No files found" 1
 
-# Add all files to chezmoi repo
-chezmoi add --exact -- "${files[@]}"
+chezmoi add --exact -- "${files[@]}" # Add all files to chezmoi repo
 
+short_files=("${files#"$target/"}") # make relative to target
 # Add files to the _update-config file
-for file in "${files[@]}"; do
-  short_file=${file#"$target/"} # make relative to target
-  ! grep -Fxq "$short_file" "$CONFIG_FILES" || continue
-  printf '%s\n' "$short_file" >>"$CONFIG_FILES"
+for file in "${short_files[@]}"; do
+  ! grep -Fxq "$file" "$CONFIG_FILE" || continue
+  printf '%s\n' "$file" >>"$CONFIG_FILE"
 done
+
+case "$(resolve_path "$CONFIG_FILE")" in
+"$CHEZMOI_DIR"/*)
+  log 'Committing config changes'
+  commit_msg="Update autoupdate file: $(join ", " "${short_files[@]}")"
+  update_file "$commit_msg" "$CONFIG_FILE"
+  ;;
+esac

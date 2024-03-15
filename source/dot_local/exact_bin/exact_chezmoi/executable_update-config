@@ -20,7 +20,7 @@ fi
 # Finds files line-by-line
 files=() dirs=()
 add=()
-[ -r "$CONFIG_FILES" ] || abort "Could not find config file list: ${CONFIG_FILES}"
+[ -r "$CONFIG_FILE" ] || abort "Could not find config file list: ${CONFIG_FILE}"
 while IFS= read -r file || [ -n "$file" ]; do
   file=$(trim "$file")                 # Strip leading and trailing whitespace
   [ -n "$file" ] || continue           # ignore empty lines
@@ -35,7 +35,7 @@ while IFS= read -r file || [ -n "$file" ]; do
   directory) dirs+=("$file") ;;
   *) files+=("$file") ;;
   esac
-done <"$CONFIG_FILES"
+done <"$CONFIG_FILE"
 
 if [ "${#files[@]}" -gt 0 ] || [ "${#dirs[@]}" -gt 0 ]; then
 
@@ -79,9 +79,7 @@ commit_msg="Update $(basename -- "$DCONF_BACKUP")"
 if ! cmp -s "$DCONF_BACKUP" <(chezmoi decrypt -- "$dconf_path"); then
   log 'Updating dconf backup'
   chezmoi encrypt "$DCONF_BACKUP" -o "$dconf_path"
-  chezmoi git -- add "$dconf_path"
-  chezmoi git -- commit --quiet -m "$commit_msg"
-  chezmoi git -- push --quiet
+  update_file "$commit_msg" "$dconf_path"
 fi
 
 log "Final chezmoi status: "

@@ -42,7 +42,7 @@
 [rebase]
   autosquash = true
 [rerere]
-  enabled = 1
+  enabled = true
 
 [format]
   pretty = format:"%C(yellow)commit %H%C(auto)%d%n%C(reset)%C(brightblue)Author: %an <%ae>%C(reset)%n%C(green)Date:   %ad%C(reset)%n%n%C(brightyellow)%w(0,4,4)%s%n%n%C(reset)%b%n" 
@@ -128,3 +128,7 @@
 	get-remote = alias-wrapper get-remote
 [branch]
 	sort = -committerdate
+[maintenance]
+	repo = /home/aaron/code/js/fslite
+	repo = /home/aaron/.config/nvim.bak
+	repo = /home/aaron/.config/awesome

@@ -74,3 +74,4 @@ code/repos/.nvim/
 .config/autorandr/
 .config/redshift/
 .config/vimium-options.json
+.config/user-dirs.dirs
