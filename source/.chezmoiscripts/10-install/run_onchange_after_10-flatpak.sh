@@ -16,8 +16,7 @@ function install_flatpaks() {
   flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
   flatpak_apps=(
     com.github.johnfactotum.Foliate com.github.tchx84.Flatseal
-    com.valvesoftware.Steam io.mrarm.mcpelauncher
-    org.libretro.RetroArch io.github.alainm23.planify
+    com.valvesoftware.Steam org.libretro.RetroArch io.github.alainm23.planify
   )
   for flatpak_app in "${flatpak_apps[@]}"; do
     if ! flatpak_is_installed "$flatpak_app"; then
