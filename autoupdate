@@ -75,3 +75,4 @@ code/repos/.nvim/
 .config/redshift/
 .config/vimium-options.json
 .config/user-dirs.dirs
+.config/systemd/user/google-chrome-profile.service
