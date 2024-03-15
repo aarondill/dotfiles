@@ -28,7 +28,6 @@
 .config/screenkey.json
 .config/shellcheckrc
 .config/starship.toml
-.config/systemd/
 .config/tabtab/
 .config/tealdeer/
 .config/udiskie/
