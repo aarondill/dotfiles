@@ -1,0 +1,8 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Version=1.0
+Type=Application
+Exec=/usr/local/bin/mcpe-launcher.AppImage
+Name=mcpe-launcher
+Comment=Start Minecraft Bedrock (andriod) (AppImage)
+Categories=Games
