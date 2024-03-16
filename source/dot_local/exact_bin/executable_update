@@ -206,8 +206,8 @@ for m in "${to_update[@]}"; do
   chezmoi)
     has_cmd chezmoi || continue
     log "Updating chezmoi"
-    chezmoi=$(cmdpath chezmoi)
-    verbose "$chezmoi" upgrade --executable "$chezmoi"
+    verbose sudo_cmd "$(cmdpath chezmoi)" upgrade --method replace-executable
+    # chezmoi=$(cmdpath chezmoi) && verbose "$chezmoi" upgrade --executable "$chezmoi"
     ;;
   *) abort "This is a bug! Found unknown method: $m" 3 ;;
   esac
