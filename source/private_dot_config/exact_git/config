@@ -41,6 +41,7 @@
   ff = no
 [rebase]
   autosquash = true
+	updateRefs = true
 [rerere]
   enabled = true
 
