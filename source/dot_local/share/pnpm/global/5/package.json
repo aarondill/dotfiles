@@ -16,10 +16,10 @@
     "release-it": "^17.1.1",
     "sort-package-json": "^2.8.0",
     "tsx": "^4.7.1",
-    "typescript": "^5.4.2",
+    "typescript": "^5.4.3",
     "uglify-js": "^3.17.4",
     "vercel": "^33.6.1",
-    "vite": "^5.1.6",
+    "vite": "^5.2.3",
     "wipe-modules": "^1.2.0"
   },
   "//": "force core-js to be on latest. It shouldn't cause any issues.",
