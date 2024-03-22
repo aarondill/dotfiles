@@ -6,7 +6,7 @@ clone.args = ['--filter=tree:0']
 
 [".config/nvim"]
 type = "git-repo"
-url = "https://github.com/aarondill/LazyVim.git"
+url = "https://github.com/aarondill/nvim.git"
 refreshPeriod = "12h"
 clone.args = ['--filter=tree:0']
 
