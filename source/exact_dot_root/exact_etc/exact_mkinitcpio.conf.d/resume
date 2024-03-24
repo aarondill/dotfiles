@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# When an initramfs with the systemd hook is used, a resume mechanism is
+# already provided, and no further hooks need to be added.
+for h in "${HOOKS[@]}"; do
+  [ "$h" != systemd ] || return 0
+done
+HOOKS+=(resume)
