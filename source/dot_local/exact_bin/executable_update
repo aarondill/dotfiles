@@ -92,6 +92,15 @@ for arg; do # Doesn't do anything if $# is zero
     ;;
   esac
 done
+function repeat() {
+  local err=0
+  while true; do
+    "$@" || err=$?
+    [ "$err" != 0 ] || return 0 # success
+    err "Command failed: ${*@Q}"
+    confirm "Try again?" || return "$err"
+  done
+}
 
 to_update=()
 for m in "${!methods[@]}"; do

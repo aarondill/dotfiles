@@ -110,6 +110,7 @@
 
   # Random Utilities
   root = rev-parse --show-toplevel
+  bisect-undo = alias-wrapper bisect-undo
   # Get to a detached HEAD state on purpose! Usage: `git detach [REF]`
   detach = switch -d
   # Print short sha1; usage: `git sha1 [REF]`

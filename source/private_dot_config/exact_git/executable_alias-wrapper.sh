@@ -77,6 +77,11 @@ sync-tags) # syncs tags with remote by removing local tags. Note: assumes remote
   origin=$(get_remote) || abort "No upstream found" 1
   git fetch --prune "$origin" "+refs/tags/*:refs/tags/*"
   ;;
+bisect-undo)
+  git bisect log | head -n -2 >/tmp/fixed_bisect.log
+  git bisect replay /tmp/fixed_bisect.log
+  rm -f -- /tmp/fixed_bisect.log
+  ;;
 '') abort "usage: ${BASH_SOURCE[0]##*/} <command> [args]..." 2 ;;
 *) abort "Unknown command: $command" 2 ;;
 esac
