@@ -14,15 +14,17 @@ cd "$target" # add from target so files are relative to target
 
 encrypted_files=() add_files=() add_dirs=() add_exact_dirs=()
 for file in "$ROOT_FOLDER"/**; do
-  [ -f "$dir" ] || continue
-  rootpath="/${file#"$ROOT_FOLDER"}" # The path, without the root directory, under /
+  [ -f "$file" ] || continue
+  rootpath="${file#"$ROOT_FOLDER"}" # The path, without the root directory, under / (starts with / already)
   # Hasn't yet been copied to root (or deleted, but that's up to the user), so ignore it.
   [ -f "$rootpath" ] || continue
   # Change permissions to match the root
   perms=$(sudo_cmd chmod --changes --reference="$rootpath" "$file")
-  { [ -n "$perms" ] &&                                        # permissions are same
-    ! sudo_cmd cmp --quiet "$rootpath" "$file"; } || continue # the contents are same
+  # permissions are same & the contents are same
+  if [ -z "$perms" ] && sudo_cmd cmp --quiet "$rootpath" "$file"; then continue; fi
+  echo "Comparing: $file -> $rootpath"
 
+  log "Updating: $file"
   # Doesn't need to be recursive bc only includes files, not dirs.
   sudo_cmd cp -f -- "$rootpath" "$file"
   sudo_cmd chown -h -- "$USER" "$file"
