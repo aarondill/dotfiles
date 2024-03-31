@@ -257,23 +257,54 @@ function log() { printf_c "$TEAL_COLOR" '%s\n' "$@" || true; }
 function err() { printf_c "$RED_COLOR" "%s\n" "$@" >&2 || true; }
 function warn() { printf_c "$YELLOW_COLOR" "%s\n" "$@" >&2 || true; }
 function success() { printf_c "$GREEN_COLOR$BOLD_COLOR" "%s\n" "Success!" || true; }
+# Escapes and outputs the command in a user-friendly maner
+# If outputted to a terminal, colorizes and prefixes with '>' or '$'
+# Else, outputs quoted, non-colorized command.
+# There is a special case for sudo_cmd to output the final value of ${sudo[@]}
+# note: Don't use this for anything other than output! It may not be stable!
 function print_cmd() {
+  # Hard-coded exception for sudo_cmd - if it's a shell function
+  if [ "${1:-}" = "sudo_cmd" ] && declare -pF sudo_cmd &>/dev/null; then
+    local sudo=() && set_sudo_cmd
+    set -- "${sudo[@]}" "${@:2}"
+  fi
   # ${var@Q} will quote it.
   # Q The expansion is a string that is the value of parameter quoted in a
   # format that can be reused as input.
-  local output='>'                   # use > for prompt
-  [ "$(id -u)" -ne 0 ] || output='$' # if root, use $ for prompt
-  output+=" ${*@Q}"                  # add quoted command line to output
-  printf_c "$GREEN_COLOR" '%s\n' "$output" || true
+  local output="${*@Q}"
+  if ! [ -t 1 ]; then
+    # Just output command
+    printf '%s\n' "$output" || true
+    return 0
+  fi
+  local prompt=">"                   # use > for prompt
+  [ "$(id -u)" -ne 0 ] || prompt='$' # if root, use $ for prompt
+  # output prompt, space, then command
+  printf_c "$GREEN_COLOR" '%s\n' "$prompt $output" || true
 }
 # calls log only if USE_VERBOSE is non-zero
 function vlog() { [ "${USE_VERBOSE:-0}" -eq 0 ] || log "$@"; }
+
 # prints the command and runs it
 # verbose echo do something -> echo do something\ndo something
+# note: uses `print_cmd` to output the command
 function verbose() {
   # if USE_VERBOSE != 0, then output current command to stdout
   [ "${USE_VERBOSE:-0}" -eq 0 ] || print_cmd "$@"
   "$@"
+}
+
+# Usage: repeat do_cmd -> `> do_cmd`
+# Verbosely(!) shows the command and runs it. (using `verbose $@`
+# If it fails, asks the user if they want to run the command again.
+function repeat() {
+  local err=0
+  while true; do
+    verbose "$@" || err=$?
+    [ "$err" != 0 ] || return 0 # success
+    err "Command failed: $(print_cmd "$@")"
+    confirm "Try again?" || return "$err"
+  done
 }
 
 # trims leading and trailing whitespace
@@ -339,6 +370,7 @@ function first_cmd() {
   done
   return 1 # None found
 }
+
 # Use to set the $sudo array to an executable command
 # Usage: set_sudo_cmd && exec "${sudo[@]}" other-command
 function set_sudo_cmd() {

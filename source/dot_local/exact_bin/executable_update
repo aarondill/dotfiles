@@ -92,15 +92,6 @@ for arg; do # Doesn't do anything if $# is zero
     ;;
   esac
 done
-function repeat() {
-  local err=0
-  while true; do
-    "$@" || err=$?
-    [ "$err" != 0 ] || return 0 # success
-    err "Command failed: ${*@Q}"
-    confirm "Try again?" || return "$err"
-  done
-}
 
 to_update=()
 for m in "${!methods[@]}"; do
@@ -109,57 +100,63 @@ for m in "${!methods[@]}"; do
 done
 if [ "${#to_update}" -eq 0 ]; then log "Nothing to do" && exit 0; fi
 
-for m in "${to_update[@]}"; do
+# Note: `set -e` doesn't take effect here because the conditional at the bottom :(
+# Return 0 to continue, 1 to ask the user if they want to continue
+# Exit the script on truely fatal errors (avoid)
+function update_method() {
+  local m="$1"
   case "$m" in
   native)
-    native_cmd=$(first_cmd nala apt yay pacman dnf) || { err "Could not find a command to update native packages." && continue; }
+    native_cmd=$(first_cmd nala apt yay pacman dnf) || { err "Could not find a command to update native packages." && return 0; }
     log "Using $native_cmd to update native packages"
     case "$native_cmd" in
-    nala) verbose sudo_cmd nala upgrade ;;
-    apt) verbose sudo_cmd apt update && verbose sudo_cmd apt upgrade ;;
-    yay) verbose yay -Syu ;;
-    pacman) verbose sudo_cmd pacman -Syu ;;
-    dnf) verbose sudo_cmd dnf upgrade ;;
-    esac
+    nala) repeat sudo_cmd nala upgrade ;;
+    apt) repeat sudo_cmd apt update && repeat sudo_cmd apt upgrade ;;
+    yay) repeat yay -Syu ;;
+    pacman) repeat sudo_cmd pacman -Syu ;;
+    dnf) repeat sudo_cmd dnf upgrade ;;
+    esac || return
     ;;
   snap)
-    has_cmd snap || continue
+    has_cmd snap || return 0
     log "Updating snap packages!"
-    verbose sudo_cmd "$(cmdpath snap)" refresh
+    repeat sudo_cmd "$(cmdpath snap)" refresh || return
     success
 
-    has_cmd snap-cleanup || continue
+    has_cmd snap-cleanup || return 0
     log "Cleaning up snap packages"
-    verbose sudo_cmd "$(cmdpath snap-cleanup)" -y
+    repeat sudo_cmd "$(cmdpath snap-cleanup)" -y || return
     success
     ;;
   flatpak)
-    has_cmd flatpak || continue
+    has_cmd flatpak || return 0
     log "Updating flatpak packages!"
-    verbose "$(cmdpath flatpak)" update # NOT as root!
+    # NOT as root!
+    repeat "$(cmdpath flatpak)" update || return
     success
     ;;
   npm)
     if has_cmd n; then # Note: n is optional
       log "Updating npm!"
-      verbose sudo_cmd "$(cmdpath n)" -d lts             # download
-      verbose sudo_cmd "$(cmdpath n)" -d latest          # download
-      node_latest=$(n ls-remote latest)                  # 1.1.1
+      repeat sudo_cmd "$(cmdpath n)" -d lts || return    # download
+      repeat sudo_cmd "$(cmdpath n)" -d latest || return # download
+      node_latest=$(n ls-remote latest) || return        # 1.1.1
       node_current=$(node --version 2>/dev/null) || true # v1.1.1
       if [ "v$node_latest" != "$node_current" ]; then    # only if not already active
-        verbose sudo_cmd "$(cmdpath n)" latest           # activate latest
+        repeat sudo_cmd "$(cmdpath n)" latest || return  # activate latest
       fi
       success
     fi
 
-    has_cmd npm || continue
+    has_cmd npm || return 0
     log "Updating npm packages!"
     if has_cmd ncu; then
-      verbose "$(cmdpath ncu)" -p npm -g # get them to latest
+      repeat "$(cmdpath ncu)" -p npm -g || return # get them to latest
     else
       log "install 'ncu' to improve this experience"
     fi
-    verbose "$(cmdpath npm)" upgrade -g # NOT as root!
+    # NOT as root!
+    repeat "$(cmdpath npm)" upgrade -g || return
     success
     ;;
   pnpm)
@@ -167,57 +164,62 @@ for m in "${to_update[@]}"; do
     #This is fixed by updating to latest before updating pnpm - see above.
     if has_cmd corepack; then
       log "Updating pnpm!"
-      verbose "$(cmdpath corepack)" prepare pnpm@latest --activate
+      repeat "$(cmdpath corepack)" prepare pnpm@latest --activate
       success
     fi
 
-    has_cmd pnpm || continue
+    has_cmd pnpm || return 0
     log "Updating pnpm packages!"
-    verbose "$(cmdpath pnpm)" upgrade -g --latest # NOT as root!
+    repeat "$(cmdpath pnpm)" upgrade -g --latest # NOT as root!
     pnpm_root=0
     for f in /root/.local/share/pnpm/global/*/package.json; do
       if [ -f "$f" ]; then pnpm_root=1 && break; fi
     done
-    [ "$pnpm_root" -eq 0 ] || verbose sudo_cmd "$(cmdpath pnpm)" update -g --latest
+    [ "$pnpm_root" -eq 0 ] || repeat sudo_cmd "$(cmdpath pnpm)" update -g --latest
     success
     ;;
 
   cargo)
     if has_cmd rustup; then
       log "Updating cargo and rustc!"
-      verbose "$(cmdpath rustup)" update
+      repeat "$(cmdpath rustup)" update
       success
     fi
 
-    has_cmd cargo cargo-install-update || continue
+    has_cmd cargo cargo-install-update || return 0
     cpumode_before=''
     if has_cmd cpumode; then
       cpumode_before=$(cpumode -c) || err "Failed to get the CPU mode."
       cpumode -q -- 'performance' 2>/dev/null || err "Failed to set the CPU mode to performance."
     fi
     log "Updating cargo installed packages!"
-    verbose "$(cmdpath cargo)" install-update --all --git || true # || true to ensure that the cpumode can be restored
+    repeat "$(cmdpath cargo)" install-update --all --git || true # || true to ensure that the cpumode can be restored
     if [ -n "$cpumode_before" ]; then cpumode -q -- "$cpumode_before" 2>/dev/null || err "Failed to restore the CPU mode."; fi
     success
     ;;
   vmware)
-    has_cmd vmplayer || continue
+    has_cmd vmplayer || return 0
     # log "updating vmware using vmware-installer!"
-    # verbose sudo_cmd "$(cmdpath vmware-installer)" --console --eulas-agreed
+    # repeat sudo_cmd "$(cmdpath vmware-installer)" --console --eulas-agreed || return
     # success
 
     # These need to be updated because they break randomly otherwise
     log "updating vmware modconfig!"
-    verbose sudo_cmd "$(cmdpath vmware-modconfig)" --console --install-all
+    repeat sudo_cmd "$(cmdpath vmware-modconfig)" --console --install-all || return
     success
     ;;
 
   chezmoi)
-    has_cmd chezmoi || continue
+    has_cmd chezmoi || return 0
     log "Updating chezmoi"
-    verbose sudo_cmd "$(cmdpath chezmoi)" upgrade --method replace-executable
-    # chezmoi=$(cmdpath chezmoi) && verbose "$chezmoi" upgrade --executable "$chezmoi"
+    repeat sudo_cmd "$(cmdpath chezmoi)" upgrade --method replace-executable || return
+    # chezmoi=$(cmdpath chezmoi) && repeat "$chezmoi" upgrade --executable "$chezmoi" || return
     ;;
   *) abort "This is a bug! Found unknown method: $m" 3 ;;
   esac
+}
+for m in "${to_update[@]}"; do
+  if update_method "$m"; then continue; fi
+  err "Updating $m failed!"
+  confirm "Continue?" || exit 1
 done
