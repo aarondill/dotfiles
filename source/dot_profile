@@ -55,6 +55,7 @@ export LESSKEY="$XDG_CONFIG_HOME/less/lesskey"
 # Allow mouse scolling in journalctl
 export SYSTEMD_LESS=RSMK
 export GNUPGHOME="$XDG_CONFIG_HOME"/gnupg
+export GDBHISTFILE="$XDG_DATA_HOME"/gdb/history
 export NODE_REPL_HISTORY="$XDG_STATE_HOME"/node/node_repl_history
 export NPM_CONFIG_USERCONFIG="$XDG_CONFIG_HOME"/npm/npmrc
 export INPUTRC="$XDG_CONFIG_HOME"/readline/inputrc
