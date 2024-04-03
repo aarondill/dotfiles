@@ -298,8 +298,9 @@ function verbose() {
 # Verbosely(!) shows the command and runs it. (using `verbose $@`
 # If it fails, asks the user if they want to run the command again.
 function repeat() {
-  local err=0
+  local err
   while true; do
+    err=0
     verbose "$@" || err=$?
     [ "$err" != 0 ] || return 0 # success
     err "Command failed: $(print_cmd "$@")"
