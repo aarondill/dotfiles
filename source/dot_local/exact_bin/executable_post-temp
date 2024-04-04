@@ -11,34 +11,40 @@ if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
 # shellcheck source=./script_utils.sh
 . "$utils"
 
-# default_temp_source=https://tmpfiles.org/api/v1/upload
-default_temp_source=https://file.io
+declare -A default_temp_sources=(
+  [default]=https://file.io
+  [file.io]=https://file.io
+  [tmpfiles]=https://tmpfiles.org/api/v1/upload
+  [tmpfiles.org]=https://tmpfiles.org/api/v1/upload
+)
+temp_source=${default_temp_sources[default]}
 
 function usage() {
   cat <<EOF || true
 Usage: $THIS [OPTION...] [--] FILE...
 Hosts a temporary file on the internet for 60 mins and outputs the url.
-Note: requires jq to output the url. If jq is not installed (or -t is specified)
-the full server response will be output.
+Note: requires jq to output the url. If jq is not installed (or an unknown
+-t is specified), then the full server response will be output.
 
 OPTIONS:
   -h, --help         display this help message
   -v, --verbose      display verbose messages
   -q, --quiet        be quieter
-  -t, --temp=url     use url to upload files (POST) (default: $default_temp_source)
+  -t, --temp=url     use url to upload files (POST) (default: $temp_source)
 EOF
 }
 LONGOPTS=help,verbose,quiet,temp: SHORTOPTS=h,v,q,t:
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 
-verbose=0 quiet=0 temp_source="$default_temp_source"
+verbose=0 quiet=0
 while true; do
   case "$1" in
   --help | -h) usage && exit 0 ;;
   --) shift && break ;;
   -v | --verbose) verbose=1 && shift ;; # Verbose option
   -q | --quiet) quiet=1 && shift ;;     # Quiet option
-  -t | --temp) temp_source="$2" && shift 2 ;;
+  # if $2 is in default_temp_sources, use the value, else use user input exactly
+  -t | --temp) temp_source="${default_temp_sources[$2]:-$2}" && shift 2 ;;
   *) abort "This is a bug" 3 ;;
   esac
 done
@@ -48,27 +54,36 @@ done
 jq=$(cmdpath jq) || true
 
 declare -i exitcode=0
+unknown_tmp_source=0
 for file in "$@"; do
   [ -f "$file" ] || abort "'$file' is not a file" 1
 
-  result="$(curl -L -F "file=@$file" "$temp_source")" || abort 'Something went wrong during curl command.' 1
+  cmd=(curl -L -F "file=@$file" "$temp_source")
+  [ "$verbose" -ne 1 ] || print_cmd "${cmd[@]}"
+  result="$("${cmd[@]}")" || abort 'Something went wrong during curl command.' 1
   # Example outputs:
   # {"message": "server error"}
   # {"status":"success","data":{"url":"https://tmpfiles.org/######/file"}}
 
+  case "$temp_source" in
+  *'://tmpfiles.org' | *'://tmpfiles.org/'*)
+    status=$("$jq" -re ".status" <<<"$result") || status=''
+    url=$("$jq" -re ".data.url" <<<"$result") || url=""
+    ;;
+  *'://file.io' | *'://file.io/*')
+    # exits 1 if falsy
+    "$jq" -re ".success" <<<"$result" &>/dev/null && status=success || status=
+    url=$("$jq" -re ".link" <<<"$result") || url=""
+    ;;
+  *) unknown_tmp_source=1 ;;
+  esac
+
   # If verbose, jq not installed, or unrecognized temp_source, then print entire json
-  if [ "$verbose" = 1 ] || [ -z "$jq" ] || [ "$temp_source" != "$default_temp_source" ]; then
+  if [ "$verbose" = 1 ] || [ -z "$jq" ] || [ "$unknown_tmp_source" = 1 ]; then
     # Pretty print if possible, else log it.
     if [ -n "$jq" ]; then jq <<<"$result"; else log "$result"; fi
     [ "$verbose" = 1 ] || continue # If any other condition was met, skip the rest of the loop
   fi
-
-  # status=$("$jq" -re ".status") || status=''
-  # url=$("$jq" -re ".data.url" <<<"$result") || url=""
-
-  # exits 1 if falsy
-  "$jq" -re ".success" <<<"$result" &>/dev/null && status=success || status=
-  url=$("$jq" -re ".link" <<<"$result") || url=""
 
   if [ -z "$status" ] || [ -z "$url" ]; then
     message=$("$jq" -re .message <<<"$result") || message=''
