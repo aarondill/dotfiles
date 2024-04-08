@@ -199,6 +199,9 @@ function update_method() {
     ;;
   vmware)
     has_cmd vmplayer || return 0
+    # On arch, this should be handled by the vmware-host-modules-dkms-git package
+    [ "$OS" != "Arch" ] || return 0
+
     # log "updating vmware using vmware-installer!"
     # repeat sudo_cmd "$(cmdpath vmware-installer)" --console --eulas-agreed || return
     # success

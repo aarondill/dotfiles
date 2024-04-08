@@ -21,6 +21,13 @@ XDG_STATE_HOME=${XDG_STATE_HOME:-"$HOME/.local/state"}
 XDG_DATA_DIRS=${XDG_DATA_DIRS:-"/usr/local/share/:/usr/share/"}
 XDG_CONFIG_DIRS=${XDG_CONFIG_DIRS:-"/etc/xdg/"}
 
+OS_RELEASE=/etc/os-release
+[ -f "$OS_RELEASE" ] || OS_RELEASE=/usr/lib/os-release
+# shellcheck source=/etc/os-release
+# eg: Ubuntu | Arch
+OS="$(source "$OS_RELEASE" 2>/dev/null && printf '%s' "${ID:-${NAME:-}}")" || true
+OS=${OS,,} OS=${OS^} # lower -> first_upper
+
 # The name of the currently running script. Override this if the current filename's basename is not satisfactory.
 # If $0 is not defined, defaults to ${BASH_SOURCE[1]} (the calling script)
 THIS="$(basename -- "${0:-${BASH_SOURCE[1]}}")" # This script is designed to be sourced. $0 should be the name of the parent script.
