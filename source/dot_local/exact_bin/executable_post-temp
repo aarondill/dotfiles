@@ -12,10 +12,10 @@ if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
 . "$utils"
 
 declare -A default_temp_sources=(
-  [default]=https://file.io
   [file.io]=https://file.io
   [tmpfiles]=https://tmpfiles.org/api/v1/upload
   [tmpfiles.org]=https://tmpfiles.org/api/v1/upload
+  [default]=https://tmpfiles.org/api/v1/upload
 )
 temp_source=${default_temp_sources[default]}
 
@@ -67,8 +67,8 @@ for file in "$@"; do
 
   case "$temp_source" in
   *'://tmpfiles.org' | *'://tmpfiles.org/'*)
-    status=$("$jq" -re ".status" <<<"$result") || status=''
-    url=$("$jq" -re ".data.url" <<<"$result") || url=""
+    status=$("$jq" -re ".status" <<<"$result") || true
+    url=$("$jq" -re ".data.url" <<<"$result") || true
     ;;
   *'://file.io' | *'://file.io/*')
     # exits 1 if falsy
@@ -81,7 +81,7 @@ for file in "$@"; do
   # If verbose, jq not installed, or unrecognized temp_source, then print entire json
   if [ "$verbose" = 1 ] || [ -z "$jq" ] || [ "$unknown_tmp_source" = 1 ]; then
     # Pretty print if possible, else log it.
-    if [ -n "$jq" ]; then jq <<<"$result"; else log "$result"; fi
+    { [ -n "$jq" ] && jq <<<"$result"; } || log "$result"
     [ "$verbose" = 1 ] || continue # If any other condition was met, skip the rest of the loop
   fi
 
