@@ -11,7 +11,7 @@ _todo() {
 
   # todo <action> (complete)
   if [ "$COMP_CWORD" -eq 1 ]; then # complete the actions
-    COMPREPLY=($(compgen -W 'list add show edit remove rm done count path' -- "$cur")) && return 0
+    COMPREPLY=($(compgen -W 'list ls add show edit remove rm done count path' -- "$cur")) && return 0
   fi
   # shellcheck disable=SC2207
   local arr=($(cd "$todo_dir" && compgen -f -- "$cur")) # complete the todos

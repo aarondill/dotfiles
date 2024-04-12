@@ -14,10 +14,9 @@ Usage: $THIS [OPTS]... [action]
 manage todos.
 
 Valid actions:
-List [name]: List the current todos (default)
+Show/List [name]: Show the description of todo or list contents of directory (default)
 Count [name]: Count the number of todos
 Add <name>: Add a new todo (opens \$EDITOR)
-Show <name>: Show the description of todo (opens a pager)
 Edit <name>: Edit todo in \$EDITOR (Creates todo if not exist)
 Remove/rm <name>: Remove todo
 Done <name>: Synonoym for Remove
@@ -80,24 +79,24 @@ case "$name" in
 esac
 
 case "$action" in
-list | ls) show_directory "$todo_dir/$name" ;;
 count | wc)
   dir="$todo_dir/$name"
   [ -d "$dir" ] || abort "No directory: $dir"
   count "$dir"/*
   ;;
-add | edit)
+add | edit | new)
   [ -n "$name" ] || abort "usage: $THIS $action <name>" 2
   # Add and edit are the same, EXCEPT add can not double create a todo
   if [ "$action" == add ] && [ -e "$name" ]; then abort "Todo already exists: $name"; fi
   mkdirname "$name" || abort "Could not create directory for todo file"
   edit "$name"
   ;;
+list | ls) ;&
 show | cat)
-  [ -n "$name" ] || abort "usage: $THIS $action <name>" 2
-  [ -e "$name" ] || abort "Todo doesn't exist: $name"
-  if [ -d "$name" ]; then
-    show_directory "$name"
+  [ -z "$name" ] || [ -e "$name" ] || abort "Todo doesn't exist: $name"
+  # If empty, or directory, list
+  if [ -z "$name" ] || [ -d "$name" ]; then
+    show_directory "$todo_dir/$name"
   else
     page "$name"
   fi
