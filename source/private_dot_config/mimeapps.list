@@ -42,6 +42,8 @@ image/webp=org.gnome.eog.desktop;
 image/heif=org.gnome.eog.desktop;
 image/png=org.gnome.eog.desktop;
 application/pdf=org.gnome.Evince.desktop
+image/svg=org.gnome.eog.desktop
+image/svg+xml=org.gnome.eog.desktop
 
 [Added Associations]
 image/webp=gimp.desktop;
