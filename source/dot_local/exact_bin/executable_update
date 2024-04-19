@@ -107,6 +107,16 @@ function update_method() {
   local m="$1"
   case "$m" in
   native)
+    if has_cmd informant; then
+      log "Checking news with informant"
+      if ! sudo_cmd informant check; then
+        err "Unread news items found!"
+        err "You might want to run \`informant read\` before continuing!"
+        err "You can pause this command with ctrl+z, then fg to return"
+        confirm "Continue?" || return 0
+      fi
+    fi
+    local native_cmd
     native_cmd=$(first_cmd nala apt yay pacman dnf) || { err "Could not find a command to update native packages." && return 0; }
     log "Using $native_cmd to update native packages"
     case "$native_cmd" in
