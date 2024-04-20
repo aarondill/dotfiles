@@ -15,3 +15,9 @@ type = "git-repo"
 url = "https://github.com/aarondill/wezterm.git"
 # refreshPeriod = "12h"
 clone.args = ['--filter=tree:0']
+
+[".config/mpv"]
+type = "git-repo"
+url = "https://github.com/aarondill/mpv.git"
+# refreshPeriod = "12h"
+clone.args = ['--filter=tree:0']
