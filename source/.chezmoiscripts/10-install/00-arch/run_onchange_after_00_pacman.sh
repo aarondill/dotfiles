@@ -29,9 +29,9 @@ VIRTUAL_MACHINE_PACKAGES=(
 GRAPHICAL_PACKAGES=(
   arandr dconf-editor eog evince file-roller firefox firejail gimp
   gnome-calculator gnome-calendar gnome-font-viewer gnome-power-manager
-  gnome-system-monitor gparted gucharmap hplip libreoffice-fresh nautilus okular
-  onboard pavucontrol qtqr rhythmbox screenkey seahorse simple-scan
-  spotify-launcher sqlitebrowser thunderbird totem transmission-gtk wmctrl xclip
+  gnome-system-monitor gparted gucharmap hplip libreoffice-fresh mpv nautilus
+  okular onboard pavucontrol qtqr rhythmbox screenkey seahorse simple-scan
+  spotify-launcher sqlitebrowser thunderbird transmission-gtk wmctrl xclip
   xdg-desktop-portal-gnome xdg-desktop-portal-gtk xdg-utils xdotool xorg-xinit
   zeal
 )
