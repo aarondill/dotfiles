@@ -76,3 +76,4 @@ code/repos/.nvim/
 .config/user-dirs.dirs
 .config/systemd/user/google-chrome-profile.service
 .local/share/applications/mcpe-launcher.desktop
+.config/mpv/.
