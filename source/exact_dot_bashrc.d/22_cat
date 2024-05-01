@@ -13,8 +13,8 @@ alias cat &>/dev/null || alias cat='command cat' # ensure no recursive call of c
 # function header
 # Calls `ls` if called on a directory, else calls `cat` to show the contents of the file
 function cat() {
-  if [ "$#" -eq 0 ]; then
-    cat # if no arguments, act same as `cat`
+  if [ "$#" -ne 1 ]; then
+    cat "$@" # if 0 or >1 arguments, act same as `cat`
     return
   fi
   local f exit=0
