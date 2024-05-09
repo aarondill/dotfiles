@@ -44,7 +44,8 @@ packages=(
   protonvpn            # protonvpn cli and gui
   ripdrag              # Drag and drop from terminal
   simplescreenrecorder # screen recording
-  zeal
+  zeal                 # Documentation reader
+  dashbinsh            # Use dash as /bin/sh
 )
 for p in "${packages[@]}"; do
   ! pacman_is_installed "$p" || continue
