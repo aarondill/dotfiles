@@ -350,6 +350,15 @@ print)
 esac
 [ "$did_something" -eq 1 ] || abort "Didn't do anything. Please check your configuration and try again." 2
 
+new_args=()
+for arg in "${args[@]}"; do
+  # Remove volsize
+  case "$arg" in --volsize=*) continue ;; esac
+  new_args+=("$arg")
+done
+args=("${new_args[@]}")
+unset new_args
+
 log
 log "Verifying $DESTINATION_URI"
 verbose "$DUPLICITY" verify "${args[@]}" "$DESTINATION_URI" "$SOURCE_DIR"
