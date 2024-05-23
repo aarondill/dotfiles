@@ -208,33 +208,6 @@ if [ "$mode" != "print" ]; then # This is a special case. We don't want to error
   fi
 fi
 
-# include/exclude
-for pat in "${files[@]}"; do
-  case "$pat" in
-  '- '*) args+=("--exclude=${pat#- }") ;; # '- path' -> '--exclude=path'
-  -*) args+=("--exclude=${pat#-}") ;;     # '-path' -> '--exclude=path'
-
-  '+ '*) args+=("--include=${pat#+ }") ;; # '+ path' -> '--include=path'
-  +*) args+=("--include=${pat#+}") ;;     # '+path' -> '--include=path'
-
-  *) args+=("--include=$pat") ;; # 'path' -> 'include=path'
-  esac
-done
-
-# exclude-if-present
-# check is set and not empty
-# note: "${!var[@]}" returns the indicies (ie 0 1 2 3) for the full array
-if [ -n "${!exclude_if_present[*]}" ]; then
-  for file in "${exclude_if_present[@]}"; do
-    args+=("--exclude-if-present=$file")
-  done
-fi
-
-# volsize
-if [ -n "${VOLSIZE:-}" ]; then
-  args+=("--volsize=$VOLSIZE")
-fi
-
 # Encryption
 if [ "${ENCRYPTION_TYPE:-}" = 'no' ]; then
   args+=("--no-encryption")
@@ -246,11 +219,6 @@ fi
 # verbosity
 if [ -n "${VERBOSITY:-}" ]; then
   args+=("--verbosity=$VERBOSITY")
-fi
-
-# timeout
-if [ -n "${TIMEOUT:-}" ]; then
-  args+=("--timeout=$TIMEOUT")
 fi
 
 # archive-dir
@@ -295,6 +263,43 @@ function run() {
 }
 
 [ "${#args[@]}" -gt 0 ] || abort "No arguments were specified. Something went wrong" 3
+
+# Store the args for verify
+verify_args=("${args[@]}")
+case "$mode" in
+backup | print) # setup args for print to ensure proper output
+  # include/exclude
+  for pat in "${files[@]}"; do
+    case "$pat" in
+    '- '*) args+=("--exclude=${pat#- }") ;; # '- path' -> '--exclude=path'
+    -*) args+=("--exclude=${pat#-}") ;;     # '-path' -> '--exclude=path'
+
+    '+ '*) args+=("--include=${pat#+ }") ;; # '+ path' -> '--include=path'
+    +*) args+=("--include=${pat#+}") ;;     # '+path' -> '--include=path'
+
+    *) args+=("--include=$pat") ;; # 'path' -> 'include=path'
+    esac
+  done
+
+  # exclude-if-present
+  # check is set and not empty
+  # note: "${!var[@]}" returns the indicies (ie 0 1 2 3) for the full array
+  if [ -n "${!exclude_if_present[*]}" ]; then
+    for file in "${exclude_if_present[@]}"; do
+      args+=("--exclude-if-present=$file")
+    done
+  fi
+
+  # volsize
+  if [ -n "${VOLSIZE:-}" ]; then
+    args+=("--volsize=$VOLSIZE")
+  fi
+  # timeout
+  if [ -n "${TIMEOUT:-}" ]; then
+    args+=("--timeout=$TIMEOUT")
+  fi
+  ;;
+esac
 
 case "$mode" in
 backup)
@@ -350,15 +355,6 @@ print)
 esac
 [ "$did_something" -eq 1 ] || abort "Didn't do anything. Please check your configuration and try again." 2
 
-new_args=()
-for arg in "${args[@]}"; do
-  # Remove volsize
-  case "$arg" in --volsize=*) continue ;; esac
-  new_args+=("$arg")
-done
-args=("${new_args[@]}")
-unset new_args
-
 log
 log "Verifying $DESTINATION_URI"
-verbose "$DUPLICITY" verify "${args[@]}" "$DESTINATION_URI" "$SOURCE_DIR"
+verbose "$DUPLICITY" verify "${verify_args[@]}" "$DESTINATION_URI" "$SOURCE_DIR"

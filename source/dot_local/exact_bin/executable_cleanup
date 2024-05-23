@@ -72,8 +72,10 @@ for d in "${dirs[@]}"; do
 done
 
 log "Cleaning the trash"
-if has_cmd trash-empty; then
-  verbose trash-empty || true
+if has_cmd trash-list trash-empty; then
+  if [ -n "$(trash-list)" ]; then
+    verbose trash-empty || true
+  fi
 elif has_cmd gio; then
   verbose gio trash --empty || true
 else
