@@ -85,7 +85,7 @@ exclude_if_present=(
 VOLSIZE=200
 
 # Searching for usb drive
-external=
+external=/mnt/backup/
 
 # maj:min, LABEL=label, UUID=uuid, PARTLABEL=label, PARTUUID=uuid
 usbdevice=UUID=86eb0e3c-c03a-4414-9bfc-f20bef42f2ba
@@ -123,8 +123,9 @@ TIMEOUT=120
 # Named levels and corresponding values are 0 Error, 2 Warning, 4 Notice (default), 8 Info, 9 Debug (noisiest).
 #          level may also be a character: e, w, n, i, d
 #          or a word: error, warning, notice, info, debug
-VERBOSITY=8 # default to 8 if stdout is tty, else 4
-[ -t 1 ] || VERBOSITY=4
+# VERBOSITY=8 # default to 8 if stdout is tty, else 4
+# [ -t 1 ] || VERBOSITY=4
+VERBOSITY=4
 # Write specially-formatted versions of output messages to the specified file.  The format used is designed to be easily consumable by other programs.
 LOGFILE=
 
@@ -216,6 +217,8 @@ elif [ -n "${ENCRYPTION_TYPE:-}" ]; then
   err "Warning: Encryption type '${ENCRYPTION_TYPE}' is not supported"
 fi
 
+# If -v is passed, increase verbosity
+[ "$BACKUP_VERBOSE" = 0 ] || VERBOSITY=8
 # verbosity
 if [ -n "${VERBOSITY:-}" ]; then
   args+=("--verbosity=$VERBOSITY")
