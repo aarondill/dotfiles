@@ -218,7 +218,7 @@ elif [ -n "${ENCRYPTION_TYPE:-}" ]; then
 fi
 
 # If -v is passed, increase verbosity
-[ "$BACKUP_VERBOSE" = 0 ] || VERBOSITY=8
+if [ "${BACKUP_VERBOSE:-}" = 1 ]; then VERBOSITY=8; fi
 # verbosity
 if [ -n "${VERBOSITY:-}" ]; then
   args+=("--verbosity=$VERBOSITY")
