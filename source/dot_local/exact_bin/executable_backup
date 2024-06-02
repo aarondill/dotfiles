@@ -143,6 +143,9 @@ REMOVE_OLDER_THAN=3M
 # Use this existing directory for duplicity temporary files instead of the system default, which is usually the /tmp directory.
 # TEMP_DIR=/tmp
 
+# Set to 0 to disable verification (speeds up a lot)
+BACKUP_VERIFY=${BACKUP_VERIFY:-1}
+
 # ----------------------------------------------------------------
 # ----------------------------------------------------------------
 # -------------------------- PROCESSING --------------------------
@@ -193,6 +196,7 @@ for arg in "$@"; do
   --status | -s) mode=status ;;
   --dry-run | -n) BACKUP_DRY_RUN=1 ;; # overrides environment variables
   --verbose | -v) BACKUP_VERBOSE=1 ;; # overrides environment variables
+  --no-verify) BACKUP_VERIFY=0 ;;
   --*) abort "Unknown option: '$arg'" ;;
   -*) abort "Unknown option: '$arg'" ;;
   *) abort "this script does not support positional arguments" ;;
@@ -357,6 +361,7 @@ print)
 *) abort "Unknown mode '$mode'. This is most likely a bug." 3 ;;
 esac
 [ "$did_something" -eq 1 ] || abort "Didn't do anything. Please check your configuration and try again." 2
+[ "$BACKUP_VERIFY" -ne 0 ] || exit 0 # We're done here.
 
 log
 log "Verifying $DESTINATION_URI"
