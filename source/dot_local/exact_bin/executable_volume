@@ -5,7 +5,7 @@ if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
 # shellcheck source=./script_utils.sh
 . "$utils"
 
-sink='@DEFAULT_SINK@'
+default_sink='@DEFAULT_SINK@' default_source='@DEFAULT_SOURCE@'
 function usage() {
   cat <<EOF || true
 Usage: $THIS [OPTS]... [PERCENT|'mute']
@@ -13,21 +13,31 @@ Sets the volume to the specified PERCENT. Use n{+,-} to incremenet the volume.
 Call with no positional arguments to output the current volume.
 
 Options:
-  -h, --help        Show this help message.
-  -m, --mute        Toggle mute on the device (PERCENT is ignored).
-  -s, --sink=sink   pactl sink to set the volume on (default: $sink)
+  -h, --help           Show this help message.
+  -m, --mute           Toggle mute on the device (PERCENT is ignored).
+  -d, --device=dev     pactl sink/source to set the volume on (default: $default_sink)
+  -s, --source         Treat device as a source instead. (default: $default_source)
 EOF
 }
 
-LONGOPTS="help,sink:,mute" SHORTOPTS="h,s:,m"
+LONGOPTS="help,device:,mute,source" SHORTOPTS="h,d:,m,s"
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 
+device="$default_sink" device_type=sink
 mute=0
 while true; do
   case "$1" in
-  --help | -h) usage && exit 0 ;;
-  -s | --sink) sink="$2" && shift 2 ;;
+  -h | --help) usage && exit 0 ;;
+  -d | --device) device="$2" && shift 2 ;;
   -m | --mute) mute=1 && shift ;;
+  -s | --source)
+    device_type=source
+    # Don't change if the user specified a source
+    if [ "$device" = "$default_sink" ]; then
+      device="$default_source"
+    fi
+    shift
+    ;;
   --) shift && break ;;
   *) abort "This is a bug" 3 ;;
   esac
@@ -38,9 +48,9 @@ mute | m) mute=1 ;;
 esac
 
 if [ "$mute" -eq 1 ]; then
-  pactl set-sink-mute "$sink" toggle
+  pactl "set-$device_type-mute" "$device" toggle
 elif [ "$#" -eq 0 ]; then
-  pactl get-sink-volume "$sink"
+  pactl "get-$device_type-volume" "$device"
 else
   suf='' vol=${1}
   case "$vol" in
@@ -49,6 +59,6 @@ else
   esac
   # all valid: 20-, -20, 20+, +20, +20%, 20%+, 20%
   vol=${vol%-} vol=${vol#-} vol=${vol%+} vol=${vol#+} vol=${vol%\%}
-  pactl set-sink-volume "$sink" "$suf$vol%"
-  pactl set-sink-mute "$sink" false # user experience! :)
+  pactl "set-$device_type-volume" "$device" "$suf$vol%"
+  pactl "set-$device_type-mute" "$device" false # user experience! :)
 fi

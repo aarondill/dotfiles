@@ -85,11 +85,12 @@ exclude_if_present=(
 VOLSIZE=200
 
 # Searching for usb drive
-external=/mnt/backup/
+external=
 
 # maj:min, LABEL=label, UUID=uuid, PARTLABEL=label, PARTUUID=uuid
 usbdevice=UUID=86eb0e3c-c03a-4414-9bfc-f20bef42f2ba
 usbname=Backup # The directory name it is automounted under
+usbdirectory=/mnt/backup/
 
 # Search for a mountpoint - uuid, label, or partition label
 if [ -z "$external" ] && [ -n "$usbdevice" ] && command -v findmnt &>/dev/null; then
@@ -101,6 +102,12 @@ if [ -z "$external" ] && [ -n "$usbname" ]; then
     [ -d "$dir/$usbname" ] || continue
     external="$dir/$usbname" && break
   done
+fi
+# Search by mounted directory - automounted (constant directory)
+if [ -z "$external" ] && [ -d "$usbdirectory" ]; then
+  if findmnt -M "$usbdirectory" &>/dev/null; then
+    external="$usbdirectory"
+  fi
 fi
 
 if [ -z "$external" ]; then
