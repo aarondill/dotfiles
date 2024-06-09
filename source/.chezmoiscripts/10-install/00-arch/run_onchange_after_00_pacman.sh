@@ -11,15 +11,15 @@ if ! has_pacman; then
   abort "pacman is not installed, skipping pacman installation" 0
 fi
 PACKAGES=(
-  age base-devel bash-completion bat cmake cronie curl dconf-editor dosfstools
-  duf duplicity e2fsprogs exfatprogs fuse2 gdb git git-delta github-cli grep
-  hexedit imagemagick inetutils inotify-tools jq less libpulse lsof lua luajit
-  make neofetch neovim net-tools networkmanager-openvpn noto-fonts-cjk
-  noto-fonts-emoji noto-fonts-extra openssh openvpn os-prober p7zip pacutils
-  pkgfile plocate posix pulseaudio python-pip reflector ripgrep rlwrap rsync
-  shfmt speedtest-cli sudo tlp trash-cli tree ttf-font-awesome ttf-liberation
-  ttf-nerd-fonts-symbols-mono unzip util-linux vivaldi wezterm wget xdg-user-dirs
-  zip zoxide
+  age base-devel bash-completion bat cheese cmake cronie curl dconf-editor
+  dosfstools duf duplicity e2fsprogs exfatprogs fuse2 gdb git git-delta
+  github-cli grep hexedit imagemagick inetutils inotify-tools jq less libpulse
+  lsof lua luajit make neofetch neovim net-tools networkmanager-openvpn
+  noto-fonts-cjk noto-fonts-emoji noto-fonts-extra openssh openvpn os-prober
+  p7zip pacutils pkgfile plocate posix pulseaudio python-pip reflector ripgrep
+  rlwrap rsync shfmt speedtest-cli sudo tlp trash-cli tree ttf-font-awesome
+  ttf-liberation ttf-nerd-fonts-symbols-mono unzip util-linux vivaldi wezterm
+  wget xdg-user-dirs zip zoxide
 )
 VIRTUAL_MACHINE_PACKAGES=(
   virt-manager qemu-desktop # VM management. Technically, only virt-manager is graphical, but they are used together
