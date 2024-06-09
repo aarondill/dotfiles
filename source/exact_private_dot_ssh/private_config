@@ -1,12 +1,3 @@
 Host raspberrypi
   HostName 192.168.1.91
   User aaron
-
-Host arch
-  HostName 2600:1700:fd0:70f0::3ef
-  User aaron
-  IdentityFile ~/.ssh/Arch_VM_id_ed25519
-Host arch2
-  HostName 2601:2c3:cd00:7960::2b26
-  User aaron
-  IdentityFile ~/.ssh/Arch_VM_id_ed25519
