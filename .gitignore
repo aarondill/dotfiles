@@ -1,0 +1,3 @@
+# Don't use the global gitignore patterns!
+# I may want to store some of these files (such as .bak)
+!*
