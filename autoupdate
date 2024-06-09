@@ -79,3 +79,4 @@ code/repos/.nvim/
 .config/mpv/.
 .ssh/config
 .config/user-dirs.conf
+.config/systemd/user/default.target.wants/google-chrome-profile.service
