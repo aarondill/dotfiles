@@ -13,7 +13,7 @@ function install_java() {
     return 0
   fi
   log "downloading jdk-$version"
-  tmp=$(download_file "$url")
+  tmp=$(download_file "$url" '' '' progress) #These files are big, so we want to show progress
   rm_exit "$tmp"
   # output to destination
   log "unpacking jdk-$version"
@@ -21,11 +21,11 @@ function install_java() {
   sudo_cmd tar -xz -C "$destination" -f "$tmp"
   rm_exit_cleanup "$tmp"
 }
-base_url="https://download.java.net/java" update_version="21.0.2"
+base_url="https://download.java.net/java" update_version="22.0.1"
 declare -A versions=(
-  [17.0.2]="$base_url/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_linux-x64_bin.tar.gz" # Don't use this version! It's outdated!
-  [21.0.2]="$base_url/GA/jdk21.0.2/f2283984656d49d69e91c558476027ac/13/GPL/openjdk-21.0.2_linux-x64_bin.tar.gz"
-  [23]="$base_url/early_access/jdk23/8/GPL/openjdk-23-ea+8_linux-x64_bin.tar.gz"
+  [21.0.2]="$base_url/GA/jdk21.0.2/f2283984656d49d69e91c558476027ac/13/GPL/openjdk-21.0.2_linux-x64_bin.tar.gz" # Outdated version for UIL use
+  [22.0.1]="$base_url/GA/jdk22.0.1/c7ec1332f7bb44aeba2eb341ae18aca4/8/GPL/openjdk-22.0.1_linux-x64_bin.tar.gz"
+  [24]="$base_url/early_access/jdk24/1/GPL/openjdk-24-ea+1_linux-x64_bin.tar.gz"
 )
 
 if [ -z "${versions[$update_version]:-}" ]; then

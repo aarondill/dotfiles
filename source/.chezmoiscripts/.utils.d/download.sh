@@ -59,7 +59,7 @@ function download() {
   fi
 }
 
-# download_file <URL> [destination] [mode]
+# download_file <URL> [destination] [mode] ['progress']
 # destination should be the *final* filename, not a directory.
 # this function handles escalation to root when possible.
 # if destination is not present, outputs the temp file on stdout.
@@ -67,7 +67,7 @@ function download() {
 # The easiest way is to call rm_exit with the file!
 function download_file() {
   local dir='' temp
-  local file_url=$1 dest=${2:-} mode=${3:-}
+  local file_url=$1 dest=${2:-} mode=${3:-} progress=${4:-}
 
   if [ -n "$dest" ]; then
     dir=$(dirname "$dest")
@@ -76,7 +76,7 @@ function download_file() {
   temp=$(mktemp) || abort "Could not create temporary directory" 1
   _add_tempfiles "$temp" || true # just incase the user defines the trap, slight safety without overwriting their trap
 
-  download "$file_url" >|"$temp" || rm_exit_cleanup "$temp" # this will clean up and remove from the trap. Whether it's set or not.
+  download "$file_url" "$progress" >|"$temp" || rm_exit_cleanup "$temp" # this will clean up and remove from the trap. Whether it's set or not.
 
   # Stop if no dest
   if [ -z "$dest" ]; then
