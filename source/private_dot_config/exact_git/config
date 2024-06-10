@@ -132,5 +132,5 @@
 	sort = -committerdate
 [maintenance]
 	repo = /home/aaron/code/js/fslite
-	repo = /home/aaron/.config/nvim.bak
+	repo = /home/aaron/.config/nvim
 	repo = /home/aaron/.config/awesome
