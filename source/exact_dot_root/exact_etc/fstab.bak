@@ -15,4 +15,4 @@ UUID=6416-06C3      	/boot/efi 	vfat      	rw,relatime,fmask=0022,dmask=0022,cod
 UUID=ecf35f94-bf06-4840-bc9a-ef990a253425	none      	swap      	defaults  	0 0
 
 # NFS Backup mount
-192.168.1.91:/backup      	/mnt/backup/       	nfs      	nofail,x-systemd.automount,x-systemd.requires=network-online.target,x-systemd.mount-timeout=10s,retry=1,x-systemd.idle-timeout=1min      	0 0
+10.0.0.2:/backup      	/mnt/backup/       	nfs      	nofail,x-systemd.automount,x-systemd.requires=network-online.target,x-systemd.mount-timeout=10s,retry=1,x-systemd.idle-timeout=1min      	0 0
