@@ -16,6 +16,9 @@ elif has exa; then
 fi
 unset -f has
 
+# Ensure that none of these aliases are pre-defined
+unalias ls la ll lla llaa &>/dev/null || true
+
 if [ -z "$exa" ]; then
   unset exa
   alias ls='ls --color=auto -h'
@@ -23,6 +26,7 @@ if [ -z "$exa" ]; then
   alias ll="ls -l"
   alias lla="ls -lA"
   alias llaa="ls -la"
+  return 0 # Don't error out if eza is not installed
 fi
 
 ls="$exa --color=auto -h --group"
