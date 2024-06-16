@@ -42,7 +42,7 @@ if [ -d "$DESTINATION" ]; then
 fi
 
 # Pick a package manager!
-NPM=$(which yarn 2>/dev/null) || abort "yarn is required to install extensions sync"
+NPM=$(cmd_path yarn 2>/dev/null) || abort "yarn is required to install extensions sync"
 
 ## Install extensions sync
 

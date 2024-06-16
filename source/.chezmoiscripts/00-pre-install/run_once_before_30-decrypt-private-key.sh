@@ -7,17 +7,17 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
 log "Decrypting age key for encrypted files"
-if ! command -v age &>/dev/null; then
+if ! has_cmd age; then
   err "Age is not present, attempting to install."
   # Exits on failure
   if has_apt; then
     apt_install age
   elif has_pacman; then
     pacman_install age
-  else
-    abort "age is required to decrypt files. Please install it and try again." 1
   fi
 fi
+# install failed, abort
+has_cmd age || abort "age is required to decrypt files. Please install it and try again." 1
 
 config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/chezmoi"
 if ! [ -f "$config_dir/key.txt" ]; then

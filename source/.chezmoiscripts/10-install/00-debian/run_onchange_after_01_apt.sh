@@ -94,6 +94,6 @@ log_and_run 'Installing graphical packages' install_graphical_packages
 # Gnome comes with it, but I don't want it.
 if apt_is_installed gnome-characters; then apt_remove gnome-characters; fi
 # Install vim symlink to nvim
-if has_cmd update-alternatives && has_cmd nvim && ! [ "$(readlink -e /usr/bin/vim)" = "$(which nvim)" ]; then
+if has_cmd update-alternatives && has_cmd nvim && ! [ "$(readlink -e /usr/bin/vim)" = "$(cmd_path nvim)" ]; then
   sudo_cmd update-alternatives --install /usr/bin/vim vim "$(cmd_path nvim)" 100 || true
 fi

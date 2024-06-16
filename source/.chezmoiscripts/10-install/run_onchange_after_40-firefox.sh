@@ -20,11 +20,8 @@ else
   err "$firefox already linked to esr. Skipping linking."
 fi
 
-if ! has_cmd firejail; then
-  abort 'firejail not found. Skipping firejail links.' 0
-fi
+firejail=$(cmd_path firejail) || abort 'firejail not found. Skipping firejail links.' 0
 
-firejail=$(command -v firejail)
 log "Setting up firefox with firejail at $firejail"
 for c in "${firejail_links[@]}"; do
   name=$(basename -- "$c")

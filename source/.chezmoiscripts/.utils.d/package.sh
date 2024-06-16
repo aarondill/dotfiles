@@ -10,8 +10,8 @@ fi
 assert_source_once "${BASH_SOURCE[0]}" || return 0
 
 if true; then
-  . ./flow.sh   # abort has_cmd
-  . ./output.sh # abort has_cmd
+  . ./flow.sh   # abort has_cmd cmd_path
+  . ./output.sh # err
 fi
 
 if [ "${BASH_SOURCE[0]}" = "$_LEADER" ]; then
@@ -23,9 +23,9 @@ fi
 ## ------------------------------------------- APT utils --------------------------------------------
 ## --------------------------------------------------------------------------------------------------
 # Path to apt (or nala) for installation/removal of packages
-APT=$(which nala 2>/dev/null || which apt 2>/dev/null || printf '')
+APT=$(cmd_path nala 2>/dev/null || cmd_path apt 2>/dev/null || printf '')
 function apt_is_installed() { dpkg -s "$@" &>/dev/null; }
-function apt_is_available() { for pac; do test -n "$(apt-cache show -- "$pac" 2>/dev/null)" || return 1; done; }
+function apt_is_arvailable() { for pac; do test -n "$(apt-cache show -- "$pac" 2>/dev/null)" || return 1; done; }
 # usage: apt_install file_or_package
 # NOTE: ensure files end in .deb!
 function apt_install() { sudo_cmd "$APT" install -- "$@"; }
@@ -40,7 +40,7 @@ function has_apt() { [ -n "$APT" ]; }
 ## --------------------------------------------------------------------------------------------------
 
 # Path to pacman for installation/removal of packages
-PACMAN=$(which yay 2>/dev/null || which pacman 2>/dev/null || printf '')
+PACMAN=$(cmd_path yay 2>/dev/null || cmd_path pacman 2>/dev/null || printf '')
 # Internal function. don't call.
 _pacman_exec() (
   export -n SHELLOPTS # makepkg/yay doesn't play nice with this

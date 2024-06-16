@@ -64,7 +64,7 @@ ARCH=$(uname -m)
 # eg: Ubuntu
 OS="$(source /etc/os-release && lower <<<"${ID:-${NAME:-}}" | first_upper)"
 # eg: /usr/bin/gnome-shell, if empty, gnome not installed
-GNOME=$(which gnome-shell 2>/dev/null || printf '')
+GNOME=$(cmd_path gnome-shell 2>/dev/null || printf '')
 
 export ARCH KERNEL OS APT GNOME PACMAN
 # Code to source *this* file. DON'T MOVE THIS FILE!

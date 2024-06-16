@@ -2,7 +2,7 @@
 set -euC -o pipefail
 err() { printf '%s\n' "$@" >&2; }
 
-chezmoi="${CHEZMOI_EXECUTABLE:-$(which chezmoi 2>/dev/null || printf '')}"
+chezmoi="${CHEZMOI_EXECUTABLE:-$(command -v chezmoi 2>/dev/null || printf '')}"
 
 source_path='Could not find chezmoi in PATH'
 if [ -x "$chezmoi" ]; then source_path="$("$chezmoi" source-path)"; fi

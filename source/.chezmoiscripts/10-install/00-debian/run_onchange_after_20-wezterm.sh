@@ -69,8 +69,8 @@ rm_exit_cleanup "$tmp_dir"
 
 # set wezterm as default term
 # sudo_cmd update-alternatives --set x-terminal-emulator /usr/bin/open-wezterm-here
-x_term="$(which x-terminal-emulator || printf '/usr/bin/x-terminal-emulator')"
-wez="$(which wezterm-gui)"
+x_term="$(cmd_path x-terminal-emulator || printf '/usr/bin/x-terminal-emulator')"
+wez="$(cmd_path wezterm-gui)"
 if [ -z "$wez" ]; then abort "Something went wrong setting wezterm as default term" 0; fi
 
 sudo_cmd update-alternatives --install "$x_term" x-terminal-emulator "$wez" 50
