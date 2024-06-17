@@ -68,8 +68,14 @@ if [ -n "${EDITOR:-}" ]; then
 fi
 
 alias fslite='browser fslite.vercel.app'
-# Don't show loopback, and show more useful columns
-alias lsblk="lsblk -e 7 -o NAME,MAJ:MIN,SIZE,FSTYPE,LABEL,MOUNTPOINT"
+{
+  # Don't show loopback, and show more useful columns
+  _lsblk='lsblk -o NAME,MAJ:MIN,SIZE,FSTYPE,LABEL,MOUNTPOINT'
+  if has snap; then _lsblk+=' -e 7'; fi
+  # shellcheck disable=SC2139 # I exect it to expand now
+  alias lsblk="$_lsblk"
+  unset _lsblk
+}
 
 alias cl='clear'
 alias tree='tree -a' # show hidden
