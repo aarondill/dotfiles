@@ -61,6 +61,8 @@ files=(
   "-$HOME/code/repos"
   "-$HOME/Games/battlenet"
   "-**/node_modules/**"
+  # Common dangerously large files
+  "-**/*.img" "-**/*.iso" "-**/*.img.gz" "-**/*.iso.gz"
 )
 # Duplicity complains if an ignore pattern is not a subdirectory of the source directory
 if [ "$SOURCE_DIR" = / ]; then
