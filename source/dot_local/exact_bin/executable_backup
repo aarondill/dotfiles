@@ -17,8 +17,8 @@ set -euC -o pipefail
 # the future. Users running more than one distinct backup are encouraged to use this option. If not specified, the default value is a hash of the backend URL.
 os=$(. /etc/os-release 2>/dev/null && printf '%s\n' "${ID:-${NAME:-}}") || true
 host=$(uname -n 2>/dev/null) || true
-hostid=$(hostid 2>/dev/null) || true # added differential
-NAME="full-system-$host-$os-$hostid"
+machine_id=$(md5sum /etc/machine-id 2>/dev/null | cut -f1 -d' ') || true # added differential
+NAME="full-system-$host-$os-$machine_id"
 
 # The source directory *to* backup (usually / or "$HOME")
 SOURCE_DIR="$HOME"
