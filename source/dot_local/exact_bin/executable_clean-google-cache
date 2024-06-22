@@ -35,7 +35,7 @@ function size_diff() {
 function clean_config_dir() {
   local dir=$1 file mkfiles rmfiles
 
-  # These directories will be removed, then replaced with a new empty file
+  # These files will be removed, then replaced with a new empty file
   mkfiles=(
     "$dir/OnDeviceHeadSuggestModel"
     "$dir/Default/optimization_guide_prediction_model_downloads"
@@ -43,26 +43,30 @@ function clean_config_dir() {
     "$dir/Default/optimization_guide_hint_cache_store"
     "$dir/pnacl"
     "$dir/BrowserMetrics"
-    "$dir/"*_crx_cache
+    "$dir/ClientSidePhishing/"
+    "$dir/segmentation_platform/"
   )
   # These files will be removed, but not recreated
   rmfiles=(
+    "$dir/GrShaderCache/"
+    "$dir/"*_crx_cache
     "$dir/Safe Browsing"
     "$dir/Crash Reports"
+    "$dir/"*Cache "$dir"/Cache*
     "$dir/"**/*Cache "$dir"/**/Cache*
     "$dir"/**/LOG "$dir"/**/LOG.old
     "$dir/Default/IndexedDB/"*
+    "$dir/SafetyTips/"
   )
-  # causes issues?
-  for d in "${mkfiles[@]}"; do
-    if [ -d "$d" ]; then
-      rm -rf -- "$d"
-      touch -- "$d"
-    fi
-  done
 
+  for file in "${mkfiles[@]}"; do
+    [ -e "$file" ] || continue
+    rm -rf -- "$file"
+    touch -- "$file"
+  done
   for file in "${rmfiles[@]}"; do
-    if [ -e "$file" ]; then rm -rf -- "$file"; fi
+    [ -e "$file" ] || continue
+    rm -rf -- "$file"
   done
 }
 
