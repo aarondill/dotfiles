@@ -20,6 +20,9 @@ host=$(uname -n 2>/dev/null) || true
 machine_id=$(md5sum /etc/machine-id 2>/dev/null | cut -f1 -d' ') || true # added differential
 NAME="full-system-$host-$os-$machine_id"
 
+# The file to backup the list of installed packages to
+PACKAGE_LIST="$HOME/.local/state/package_list"
+
 # The source directory *to* backup (usually / or "$HOME")
 SOURCE_DIR="$HOME"
 
@@ -37,6 +40,9 @@ SOURCE_DIR="$HOME"
 # Furthermore, if the pattern starts with "ignorecase:" (case insensitive), then this prefix will be removed and
 # any character in the string can be replaced with an upper- or lowercase version of itself.
 files=(
+  "$HOME/.local/state/bash_history"
+  "$PACKAGE_LIST"
+
   "-$HOME/.cache"
   "-$HOME/.cache/deja-dup"
   "-$HOME/.config/Code"
@@ -277,6 +283,15 @@ function run() {
   did_something=1
   verbose "$@"
 }
+function has() { command -v -- "$@" &>/dev/null; }
+function first_cmd() {
+  local cmd && for cmd in "$@"; do
+    has "$cmd" || continue
+    printf '%s' "$cmd" || true
+    return 0
+  done
+  return 1
+}
 
 [ "${#args[@]}" -gt 0 ] || abort "No arguments were specified. Something went wrong" 3
 
@@ -317,11 +332,31 @@ backup | print) # setup args for print to ensure proper output
   ;;
 esac
 
+function list_pacakges() {
+  local pkg_manager
+  # Note: Order matters!
+  local pkg_managers=(
+    yay paru pacman       # Arch / Manjaro
+    apt-mark aptitude apt # Debian / Ubuntu
+  )
+  pkg_manager="$(first_cmd "${pkg_managers[@]}")" || true
+  case "$pkg_manager" in
+  yay | paru) "$pkg_manager" -Qqe ;; pacman) pacman -Qqen ;;
+  'apt-mark') apt-mark showmanual ;; aptitude) aptitude search '~i !~M' -F '%p' ;;
+  apt) apt list --manual-installed | cut -d/ -f1 ;; # worst case; apt does not have a stable CLI interface.
+  '') err "Could not determine package manager. To add support, add a case statement to list_pacakges()" ;;
+  # This means it was added to the list of package managers but not the case statement
+  *) abort "Unknown package manager '$pkg_manager'. This is most likely a bug." 3 ;;
+  esac
+}
 case "$mode" in
 backup)
   log ''
   log "--- Backup at $(date) ---"
   log ''
+
+  log "Backing up package list to $PACKAGE_LIST"
+  list_pacakges >|"$PACKAGE_LIST"
 
   log "Backing up to $DESTINATION_URI"
   run "$DUPLICITY" --full-if-older-than="${FULL_IF_OLDER:-1M}" "${command[@]}" "${args[@]}" "$SOURCE_DIR" "$DESTINATION_URI"
