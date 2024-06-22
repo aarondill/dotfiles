@@ -42,6 +42,12 @@ SOURCE_DIR="$HOME"
 files=(
   "$HOME/.local/state/bash_history"
   "$PACKAGE_LIST"
+  # Backup the browser things I care about
+  "$HOME/.config/vivaldi/Default/History"
+  "$HOME/.config/vivaldi/Default/Extensions/"
+  "$HOME/.config/vivaldi/Default/Preferences"
+  # The rest is ignored
+  "-$HOME/.config/vivaldi" "-$HOME/.config/vivaldi-static"
 
   "-$HOME/.cache"
   "-$HOME/.cache/deja-dup"
@@ -49,8 +55,6 @@ files=(
   "-$HOME/.config/TabNine"
   "-$HOME/.config/google-chrome"
   "-$HOME/.config/google-chrome-static"
-  "-$HOME/.config/vivaldi"
-  "-$HOME/.config/vivaldi-static"
   "-$HOME/.local/share"
   "-$HOME/.local/share/Trash"
   "-$HOME/.local/state"
@@ -197,7 +201,8 @@ function err() { printf '%s\n' "$@" >&2 || true; }
 function abort() { err "$1" && exit "${2:-1}"; }
 
 # Array of arguments to pass to duplicity
-args=()
+# Slightly safer options
+args=(--exclude-other-filesystems --exclude-device-files)
 
 mode=backup
 command=() # an array for the sake of empty strings (allows to skip the command and dynamically create full backups)
