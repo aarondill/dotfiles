@@ -96,7 +96,7 @@ VOLSIZE=200
 external=
 
 # maj:min, LABEL=label, UUID=uuid, PARTLABEL=label, PARTUUID=uuid
-usbdevice=UUID=86eb0e3c-c03a-4414-9bfc-f20bef42f2ba
+usbdevice=UUID=e9dff24c-bba3-424e-9855-79e4b2883488
 usbname=Backup # The directory name it is automounted under
 usbdirectory=/mnt/backup/
 
