@@ -33,21 +33,35 @@ function size_diff() {
 }
 
 function clean_config_dir() {
-  local dir=$1 file
+  local dir=$1 file mkfiles rmfiles
 
+  # These directories will be removed, then replaced with a new empty file
+  mkfiles=(
+    "$dir/OnDeviceHeadSuggestModel"
+    "$dir/Default/optimization_guide_prediction_model_downloads"
+    "$dir/Default/optimization_guide_model_metadata_store"
+    "$dir/Default/optimization_guide_hint_cache_store"
+    "$dir/pnacl"
+    "$dir/BrowserMetrics"
+    "$dir/"*_crx_cache
+  )
+  # These files will be removed, but not recreated
+  rmfiles=(
+    "$dir/Safe Browsing"
+    "$dir/Crash Reports"
+    "$dir/"**/*Cache "$dir"/**/Cache*
+    "$dir"/**/LOG "$dir"/**/LOG.old
+    "$dir/Default/IndexedDB/"*
+  )
   # causes issues?
-  for d in "$dir/OnDeviceHeadSuggestModel" \
-    "$dir/Default/optimization_guide_prediction_model_downloads" \
-    "$dir/Default/optimization_guide_model_metadata_store" \
-    "$dir/Default/optimization_guide_hint_cache_store" \
-    "$dir/pnacl" "$dir/BrowserMetrics"; do
+  for d in "${mkfiles[@]}"; do
     if [ -d "$d" ]; then
       rm -rf -- "$d"
       touch -- "$d"
     fi
   done
 
-  for file in "$dir/Safe Browsing" "$dir/Crash Reports" "$dir/"**/*Cache "$dir"/**/Cache* "$dir"/**/LOG "$dir"/**/LOG.old "$dir/Default/IndexedDB/"*; do
+  for file in "${rmfiles[@]}"; do
     if [ -e "$file" ]; then rm -rf -- "$file"; fi
   done
 }
