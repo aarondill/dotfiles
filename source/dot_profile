@@ -11,14 +11,20 @@
 # for ssh logins, install and configure the libpam-umask package.
 #umask 022
 
-path_contains() {
-  case ":$PATH:" in
-  *":${1:-}:"*) return 0 ;;
-  *) return 1 ;;
-  esac
+dedupe_path() {
+  # If perl isn't available, just give up
+  command -v perl >/dev/null 2>&1 || return 0
+  PATH=$(perl -e '
+use Config; use File::Spec; use Cwd;
+foreach my $path (File::Spec->path) {
+    my $realpath = File::Spec->file_name_is_absolute($path) && -d $path ? Cwd::realpath($path) : File::Spec->canonpath($path);
+    push @res, $realpath unless ($seen{$realpath}++) 
 }
-append_path() { p="${1:-}" && ! path_contains "$p" && PATH="${PATH:+$PATH:}$p"; }
-prepend_path() { p="${1:-}" && ! path_contains "$p" && PATH="$p${PATH:+:$PATH}"; }
+print join($main::Config{"path_sep"}, @res);
+')
+}
+append_path() { PATH="${PATH:+$PATH:}$1"; }
+prepend_path() { PATH="$1${PATH:+:$PATH}"; }
 
 if [ -z "${USER:-}" ]; then USER="$(id -nu)"; fi
 if [ -n "${USER:-}" ]; then export USER; fi
@@ -144,6 +150,9 @@ if [ -n "$BASH_VERSION" ]; then
     . "$HOME/.bashrc"
   fi
 fi
+
+dedupe_path
+unset -f append_path prepend_path dedupe_path
 
 # A variable to use in chezmoi to make sure the user has sourced the profile
 export MY_PROFILE_HAS_LOADED=1
