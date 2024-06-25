@@ -80,3 +80,4 @@ code/repos/.nvim/
 .ssh/config
 .config/user-dirs.conf
 .config/systemd/user/default.target.wants/google-chrome-profile.service
+code/perl/dedupe.pl
