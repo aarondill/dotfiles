@@ -13,6 +13,11 @@ fi
 
 has() { command -v "$1" >/dev/null 2>&1; }
 if has fastfetch; then
+  if [ -n "$DISPLAY" ]; then
+    # HACK: fastfetch messes up the output when the terminal is resized while it is running
+    # Give the WM time to resize the terminal before we run fastfetch
+    sleep .3
+  fi
   fastfetch
 elif has neofetch; then
   neofetch
