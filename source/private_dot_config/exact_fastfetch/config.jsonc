@@ -1,0 +1,72 @@
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+  "logo": {
+    "padding": {
+      "top": 2
+    }
+  },
+  "display": {
+    // "stat": true,
+    "temp": { "unit": "F" },
+    "percent": { "type": 3 },
+    "brightColor": true,
+    "binaryPrefix": "si"
+  },
+  "general": {
+    "thread": true
+  },
+  "modules": [
+    "title",
+    "separator",
+    "datetime",
+    "os",
+    "host",
+    "kernel",
+    "uptime",
+    "processes",
+    "packages",
+    "shell",
+    "editor",
+    "display",
+    "brightness",
+    "monitor",
+    "lm",
+    "de",
+    "wm",
+    "theme",
+    "icons",
+    "terminal",
+    { "type": "cpu", "temp": true },
+    "cpuusage",
+    { "type": "gpu", "temp": true },
+    "memory",
+    "swap",
+    "disk",
+    "battery",
+    "player",
+    "media",
+    {
+      "type": "localip",
+      "showIpv6": true,
+      "compact": true,
+      "showPrefixLen": true
+    },
+    {
+      "type": "wifi",
+      "format": "{inf-status}{?ssid}: {ssid} ({#green}{signal-quality}%{#}){?}"
+    },
+    {
+      "type": "command",
+      "key": "Last Login",
+      "text": "last \"$USER\" -2R --time-format short | head -n1 | cut -d' ' -f2- | sed -e 's/^ *//g' -e 's/ \\{2,\\}/ /g'"
+    },
+    "bluetooth",
+    // NOTE: modify when fastfetch-cli/fastfetch#1043 is fixed
+    // { "type": "sound", "format": "{2:30} ({3}%)" },
+    "sound",
+    // { "type": "weather", "timeout": 1000, "outputFormat": "%t+-+%C" }, // Too slow
+    { "type": "physicaldisk", "temp": true },
+    "break",
+    "colors"
+  ]
+}
