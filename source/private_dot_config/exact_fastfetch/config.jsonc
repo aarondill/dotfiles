@@ -65,7 +65,7 @@
     // { "type": "sound", "format": "{2:30} ({3}%)" },
     "sound",
     // { "type": "weather", "timeout": 1000, "outputFormat": "%t+-+%C" }, // Too slow
-    { "type": "physicaldisk", "temp": true },
+    { "type": "physicaldisk", "temp": true, "key": ""  },
     "break",
     "colors"
   ]

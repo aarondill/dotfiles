@@ -123,7 +123,7 @@ if has git; then
   fi
 fi
 
-alias gsudo='pkexec env DISPLAY="$DISPLAY" XAUTHORITY="$XAUTHORITY" '
+alias gsudo='pkexec env GTK_THEME="$GTK_THEME" DISPLAY="$DISPLAY" XAUTHORITY="$XAUTHORITY" '
 alias restart-ibus='ibus-daemon --xim -d -r'
 
 # Don't you DARE open a window
