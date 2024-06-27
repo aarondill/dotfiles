@@ -50,7 +50,6 @@ for dir in "$XDG_CACHE_HOME" "$XDG_STATE_HOME" "$XDG_CONFIG_HOME" "$XDG_DATA_HOM
 done
 unset dir
 
-export LIBVIRT_DEFAULT_URI=qemu:///system
 # Stop less from saving it's history
 export LESSHISTFILE=-
 # Make search case insensitive -- Support colors
