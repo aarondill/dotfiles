@@ -82,3 +82,4 @@ code/repos/.nvim/
 .config/systemd/user/default.target.wants/google-chrome-profile.service
 code/perl
 .config/fastfetch/.
+.config/libvirt/libvirt.conf
