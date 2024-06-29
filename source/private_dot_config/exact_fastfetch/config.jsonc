@@ -29,14 +29,18 @@
     "editor",
     "display",
     "brightness",
-    "monitor",
+    { "type": "monitor", "format": "{2}x{3}px ({4}x{5} mm)" },
     "lm",
     "de",
     "wm",
     "theme",
     "icons",
     "terminal",
-    { "type": "cpu", "temp": true },
+    {
+      "type": "cpu",
+      "temp": true,
+      "format": "{name:-20} ({cores-online}) @ {freq-max} GHz - {temperature}"
+    },
     "cpuusage",
     { "type": "gpu", "temp": true },
     "memory",
@@ -61,11 +65,9 @@
       "text": "last \"$USER\" -2R --time-format short | head -n1 | cut -d' ' -f2- | sed -e 's/^ *//g' -e 's/ \\{2,\\}/ /g'"
     },
     "bluetooth",
-    // NOTE: modify when fastfetch-cli/fastfetch#1043 is fixed
-    // { "type": "sound", "format": "{2:30} ({3}%)" },
-    "sound",
+    { "type": "sound", "format": "{2:-30} ({3}%)" },
     // { "type": "weather", "timeout": 1000, "outputFormat": "%t+-+%C" }, // Too slow
-    { "type": "physicaldisk", "temp": true, "key": ""  },
+    { "type": "physicaldisk", "temp": true, "key": "Disk ({name:-8})" },
     "break",
     "colors"
   ]
