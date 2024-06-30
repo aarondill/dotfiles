@@ -172,7 +172,7 @@ if [ -f ~/.config/tabtab/bash/__tabtab.bash ]; then . ~/.config/tabtab/bash/__ta
 if will_startx; then
   # The command to run. Leave empty to use the default. This should be a absolute path!
   startx_command=()
-  # startx_command+=(~/code/repos/awesome/_scripts/run)
+  # [ -f ~/code/repos/awesome/_scripts/run ] && startx_command+=(~/code/repos/awesome/_scripts/run)
   # LOG_FILE="$HOME/.cache/visual/$(date +"%D-%T.%3N").log"
   LOG_FILE="$HOME/.cache/visual/visual.log"
   mkdir -p -- "$(dirname "$LOG_FILE")"
