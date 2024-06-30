@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+
+xinput --map-to-output 'ELAN Touchscreen' eDP-1

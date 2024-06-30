@@ -11,8 +11,6 @@ this_dir=$(dirname -- "$0") || abort "Could not find current script filepath"
 
 DEST=$(dirname -- "$this_dir")
 
-if has pacman; then exec "$this_dir/arch/makepkg.sh" "$DEST"; fi
-
 install_deps() {
   if [ -f "$DEST/build/.has_installed_deps" ]; then return 0; fi # already did it :)
   if ! [ -d "$this_dir" ]; then err "Couldn't find script dir" && return 1; fi
