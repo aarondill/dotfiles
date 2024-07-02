@@ -50,8 +50,9 @@ for dir in "$XDG_CACHE_HOME" "$XDG_STATE_HOME" "$XDG_CONFIG_HOME" "$XDG_DATA_HOM
 done
 unset dir
 
-MAKEFLAGS="-j$(nproc)"
-export MAKEFLAGS
+_cores=$({ nproc || sysctl -n hw.ncpu || getconf _NPROCESSORS_ONLN || echo 1; } 2>/dev/null)
+export MAKEFLAGS="-j$_cores"
+unset _cores
 # Stop less from saving it's history
 export LESSHISTFILE=-
 # Make search case insensitive -- Support colors
