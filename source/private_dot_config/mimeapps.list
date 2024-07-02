@@ -44,6 +44,7 @@ image/png=org.gnome.eog.desktop;
 application/pdf=org.gnome.Evince.desktop
 image/svg=org.gnome.eog.desktop
 image/svg+xml=org.gnome.eog.desktop
+x-scheme-handler/sidequest=SideQuest.desktop
 
 [Added Associations]
 image/webp=gimp.desktop;
