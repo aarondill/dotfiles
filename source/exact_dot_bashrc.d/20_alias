@@ -36,6 +36,9 @@ alias shutdown="history -a; /sbin/shutdown"
 # Toggle capslock from terminal (bc capslock key is remapped)
 alias capslock='xdotool key Caps_Lock'
 alias CAPSLOCK='xdotool key Caps_Lock'
+if has qmv; then
+  alias qmv='qmv -f do'
+fi
 
 if has new; then alias new-java='new -l java'; fi
 
