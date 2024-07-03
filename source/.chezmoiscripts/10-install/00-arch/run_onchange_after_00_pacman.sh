@@ -17,7 +17,7 @@ PACKAGES=(
   lsof lua luajit make neofetch neovim net-tools networkmanager-openvpn
   noto-fonts-cjk noto-fonts-emoji noto-fonts-extra openssh openvpn os-prober
   p7zip pacutils pkgfile plocate posix progress pulseaudio python-pip reflector
-  ripgrep rlwrap rsync shfmt speedtest-cli sudo tlp trash-cli tree
+  ripgrep ripgrep-all rlwrap rsync shfmt speedtest-cli sudo tlp trash-cli tree
   ttf-font-awesome ttf-liberation ttf-nerd-fonts-symbols-mono unzip util-linux
   vivaldi wezterm wget xdg-user-dirs zip zoxide
 )
