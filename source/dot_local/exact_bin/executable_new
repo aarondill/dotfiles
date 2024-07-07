@@ -15,7 +15,7 @@ if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
 # Include dotfiles in globs
 shopt -s dotglob
 
-template_parent_dir=("$HOME/code" "$HOME/Templates")
+template_parent_dir=("$HOME/Templates" "$HOME/code")
 
 BASH_TPL=$(cmdpath bash-tpl 2>/dev/null) || true
 function get_bash_tpl() {
