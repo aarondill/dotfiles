@@ -1,6 +1,6 @@
 # ~/.config/git/config
 [user]
-  name = aarondill
+  name = Aaron Dill
   email = aaronsacks2006@gmail.com
 [credential "https://github.com"]
   helper = 
