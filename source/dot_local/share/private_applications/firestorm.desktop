@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name=Firestorm
+Comment=fslite
+Icon=/home/aaron/.local/share/icons/fslite.ico
+
+# Uncomment this to open *Vivaldi* in 'app-mode' (no titlebar)
+Exec=vivaldi --app=https://firestorm-delta.vercel.app
+Terminal=false
+Type=Application
+
+# Uncomment this to use the default browser (recommended)
+URL=https://firestorm-delta.vercel.app
+# Type=Link
