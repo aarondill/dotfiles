@@ -39,7 +39,7 @@
 .local/share/applications/bitwarden.desktop
 .local/share/applications/canvas.desktop
 .local/share/applications/dunnet.desktop
-.local/share/applications/fslite.desktop
+.local/share/applications/firestorm.desktop
 .local/share/applications/github.desktop
 .local/share/applications/gnome-boxes.desktop
 .local/share/applications/google-chrome.desktop
