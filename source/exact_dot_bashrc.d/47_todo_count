@@ -8,8 +8,12 @@
 [ "$SHLVL" -eq 1 ] || return 0
 command -v todo &>/dev/null || return 0
 
-_count=$(todo count)
+_count=$(todo count) || true
 if [ "$_count" -gt 0 ]; then
-  printf '%s\n' "You have $_count todos!" || true
+  _msg="You have $_count todo"
+  [ "$_count" -eq 1 ] || _msg+="s"
+  _msg+="!"
+  printf '%s\n' "$_msg" || true
+  unset _msg
 fi
 unset _count
