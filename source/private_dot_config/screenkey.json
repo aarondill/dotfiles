@@ -11,7 +11,7 @@
     "font_size": "small",
     "font_color": "white",
     "bg_color": "black",
-    "opacity": 0.4,
+    "opacity": 0.5,
     "key_mode": "composed",
     "bak_mode": "baked",
     "mods_mode": "normal",
