@@ -10,7 +10,9 @@
     "temp": { "unit": "F" },
     "percent": { "type": 3 },
     "brightColor": true,
-    "binaryPrefix": "si"
+    "size": {
+      "binaryPrefix": "si"
+    }
   },
   "general": {
     "thread": true

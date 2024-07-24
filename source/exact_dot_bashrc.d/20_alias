@@ -70,7 +70,6 @@ if [ -n "${EDITOR:-}" ]; then
   export VISUAL="$EDITOR"
 fi
 
-alias fslite='browser fslite.vercel.app'
 {
   # Don't show loopback, and show more useful columns
   _lsblk='lsblk -o NAME,MAJ:MIN,SIZE,FSTYPE,LABEL,MOUNTPOINT'

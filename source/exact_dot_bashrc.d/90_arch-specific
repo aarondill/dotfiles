@@ -7,6 +7,7 @@
 #
 #
 
+if true; then return 0; fi
 cnf=(/usr/share/doc/pkgfile/command-not-found.bash /usr/share/doc/find-the-command/ftc.bash)
 for file in "${cnf[@]}"; do
   [ -r "$file" ] || continue
