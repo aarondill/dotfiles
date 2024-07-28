@@ -79,6 +79,17 @@ fi
   unset _lsblk
 }
 
+# Don't show /run/credentials/* in df or duf
+if [ -d /run/credentials/ ]; then
+  if has duf; then
+    _hide=('/run/credentials/*')
+    # shellcheck disable=SC2139
+    alias duf="duf -hide-mp ${_hide@Q}"
+    unset _hide
+  fi
+  if has df; then alias df="df --exclude-type=tmpfs"; fi
+fi
+
 alias cl='clear'
 alias tree='tree -a' # show hidden
 if has tty-clock; then alias clock='tty-clock  -sScbtrn'; fi
@@ -114,11 +125,10 @@ if has git; then
   alias gitroot='cd "$(git rev-parse --show-toplevel)"'
   alias g='git'
   # Reuse git completion if present (overwritten already), else default to directories
-  complete=$(complete -p git 2>/dev/null || printf '%s ' complete -o bashdefault -o default -o nospace -F __git_wrap__git_main git)
-  # remove ' git' and replace with ' g'. Lack of quotes is intentional!
-  if [ -n "$complete" ]; then
-    eval "${complete% git} g"
-  fi
+  _complete=$(complete -p git 2>/dev/null || printf '%s ' complete -o bashdefault -o default -o nospace -F __git_wrap__git_main git)
+  # remove ' git' and replace with ' g'
+  [ -z "$_complete" ] || eval "${_complete% git} g"
+  unset _complete
   # if not defined, just wait till git is used
   if has __load_completion; then
     __load_completion git
