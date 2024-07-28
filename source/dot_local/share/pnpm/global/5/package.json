@@ -18,8 +18,8 @@
     "tsx": "^4.16.2",
     "typescript": "^5.5.4",
     "uglify-js": "^3.19.0",
-    "vercel": "^35.1.0",
-    "vite": "^5.3.4",
+    "vercel": "^35.2.1",
+    "vite": "^5.3.5",
     "wipe-modules": "^1.2.0"
   },
   "//": "force core-js to be on latest. It shouldn't cause any issues.",
