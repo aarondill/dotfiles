@@ -57,8 +57,10 @@ function pacyay() {
 }
 function pacman_is_installed() { for pac; do pacyay -Q -- "$pac" &>/dev/null || return 1; done; }
 function pacman_is_available() { for pac; do pacyay -Si -- "$pac" &>/dev/null || return 1; done; }
+function pacman_mark_explicit() { pacyay -qD --asexplicit -- "$@"; }
+function pacman_mark_deps() { pacyay -qD --asdeps -- "$@"; }
 # usage: pacman_install package
-function pacman_install() { pacyay -S --needed -- "$@"; }
+function pacman_install() { pacyay -S --needed -- "$@" && pacman_mark_explicit "$@"; }
 function pacman_update() { pacyay -Syu; }
 function pacman_remove() { pacyay -Rncus -- "$@"; } # Careful here!
 # install aur packages. not repo. use pacman_* for that.
