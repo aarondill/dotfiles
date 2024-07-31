@@ -59,7 +59,7 @@ case "$JAVADIR" in */bin)
   fi
   ;;
 esac
-[ "$yes" -eq 1 ] || confirm "Are you sure you would like to link all binaries in $JAVADIR?" || abort "Aborting" 1
+[ "$yes" -eq 1 ] || confirm "Are you sure you would like to link all binaries in $JAVADIR/bin?" || abort "Aborting" 1
 
 sudo_cmd mkdir -p "$JVM_VERS_DIR"
 JVM_VERS_DIR=$(realpath -- "$JVM_VERS_DIR")
@@ -82,11 +82,11 @@ function link() {
   verbose sudo_cmd update-alternatives --set "$name" "$from_path"
 }
 
-while read -d '' -r -s from_path; do
-  name=$(basename -- "$from_path")
+for bin in "$JAVADIR/bin"/*; do
+  name=$(basename -- "$bin")
   dest_path="$BINDIR/$name"
-  link "$dest_path" "$name" "$from_path" "$PRIORITY"
-done < <(find "$JAVADIR" -perm /u=x,g=x,o=x -type f -print0)
+  link "$dest_path" "$name" "$bin" "$PRIORITY"
+done
 
 verbose sudo_cmd ln -sf -T "$JAVADIR" "$JVM_VERS_DIR/default-java"
 unset -v cmd
