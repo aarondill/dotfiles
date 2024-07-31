@@ -14,7 +14,7 @@ PACKAGES=(
   age base-devel bash-completion bat cheese cmake cronie curl dconf-editor
   dosfstools duf duplicity e2fsprogs exfatprogs fuse2 gdb git git-delta
   github-cli grep hexedit imagemagick inetutils inotify-tools jq less libpulse
-  lsof lua luajit make neofetch neovim net-tools networkmanager-openvpn
+  lsof lua luajit make fastfetch neovim net-tools networkmanager-openvpn
   noto-fonts-cjk noto-fonts-emoji noto-fonts-extra openssh openvpn os-prober
   p7zip pacutils pkgfile plocate posix progress pulseaudio python-pip reflector
   ripgrep ripgrep-all rlwrap rsync shfmt speedtest-cli sudo tlp trash-cli tree
