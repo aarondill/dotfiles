@@ -337,27 +337,35 @@ backup | print) # setup args for print to ensure proper output
   ;;
 esac
 
+# Shell output
+# usage: prefix echo <<<"hello world"
+# output: 'echo' 'hello world'
+prefix() {
+  awk -v prefix="${*@Q} " '{print $prefix$0}'
+}
+
 function list_packages() {
-  local pkg_manager pkg
+  local pkg_manager
   # Note: Order matters!
   local pkg_managers=(
-    yay paru pacman       # Arch / Manjaro
-    apt-mark aptitude apt # Debian / Ubuntu
+    yay paru pacman # Arch / Manjaro
+    apt             # Debian / Ubuntu
   )
   pkg_manager="$(first_cmd "${pkg_managers[@]}")" || true
   case "$pkg_manager" in
   yay | paru | pacman)
     local args=(-Qq)
     [ "$pkg_manager" != pacman ] || args+=(-n) # only show native packages if using pacman
-    "$pkg_manager" "${args[@]}" -e | while read -r pkg; do
-      printf '%s %s\n' "$pkg_manager -S --needed --asexplicit" "$pkg"
-    done
-    "$pkg_manager" "${args[@]}" -d | while read -r pkg; do
-      printf '%s %s\n' "$pkg_manager -S --needed --asdeps" "$pkg"
-    done
+    "$pkg_manager" "${args[@]}" -e | prefix "$pkg_manager" -S --needed --asexplicit --
+    "$pkg_manager" "${args[@]}" -d | prefix "$pkg_manager" -S --needed --asdeps --
     ;;
-  'apt-mark') apt-mark showmanual ;; aptitude) aptitude search '~i !~M' -F '%p' ;;
-  apt) apt list --manual-installed | cut -d/ -f1 ;; # worst case; apt does not have a stable CLI interface.
+  apt)
+    has apt-mark || abort "apt-mark is not installed. Please install it" 3
+    apt-mark showmanual | prefix apt install --
+    apt-mark showauto | prefix apt install --mark-auto --
+    ;;
+  # aptitude) aptitude search '~i !~M' -F '%p' ;;
+  # apt) apt list --manual-installed | cut -d/ -f1 ;; # worst case; apt does not have a stable CLI interface.
   '') err "Could not determine package manager. To add support, add a case statement to list_pacakges()" ;;
   # This means it was added to the list of package managers but not the case statement
   *) abort "Unknown package manager '$pkg_manager'. This is most likely a bug." 3 ;;
