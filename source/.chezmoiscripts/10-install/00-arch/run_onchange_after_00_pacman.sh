@@ -11,15 +11,17 @@ if ! has_pacman; then
   abort "pacman is not installed, skipping pacman installation" 0
 fi
 PACKAGES=(
-  age base-devel bash-completion bat cheese cmake cronie curl dconf-editor
-  dosfstools duf duplicity e2fsprogs exfatprogs fuse2 gdb git git-delta
-  github-cli grep hexedit imagemagick inetutils inotify-tools jq less libpulse
-  lsof lua luajit make fastfetch neovim net-tools networkmanager-openvpn
+  age base-devel bash-completion bat bluez-utils cheese cmake cronie curl
+  dconf-editor ddrescue dosfstools downgrade duf duplicity dust e2fsprogs
+  exfatprogs expac fastfetch ffmpeg fuse2 gdb git git-delta github-cli grep
+  hexedit imagemagick inetutils inotify-tools jq less libpulse lsof lua luajit
+  make mdcat moreutils neovim net-tools networkmanager-openvpn nnn
   noto-fonts-cjk noto-fonts-emoji noto-fonts-extra openssh openvpn os-prober
-  p7zip pacutils pkgfile plocate posix progress pulseaudio python-pip reflector
-  ripgrep ripgrep-all rlwrap rsync shfmt speedtest-cli sudo tlp trash-cli tree
-  ttf-font-awesome ttf-liberation ttf-nerd-fonts-symbols-mono unzip util-linux
-  vivaldi wezterm wget xdg-user-dirs zip zoxide
+  p7zip pacman-contrib pacutils pigz pkgfile plocate posix progress pulseaudio
+  pv python-pip reflector renameutils ripgrep ripgrep-all rlwrap rsync shfmt
+  silicon speedtest-cli strace sudo tlp trash-cli tree ttf-font-awesome
+  ttf-liberation ttf-nerd-fonts-symbols-mono unzip util-linux vivaldi wezterm
+  wget xdg-user-dirs zip zoxide
 )
 VIRTUAL_MACHINE_PACKAGES=(
   virt-manager qemu-desktop # VM management. Technically, only virt-manager is graphical, but they are used together
