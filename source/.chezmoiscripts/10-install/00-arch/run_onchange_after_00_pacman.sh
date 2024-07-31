@@ -13,7 +13,7 @@ fi
 PACKAGES=(
   age base-devel bash-completion bat bluez-utils cheese cmake cronie curl
   dconf-editor ddrescue dosfstools downgrade duf duplicity dust e2fsprogs
-  exfatprogs expac fastfetch ffmpeg fuse2 gdb git git-delta github-cli grep
+  exfatprogs expac eza fastfetch ffmpeg fuse2 gdb git git-delta github-cli grep
   hexedit imagemagick inetutils inotify-tools jq less libpulse lsof lua luajit
   make mdcat moreutils neovim net-tools networkmanager-openvpn nnn
   noto-fonts-cjk noto-fonts-emoji noto-fonts-extra openssh openvpn os-prober
