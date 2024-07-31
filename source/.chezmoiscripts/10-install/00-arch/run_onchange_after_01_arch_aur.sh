@@ -47,6 +47,7 @@ packages=(
   zeal                           # Documentation reader
   dashbinsh                      # Use dash as /bin/sh
   yaru-gtk-theme yaru-icon-theme # Yaru themeing
+  downgrade                      # downgrades packages
 )
 for p in "${packages[@]}"; do
   ! pacman_is_installed "$p" || continue
