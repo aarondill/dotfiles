@@ -15,6 +15,9 @@ alias d='cd'
 if ! has totem && has mpv; then
   alias totem='echo "maybe you meant mpv?" >&2 && mpv'
 fi
+if has nnn && ! has fff; then
+  alias fff='echo "maybe you meant nnn?" >&2 && nnn'
+fi
 # Alias sudo to call sudo with *my* $HOME/ENV/PATH
 # alias sudo="sudo -E env PATH=\"\$PATH\" "
 alias sudo='sudo -E ' # dont use env so permitted commands still work
