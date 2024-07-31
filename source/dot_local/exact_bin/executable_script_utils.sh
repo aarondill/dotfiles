@@ -216,6 +216,8 @@ function get_script_path() { resolve_path "${1-${BASH_SOURCE[1]:-}}"; }
 declare -i USE_COLOR="${USE_COLOR:-0}"
 # If this variable is set to 0, the verbose() function will not output anything, and just calls the arguments
 declare -i USE_VERBOSE="${USE_VERBOSE:-1}"
+# If this variable is set to 1, the verbose() function will only output, and not call the arguments
+declare -i USE_DRY_RUN="${USE_DRY_RUN:-0}"
 YELLOW_COLOR='' TEAL_COLOR='' RED_COLOR='' PINK_COLOR='' OFF_COLOR=''
 if has_cmd tput; then
   YELLOW_COLOR="$(tput setaf 3 2>/dev/null)" || true # Used for warn
@@ -296,9 +298,13 @@ function vlog() { [ "${USE_VERBOSE:-0}" -eq 0 ] || log "$@"; }
 # verbose echo do something -> echo do something\ndo something
 # note: uses `print_cmd` to output the command
 function verbose() {
-  # if USE_VERBOSE != 0, then output current command to stdout
-  [ "${USE_VERBOSE:-0}" -eq 0 ] || print_cmd "$@"
-  "$@"
+  local verbose=$USE_VERBOSE            # if USE_VERBOSE=1, be verbose
+  [ "$USE_DRY_RUN" -eq 0 ] || verbose=1 # if USE_DRY_RUN=1, be verbose
+  #   # if USE_VERBOSE != 0, then output current command to stdout
+  [ "$verbose" -eq 0 ] || print_cmd "$@" >&2
+  # If USE_DRY_RUN=1, don't run anything
+  [ "$USE_DRY_RUN" -ne 1 ] || return 0
+  "$@" # run it
 }
 
 # Usage: repeat do_cmd -> `> do_cmd`

@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
-# TODO: less "/home/aaron" more "$HOME" -- need to investigate interactions with existing backups
-set -euC -o pipefail
+set -euC -o pipefail && shopt -s nullglob globstar
+utils=script_utils.sh dir=$(dirname -- "${BASH_SOURCE[0]}") || true
+if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
+# shellcheck source=./script_utils.sh
+. "$utils"
 
 # Calls duplicity to run a backup. Passes user arguments to first arguments of duplicity.
 # Requires duplicity to be installed
@@ -122,10 +125,7 @@ if [ -z "$external" ] && [ -d "$usbdirectory" ]; then
   fi
 fi
 
-if [ -z "$external" ]; then
-  printf '%s\n' "$(date): Could not find usb drive for backup. Please check that it's mounted." >&2
-  exit 1
-fi
+[ -n "$external" ] || abort "$(date): Could not find usb drive for backup. Please check that it's mounted." 1
 
 # The destination directory to backup *to* (usually a remote location or external storage)
 DESTINATION_URI=file://$external/duplicity_backup/$host-$os
@@ -196,17 +196,18 @@ Environment Variables:
   DUPLICITY: The path to the duplicity executable
 EOF
 }
-function log() { printf '%s\n' "$@" || true; }
-function err() { printf '%s\n' "$@" >&2 || true; }
-function abort() { err "$1" && exit "${2:-1}"; }
 
 # Array of arguments to pass to duplicity
 # Slightly safer options
 args=(--exclude-other-filesystems --exclude-device-files)
 
+LONGOPTS=incr,full,help,cleanup,info,dry-run,print,status,verbose
+SHORTOPTS=h,c,i,n,p,s,v
+ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 mode=backup
 command=() # an array for the sake of empty strings (allows to skip the command and dynamically create full backups)
-for arg in "$@"; do
+while true; do
+  arg="$1" && shift
   case "$arg" in
   --full | --incr) command=("${arg#--}") ;;
   --help | -h) usage && exit 0 ;;
@@ -217,13 +218,13 @@ for arg in "$@"; do
   --dry-run | -n) BACKUP_DRY_RUN=1 ;; # overrides environment variables
   --verbose | -v) BACKUP_VERBOSE=1 ;; # overrides environment variables
   --no-verify) BACKUP_VERIFY=0 ;;
-  --*) abort "Unknown option: '$arg'" ;;
-  -*) abort "Unknown option: '$arg'" ;;
-  *) abort "this script does not support positional arguments" ;;
+  --) break ;;
+  *) abort "this is a bug" 3 ;;
   esac
 done
+[ "$#" -eq 0 ] || abort "This script does not support positional arguments" 2
 
-DUPLICITY="${DUPLICITY:-"$(command -v duplicity 2>/dev/null || true)"}"
+DUPLICITY="${DUPLICITY:-"$(cmdpath duplicity || true)"}"
 # Ensure duplicity can be accessed
 if [ "$mode" != "print" ]; then # This is a special case. We don't want to error out!
   if [ -z "$DUPLICITY" ]; then
@@ -274,28 +275,18 @@ fi
 # ----------------------------------------------------------------
 # ----------------------------------------------------------------
 
-function verbose() {
-  local verbose=${BACKUP_VERBOSE:-}                 # if BACKUP_VERBOSE, be verbose
-  [ -z "${BACKUP_DRY_RUN:-}" ] || verbose=1         # if dry-run, be verbose
-  [ -z "$verbose" ] || printf "%s\n" "> ${*@Q}" >&2 # print it
+# Opt into color if stdout is a terminal
+USE_COLOR=1
+# IF BACKUP_DRY_RUN is set, don't actually run anything
+[ -z "${BACKUP_DRY_RUN:-}" ] || USE_DRY_RUN=1
+# If BACKUP_VERBOSE is *not* set, don't be verbose
+[ -n "${BACKUP_VERBOSE:-}" ] || USE_VERBOSE=0
 
-  [ -z "${BACKUP_DRY_RUN:-}" ] || return 0
-  "$@" # run it
-}
 did_something=0
 # Sets did_something and verbosely runs "$@"
 function run() {
   did_something=1
   verbose "$@"
-}
-function has() { command -v -- "$@" &>/dev/null; }
-function first_cmd() {
-  local cmd && for cmd in "$@"; do
-    has "$cmd" || continue
-    printf '%s' "$cmd" || true
-    return 0
-  done
-  return 1
 }
 
 [ "${#args[@]}" -gt 0 ] || abort "No arguments were specified. Something went wrong" 3
@@ -336,13 +327,6 @@ backup | print) # setup args for print to ensure proper output
   fi
   ;;
 esac
-
-# Shell output
-# usage: prefix echo <<<"hello world"
-# output: 'echo' 'hello world'
-prefix() {
-  awk -v prefix="${*@Q} " '{print prefix $0}'
-}
 
 # like declare -p, but nicer output
 print_array() {
