@@ -5,18 +5,6 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 # shellcheck source=../.utils.sh
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
-function install_humanity_icons() {
-  local TMP_DIR
-
-  TMP_DIR=$(mktemp -d)
-  rm_exit "$TMP_DIR"
-
-  git_clone 'https://git.launchpad.net/ubuntu/+source/humanity-icon-theme' "$TMP_DIR" 'ubuntu/devel'
-  sudo_cmd mv -vi "$TMP_DIR/Humanity" "$TMP_DIR/Humanity-Dark" "/usr/share/icons"
-
-  rm_exit_cleanup "$TMP_DIR"
-}
-
 function install_yaru() {
   local TMP_DIR
 
@@ -55,10 +43,6 @@ function install_yaru() {
   rm_exit_cleanup "$TMP_DIR"
   popd >/dev/null
 }
-
-if ! [ -d /usr/share/icons/Humanity/ ] || ! [ -d /usr/share/icons/Humanity-Dark/ ]; then
-  log_and_run "Installing Humanity icon theme" install_humanity_icons
-fi
 
 if ! [ -d /usr/share/icons/Yaru/ ] || ! [ -d /usr/share/icons/Yaru-dark/ ]; then
   log_and_run "Installing Yaru theme" install_yaru
