@@ -42,7 +42,7 @@ packages=(
   informant            # arch news through pacman
   isomaster            # unpack/edit .isos
   protonvpn            # protonvpn cli and gui
-  ripdrag              # Drag and drop from terminal
+  ripdrag-git          # Drag and drop from terminal
   simplescreenrecorder # screen recording
   zeal                 # Documentation reader
   dashbinsh            # Use dash as /bin/sh
