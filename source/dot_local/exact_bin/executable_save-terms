@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+set -euo pipefail
+shopt -s nullglob extglob globstar
+# Output a script that will restore interactive shells after a reboot
+
+esc() { printf '%s\n' "${*@Q}"; }
+log() { printf '%s\n' "$green$*$reset" >&2; }
+
+terminal=xdg-terminal-exec
+[ "$TERM_PROGRAM" != WezTerm ] || terminal=wezterm
+
+# Outputs the command to restore a shell (NON-bloacking)
+# usage: get_shell <cwd> <argv0> <cmdline...>
+function get_shell() {
+  local cwd="$1" zero="$2" cmdline=("${@:3}")
+  local script
+  if [ "$terminal" = wezterm ]; then
+    script=$(esc exec -a "$zero" "${cmdline[@]}")
+    esc wezterm start --cwd "$cwd" -- bash -c "$script"
+    return 0
+  fi
+  script=$(
+    esc cd "$cwd"
+    esc exec -a "$zero" "${cmdline[@]}"
+  )
+  printf '%s\n' "$(esc "$terminal" -e bash -c "$script") &"
+  return 0
+}
+
+green=$(tput setaf 2)
+reset=$(tput sgr0)
+log "Detected terminal: $terminal"
+log "Searching for interactive shells..."
+
+# shellcheck disable=SC2016
+lines=(
+  "#!/usr/bin/env bash"
+  "$(esc set -euo pipefail)"
+  "if [ -z \"\${DISPLAY:-}\" ]; then"
+  "  $(esc echo \$'DISPLAY is unset, not restoring shells.')"
+  "  $(esc exit 1)"
+  "fi"
+  "SHLVL=0"
+)
+for pid in /proc/[0-9]*/; do
+  pid=$(basename "$pid")
+  mapfile -d '' -t cmdline </proc/"$pid"/cmdline
+  [ "${#cmdline[@]}" -gt 0 ] || continue
+  zero="${cmdline[0]}"
+  case "$zero" in
+  -bash) ;; -fish) ;; -zsh) ;; -dash) ;; -sh) ;;
+  *) continue ;;
+  esac
+
+  cwd=$(readlink /proc/"$pid"/cwd)
+  [ -n "$cwd" ] || continue
+  exe=$(readlink /proc/"$pid"/exe)
+  [ -n "$exe" ] || continue
+  cmdline[0]="$exe"
+
+  log "Found $zero($pid) at $cwd (${cmdline[*]})"
+  lines+=(
+    "$(esc echo Restoring "$pid" at "$cwd")"
+    "$(get_shell "$cwd" "$zero" "${cmdline[@]}")"
+  )
+done
+# shellcheck disable=SC2016
+log "Done."
+
+printf '%s\n' "${lines[@]}"
