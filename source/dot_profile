@@ -147,8 +147,12 @@ fi
 
 # Saved terminals
 if [ -f ~/.terms ]; then
-  printf '%s\n' "Loading saved terminals"
-  bash ~/.terms && rm ~/.terms
+  printf '%s\n' "Loading saved terminals" >&2
+  # Move first to ensure child processes don't try to load it
+  # Store in case i need it
+  mv -f -- ~/.terms "$XDG_CACHE_HOME"/.terms
+  # If it fails, move it back
+  bash "$XDG_CACHE_HOME"/.terms || mv -i -- "$XDG_CACHE_HOME"/.terms ~/.terms
 fi
 
 # if running bash
