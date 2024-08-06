@@ -83,3 +83,4 @@ code/repos/.nvim/
 code/perl
 .config/fastfetch/.
 .config/libvirt/libvirt.conf
+.config/.prettierrc
