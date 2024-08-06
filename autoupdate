@@ -84,3 +84,4 @@ code/perl
 .config/fastfetch/.
 .config/libvirt/libvirt.conf
 .config/.prettierrc
+.config/.prettierrc.mjs
