@@ -62,7 +62,7 @@
 .vim
 code/.alexrc.mjs
 code/.eslintrc.cjs
-code/.prettierrc.cjs
+code/.prettierrc.mjs
 code/.release-it.json
 code/.shellcheckrc
 code/c/.clang-format
@@ -83,5 +83,4 @@ code/repos/.nvim/
 code/perl
 .config/fastfetch/.
 .config/libvirt/libvirt.conf
-.config/.prettierrc
 .config/.prettierrc.mjs
