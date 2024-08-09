@@ -32,6 +32,8 @@ function first_cmd() {
 }
 function verbose() {
   printf '%s\n' "> ${*@Q}" || true
+  # If this is a dry run, exit here because we don't need to do anything else
+  [ "$dry_run" -eq 0 ] || return 0
   "$@"
 }
 
@@ -82,10 +84,6 @@ if is_display "$server"; then cmd+=(--); fi
 if [ -n "$server" ]; then cmd+=("$server"); fi
 cmd+=("${rest[@]}")
 
-# If this is a dry run, exit here because we don't need to do anything else
-# If something went wrong, we would have already exited
-[ "$dry_run" -eq 0 ] || exit 0
-
 # from /etc/X11/Xsession.d/20dbus_xdg-runtime
 if [ -z "${DBUS_SESSION_BUS_ADDRESS:-}" ] && [ -n "${XDG_RUNTIME_DIR:-}" ] &&
   [ "$XDG_RUNTIME_DIR" = "/run/user/$(id -u)" ] && [ -S "$XDG_RUNTIME_DIR/bus" ]; then
@@ -102,10 +100,11 @@ if [ -z "${DBUS_SESSION_BUS_ADDRESS:-}" ] && [ -n "${XDG_RUNTIME_DIR:-}" ] &&
 fi
 
 if [ -z "${XAUTHORITY:-}" ] && [ -d "${XDG_RUNTIME_DIR:-}" ]; then
-  # NOTE: this path was chosen because in Ubuntu, it is permitted in the AppArmor config. See /etc/apparmor.d/abstractions/X.
+  # NOTE: this path was chosen because it is permitted in the default AppArmor config.
+  # See /etc/apparmor.d/abstractions/X.
   export XAUTHORITY="$XDG_RUNTIME_DIR/X11/Xauthority"
-  mkdir -p -- "$(dirname "$XAUTHORITY")" # Ensure the directory exists
-  touch -- "$XAUTHORITY"
+  verbose mkdir -p -- "$(dirname "$XAUTHORITY")" # Ensure the directory exists
+  verbose touch -- "$XAUTHORITY"
 fi
 
 verbose exec "${cmd[@]}"

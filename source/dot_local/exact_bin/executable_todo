@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# vim: set ft=sh:
 set -euC -o pipefail && shopt -s nullglob globstar
 utils=script_utils.sh dir=$(dirname -- "${BASH_SOURCE[0]}") || true
 if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
@@ -21,6 +22,7 @@ Edit <name>: Edit todo in \$EDITOR (Creates todo if not exist)
 Remove/rm <name>: Remove todo
 Done <name>: Synonoym for Remove
 Path [name]: Print the path of the todo (directory if no name specified)
+Cd [name]: Open a shell in the todo's directory (main directory if no name specified)
 
 Options:
   -h, --help         Show this help message.
@@ -111,6 +113,13 @@ path | dir)
   ret=${todo_dir}/${name}
   ret=${ret//\/\//\/} ret="${ret%/}" # remove double slashes and trailing slash
   log "$ret"
+  ;;
+cd | chdir)
+  [ -z "$name" ] || [ -e "$name" ] || abort "Todo doesn't exist: $name"
+  dir="${todo_dir}/${name}"
+  cd -- "$dir" || abort "Couldn't change to directory: $dir"
+  shell=$(cmdpath "$SHELL" || getent passwd "$USER" | cut -d : -f 7)
+  exec "$shell"
   ;;
 *) abort "Unrecognized action: $action" 2 ;;
 esac

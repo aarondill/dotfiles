@@ -74,6 +74,7 @@ function find_in_path() {
   [ -n "${PATH:-}" ] || return 1
   local path cmd exclude="${2:-}"
   cmd=${1%/} cmd="${1##*/}" # remove trailing slash -- then get basename
+  [ -n "$cmd" ] || return 1
   while read -r -d: path; do
     path=${path:-$PWD} # empty path means pwd
 
