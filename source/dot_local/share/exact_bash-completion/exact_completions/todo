@@ -1,30 +1,27 @@
 #!/usr/bin/env bash
-
+# vim:set ft=sh ts=2 sw=2 sts=2 et nospell:
 # shellcheck disable=SC2207
-
-\_todo() {
-local \_cmd=$1 cur=$2 _pre=$3
+_todo() {
+  local _cmd=$1 cur=$2 _pre=$3
   local todo_dir="${XDG_DATA_HOME:-~/.local/share}/todo"
-COMPREPLY=()
+  COMPREPLY=()
 
-case "$cur" in
+  case "$cur" in
   -*) COMPREPLY=($(compgen -W "$(todo --handle-completion-options)" -- "$cur")) && return 0 ;;
-esac
+  esac
 
-# todo <action> (complete)
-
-if [ "$COMP_CWORD" -eq 1 ]; then # complete the actions
-COMPREPLY=($(compgen -W 'list ls add show edit remove rm done count path cd' -- "$cur")) && return 0
-fi
-
-# shellcheck disable=SC2207
-
-local arr=($(cd "$todo_dir" && compgen -f -- "$cur")) # complete the todos
+  # todo <action> (complete)
+  if [ "$COMP_CWORD" -eq 1 ]; then # complete the actions
+    COMPREPLY=($(compgen -W "$(todo --handle-completion-actions)" -- "$cur"))
+    return 0
+  fi
+  # shellcheck disable=SC2207
+  local arr=($(cd "$todo_dir" && compgen -f -- "$cur")) # complete the todos
   local file && for file in "${arr[@]}"; do
-case "$file" in
+    case "$file" in
     .*) continue ;; esac # Skip dotfiles
     ! [ -d "$todo_dir/$file" ] || file+=/
     COMPREPLY+=("$file")
-done
+  done
 }
-complete -o bashdefault -F \_todo todo
+complete -o bashdefault -F _todo todo

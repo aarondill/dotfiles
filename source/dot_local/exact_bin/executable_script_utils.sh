@@ -45,7 +45,7 @@ EOF
 function join() {
   local sep="${1:-}" ret="${2:-}"
   if ! shift 2; then return 0; fi
-  printf "%s" "$ret" "${@/#/$sep}" || true
+  printf "%s" "$ret" "${@/#/"$sep"}" || true
 }
 # splits arguments by delim argument.
 # Note: if string ends in a delim, an empty element will be present in the output
@@ -508,13 +508,19 @@ function download() {
 
 # Returns a string that should be 'eval'ed to set the positional arguments
 # Store the string in a variable (ie ARGSTRING) to maintain the exit code if parse_args fails.
-# Input: $LONGOPTS,$SHORTOPTS
+# Input: $LONGOPTS,$SHORTOPTS - Arrays or comma-separated strings
 # eval "$(parse_args "$@")"
 function parse_args() {
   local parsed
   local code=0 && getopt --test &>/dev/null || code=$?
   if [ "$code" -ne 4 ]; then abort "Enhanced getopt is required for this script to work. Please install it." 1; fi
-  parsed=$(getopt --options="$SHORTOPTS" --longoptions="$LONGOPTS" --name "${THIS:-$0}" -- "$@") ||
+  # shellcheck disable=SC2145 # This works with strings, because they're passed as a single argument
+  {
+    local shortopts longopts
+    shortopts=$(join , "${SHORTOPTS[@]}}")
+    longopts=$(join , "${LONGOPTS[@]}}")
+  }
+  parsed=$(getopt --options="$shortopts" --longoptions="$longopts" --name "${THIS:-$0}" -- "$@") ||
     exit 2                     # getopt has already complained about wrong arguments to stdout - Exit script
   printf '%s' "set -- $parsed" # output getopt’s output this way to handle the quoting right
 }

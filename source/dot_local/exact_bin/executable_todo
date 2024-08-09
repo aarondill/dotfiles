@@ -43,16 +43,20 @@ show_directory() {
   [ "${#files[@]}" -gt 0 ] || log "No todos!"
 }
 
-LONGOPTS="help,handle-completion-options,dir:" SHORTOPTS="h,d:"
+LONGOPTS=(help handle-completion-{option,action}s dir:) SHORTOPTS=(h d:)
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
+COMPLETION_ACTIONS=(list ls add show edit remove rm 'done' count path cd)
 
 while true; do
   case "$1" in
   --help | -h) usage && exit 0 ;;
   --dir | -d) todo_dir=$2 && shift 2 ;;
+  --handle-completion-actions)
+    join " " "${COMPLETION_ACTIONS[@]}"
+    exit 0
+    ;;
   --handle-completion-options)
-    long=() short=()
-    split long "," "$LONGOPTS" && split short "," "$SHORTOPTS"
+    long=("${LONGOPTS[@]}") short=("${SHORTOPTS[@]}")
     for opt in "${long[@]%:}"; do      # Strip trailing colons
       [ "--$opt" != "$1" ] || continue # skip --handle-completion-options
       [ -n "$opt" ] || continue        # skip empty
