@@ -14,7 +14,7 @@ function _home_count() {
   shopt -s dotglob    # enable dotglob
   declare -A files=() # all files under $HOME
   local f && for f in ~/*; do files["$f"]=1; done
-  shopt "$dotglob" globstar # restore globstar
+  shopt "$dotglob" dotglob # restore dotglob
 
   printf '%s\n' "${#files[@]} files found in $HOME"
 
