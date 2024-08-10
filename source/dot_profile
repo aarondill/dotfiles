@@ -145,6 +145,10 @@ else
   append_path "$GOPATH/bin"
 fi
 
+if command -v luarocks >/dev/null 2>/dev/null; then
+  eval "$(luarocks path --append)" || true
+fi
+
 # Saved terminals
 if [ -f ~/.terms ]; then
   printf '%s\n' "Loading saved terminals" >&2
