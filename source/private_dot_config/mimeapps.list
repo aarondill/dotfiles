@@ -46,6 +46,7 @@ application/pdf=org.gnome.Evince.desktop
 image/svg=org.gnome.eog.desktop
 image/svg+xml=org.gnome.eog.desktop
 x-scheme-handler/sidequest=SideQuest.desktop
+x-scheme-handler/discord-719647875465871400=discord-719647875465871400.desktop
 
 [Added Associations]
 image/webp=gimp.desktop;
