@@ -393,6 +393,8 @@ backup)
   log "Backing up package list to $PACKAGE_LIST"
   list_packages >|"$PACKAGE_LIST"
 
+  if [ -t 1 ]; then args+=("--progress"); fi
+
   log "Backing up to $DESTINATION_URI"
   run "$DUPLICITY" --full-if-older-than="${FULL_IF_OLDER:-1M}" "${command[@]}" "${args[@]}" "$SOURCE_DIR" "$DESTINATION_URI"
   ;;
