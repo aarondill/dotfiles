@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+# Don't verify backups (allow me to shut down pls)
+export BACKUP_VERIFY=0
+
+prepend_path() { PATH="$1${PATH:+:$PATH}"; }
+
+if [ -z "${HOME:-}" ]; then
+  home=~ # bash will expand this
+  case "$home" in
+  /*) HOME=$home ;; # test for expanded dir
+  esac
+  if [ -z "${HOME:-}" ] && command -v getent >/dev/null 2>&1; then
+    HOME="$(getent passwd "$USER" | cut -d: -f6)" # use getent
+  fi
+fi
+
+prepend_path "$HOME/.bin"
+prepend_path "$HOME/.local/bin"
+
+code=0
+backup || code=$?
+if [ "$code" -ne 0 ]; then
+  printf '%s\n' "Backup failed on $(date)." >|"$HOME/.backup.err"
+fi
+exit "$code"

@@ -1,11 +1,7 @@
 SHELL=/bin/sh
-# This *should* be defined
-# HOME=/home/aaron
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
 # Don't look for /usr/sbin/sendmail
 MAILTO=""
-# Don't verify backups (allow me to shut down pls)
-BACKUP_VERIFY=0
 
 # hopefully this will run before others - it has lower delay (but they are random)
 1 0 mkdir.daily mkdir -p "$HOME/.var/log/anacron/"
