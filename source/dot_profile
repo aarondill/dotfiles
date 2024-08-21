@@ -171,5 +171,8 @@ fi
 dedupe_path
 unset -f append_path prepend_path dedupe_path
 
+dbus-update-activation-environment --all 2>/dev/null || true
+systemctl --user import-environment 2>/dev/null || true
+
 # A variable to use in chezmoi to make sure the user has sourced the profile
 export MY_PROFILE_HAS_LOADED=1
