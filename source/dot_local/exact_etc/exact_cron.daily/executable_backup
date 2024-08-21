@@ -20,7 +20,12 @@ prepend_path "$HOME/.local/bin"
 
 code=0
 backup || code=$?
-if [ "$code" -ne 0 ]; then
-  printf '%s\n' "Backup failed on $(date)." >|"$HOME/.backup.err"
-fi
+case "$code" in
+0) ;;  # success
+75) ;; # temporary failure, due likely to unavaiable backup server
+*)     # Some other error, notify me
+  msg="Backup failed on $(date) with exit code $code."
+  printf '%s\n' "$msg" >|"$HOME/.backup.err"
+  ;;
+esac
 exit "$code"

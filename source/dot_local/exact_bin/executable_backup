@@ -125,7 +125,8 @@ if [ -z "$external" ] && [ -d "$usbdirectory" ]; then
   fi
 fi
 
-[ -n "$external" ] || abort "$(date): Could not find usb drive for backup. Please check that it's mounted." 1
+# Exit 75 indicates that this is a temporary error, and the backup should be retried later. (EX_TEMPFAIL in `man sysexits.h(3)`)
+[ -n "$external" ] || abort "$(date): Could not find usb drive for backup. Please check that it's mounted." 75
 
 # The destination directory to backup *to* (usually a remote location or external storage)
 DESTINATION_URI=file://$external/duplicity_backup/$host-$os

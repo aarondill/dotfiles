@@ -26,6 +26,7 @@ if has fdfind; then alias fd="fdfind -uu"; fi
 alias rg="rg -uu -i"
 alias rd='ripdrag -r'
 alias rdt='ripdrag -ktr'
+alias info='info --vi-keys'
 alias dd="dd status=progress" # Show progress pls
 alias mv="mv -i"              # Ask before overwriting
 unmv() { mv -i "$2" "$1"; }   # Note: only works for simple moves.
