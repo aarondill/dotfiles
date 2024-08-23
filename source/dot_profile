@@ -23,7 +23,14 @@ foreach my $path (File::Spec->path) {
 print join($main::Config{"path_sep"}, @res);
 ')
 }
-append_path() { PATH="${PATH:+$PATH:}$1"; }
+# Appends to PATH, if it isn't already there
+append_path() {
+  case ":$PATH:" in
+  *:"$1":*) return 0 ;;
+  esac
+  PATH="${PATH:+$PATH:}$1"
+}
+# NOTE: doesn't check if it's already there, to enforce order
 prepend_path() { PATH="$1${PATH:+:$PATH}"; }
 
 if [ -z "${USER:-}" ]; then USER="$(id -nu)"; fi
@@ -86,7 +93,7 @@ export TS_NODE_HISTORY="$XDG_STATE_HOME"/node/ts_node_repl_history
 export GTK2_RC_FILES="$XDG_CONFIG_HOME/gtk-2.0/gtkrc"
 
 # set PATH so it includes system bin (on debian)
-prepend_path "/sbin"
+append_path "/sbin"
 # set PATH so it includes user's private bin if it exists
 prepend_path "$HOME/bin"
 # set PATH so it includes user's private bin if it exists
