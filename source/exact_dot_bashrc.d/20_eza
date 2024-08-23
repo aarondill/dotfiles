@@ -5,16 +5,12 @@
 # Sets up eza/ls
 #
 
-# Is a command available?
-function has() { [ -x "$(command -v -- "$1")" ]; }
-
 exa=
 if has eza; then
   exa=eza
 elif has exa; then
   exa=exa
 fi
-unset -f has
 
 # Ensure that none of these aliases are pre-defined
 unalias ls la ll lla llaa &>/dev/null || true

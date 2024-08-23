@@ -3,10 +3,6 @@
 # ~/.bashrc.d/20_bat
 #
 #
-
-# Is a command available?
-function has() { [ -x "$(command -v -- "$1")" ]; }
-
 # Replace `cat` with `bat`, if installed
 
 # The path to the bat executable

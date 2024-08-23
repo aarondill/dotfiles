@@ -5,9 +5,6 @@
 # Sets up aliases for user usage
 #
 
-# Is a command available?
-function has() { [ -x "$(command -v -- "$1")" ]; }
-
 # I'm stupid and can't remember what to type
 alias quit='exit'
 alias :q='exit'
@@ -172,6 +169,3 @@ else
   }
 fi
 # https://nvchad.com/
-
-# Don't leak this to the shell
-unset -f has
