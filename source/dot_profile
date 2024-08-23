@@ -11,9 +11,10 @@
 # for ssh logins, install and configure the libpam-umask package.
 #umask 022
 
+has() { command -v "$1" >/dev/null 2>/dev/null; }
 dedupe_path() {
   # If perl isn't available, just give up
-  command -v perl >/dev/null 2>&1 || return 0
+  has perl || return 0
   PATH=$(perl -e '
 use Config; use File::Spec; use Cwd;
 foreach my $path (File::Spec->path) {
@@ -43,7 +44,7 @@ if [ -z "${HOME:-}" ]; then
   esac
   unset home # don't leak to shell
 fi
-if [ -z "${HOME:-}" ] && command -v getent >/dev/null 2>&1; then
+if [ -z "${HOME:-}" ] && has getent; then
   HOME="$(getent passwd "$USER" | cut -d: -f6)" # use getent
 fi
 if [ -n "${HOME:-}" ]; then export HOME; fi
@@ -99,7 +100,7 @@ prepend_path "$HOME/bin"
 # set PATH so it includes user's private bin if it exists
 prepend_path "$HOME/.local/bin"
 
-if command -v "java" >/dev/null 2>/dev/null; then
+if has java; then
   java_home=$(realpath -- "$(command -v -- java)")
   java_home=${java_home%/*} java_home=${java_home%/*} # $(dirname $(dirname $java_home))
   JAVA_HOME="$java_home"
@@ -146,40 +147,72 @@ append_path "/var/lib/flatpak/exports/bin"
 # include go in path
 append_path "/usr/local/go/bin"
 export GOPATH="$XDG_DATA_HOME/go"
-if command -v go >/dev/null 2>/dev/null; then
+if has go; then
   append_path "$(go env GOPATH)/bin"
 else
   append_path "$GOPATH/bin"
 fi
 
-if command -v luarocks >/dev/null 2>/dev/null; then
-  eval "$(luarocks path --append)" || true
+if has luarocks; then eval "$(luarocks path --append)" || true; fi
+
+_will_startx=
+if has startx && [ -z "$DISPLAY" ] && [ "$TERM" = "linux" ] && [ "$(tty)" = /dev/tty1 ] && [ -z "$SKIP_STARTX_LOGIN" ]; then
+  _will_startx=1
 fi
 
-# Saved terminals
-if [ -f ~/.terms ]; then
-  printf '%s\n' "Loading saved terminals" >&2
-  # Move first to ensure child processes don't try to load it
-  # Store in case i need it
-  mv -f -- ~/.terms "$XDG_CACHE_HOME"/.terms
-  # If it fails, move it back
-  bash "$XDG_CACHE_HOME"/.terms || mv -i -- "$XDG_CACHE_HOME"/.terms ~/.terms
-fi
+if [ -z "$_will_startx" ]; then
+  # Saved terminals
+  if [ -f ~/.terms ]; then
+    printf '%s\n' "Loading saved terminals" >&2
+    # Move first to ensure child processes don't try to load it
+    # Store in case i need it
+    mv -f -- ~/.terms "$XDG_CACHE_HOME"/.terms
+    # If it fails, move it back
+    bash "$XDG_CACHE_HOME"/.terms || mv -i -- "$XDG_CACHE_HOME"/.terms ~/.terms
+  fi
 
-# if running bash
-if [ -n "$BASH_VERSION" ]; then
-  # include .bashrc if it exists
-  if [ -f "$HOME/.bashrc" ]; then
-    # shellcheck source=/home/aaron/.bashrc
-    . "$HOME/.bashrc"
+  # if running bash
+  if [ -n "$BASH_VERSION" ]; then
+    # include .bashrc if it exists
+    if [ -f "$HOME/.bashrc" ]; then
+      # shellcheck source=/home/aaron/.bashrc
+      . "$HOME/.bashrc"
+    fi
   fi
 fi
 
 dedupe_path
-unset -f append_path prepend_path dedupe_path
 
 dbus-update-activation-environment --all 2>/dev/null || true
 systemctl --user import-environment 2>/dev/null || true
+
+# Startx on tty1 -- tty should not return tty* in an emulator or ssh
+if [ -n "$_will_startx" ]; then
+  # The command to run. Leave empty to use the default. This should be a absolute path!
+  startx_command=''
+  # [ -f ~/code/repos/awesome/_scripts/run ] && startx_command+=(~/code/repos/awesome/_scripts/run)
+  # LOG_FILE="$HOME/.cache/visual/$(date +"%D-%T.%3N").log"
+  LOG_FILE="$HOME/.cache/visual/visual.log"
+  mkdir -p -- "$(dirname "$LOG_FILE")"
+  # Keep LOG_FILE, LOG_FILE.old, and LOG_FILE.old.1
+  [ -f "$LOG_FILE.old.1" ] && \rm -f -- "$LOG_FILE.old.1"
+  [ -f "$LOG_FILE.old" ] && \mv -f -- "$LOG_FILE.old" "$LOG_FILE.old.1"
+  [ -f "$LOG_FILE" ] && \mv -f -- "$LOG_FILE" "$LOG_FILE.old"
+
+  # shellcheck disable=SC2086 # Sh doesn't allow arrays.
+  if has visual; then
+    # note: visual -t will complain to stderr if something is wrong.
+    # If we can't start an x server, then at least give me a shell!
+    if visual -t $startx_command; then
+      exec visual $startx_command >|"$LOG_FILE" 2>&1 || true
+    fi
+  else
+    exec startx $startx_command >|"$LOG_FILE" 2>&1 || true
+  fi
+  unset LOG_FILE startx_command
+fi
+unset will_startx
+unset -f append_path prepend_path dedupe_path has
 
 # A variable to use in chezmoi to make sure the user has sourced the profile
 export MY_PROFILE_HAS_LOADED=1
