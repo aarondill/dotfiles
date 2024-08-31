@@ -11,7 +11,9 @@
 # for ssh logins, install and configure the libpam-umask package.
 #umask 022
 
+# This function is leaked to the shell, this is fine.
 has() { command -v "$1" >/dev/null 2>/dev/null; }
+
 dedupe_path() {
   # If perl isn't available, just give up
   has perl || return 0
@@ -212,7 +214,7 @@ if [ -n "$_will_startx" ]; then
   unset LOG_FILE startx_command
 fi
 unset will_startx
-unset -f append_path prepend_path dedupe_path has
+unset -f append_path prepend_path dedupe_path
 
 # A variable to use in chezmoi to make sure the user has sourced the profile
 export MY_PROFILE_HAS_LOADED=1
