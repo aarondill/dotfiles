@@ -52,4 +52,4 @@ _rm_files
 unset rm_rf rmdir _rm_files
 
 # Create the SSR config directory if it doesn't exist, it only respects XDG_CONFIG_HOME if it already exists.
-! has ssr || mkdir -p "$XDG_CONFIG_HOME/ssr"
+! has simplescreenrecorder || mkdir -p "$XDG_CONFIG_HOME/simplescreenrecorder"
