@@ -30,6 +30,7 @@ unmv() { mv -i "$2" "$1"; }   # Note: only works for simple moves.
 alias cp="cp -ai"
 alias rm="rm --preserve-root"
 mkdirc() { mkdir -p -- "$1" && builtin cd -- "$1" || return; }
+alias cdm=mkdirc
 # Save history on exit
 alias poweroff="history -a; /sbin/poweroff"
 alias reboot="history -a; /sbin/reboot"
