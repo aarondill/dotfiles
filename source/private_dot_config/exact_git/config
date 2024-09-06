@@ -37,6 +37,7 @@
   prune = true
 [push]
   default = current
+  autoSetupRemote = true
 [pull]
   ff = yes
   rebase = merges
@@ -77,7 +78,7 @@
   co = commit
   st = status
   br = branch
-  p = !git push origin \"$(git rev-parse --abbrev-ref HEAD)\" -u
+  p = push
   new = switch -c
 
   # Less destructive pushing
