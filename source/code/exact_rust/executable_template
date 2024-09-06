@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# This file is called by ~/.local/bin/new
+# It is passed directory names as arguments
+for name in "$@"; do
+  cargo new --bin -- "$name"
+done
