@@ -76,6 +76,7 @@
   res = restore
   ci = commit
   co = commit
+  c = commit
   st = status
   br = branch
   p = push
