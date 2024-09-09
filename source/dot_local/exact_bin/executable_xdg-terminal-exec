@@ -1,4 +1,9 @@
 #!/usr/bin/env sh
 # just a wrapper to force gio to open the right terminal
 [ "$#" -eq 0 ] || set -- -e "$@" # If arguments are passed, prepend them with -e
-exec x-terminal-emulator "$@"
+for term in x-terminal-emulator wezterm xterm; do
+  command -v "$term" >/dev/null 2>&1 || continue
+  exec "$term" "$@" || exit
+done
+printf '%s\n' "No terminal emulator found" >&2
+exit 1
