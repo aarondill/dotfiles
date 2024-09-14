@@ -82,7 +82,8 @@ for arg; do # Doesn't do anything if $# is zero
   case "$method" in # Allow `native` to enable or `native-` to disable. ORDER MATTERS!
   all) for m in "${!methods[@]}"; do methods["$m"]=1; done ;;
   +all) for m in "${!methods[@]}"; do methods["$m"]=0; done ;;
-  +*) # disable pattern
+  +*)                    # disable pattern
+    method="${method#+}" # remove the '+'
     [ -n "${methods["$method"]:-}" ] || abort "Unknown method: $method" 2
     methods["$method"]=0
     ;;
