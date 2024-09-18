@@ -21,6 +21,7 @@ Options:
   -h, --help         Show this help message.
   -n, --num=n        Operate on the nth most recent file, instead of the first
 Operations (Only use one at a time):
+  -o, --open         Open the file
   -r, --remove       Remove the file
   -c, --copy         Copy the file to DEST
   -m, --move         Move the file to DEST
@@ -30,7 +31,7 @@ EOF
 }
 
 # NOTE: When updating this, update the usage and the case at the bottom!
-declare -A operations=([r]=remove [c]=copy [m]=move [p]=print [e]=edit)
+declare -A operations=([r]=remove [c]=copy [m]=move [p]=print [e]=edit [o]=open)
 
 LONGOPTS="help,num:,$(join ',' "${operations[@]}")" SHORTOPTS="h,n:,$(join ',' "${!operations[@]}")"
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
@@ -67,11 +68,15 @@ case "$op" in
 remove)
   log "Removing '$file'"
   confirm "remove '$file'?" || abort "aborting" 1
-  rm -rf -- "$file"
+  exec rm -rf -- "$file"
   ;;
 # cp -Pp -R is posix for cp --archive
-copy) log "Copying '$file' to '$dest'" && cp -pP -R -i -- "$file" "$dest" ;;
-move) log "Moving '$file' to '$dest'" && mv -i -- "$file" "$dest" ;;
-edit) "${VISUAL:-${EDITOR:-editor}}" -- "$file" ;;
+copy) log "Copying '$file' to '$dest'" && exec cp -pP -R -i -- "$file" "$dest" ;;
+move) log "Moving '$file' to '$dest'" && exec mv -i -- "$file" "$dest" ;;
+edit) exec "${VISUAL:-${EDITOR:-editor}}" -- "$file" ;;
 print) printf '%s\n' "$file" ;;
+open)
+  opener="$(first_cmd xdg-open start open)" || abort "No opener found!" 1
+  exec "$opener" "$file"
+  ;;
 esac
