@@ -7,5 +7,7 @@
 function rge() {
   local rg=(rg -l)
   command -v rg &>/dev/null || rg=(grep -r -l) # Closest to rg available
-  "${rg[@]}" "$@" | xargs -- "${EDITOR:-editor}"
+  local files=()
+  readarray -t files < <("${rg[@]}" "$@")
+  ${VISUAL:-${EDITOR:-editor}} "${files[@]}"
 }
