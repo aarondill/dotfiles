@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -euC -o pipefail && shopt -s nullglob globstar
+
+BUILD_GRADLE=(build.gradle build.gradle.kts)
+
+function err() { printf '%s\n' "$@" >&2 || true; }
+function log() { printf '%s\n' "$@" || true; }
+function abort() { err "$1" && exit "${2:-1}"; }
+
+command -v dirname >/dev/null 2>&1 || abort "dirname is not installed." 127
+
+build_gradle=""
+curr="${PWD}"
+# First, search recursively upwards for a build.gradle.
+until [ "$curr" == "/" ]; do
+  for name in "${BUILD_GRADLE[@]}"; do
+    [ -e "${curr}/$name" ] || continue
+    build_gradle="$curr/$name"
+    break 2
+  done
+  curr=$(dirname -- "$curr")
+done
+[ -n "$build_gradle" ] || abort "Unable to find a ${BUILD_GRADLE[0]} in any parent directory." 1
+
+gradlew=''
+# Search recursively upwards from the first-found build.gradle for a gradlew.
+until [ "$curr" == "/" ]; do
+  if [ -x "$curr/gradlew" ]; then
+    gradlew="${curr}/gradlew"
+    break
+  fi
+  curr=$(dirname "${curr}")
+done
+
+# Select the right gradle or error out if no good options exist.
+if [ -n "$gradlew" ]; then
+  gradle_type="wrapper"
+else
+  # Find the system gradle executable to fall back on.
+  gradlew=$(command -v gradle 2>/dev/null) || abort "Unable to find a gradlew or gradle."
+  gradle_type="executable"
+  log "There is no gradlew set up for this project. You may want to consider setting one up."
+  log "See: http://gradle.org/docs/current/userguide/gradle_wrapper.html"
+fi
+
+# Say what we are gonna do, then do it.
+log "Using gradle ${gradle_type} at ${gradlew@Q} to run ${build_gradle@Q}:"
+log ''
+cd -- "$(dirname -- "$build_gradle")"
+exec -- "$gradlew" "$@"
