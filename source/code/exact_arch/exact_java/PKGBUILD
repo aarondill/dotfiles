@@ -1,0 +1,16 @@
+# This is a dummy package to satisfy gradle's dependency on jdk-21
+
+pkgname=jdk-openjdk-22
+pkgver=22.0.1
+pkgrel=1
+arch=('x86_64')
+pkgdesc="jdk 22 but dummy"
+license=('unknown')
+provides=(
+  java-environment=22
+  java-runtime=22
+  # HACK: for gradle, the package doesn't support jdk-22, even tho gradle does.
+  java-environment=21
+  java-runtime=21
+)
+conflicts=(jre-openjdk jre-openjdk-headless)
