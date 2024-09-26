@@ -85,3 +85,4 @@ code/perl
 .config/.prettierrc.mjs
 .config/xdg-desktop-portal/awesome-portals.conf
 code/rust/template
+code/arch
