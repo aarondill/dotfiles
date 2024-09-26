@@ -89,6 +89,10 @@ export WEZTERM_LOG=config=info,warn
 # https://github.com/nodejs/node/issues/41145#issuecomment-992948130
 # Bun, npm, and node are broken on ipv6. Because of course they are.
 export NODE_OPTIONS="--dns-result-order=ipv4first"
+# Ideally, gradle.properties should be in $XDG_CONFIG_HOME/gradle, and the rest
+# in $XDG_CACHE_HOME/gradle, but that's not a supported option. I don't want
+# this in cache so I don't delete the config by accident
+export GRADLE_USER_HOME="$XDG_DATA_HOME/gradle"
 
 export WGETRC="$XDG_CONFIG_HOME/wgetrc"
 export ASPELL_CONF="per-conf $XDG_CONFIG_HOME/aspell/aspell.conf; personal $XDG_CONFIG_HOME/aspell/en.pws; repl $XDG_CONFIG_HOME/aspell/en.prepl"
