@@ -59,7 +59,6 @@
 .pam_environment
 .profile
 .root
-.vim
 code/.alexrc.mjs
 code/.eslintrc.cjs
 code/.prettierrc.mjs
