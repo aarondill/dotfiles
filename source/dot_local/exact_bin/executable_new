@@ -140,14 +140,14 @@ function substitute() {
 function handle_file_sub() {
   local f="$1" dest="$2"
   local filename dir newname
-  debug "handling $f"
+  debug "Handling path $f"
   # handle filename replacements
   filename=$(basename -- "$f") dir=$(dirname -- "$f")
   # Note: FILEPATH,REALPATH,FILENAME,EXTENSION,BASENAME are relatively useless here
   newname=$(substitute "$f" "$dest" <<<"$filename") || abort "Error while handling file: $f" "$?"
   case "$newname" in
   "$filename") ;; # ignore if same
-  */../* | ../* | */..) err "Disallowed directory traversal: '$newname'. Skipping." ;;
+  */../* | ../* | */..) err "Disallowed directory traversal: ${newname@Q}. Skipping." ;;
   */*) mkdir -p "$dir/$(dirname -- "$newname")" ;& # make the directory and fallthrough
   *)
     debug "move to $dir/$newname"
@@ -155,14 +155,24 @@ function handle_file_sub() {
     f="$dir/$newname"       # ensure future references are correct
     ;;
   esac
+  if [ -f "$f" ] && ! grep -qI . -- "$f"; then
+    debug "Skipping ${f@Q} since it is a binary file"
+    return 0
+  fi
+  case "$f" in
+  *.bat)
+    debug "Skipping ${f@Q} since batch files allow broken syntax (BASH_TPL_DIR_DELIM)"
+    return 0
+    ;;
+  esac
 
   # handle string replacements
   if [ -d "$f" ]; then
     for d in "$f"/*; do handle_file_sub "$d" "$dest"; done
   elif ! [ -L "$f" ] && [ -f "$f" ]; then # Don't write to links
-    debug "handle file $f"
+    debug "Handle file $f"
     # shellcheck disable=SC2094 # substitute doesn't output to a file
-    # Write to tmp file to avoid loosing data (https://www.shellcheck.net/wiki/SC2094)
+    # Write to tmp file to avoid losing data (https://www.shellcheck.net/wiki/SC2094)
     substitute "$f" "$dest" <"$f" >|"$tmp" || abort "Error while handling file: $f" "$?"
     cp -p --attributes-only -- "$f" "$tmp" 2>/dev/null || true # save the attributes from the original file (if possible)
     mv -f -- "$tmp" "$f"                                       # overwrite existing file
