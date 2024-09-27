@@ -55,7 +55,7 @@ unset rm_rf rmdir _rm_files
 # Create the SSR config directory if it doesn't exist, it only respects XDG_CONFIG_HOME if it already exists.
 ! has simplescreenrecorder || mkdir -p "$XDG_CONFIG_HOME/simplescreenrecorder"
 
-if has nmcli && nmcli con show --active | { ! grep -q '\bvpn\b'; }; then
+if has nmcli && nmcli con show --active | { ! grep -q -e '\bvpn\b' -e '\btun\b'; }; then
   # If nmcli is installed and there's no active VPN connection, then delete ~/.cert/nm-openvpn/
   rm -f -- ~/.cert/nm-openvpn/*
   rmdir -p -- ~/.cert/nm-openvpn/
