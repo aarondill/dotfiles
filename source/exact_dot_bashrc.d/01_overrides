@@ -58,5 +58,7 @@ unset rm_rf rmdir _rm_files
 if has nmcli && nmcli con show --active | { ! grep -q -e '\bvpn\b' -e '\btun\b'; }; then
   # If nmcli is installed and there's no active VPN connection, then delete ~/.cert/nm-openvpn/
   rm -f -- ~/.cert/nm-openvpn/*
-  rmdir -p -- ~/.cert/nm-openvpn/
+  if [ -d ~/.cert/nm-openvpn/ ]; then
+    (cd ~ && rmdir -p -- .cert/nm-openvpn/ 2>/dev/null)
+  fi
 fi
