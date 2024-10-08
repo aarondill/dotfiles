@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -euC
 timestamp="$(($(date +%s%N) / 1000000))" # current time in milliseconds
-printf '%s' "$timestamp" >/tmp/last_notify
+printf '%s' "$timestamp" >|/tmp/last_notify
 sleep 2                                  # wait to allow another program to run
 last_timestamp="$(cat /tmp/last_notify)" # last time we notified
 
