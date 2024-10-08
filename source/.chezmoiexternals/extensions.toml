@@ -3,7 +3,7 @@
 
 # Note: chromeext variable is set in ~/.bashrc.d/10_util-vars. If not defined, use code/chromeExtensions
 # {{ $path := env "chromeext" | trimPrefix (print (env "HOME") "/") | default "code/chromeExtensions" }}
-# {{ $repos := list "googleCopyUser" "chrome-hist" "seizureChrome" }}
+# {{ $repos := list "googleCopyUser" "chrome-hist" }}
 # Path: {{$path}}
 # Repos: {{$repos | toJson}}
 
