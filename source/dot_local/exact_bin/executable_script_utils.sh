@@ -517,8 +517,8 @@ function parse_args() {
   # shellcheck disable=SC2145 # This works with strings, because they're passed as a single argument
   {
     local shortopts longopts
-    shortopts=$(join , "${SHORTOPTS[@]}}")
-    longopts=$(join , "${LONGOPTS[@]}}")
+    shortopts=$(join , "${SHORTOPTS[@]}")
+    longopts=$(join , "${LONGOPTS[@]}")
   }
   parsed=$(getopt --options="$shortopts" --longoptions="$longopts" --name "${THIS:-$0}" -- "$@") ||
     exit 2                     # getopt has already complained about wrong arguments to stdout - Exit script
