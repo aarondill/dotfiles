@@ -212,6 +212,8 @@ if [ -n "$_will_startx" ]; then
     # If we can't start an x server, then at least give me a shell!
     if visual -t $startx_command; then
       exec visual $startx_command >|"$LOG_FILE" 2>&1 || true
+    else
+      echo "You might need to source your .bashrc!" >&2
     fi
   else
     exec startx $startx_command >|"$LOG_FILE" 2>&1 || true
