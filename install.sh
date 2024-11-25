@@ -30,7 +30,10 @@ install_chezmoi() {
 }
 
 # `if cmd; then true; else cmd; fi` to fix syntax highlighting
-if chezmoi="$(command -v chezmoi)"; then true; else install_chezmoi; fi
+if ! chezmoi="$(command -v chezmoi)"; then
+	install_chezmoi
+	chezmoi="$(command -v chezmoi)"
+fi
 
 # POSIX way to get script dir: https://stackoverflow.com/a/29834779/12156188
 script_dir="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)"
@@ -48,6 +51,6 @@ if [[ ":$PATH:" != *":$bin_dir"* ]]; then
   PATH="$bin_dir:$PATH"
 fi
 
-log "Running 'chezmoi ${args[*]}'"
+log "Running '$chezmoi ${args[*]}'"
 # replace current process with chezmoi
 exec "$chezmoi" "${args[@]}"
