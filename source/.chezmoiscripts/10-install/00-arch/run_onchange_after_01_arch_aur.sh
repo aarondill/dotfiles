@@ -41,14 +41,13 @@ packages=(
   consolation                    # cursor in tty
   informant                      # arch news through pacman
   isomaster                      # unpack/edit .isos
-  protonvpn                      # protonvpn cli and gui
   ripdrag-git                    # Drag and drop from terminal
   simplescreenrecorder           # screen recording
   zeal                           # Documentation reader
   dashbinsh                      # Use dash as /bin/sh
   yaru-gtk-theme yaru-icon-theme # Yaru themeing
   downgrade                      # downgrades packages
-  protonvpn-cli                  # protonvpn cli
+  protonvpn-cli-community        # protonvpn cli
 )
 for p in "${packages[@]}"; do
   ! pacman_is_installed "$p" || continue
