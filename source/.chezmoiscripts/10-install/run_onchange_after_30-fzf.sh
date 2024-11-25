@@ -9,6 +9,7 @@ function install_fzf() {
   local REPO=junegunn/fzf targetFile="/usr/local/bin/fzf"
   local version url
   version=$(get_latest_version_github "$REPO") # 0.42.0
+  version=${version#v}                         # remove the 'v' prefix
   if has_cmd fzf; then
     if [ "$(fzf --version | cut -d' ' -f1)" = "$version" ]; then
       abort "already up to date" 0
