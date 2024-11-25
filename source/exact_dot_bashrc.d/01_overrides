@@ -22,6 +22,7 @@ rm_rf=( # These will be removed forcefully.
   ~/.BurpSuite/             # RM burp config
   ~/.gnome/apps/*-BurpSuiteCommunity.desktop
   ~/.python_history
+  ~/explicit_filter.restore
   # ~/.vmware/
 )
 # rmdir will happen *after* rm_rf.
