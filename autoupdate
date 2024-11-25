@@ -86,3 +86,4 @@ code/perl
 code/rust/template
 code/arch
 .config/gdb
+.config/gtk-4.0
