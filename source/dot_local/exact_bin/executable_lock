@@ -23,9 +23,10 @@ function revert() {
 trap revert HUP INT TERM EXIT
 optional xset +dpms dpms 5 5 5                      # every 5 seconds
 optional sleep .5 && optional xset dpms force off & # force off the first time
-i3lock -n -f -e -c 000000 &
+i3lock -n -f -c 000000 &
 pid="$!"                                                # get the pid of the i3lock process (note -n to not fork!)
 [ -z "$pid_file" ] || printf '%s\n' "$pid" >"$pid_file" # write to the pid_file if present
-wait "$pid"                                             # block until the i3lock process ends
+
+wait "$pid" # block until the i3lock process ends
 
 revert
