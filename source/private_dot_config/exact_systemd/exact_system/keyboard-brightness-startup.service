@@ -1,0 +1,12 @@
+[Unit]
+Description=Set keyboard brightness after boot
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+WorkingDirectory=/sys/class/leds/tpacpi::kbd_backlight/
+ExecStart=bash -c "[ -f /var/tmp/kbd_brightness_current ] && cat /var/tmp/kbd_brightness_current > brightness || echo 1 > brightness"
+ExecStop=bash -c "cat brightness > /var/tmp/kbd_brightness_current"
+
+[Install]
+WantedBy=multi-user.target

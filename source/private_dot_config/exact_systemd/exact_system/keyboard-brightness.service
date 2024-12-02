@@ -1,0 +1,13 @@
+[Unit]
+Description=Set keyboard brightness after resume
+StopWhenUnneeded=yes
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/sys/class/leds/tpacpi::kbd_backlight/
+ExecStart=bash -c "cat brightness >| /var/tmp/kbd_brightness_current"
+ExecStop=bash -c "sleep 1s && cat /var/tmp/kbd_brightness_current > brightness"
+
+[Install]
+WantedBy=sleep.target
