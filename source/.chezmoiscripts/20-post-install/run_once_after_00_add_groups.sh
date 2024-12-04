@@ -5,7 +5,21 @@ SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 # shellcheck source=../.utils.sh
 . "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
 
-groups=(adm cdrom video plugdev input lpadmin vboxusers libvirt loadkeys power gamemode)
+groups=(
+  adm
+  cdrom
+  video
+  plugdev
+  input
+  lpadmin
+  vboxusers
+  libvirt
+  loadkeys
+  power
+  gamemode
+  wheel
+  sudo
+)
 user="$(id -un)"
 
 log "Adding user groups to $user"
