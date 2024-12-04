@@ -35,8 +35,12 @@ fi
 
 for group in "${groups[@]}"; do
   group_exists "$group" || {
-    log "Skipping group '$group' because does it not exist"
-    continue # group doesn't exist, skip it
+    if confirm "Create group '$group'?"; then
+      sudo_cmd groupadd "$group"
+    else
+      log "Skipping group '$group' because does it not exist"
+      continue # group doesn't exist, skip it
+    fi
   }
   log "Adding group $group"
   sudo_cmd usermod -a -G "$group" -- "$user" # add to the group
