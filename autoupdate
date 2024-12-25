@@ -42,7 +42,6 @@
 .local/share/applications/github.desktop
 .local/share/applications/gnome-boxes.desktop
 .local/share/applications/google-chrome.desktop
-.local/share/applications/mathlab.desktop
 .local/share/applications/mimeapps.list
 .local/share/applications/org.gnome.gedit.desktop
 .local/share/applications/restart.desktop
