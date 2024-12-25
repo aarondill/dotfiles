@@ -85,3 +85,6 @@ set show-all-if-ambiguous on
 # M-B/M-F: skip full shell words
 "\eB": shell-backward-word
 "\eF": shell-forward-word
+# Control-W should delete the full argument behind it. Use M-Backspace to delete parts
+set bind-tty-special-chars Off
+\C-w: shell-backward-kill-word
