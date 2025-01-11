@@ -61,4 +61,8 @@ install_from_make() {
   rm_exit_cleanup "$temp"
 }
 
-log_and_run "Installing $REPO_URL" install_from_make
+if has_pacman && has_cmd yay; then
+  yay_install htop-vim
+else
+  log_and_run "Installing $REPO_URL" install_from_make
+fi
