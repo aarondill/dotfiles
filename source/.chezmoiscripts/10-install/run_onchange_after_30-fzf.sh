@@ -41,9 +41,11 @@ function install_fzf() {
     return 1
   fi
 
-  url=https://github.com/$REPO/releases/download/$version/$asset
+  # note the v prefix in tagname
+  url="https://github.com/$REPO/releases/download/v$version/$asset"
 
   log_github_install "$REPO" "$version" "$asset" "$targetFile"
+  echo "Downloading $url"
 
   case "$asset" in
   *.tar.gz) download "$url" | tar -xzf - -O | sudo_cmd tee "$targetFile" >/dev/null ;;
@@ -52,4 +54,8 @@ function install_fzf() {
   sudo_cmd chmod +x "$targetFile"
 }
 
-log_and_run 'Installing fzf' install_fzf
+if has_pacman; then
+  pacman_install fzf
+else
+  log_and_run 'Installing fzf' install_fzf
+fi
