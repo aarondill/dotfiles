@@ -29,4 +29,8 @@ function install_lazygit() (
   rm_exit_cleanup "$tmp"
 )
 
-log_and_run 'installing lazygit' install_lazygit
+if has_pacman; then
+  pacman_install lazygit
+else
+  log_and_run 'installing lazygit' install_lazygit
+fi
