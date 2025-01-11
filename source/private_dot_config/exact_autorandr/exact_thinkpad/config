@@ -5,9 +5,11 @@ off
 output DP-2
 off
 output eDP-1
-crtc 1
+crtc 0
+gamma 1.0:0.714:0.526
 mode 1600x900
 pos 0x0
+primary
 rate 59.95
 x-prop-broadcast_rgb Automatic
 x-prop-colorspace Default

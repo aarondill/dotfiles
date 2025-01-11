@@ -17,3 +17,7 @@ set -o noclobber    # Avoid accidental overwriting of files with "">/file. inste
 shopt -s nocaseglob # Allow case insensitive globs
 shopt -s nullglob   # Failed globs == "" not the glob
 set -b              # Display job status at close
+
+if [ "$SHLVL" -eq 1 ] && [ -n "${NNNLVL:-}" ]; then
+  SHLVL=2
+fi
