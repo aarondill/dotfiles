@@ -28,7 +28,6 @@
 .config/shellcheckrc
 .config/starship.toml
 .config/tabtab/
-.config/tealdeer/
 .config/udiskie/
 .config/vivaldi-static/CSS_Mods/
 .config/wgetrc
