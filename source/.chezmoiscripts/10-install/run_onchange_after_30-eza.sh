@@ -12,8 +12,12 @@ install_eza() {
   cargo install --all-features eza
 }
 
-if ! has_cmd cargo; then
-  err "cargo isn't available! Can't install eza!"
-  exit 1
+if has_pacman; then
+  pacman_install eza
+else
+  if ! has_cmd cargo; then
+    err "cargo isn't available! Can't install eza!"
+    exit 1
+  fi
+  log_and_run "Installing eza" install_eza
 fi
-log_and_run "Installing eza" install_eza
