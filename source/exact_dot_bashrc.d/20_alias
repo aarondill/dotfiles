@@ -174,3 +174,7 @@ else
   }
 fi
 # https://nvchad.com/
+
+# Usage: print
+ENSCRIPT='--no-header -T4 -DDuplex:true --font Courier10'
+alias print='enscript --line-numbers'
