@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@types/node": "22.10.5",
+    "@types/node": "22.10.6",
     "alive-server": "^1.3.0",
     "depcheck": "^1.4.7",
     "eslint": "^9.18.0",
@@ -10,10 +10,10 @@
     "npm-check-updates": "^17.1.13",
     "prettier": "^3.4.2",
     "release-it": "^18.1.1",
-    "sort-package-json": "^2.12.0",
+    "sort-package-json": "^2.13.0",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3",
-    "vercel": "^39.2.6"
+    "vercel": "^39.3.0"
   },
   "//": "force core-js to be on latest. It shouldn't cause any issues.",
   "pnpm": {
