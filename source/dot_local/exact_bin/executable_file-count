@@ -21,16 +21,18 @@ Options:
   -v, --verbose         output verbose messages
   -e, --exclude=types   exclude colon seperated types from the count (incompatible with -i)
   -i, --include=types   include only colon seperated  types in the count (incompatible with -e)
+  -r, --recursive       count files in subdirectories (directories are counted)
 
 valid types are: $(join ', ' "${!show_types[@]}")
 note: if using --include, and you expect dotfiles to be shown, you must specify dotfile
 EOF
 }
 
-LONGOPTS="help,include:,exclude:,verbose" SHORTOPTS="h,i:,e:,v"
+LONGOPTS="help,include:,exclude:,verbose,recursive" SHORTOPTS="h,i:,e:,v,r"
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 
 verbose=0 # by default show only number of files
+recursive=0
 while true; do
   case "$1" in
   -h | --help) usage && exit 0 ;;
@@ -51,6 +53,7 @@ while true; do
       show_types["$t"]=1
     done
     ;;
+  -r | --recursive) recursive=1 && shift ;;
   -v | --verbose) verbose=1 && shift ;;
   --) shift && break ;;
   *) abort "This is a bug" 3 ;;
@@ -71,12 +74,6 @@ show_all=1 show_any=0 &&
     esac
   done
 _file_count() {
-  # PERF: No need to calculate, since nothing will be returned
-  if [ "$show_any" -eq 0 ]; then
-    printf '%s\n' 0 || true
-    return 0
-  fi
-
   local files=("$1"/*)
   # PERF: if all files are counted, don't fetch the file type
   if [ "$show_all" -eq 1 ]; then
@@ -92,10 +89,29 @@ _file_count() {
   printf '%s\n' "$count" || true
 }
 
+# outputs the number of files in the given directory
+count() {
+  # PERF: No need to calculate, since nothing will be returned
+  if [ "$show_any" -eq 0 ]; then
+    printf '%s\n' 0 || true
+    return 0
+  fi
+
+  local dir="$1"
+  declare -i count=0
+  count+=$(_file_count "$dir")
+  if [ "$recursive" -eq 1 ]; then
+    local subdir
+    for subdir in "$dir"/*/; do
+      count+=$(count "$subdir")
+    done
+  fi
+  printf '%s\n' "$count"
+}
+
 for dir in "$@"; do
   [ -d "$dir" ] || abort "$dir is not a directory" 1
-  declare -i count=0
-  count=$(_file_count "$dir")
+  count=$(count "$dir")
   case "$verbose" in
   0) log "$count" ;;
   *) log "$dir: $count" ;;

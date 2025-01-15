@@ -108,47 +108,46 @@ function has_cmd() {
 # an alias for has_cmd
 function has() { has_cmd "$@"; }
 
-# Note: each value should be the same as the key
-declare -A FILE_TYPES=(
-  [symlink]="symlink"     # -L
-  [directory]="directory" # -d
-  [file]="file"           # -f
-  [chardev]="chardev"     # -c
-  [blockdev]="blockdev"   # -b
-  [fifo]="fifo"           # -f
-  [socket]="socket"       # -S
+declare FILE_TYPES=(
+  "symlink"   # -L
+  "directory" # -d
+  "file"      # -f
+  "chardev"   # -c
+  "blockdev"  # -b
+  "fifo"      # -f
+  "socket"    # -S
+  "unknown"   # anything else (e.g. message queues, semaphores, etc)
 )
 
 # Usage: file_type ./some_file [-s]
 # if -s is given, returns 'symbolic link' for all symlinks, whether broken or not
 # if -s is not given, returns 'symbolic link' only for broken symlinks
 # return values are the values of ${FILE_TYPES[@]}
-# NOTE: this may be a very expesive operation, as it has to do several file system operations
+# NOTE: this may be a very expensive operation, as it has to do several file system operations
 # Bash doesn't provide a way to get the file type in a single operation :(
 function file_type() {
   local type deref=1              # dereference by default
   [ "${2:-}" != '-s' ] || deref=0 # caller has asked not to dereference
 
   if ! [ -e "$1" ]; then
-    [ -L "$1" ] || return 1     # The file doesn't exist
-    type=${FILE_TYPES[symlink]} # broken link
+    [ -L "$1" ] || return 1 # The file doesn't exist
+    type=symlink            # broken link
   elif [ "$deref" -eq 0 ] && [ -L "$1" ]; then
-    type=${FILE_TYPES[symlink]} # non-broken link, but the caller wants links
+    type=symlink # non-broken link, but the caller wants links
   elif [ -f "$1" ]; then
-    type=${FILE_TYPES[file]}
+    type=file
   elif [ -d "$1" ]; then
-    type=${FILE_TYPES[directory]}
+    type=directory
   elif [ -c "$1" ]; then
-    type=${FILE_TYPES[chardev]}
+    type=chardev
   elif [ -b "$1" ]; then
-    type=${FILE_TYPES[blockdev]}
+    type=blockdev
   elif [ -p "$1" ]; then
-    type=${FILE_TYPES[fifo]}
+    type=fifo
   elif [ -S "$1" ]; then
-    type=${FILE_TYPES[socket]}
+    type=socket
   else
-    err "Unknown file type: $1. This is a bug!"
-    return 3
+    type=unknown
   fi
 
   printf '%s\n' "$type" || true
