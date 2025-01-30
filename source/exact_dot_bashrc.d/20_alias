@@ -178,3 +178,4 @@ fi
 # Usage: print
 ENSCRIPT='--no-header -T4 -DDuplex:true --font Courier10'
 alias print='enscript --line-numbers'
+if has jshell; then alias jsh='jshell'; fi

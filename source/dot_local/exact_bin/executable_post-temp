@@ -12,7 +12,6 @@ if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
 . "$utils"
 
 declare -A default_temp_sources=(
-  [file.io]=https://file.io
   [tmpfiles]=https://tmpfiles.org/api/v1/upload
   [tmpfiles.org]=https://tmpfiles.org/api/v1/upload
   [default]=https://tmpfiles.org/api/v1/upload
@@ -70,13 +69,10 @@ for file in "$@"; do
     status=$("$jq" -re ".status" <<<"$result") || true
     url=$("$jq" -re ".data.url" <<<"$result") || true
     ;;
-  *'://file.io' | *'://file.io/*')
-    # exits 1 if falsy
-    "$jq" -re ".success" <<<"$result" &>/dev/null && status=success || status=
-    url=$("$jq" -re ".link" <<<"$result") || url=""
-    ;;
   *) unknown_tmp_source=1 ;;
   esac
+
+  [ -n "$result" ] || abort 'Empty result from server!' 1
 
   # If verbose, jq not installed, or unrecognized temp_source, then print entire json
   if [ "$verbose" = 1 ] || [ -z "$jq" ] || [ "$unknown_tmp_source" = 1 ]; then
