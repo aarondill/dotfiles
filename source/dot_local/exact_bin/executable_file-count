@@ -9,7 +9,7 @@ if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
 
 # by default, show all types
 declare -A show_types=([dotfile]=1)
-for key in "${!FILE_TYPES[@]}"; do show_types[$key]=1; done
+for key in "${FILE_TYPES[@]}"; do show_types[$key]=1; done
 
 usage() {
   cat <<EOF || true
