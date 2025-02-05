@@ -40,6 +40,12 @@ alias poweroff="history -a; /sbin/poweroff"
 alias reboot="history -a; /sbin/reboot"
 alias halt="history -a; /sbin/halt"
 alias shutdown="history -a; /sbin/shutdown"
+
+# Shorter terminalbin for posting output of commands
+if _cmd=$(command -v nc || command -v netcat || command -v ncat); then
+  alias tb="$_cmd termbin.com 9999"
+fi && unset _cmd
+
 # Toggle capslock from terminal (bc capslock key is remapped)
 alias capslock='xdotool key Caps_Lock'
 alias CAPSLOCK='xdotool key Caps_Lock'
