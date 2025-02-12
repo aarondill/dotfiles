@@ -19,3 +19,6 @@ if [ -n "$complete" ]; then
   eval "${complete% cd} z"
 fi
 alias cd='z'
+
+# HACK: Zoxide thinks it's not setup because we overwrite PROMPT_COMMAND
+_ZO_DOCTOR=0
