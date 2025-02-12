@@ -185,3 +185,20 @@ fi
 ENSCRIPT='--no-header -T4 -DDuplex:true --font Courier10'
 alias print='enscript --line-numbers'
 if has jshell; then alias jsh='jshell'; fi
+
+# Usage: ibase num [output] [input]
+# Note: the format base#num can be used to specify the output base:
+# "ibase 16#10" == "ibase 10 10 16"
+# Input/Output are assumed to be in base 10 if not specified
+ibase() {
+  local -i num="$1" obase="${2:-10}" ibase="${3:-10}"
+  if [ "$ibase" -gt 36 ]; then
+    printf 'ibase must be between 2 and 36\n' >&2
+    return 1
+  fi
+  if [ "$ibase" -eq "$obase" ]; then
+    echo "$num" # Thise covers the case where bash converts the number
+  else
+    \bc <<<"obase=$obase;ibase=$ibase;$num"
+  fi
+}
