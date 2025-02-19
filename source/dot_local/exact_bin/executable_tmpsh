@@ -85,7 +85,8 @@ if ! rmdir -- "$dir" 2>/dev/null; then
       ls -a -F -- "$dir"
     fi
   fi
-  read -rp "$this: remove directory '$dir'? [Y/n] " yn
+  # if the user aborts, don't delete the directory
+  read -rp "$this: remove directory '$dir'? [Y/n] " yn || yn=n
   case "${yn,,}" in # note: this follows 'rm' semantics, anything begining with 'y' is true
   y* | "") rm -fr -- "$dir" ;;
   *) # Don't delete work, but warn the user that this should be moved to a long-term storage
