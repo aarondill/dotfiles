@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+set -euC -o pipefail
+user_shell=$SHELL # This is the user's login shell, or the path to bash if unset. This is usually set by login.
+_TMPDIR=~/.tmp
+
+this=${BASH_SOURCE[0]:-$0}
+this=${this##*/} # this is the name of the script without the path
+
+log() { printf '%s\n' "$@" || true; }
+err() { printf 'Error: %s\n' "$@" 2>&1 || true; }
+diag() {
+  [ -t 2 ] || return # if stderr is not a terminal, don't print diagnostics
+  printf '%s\n' "$@" >&2 || true
+}
+abort() { err "$1" && exit "${2:-1}"; }
+
+# check for the --help flag (before --)
+# this is just for user experience, since technically only one argument is allowed
+# if the user specifies `tmpsh dir --help`, we want to print the help message and exit
+for arg; do
+  case "$arg" in
+  -h | --help)
+    tildified=${_TMPDIR/#"$HOME/"/"~/"} # replace $HOME/ with ~/ at the beginning of the path
+    log "Usage: $this [directory]" \
+      "Creates a new temporary directory (defaults to $tildified/$this), then opens an interactive shell in it." \
+      "Prompts to remove the directory after the shell exits." \
+      "" \
+      "Options:" \
+      "  -h, --help    Print this help message and exit"
+    exit 0
+    ;;
+  --) break ;;
+  esac
+done
+[ "${1:-}" != "--" ] || shift                  # skip the first argument if it is --
+[ "$#" -le 1 ] || abort "Too many arguments" 2 # only one argument is allowed
+dir="${1:-}"
+
+# If a directory is specified, create it, then use it. Fail if it already exists.
+# Otherwise, create a temporary directory in "$DEFAULT_TMP_DIR"/tmpsh, counting up from 1 if it already exists.
+if [ -n "$dir" ]; then
+  if [ -d "$dir" ]; then abort "Directory $dir already exists." 2; fi
+  mkdir -- "$dir" || abort "Could not create directory $dir." "$?"
+else
+  mkdir -p -- "$_TMPDIR" || abort "Could not create directory $_TMPDIR" "$?"
+  # Sanity check: make sure "$DEFAULT_TMP_DIR" is writable. Otherwise, all the mkdirs will fail and we'll loop forever.
+  # technically a race condition, but better to fail than loop forever
+  [ -w "$_TMPDIR" ] || abort "Cannot make directories in "$_TMPDIR"" 1
+  base="$_TMPDIR"/$this dir=$base
+  if ! mkdir -- "$dir" 2>/dev/null; then
+    n=1
+    until mkdir -- "${dir:=$base-$n}" 2>/dev/null; do
+      n=$((n + 1))
+      dir=                                        # ensure that the above assignment is re-evaluated
+      [ -d "$_TMPDIR" ] || mkdir -p -- "$_TMPDIR" # just in case it was removed between mkdirs
+    done
+  fi
+fi
+[ -d "$dir" ] || abort "Somehow $dir was not created! This is probably a bug in $this." 3
+
+# Not an error, but warn the user if they are in a temporary shell
+[ -z "${TMPSH:-}" ] || diag "Warning: already in a temporary shell!"
+export TMPSH=1 # Indicate that we're in a temporary shell
+
+diag "Entering temporary directory $dir"
+# Use pushd/popd in case the directory is relative
+pushd -- "$dir" >/dev/null
+# preserve the shell exit code
+exit_code=0
+# Lie about the shlvl since it doesn't make sense to count this shell as a subshell
+SHLVL=$((SHLVL - 1)) "$user_shell" || exit_code=$?
+popd >/dev/null
+diag "Leaving temporary directory $dir"
+
+# Try to remove the directory, if empty
+if ! rmdir -- "$dir" 2>/dev/null; then
+  # the directory is not empty, so try to remove it recursively (after prompting)
+  # If tree is present, use it to print the directory structure; otherwise fall back to ls
+  if command -v tree >/dev/null; then
+    tree -a -F -L1 -- "$dir"
+  else
+    if ls --help 2>&1 | grep -q -- --color; then
+      ls -A --color -F -- "$dir"
+    else
+      ls -a -F -- "$dir"
+    fi
+  fi
+  read -rp "$this: remove directory '$dir'? [Y/n] " yn
+  case "${yn,,}" in # note: this follows 'rm' semantics, anything begining with 'y' is true
+  y* | "") rm -fr -- "$dir" ;;
+  *) # Don't delete work, but warn the user that this should be moved to a long-term storage
+    diag "Leaving temporary directory $dir"
+    diag "You must remove it manually or it will not be reused!"
+    diag "If you want to keep the directory, you should move it to another location."
+    ;;
+  esac
+fi
+case "$dir" in                                           # if directory is a subdirectory of $DEFAULT_TMP_DIR
+"$_TMPDIR"/*) rmdir -- "$_TMPDIR" 2>/dev/null || true ;; # remove the temporary directory if it is empty
+esac
+
+# preserve the shell exit code
+exit "$exit_code"
