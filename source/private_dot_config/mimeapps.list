@@ -186,3 +186,5 @@ video/vnd.avi=mpv.desktop;
 inode/directory=nnn.desktop;
 # Thunderbird
 x-scheme-handler/mailto=org.mozilla.Thunderbird.desktop;vivaldi-stable.desktop;
+# MCPE overwrides this
+application/zip=org.gnome.FileRoller.desktop;
