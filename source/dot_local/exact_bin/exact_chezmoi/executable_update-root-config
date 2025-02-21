@@ -42,11 +42,10 @@ for dir in "$ROOT_FOLDER"/**/; do
   [ -d "$rootpath" ] || continue
   # Change permissions to match the root
   sudo_cmd chmod --reference="$rootpath" "$dir"
-  dirname=$(basename -- "$dir") # The name of dir
-  case "$dir_source" in
-  *"/exact_$dirname") add_exact_dirs+=("$dir") ;;
-  *"/$dirname") add_dirs+=("$dir") ;;
-  *) err "Could not find source dir type to $dir" ;;
+  dir_source_name=$(basename -- "$dir_source") # The name of dir
+  case "$dir_source_name" in
+  exact_*) add_exact_dirs+=("$dir") ;;
+  *) add_dirs+=("$dir") ;;
   esac
 done
 
