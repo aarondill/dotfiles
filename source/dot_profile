@@ -78,6 +78,7 @@ export LESSKEY="$XDG_CONFIG_HOME/less/lesskey"
 export SYSTEMD_LESS=RSMK
 export GNUPGHOME="$XDG_CONFIG_HOME"/gnupg
 export GDBHISTFILE="$XDG_DATA_HOME"/gdb/history
+export RIPGREP_CONFIG_PATH="${XDG_CONFIG_HOME:-$HOME/.config}/rg/ripgreprc"
 export NODE_REPL_HISTORY="$XDG_STATE_HOME"/node/node_repl_history
 [ -d "${NODE_REPL_HISTORY%/*}" ] || mkdir -p "${NODE_REPL_HISTORY%/*}"
 
