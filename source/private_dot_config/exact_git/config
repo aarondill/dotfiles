@@ -8,9 +8,6 @@
 [credential "https://gist.github.com"]
   helper = 
   helper = !/usr/bin/gh auth git-credential
-# Fix for deprecated git:// protocol on github
-[url "https://github.com/"]
-	insteadOf = git://github.com/
 [core]
 	editor = nvim
   excludesFile = ~/.config/git/ignore
@@ -133,3 +130,16 @@
 	get-remote = alias-wrapper get-remote
 [branch]
 	sort = -committerdate
+
+  
+[help]
+  # Automatically correct and execute mistyped commands.
+  autocorrect = 15
+
+[url "https://github.com/"]
+  # fix deprecated git:// urls
+  insteadOf = git://github.com/
+  # URL shorthands
+  insteadOf = "gh:"
+  insteadOf = "github:"
+
