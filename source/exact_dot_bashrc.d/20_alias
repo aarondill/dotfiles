@@ -20,7 +20,6 @@ fi
 alias sudo='sudo -E ' # dont use env so permitted commands still work
 alias fd="fd -uu"     # Unrestrict fd by default
 if has fdfind; then alias fd="fdfind -uu"; fi
-alias rg="rg -uu -i"
 alias rd='ripdrag -r'
 alias rdt='ripdrag -ktr'
 alias info='info --vi-keys'
