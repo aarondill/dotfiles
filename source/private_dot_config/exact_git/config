@@ -124,7 +124,7 @@
   treeless = clone --filter=tree:0
   rh = reset --hard
   hdiff = alias-wrapper hdiff
-	cleanup = alias-wrapper cleanup
+	cleanup = repack -a -d -f --depth=250 --window=250
 	rg = grep
 	sync-tags = alias-wrapper sync-tags
 	get-remote = alias-wrapper get-remote

@@ -50,13 +50,6 @@ unalias)
   [ -n "${1:-}" ] || abort "usage: $command <alias>" 2
   git config --global --unset "alias.$1"
   ;;
-cleanup)
-  err "Warning: this is a destructive operation."
-  sleep 1 # give chance to stop
-  git reflog expire --expire=now
-  git repack -d
-  git gc --prune=now --aggressive
-  ;;
 yesterday) git hist --since "${1:-yesterday}" '--branches=*' --author="$(git config user.name)" ;;
 get-remote)
   get_remote_branch "${1:-HEAD}" || abort "No upstream branch found." 1

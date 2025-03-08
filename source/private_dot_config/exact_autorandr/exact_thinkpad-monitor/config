@@ -18,7 +18,7 @@ x-prop-non_desktop 0
 output DP-1-2
 crtc 2
 mode 1920x1080
-pos 3840x0
+pos 3520x0
 rate 60.00
 x-prop-audio auto
 x-prop-broadcast_rgb Automatic
@@ -27,9 +27,9 @@ x-prop-non_desktop 0
 output eDP-1
 crtc 0
 mode 1600x900
-pos 1920x448
+pos 1920x441
 primary
-rate 60.00
+rate 59.95
 x-prop-broadcast_rgb Automatic
 x-prop-colorspace Default
 x-prop-max_bpc 12

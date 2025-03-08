@@ -181,15 +181,21 @@ Pass --full to specify full backup or --incr to specify incremental backup
 If neither argument is passed, a full will be made if the most recent full backup is $FULL_IF_OLDER old
 
 Options:
-  --incr           Force a incremental backup
-  --full           Force a full backup
-  -h, --help       Show this message
-  -c, --cleanup    Cleanup old backups
-  -i, --info       A synonym for --status
-  -n, --dry-run    Do not run any duplicity commands, just show them
-  -p, --print      Print information about the backup without querying it
-  -s, --status     Get the collection-status
-  -v, --verbose    Show all duplicity commands before running them
+  --incr                    Force a incremental backup
+  --full                    Force a full backup
+  -h, --help                Show this message
+  -c, --cleanup             Cleanup old backups
+  -i, --info                A synonym for --status
+  -n, --dry-run             Do not run any duplicity commands, just show them
+  -p, --print               Print information about the backup without querying it
+  -s, --status              Get the collection-status
+  -v, --verbose             Show all duplicity commands before running them
+  --force-destination-uri   Force the passed destination URI to be used to backup without user confirmation.
+                            It is an error to pass this option without --destination-uri.
+  --destination-uri <uri>   The directory to backup to (default: $DESTINATION_URI).
+                            This should only be used when you *really* know what you're doing.
+                            To change the destination URI in a script, you *must* pass --force-destination-uri.
+                            Note that this is only allowed when mode != 'backup' or the user is present to confirm or --force-destination-uri is passed.
 
 Environment Variables:
   BACKUP_VERBOSE: causes the script to act as if --verbose was passed
@@ -202,15 +208,23 @@ EOF
 # Slightly safer options
 args=(--exclude-other-filesystems --exclude-device-files)
 
-LONGOPTS=incr,full,help,cleanup,info,dry-run,print,status,verbose
+LONGOPTS=incr,full,help,cleanup,info,dry-run,print,status,verbose,destination-uri:,force-destination-uri
 SHORTOPTS=h,c,i,n,p,s,v
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 mode=backup
 command=() # an array for the sake of empty strings (allows to skip the command and dynamically create full backups)
+_default_destination_uri=$DESTINATION_URI
+force_destination_uri=0
 while true; do
-  arg="$1" && shift
+  arg="$1" && shift 1 # Shift to remove the option - if it has an argument, it will be in $1
   case "$arg" in
   --full | --incr) command=("${arg#--}") ;;
+  # These three are intentionally long options so they aren't accidentally passed by users
+  # These are very dangerous if used incorrectly
+  --force-destination-uri) force_destination_uri=1 ;;
+  # If a url is passed, don't set the name (duplicity will hash the url as the name)
+  --destination-uri) DESTINATION_URI="$1" NAME="" && shift 1 ;; # Shift to remove the value
+  ## End of dangerous options
   --help | -h) usage && exit 0 ;;
   --print | -p) mode=print ;;
   --cleanup | -c) mode=cleanup ;;
@@ -387,6 +401,17 @@ function list_packages() {
 
 case "$mode" in
 backup)
+  if [ "$DESTINATION_URI" != "$_default_destination_uri" ]; then
+    warn "WARNING: The destination URI was changed from $_default_destination_uri to $DESTINATION_URI"
+    warn "If this is not the correct URI, you will lose data from the old backup!"
+    if [ "$force_destination_uri" -eq 0 ]; then
+      # Ensure stdin is a terminal and the user wants to continue
+      if ! { [ -t 0 ] && confirm "Are you sure you want to continue?" n; }; then
+        abort "Aborting backup due to mismatched destination URI" 1
+      fi
+    fi
+  fi
+
   log ''
   log "--- Backup at $(date) ---"
   log ''
