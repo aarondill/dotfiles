@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -euC -o pipefail
+
+# Include ../../key.txt.age 's hash to run when it changes
+# {{ $file := joinPath .chezmoi.sourceDir "key.txt.age" }}
+# key.txt.age hash: {{ include ( $file ) | sha256sum }}
+
+# Source utils
+SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
+# shellcheck source=../.utils.sh
+. "$SOURCE_DIR/.chezmoiscripts/.utils.sh"
+
+log "Decrypting age key for encrypted files"
+if ! has_cmd age; then
+  err "Age is not present, attempting to install."
+  # Exits on failure
+  if has_apt; then
+    apt_install age
+  elif has_pacman; then
+    pacman_install age
+  fi
+fi
+# install failed, abort
+has_cmd age || abort "age is required to decrypt files. Please install it and try again." 1
+
+config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/chezmoi"
+if [ -f "$config_dir/key.txt" ] && [ -f "$config_dir/key.txt.age" ]; then
+  # check if key.txt.age has changed
+  if cmp -s "$SOURCE_DIR/key.txt.age" "$config_dir/key.txt.age"; then
+    exit 0 # no change, exit
+  fi
+  log "key.txt.age has changed, decrypting"
+fi
+
+mkdir -p "$config_dir"
+age --decrypt --output "$config_dir/key.txt" "$SOURCE_DIR/key.txt.age"
+cp "$SOURCE_DIR/key.txt.age" "$config_dir/key.txt.age"
+chmod 600 "$config_dir/key.txt" "$config_dir/key.txt.age"
