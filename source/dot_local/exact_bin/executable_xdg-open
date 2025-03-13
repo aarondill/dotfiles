@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Vivaldi sets CHROME_WRAPPER and LD_PRELOAD
+# Several applications may segfault if LD_PRELOAD is set
+# Unset it if we're being run by Vivaldi
+if [ -n "$CHROME_WRAPPER" ]; then
+  unset LD_PRELOAD 2>/dev/null
+fi
+
+find_in_path() {
+  local path cmd exclude="${2:-${BASH_SOURCE[0]}}"
+  cmd=${1%/} cmd="${1##*/}" # remove trailing slash -- then get basename
+  while read -r -d: path; do
+    path=${path:-$PWD}                         # empty path means pwd
+    [ "$path/$cmd" != "$exclude" ] || continue # skip this_file
+    [ -x "$path/$cmd" ] || continue
+    printf '%s' "$path/$cmd" || true
+    return 0
+  done < <(printf '%s' "$PATH:")
+  printf '%s\n' "$cmd: command not found" >&2 || true
+  return 127
+}
+
+xdg_open=$(find_in_path xdg-open) || exit
+exec -- "$xdg_open" "$@"

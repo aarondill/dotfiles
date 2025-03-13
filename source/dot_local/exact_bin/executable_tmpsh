@@ -60,7 +60,8 @@ fi
 
 # Not an error, but warn the user if they are in a temporary shell
 [ -z "${TMPSH:-}" ] || diag "Warning: already in a temporary shell!"
-export TMPSH=1 # Indicate that we're in a temporary shell
+export TMPSH=1           # Indicate that we're in a temporary shell
+export TMPSH_ROOT="$dir" # The root of the temporary shell
 
 diag "Entering temporary directory $dir"
 # Use pushd/popd in case the directory is relative
