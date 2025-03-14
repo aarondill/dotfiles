@@ -183,6 +183,7 @@ If neither argument is passed, a full will be made if the most recent full backu
 Options:
   --incr                    Force a incremental backup
   --full                    Force a full backup
+  --no-verify               Do not verify the backup
   -h, --help                Show this message
   -c, --cleanup             Cleanup old backups
   -i, --info                A synonym for --status
@@ -198,8 +199,9 @@ Options:
                             Note that this is only allowed when mode != 'backup' or the user is present to confirm or --force-destination-uri is passed.
 
 Environment Variables:
-  BACKUP_VERBOSE: causes the script to act as if --verbose was passed
-  BACKUP_DRY_RUN: causes the script to act as if --dry-run was passed
+  BACKUP_VERBOSE: act as if --verbose was passed
+  BACKUP_DRY_RUN: act as if --dry-run was passed
+  BACKUP_VERIFY: if set to 0, act as if --no-verify was passed
   DUPLICITY: The path to the duplicity executable
 EOF
 }
@@ -208,7 +210,7 @@ EOF
 # Slightly safer options
 args=(--exclude-other-filesystems --exclude-device-files)
 
-LONGOPTS=incr,full,help,cleanup,info,dry-run,print,status,verbose,destination-uri:,force-destination-uri
+LONGOPTS=incr,full,help,cleanup,info,dry-run,print,status,verbose,destination-uri:,force-destination-uri,no-verify
 SHORTOPTS=h,c,i,n,p,s,v
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 mode=backup
@@ -219,6 +221,7 @@ while true; do
   arg="$1" && shift 1 # Shift to remove the option - if it has an argument, it will be in $1
   case "$arg" in
   --full | --incr) command=("${arg#--}") ;;
+  --no-verify) BACKUP_VERIFY=0 ;;
   # These three are intentionally long options so they aren't accidentally passed by users
   # These are very dangerous if used incorrectly
   --force-destination-uri) force_destination_uri=1 ;;
