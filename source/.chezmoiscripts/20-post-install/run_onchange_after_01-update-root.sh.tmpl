@@ -108,6 +108,7 @@ if has_pacman; then
   if has_cmd pacman-fix-permissions; then
     if confirm "Run pacman-fix-permissions now?"; then
       sudo_cmd pacman-fix-permissions
+      success
     fi
   else
     warn "pacman-fix-permissions not found. Install it to fix permissions."
