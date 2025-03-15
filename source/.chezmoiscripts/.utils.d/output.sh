@@ -33,6 +33,8 @@ export RED_COLOR BLUE_COLOR GREEN_COLOR BOLD_COLOR RESET_COLOR TEAL_COLOR YELLOW
 function log() { printf "${BLUE_COLOR}${BOLD_COLOR}%s\n${RESET_COLOR}" "$@" || true; }
 # err "goodbye world" -- shows in bold red - Use $THIS to show `script: error`
 function err() { printf "${THIS:+$THIS:}${RED_COLOR}${BOLD_COLOR}%s\n${RESET_COLOR}" "$@" >&2 || true; }
+# warn "goodbye world" -- shows in bold yellow - Use $THIS to show `script: error`
+function warn() { printf "${THIS:+$THIS:}${YELLOW_COLOR}${BOLD_COLOR}%s\n${RESET_COLOR}" "$@" >&2 || true; }
 # debug "debug message"
 function debug() { printf "${RED_COLOR}${BOLD_COLOR}DEBUG: %s\n${RESET_COLOR}" "$@" >&2 || true; }
 # success - no arguments
