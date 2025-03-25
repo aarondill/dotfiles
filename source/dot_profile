@@ -160,10 +160,22 @@ export BUN_INSTALL_CACHE_DIR="$XDG_CACHE_HOME/bun"
 export BUN_COMPLETION="$BUN_INSTALL/complete.bash"
 append_path "$BUN_INSTALL/bin"
 # shellcheck source=/home/aaron/.local/share/bun/complete.bash
-if [ -f "$BUN_COMPLETION" ]; then . "$BUN_COMPLETION"; fi
+if [ -f "$BUN_COMPLETION" ] && [ -n "$BASH_VERSION" ]; then . "$BUN_COMPLETION"; fi
 
 # include flatpaks in path. (Have org.example.app names)
 append_path "/var/lib/flatpak/exports/bin"
+if has flatpak; then # add steam apps to XDG_DATA_DIRS
+  steamdir=~/.var/app/com.valvesoftware.Steam
+  d="$steamdir/.local/share"
+  case ":$XDG_DATA_DIRS:" in
+  *":$d:"*) ;; # if already contains, do nothing
+  *)           # if already set, append a colon
+    [ -z "$XDG_DATA_DIRS" ] || XDG_DATA_DIRS+=":"
+    XDG_DATA_DIRS+="$d"
+    ;;
+  esac
+  unset steamdir d
+fi
 
 # include go in path
 append_path "/usr/local/go/bin"
