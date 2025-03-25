@@ -124,6 +124,12 @@ fi
 # fi
 
 # ---------------------------BEGIN CUSTOM CODE---------------------------
+if [ -z "$MY_PROFILE_STARTED" ]; then
+  MY_PROFILE_STARTED=1 # just in case .profile doesn't set this. *it should!*
+  . ~/.profile
+  return # profile will source this file
+fi
+
 # This function is leaked to the shell, this is fine.
 has() { command -v "$1" >/dev/null 2>/dev/null; }
 

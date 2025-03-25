@@ -11,6 +11,9 @@
 # for ssh logins, install and configure the libpam-umask package.
 #umask 022
 
+# Used in ./.bashrc to make sure the profile has been loaded at least once (ie `env -i bash` works)
+export MY_PROFILE_STARTED=1
+
 # This function is leaked to the shell, this is fine.
 has() { command -v "$1" >/dev/null 2>/dev/null; }
 
@@ -31,11 +34,20 @@ append_path() {
   case ":$PATH:" in
   *:"$1":*) return 0 ;;
   esac
-  PATH="${PATH:+$PATH:}$1"
+  export PATH="${PATH:+$PATH:}$1"
 }
 # NOTE: doesn't check if it's already there, to enforce order
-prepend_path() { PATH="$1${PATH:+:$PATH}"; }
+prepend_path() { export PATH="$1${PATH:+:$PATH}"; }
 shell_escape() { printf '%s\n' "$1" | sed "s/'/'\"'\"'/g; 1 s/^/'/; $ s/$/'/"; }
+
+# make sure PATH contains normal directories (it normally should already)
+# Do this before calling anything non-shell!
+for d in /usr/local/bin /usr/bin /bin; do
+  append_path "$d"
+done
+for d in /usr/bin/site_perl /usr/bin/vendor_perl /usr/bin/core_perl; do
+  append_path "$d"
+done
 
 if [ -z "${USER:-}" ]; then USER="$(id -nu)"; fi
 if [ -n "${USER:-}" ]; then export USER; fi
@@ -51,6 +63,7 @@ if [ -z "${HOME:-}" ] && has getent; then
   HOME="$(getent passwd "$USER" | cut -d: -f6)" # use getent
 fi
 if [ -n "${HOME:-}" ]; then export HOME; fi
+if [ -n "${SHELL:-}" ]; then export SHELL; fi # allow other things to use it
 
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_CONFIG_HOME="$HOME/.config"
