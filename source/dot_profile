@@ -113,8 +113,8 @@ export NODE_OPTIONS="--dns-result-order=ipv4first"
 # this in cache so I don't delete the config by accident
 export GRADLE_USER_HOME="$XDG_DATA_HOME/gradle"
 
-# editor, hidden, info, user/group
-export NNN_OPTS="eHiUd"
+# editor, hidden, info, user/group, detail, disable auto-enter, use selection
+export NNN_OPTS="eHiUdAu"
 export NNN_TRASH=
 if command -v trash >/dev/null 2>&1; then
   NNN_TRASH=1

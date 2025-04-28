@@ -1,5 +1,4 @@
 [Default Applications]
-# Vivaldi - browser
 application/json=vivaldi-stable.desktop;
 application/pdf=vivaldi-stable.desktop;
 application/rdf+xml=vivaldi-stable.desktop;
@@ -13,7 +12,6 @@ x-scheme-handler/chrome=vivaldi-stable.desktop;
 x-scheme-handler/http=vivaldi-stable.desktop;
 x-scheme-handler/https=vivaldi-stable.desktop;
 x-scheme-handler/unknown=vivaldi-stable.desktop;
-# NVIM
 text/plain=nvim.desktop;
 text/css=nvim.desktop;
 text/javascript=nvim.desktop;
@@ -46,9 +44,7 @@ application/x-python=nvim.desktop;
 application/x-shellscript=nvim.desktop;
 application/xml=nvim.desktop;
 application/xml-dtd=nvim.desktop;
-# Evince
 application/pdf=org.gnome.Evince.desktop;
-# EOG
 image/png=org.gnome.eog.desktop;
 image/jpeg=org.gnome.eog.desktop;
 image/webp=org.gnome.eog.desktop;
@@ -57,9 +53,7 @@ image/svg=org.gnome.eog.desktop;
 image/svg+xml=org.gnome.eog.desktop;
 image/avif=org.gnome.eog.desktop;
 image/gif=org.gnome.eog.desktop;
-# SideQuest
 x-scheme-handler/sidequest=SideQuest.desktop;
-# mpv
 video/webm=mpv.desktop;
 application/ogg=mpv.desktop;
 application/x-ogg=mpv.desktop;
@@ -182,9 +176,11 @@ application/x-cue=mpv.desktop;
 audio/m3u=mpv.desktop;
 audio/vnd.wave=mpv.desktop;
 video/vnd.avi=mpv.desktop;
-# nnn
 inode/directory=nnn.desktop;
-# Thunderbird
 x-scheme-handler/mailto=org.mozilla.Thunderbird.desktop;vivaldi-stable.desktop;
-# MCPE overwrides this
 application/zip=org.gnome.FileRoller.desktop;
+application/vnd.openxmlformats-officedocument.wordprocessingml.document=libreoffice-base.desktop
+x-scheme-handler/magnet=userapp-transmission-gtk-GJQA52.desktop
+
+[Added Associations]
+x-scheme-handler/magnet=userapp-transmission-gtk-GJQA52.desktop;
