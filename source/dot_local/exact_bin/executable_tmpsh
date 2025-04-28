@@ -78,7 +78,7 @@ if ! rmdir -- "$dir" 2>/dev/null; then
   # the directory is not empty, so try to remove it recursively (after prompting)
   # If tree is present, use it to print the directory structure; otherwise fall back to ls
   if command -v tree >/dev/null; then
-    tree -a -F -L1 -- "$dir"
+    tree -a -F -L2 -- "$dir"
   else
     if ls --help 2>&1 | grep -q -- --color; then
       ls -A --color -F -- "$dir"

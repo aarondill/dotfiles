@@ -157,6 +157,9 @@ alias ssh='TERM=xterm-256color ssh'
 # Save history to ~/.cache/awesome
 alias awesome-client='RLWRAP_HOME="$HOME/.cache/awesome" awesome-client'
 
+# Distable history
+alias units='units -H ""'
+
 if has ffplay; then
   alias aplay='ffplay -nodisp -hide_banner -autoexit'
 fi

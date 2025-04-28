@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Use transmission-gtk with inhibition to prevent torrents from being stopped
+set -euC -o pipefail
+function has_cmd() { command -v -- "$@" &>/dev/null; }
+
+function find_in_path() {
+  local path cmd exclude="${2:-${BASH_SOURCE[0]}}"
+  cmd=${1%/} cmd="${1##*/}" # remove trailing slash -- then get basename
+  while read -r -d: path; do
+    path=${path:-$PWD}                         # empty path means pwd
+    [ "$path/$cmd" != "$exclude" ] || continue # skip this_file
+    [ -x "$path/$cmd" ] || continue
+    printf '%s' "$path/$cmd" || true
+    return 0
+  done < <(printf '%s' "$PATH:")
+  printf '%s\n' "$cmd: command not found" >&2 || true
+  return 127
+}
+
+transmission=$(find_in_path transmission-gtk) || exit
+cmd=()
+if has_cmd systemd-inhibit; then
+  cmd=(systemd-inhibit
+    --what shutdown:sleep:idle:handle-lid-switch
+    --why 'to keep torrents running'
+    --mode block
+    --who transmission-gtk
+    --)
+fi
+exec -- "${cmd[@]}" "$transmission" "$@"
