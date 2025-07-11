@@ -24,6 +24,7 @@ rm_rf=( # These will be removed forcefully.
   ~/.gnome/apps/*-BurpSuiteCommunity.desktop
   ~/.python_history
   ~/explicit_filter.restore
+  ~/.nuget/NuGet/NuGet.Config
   # ~/.vmware/
 )
 # rmdir will happen *after* rm_rf.
@@ -37,6 +38,7 @@ rmdir=( # These will only be removed if empty
   ~/tmp/
   ~/.cups
   ~/.cert/{nm-openvpn/,}
+  ~/.nuget/{NuGet/,}
 )
 function _rm_files() (
   local f
