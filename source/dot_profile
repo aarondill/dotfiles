@@ -126,6 +126,8 @@ fi
 export ASPELL_CONF="per-conf $XDG_CONFIG_HOME/aspell/aspell.conf; personal $XDG_CONFIG_HOME/aspell/en.pws; repl $XDG_CONFIG_HOME/aspell/en.prepl"
 export TS_NODE_HISTORY="$XDG_STATE_HOME"/node/ts_node_repl_history
 export GTK2_RC_FILES="$XDG_CONFIG_HOME/gtk-2.0/gtkrc"
+export OMNISHARPHOME="$XDG_CONFIG_HOME/omnisharp"
+export NUGET_PACKAGES="$XDG_CACHE_HOME"/NuGetPackages
 
 # set PATH so it includes system bin (on debian)
 append_path "/sbin"

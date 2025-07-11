@@ -184,3 +184,4 @@ x-scheme-handler/magnet=userapp-transmission-gtk-GJQA52.desktop
 
 [Added Associations]
 x-scheme-handler/magnet=userapp-transmission-gtk-GJQA52.desktop;
+application/x-msdownload=nvim.desktop;
