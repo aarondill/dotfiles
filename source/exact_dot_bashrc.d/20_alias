@@ -164,6 +164,12 @@ if has ffplay; then
   alias aplay='ffplay -nodisp -hide_banner -autoexit'
 fi
 
+duration() {
+  local f && for f in "$@"; do
+    printf '%s: %s\n' "$(basename -- "$f")" "$(ffprobe -show_entries format=duration -v quiet -of csv="p=0" -sexagesimal -i "$f")"
+  done
+}
+
 # Allow nvchad if it's installed
 if [ -d "${NVCHAD_CONFIG:-"${XDG_CONFIG_HOME:-$HOME/.config}/NvChad"}" ]; then
   alias nvchad='NVIM_APPNAME=NvChad nvim'
