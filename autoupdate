@@ -48,7 +48,6 @@
 .config/yay/
 .local/bin/
 .local/etc/
-.local/share/applications/canvas.desktop
 .local/share/applications/dunnet.desktop
 .local/share/applications/firestorm.desktop
 .local/share/applications/github.desktop
@@ -59,7 +58,7 @@
 .local/share/applications/restart.desktop
 .local/share/applications/shutdown.desktop
 .local/share/applications/snap-store_ubuntu-software.desktop
-.local/share/applications/sso.desktop
+.local/share/applications/galaxy.desktop
 .local/share/bash-completion/
 .local/share/icons/fslite.ico
 .local/share/icons/io.snapcraft.Store.png
