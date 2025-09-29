@@ -1,0 +1,80 @@
+let mapleader=" "
+nmap <leader>vr <Action>(IdeaVim.ReloadVimRc.reload)
+nmap <leader>ve :e ~/.config/ideavim/ideavimrc<cr>
+
+" Redo plzzz
+nnoremap U <C-R>
+nnoremap <leader>wq :wq<CR>
+nnoremap <C-w> :wq<CR>
+nnoremap <leader>bd :wq<CR>
+nnoremap [b :tabprev<CR>
+nnoremap H :tabprev<CR>
+nnoremap ]b :tabnext<CR>
+nnoremap L :tabprev<CR>
+
+" \ redo the last command
+nnoremap \\ @:
+xnoremap \\ @:
+
+" set clipboard^=unnamed,unnamedplus
+
+set confirm
+set scrolloff=5
+set incsearch
+set number relativenumber
+set ignorecase smartcase
+set gdefault
+set cursorline
+
+"ideavim specific
+set ideajoin
+
+
+"plugins (only offically supported work)
+"gcc=comment
+Plug 'tpope/vim-commentary'
+"highlight yank
+Plug 'machakann/vim-highlightedyank'
+" [a]round [i]nside"
+set mini-ai
+
+" [e]ntire textobj 'yae'
+Plug 'kana/vim-textobj-entire'
+
+" Surround with gz(replace,delete,add)
+Plug 'tpope/vim-surround'
+let g:surround_no_mappings = 1
+nmap gzd <Plug>DSurround
+nmap gzr <Plug>CSurround
+nmap gza <Plug>YSurround
+vmap gza <Plug>VSurround
+xmap " gza"
+xmap ( gza)
+xmap { gza}
+xmap [ gza]
+
+" d for diagnostic
+nmap ]d <Action>(GotoNextError)
+nmap [d <Action>(GotoPreviousError)
+
+" next usage
+nmap ]] <Action>(GotoNextElementUnderCaretUsage)
+nmap [[ <Action>(GotoPrevElementUnderCaretUsage)
+
+nmap <leader>bb <Action>(ToggleLineBreakpoint)
+
+"Move lines
+nmap <M-j> <Action>(MoveLineDown)
+xmap <M-j> <Action>(MoveLineDown)
+nmap <M-k> <Action>(MoveLineUp)
+xmap <M-k> <Action>(MoveLineUp)
+
+" Yank entire should go to clipboard
+nnoremap yae gg"+yG<C-o>
+nnoremap <C-c> "+yy
+xnoremap <C-c> "+y
+
+" Better Ctrl+Space
+nmap <C-Space> <Action>(EditorSelectWord)
+vmap <C-Space> <Action>(EditorSelectWord)
+imap <C-Space> <Action>(CodeCompletion)
