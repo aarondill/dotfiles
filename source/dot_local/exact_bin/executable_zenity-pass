@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+zenity --password --title="Enter sudo password" --timeout=30

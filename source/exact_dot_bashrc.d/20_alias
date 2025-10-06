@@ -15,10 +15,7 @@ fi
 if has nnn && ! has fff; then
   alias fff='echo "maybe you meant nnn?" >&2 && nnn'
 fi
-# Alias sudo to call sudo with *my* $HOME/ENV/PATH
-# alias sudo="sudo -E env PATH=\"\$PATH\" "
-alias sudo='sudo -E ' # dont use env so permitted commands still work
-alias fd="fd -uu"     # Unrestrict fd by default
+alias fd="fd -uu" # Unrestrict fd by default
 if has fdfind; then alias fd="fdfind -uu"; fi
 alias rd='ripdrag -r'
 alias rdt='ripdrag -ktr'

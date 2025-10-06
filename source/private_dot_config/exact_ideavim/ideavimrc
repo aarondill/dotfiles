@@ -78,3 +78,6 @@ xnoremap <C-c> "+y
 nmap <C-Space> <Action>(EditorSelectWord)
 vmap <C-Space> <Action>(EditorSelectWord)
 imap <C-Space> <Action>(CodeCompletion)
+
+" [C]ode [a]ctions
+nnoremap <leader>ca :action Refactorings.QuickListPopupAction<CR>
