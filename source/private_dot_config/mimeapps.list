@@ -181,6 +181,7 @@ x-scheme-handler/mailto=org.mozilla.Thunderbird.desktop;vivaldi-stable.desktop;
 application/zip=org.gnome.FileRoller.desktop;
 application/vnd.openxmlformats-officedocument.wordprocessingml.document=libreoffice-base.desktop
 x-scheme-handler/magnet=userapp-transmission-gtk-GJQA52.desktop
+x-scheme-handler/vscode=nvim.desktop
 
 [Added Associations]
 x-scheme-handler/magnet=userapp-transmission-gtk-GJQA52.desktop;
