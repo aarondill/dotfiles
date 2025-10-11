@@ -10,7 +10,7 @@ nnoremap <leader>bd :wq<CR>
 nnoremap [b :tabprev<CR>
 nnoremap H :tabprev<CR>
 nnoremap ]b :tabnext<CR>
-nnoremap L :tabprev<CR>
+nnoremap L :tabnext<CR>
 
 " \ redo the last command
 nnoremap \\ @:

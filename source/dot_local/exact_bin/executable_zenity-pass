@@ -1,2 +1,9 @@
 #!/usr/bin/env bash
-zenity --password --title="Enter sudo password" --timeout=30
+if [ -n "${DISPLAY:-}" ] && command -v zenity &>/dev/null; then
+  zenity --password --title="Enter sudo password" --timeout=30
+elif command -v systemd-ask-password &>/dev/null; then
+  systemd-ask-password --timeout=30
+else
+  read -p 'Enter sudo password: ' -rs PASSWORD
+  echo "$PASSWORD"
+fi

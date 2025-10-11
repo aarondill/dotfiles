@@ -6,11 +6,6 @@
 # Use zenity for sudo_askpass if display is set
 
 # Allow environment
-alias sudo='sudo -E '
-
-has zenity || return
-[ -n "${DISPLAY:-}" ] || return      # only if display is set
-[ -z "${SUDO_ASKPASS:-}" ] || return # don't override existing value
-
-export SUDO_ASKPASS="$HOME/.local/bin/zenity-pass"
 alias sudo='sudo -EA '
+[ -z "${SUDO_ASKPASS:-}" ] || return # don't override existing value
+export SUDO_ASKPASS="$HOME/.local/bin/zenity-pass"
