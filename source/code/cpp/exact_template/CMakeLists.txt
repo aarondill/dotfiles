@@ -5,8 +5,11 @@ project({{$ROOT}})
 
 set(CMAKE_CXX_STANDARD 14)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # NOTE: must be *before* creating a target with add_executable
-add_compile_options(-Wall -Wextra -Wpedantic)
+# Optimizing is needed to make the compiler recognize what should be warnings
+add_compile_options(-O3 -Wall -Wextra -Wpedantic)
 
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
     add_compile_options(-Werror) # Make warnings to errors
@@ -14,9 +17,6 @@ if (CMAKE_BUILD_TYPE MATCHES "Debug")
     # -fsanitize=address enabling the detection of memory problems such as leaks.
     add_compile_options(-fsanitize=undefined -fsanitize=address)
     add_link_options(-fsanitize=undefined -fsanitize=address)
-else ()
-    # Optimize if on Release mode
-    add_compile_options(-O3)
 endif ()
 
 file(GLOB MY_SOURCES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "*.cpp")
