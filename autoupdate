@@ -76,6 +76,7 @@ code/.shellcheckrc
 code/arch
 code/c/.clang-format
 code/c/template/
+code/cpp/template/
 code/js/EslintTests.js
 code/perl
 code/repos/.awesome-scripts/
