@@ -2,12 +2,6 @@
 cmake_minimum_required(VERSION 4.1)
 project({{$ROOT}})
 
-file(GLOB MY_SOURCES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "*.cpp")
-
-# Print the list of found source files
-foreach (source_file ${MY_SOURCES})
-    message("Found source file: ${source_file}")
-endforeach ()
 
 set(CMAKE_CXX_STANDARD 14)
 
@@ -24,5 +18,10 @@ else ()
     # Optimize if on Release mode
     add_compile_options(-O3)
 endif ()
+
+file(GLOB MY_SOURCES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "*.cpp")
+foreach (source_file ${MY_SOURCES})
+    message("Found source file: ${source_file}")
+endforeach ()
 
 add_executable(main ${MY_SOURCES})
