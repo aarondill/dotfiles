@@ -14,7 +14,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 
     if (CMAKE_BUILD_TYPE MATCHES "Debug")
         # Make warnings to errors
-        add_compile_options(-Werror -Wno-error=unused-variable -Wno-error=unused-function -Wno-error=unused-value)
+        add_compile_options(-Werror -Wno-unused)
         # -fsanitize=undefined enabling the detection of undefined behavior such as integer overflows,
         # -fsanitize=address enabling the detection of memory problems such as buffer overflows and memory leaks
         add_compile_options(-fsanitize=undefined,address)
