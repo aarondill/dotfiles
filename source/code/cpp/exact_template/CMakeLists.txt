@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-if (CMAKE_COMPILER_IS_GNUCXX)
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # NOTE: must be *before* creating a target with add_executable
     # Optimizing is needed to make the compiler recognize what should be warnings
     add_compile_options(-O3 -Wall -Wextra -Wpedantic -Wno-changes-meaning)
