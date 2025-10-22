@@ -84,3 +84,4 @@ code/repos/.nvim/
 code/rust/template
 .config/rg/.
 .config/ideavim
+.config/clangd/.
