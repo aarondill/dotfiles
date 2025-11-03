@@ -23,6 +23,7 @@ if declare -f command_not_found_handle &>/dev/null; then
   command_not_found_handle() {
     local response
     printf '%s\n' "$0: $1: command not found" >&2
+    [ -t 1 ] || return 127 # only ask if running interactively
     read -r -p "Search for it? [y/N] " response >&2
     case "$response" in
     [yY][eE][sS] | [yY]) ;;
