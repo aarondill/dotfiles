@@ -8,27 +8,23 @@
 
 FZF_KEY_BIND_FILE=~/.config/readline/fzf-key-bindings.bash
 FZF_COMPLETION_FILE=~/.local/share/bash-completion/completions/fzf
+
 # Ensure fzf is installed, and key-bindings are reachable
-if ! command -v fzf &>/dev/null; then
-  return
-fi
+has fzf || return
 
 # Add fzf key bindings
 if [ -r "$FZF_KEY_BIND_FILE" ]; then
   # shellcheck source=/home/aaron/.config/readline/fzf-key-bindings.bash
   source "$FZF_KEY_BIND_FILE"
-
 fi
+
+# Stop if can't access completion. Everything after this relies on it
+[ -r "$FZF_COMPLETION_FILE" ] || return
 
 # This would be done automatically, but only on fzf<tab>, includes kill **<tab>, etc
 # TODO, seperate fzf<tab> from kill **<tab>
-if [ -r "$FZF_COMPLETION_FILE" ]; then
-  # shellcheck source=/home/aaron/.local/share/bash-completion/completions/fzf
-  source "$FZF_COMPLETION_FILE"
-else
-  # Stop if can't access completion. Everything after this relies on it
-  return
-fi
+# shellcheck source=/home/aaron/.local/share/bash-completion/completions/fzf
+source "$FZF_COMPLETION_FILE"
 
 # CTRL-/ to toggle small preview window to see the full command
 # CTRL-Y to copy the command into clipboard using pbcopy
@@ -42,6 +38,17 @@ export FZF_CTRL_R_OPTS="
 if command -v fd &>/dev/null; then
   export FZF_CTRL_T_COMMAND='fd --hidden --follow --exclude ".git" .'
   export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude ".git" .'
+  # Use fd (https://github.com/sharkdp/fd) instead of the default find command
+  # - The first argument to the function ($1) is the base path to start traversal
+  function _fzf_compgen_path() {
+    fd --hidden --follow --exclude ".git" . "$1"
+  }
+
+  # Use fd to generate the list for directory completion
+  function _fzf_compgen_dir() {
+    fd --type d --hidden --follow --exclude ".git" . "$1"
+  }
+
 else
   export FZF_CTRL_T_COMMAND='find .'
   export FZF_ALT_C_COMMAND='find . -type d '
@@ -63,19 +70,6 @@ else
   export FZF_ALT_C_OPTS="--preview 'ls --color=always {}'"
 fi
 
-# Use fd (https://github.com/sharkdp/fd) instead of the default find
-# command for listing path candidates.
-# - The first argument to the function ($1) is the base path to start traversal
-# - See the source code (completion.{bash,zsh}) for the details.
-function _fzf_compgen_path() {
-  fd --hidden --follow --exclude ".git" . "$1"
-}
-
-# Use fd to generate the list for directory completion
-function _fzf_compgen_dir() {
-  fd --type d --hidden --follow --exclude ".git" . "$1"
-}
-
 # Advanced customization of fzf options via _fzf_comprun function
 # - The first argument to the function is the name of the command.
 # - You should make sure to pass the rest of the arguments to fzf.
@@ -87,7 +81,7 @@ function _fzf_comprun() {
   command -v tree &>/dev/null && fzf_tree="tree -C -- {}" || fzf_tree="ls --color=always -- {}"
 
   case "$command" in
-  cd | pushd | rmdir | "${dir_completeds[@]}") fzf --preview 'tree -C {} | head -200' "$@" ;;
+  cd | pushd | rmdir | "${_dir_completeds[@]}") fzf --preview 'tree -C {} | head -200' "$@" ;;
   export | unset | printenv) fzf --preview "eval 'printf \"%s \" \${{}[@]}'" "$@" ;;
   ssh | telnet) fzf --preview 'dig -- {}' "$@" ;;
   unalias) fzf --preview "printf '%s' ${aliases@Q} | grep -- 'alias {}='" "$@" --preview-window down:70%:wrap --min-height 20 ;;
@@ -102,16 +96,16 @@ export _fzf_comprun
 # path | dir | var | alias | host | proc
 complete -d -F _longopt tree
 
-dir_completeds=(dir live-server nautilus rmdir tree wipe-modules)
-for cmd in "${dir_completeds[@]}"; do
+# This needs to leak to be used in the completions
+_dir_completeds=(dir live-server nautilus tree wipe-modules)
+for cmd in "${_dir_completeds[@]}"; do
   _fzf_setup_completion dir "$cmd"
 done
 
-path_completeds=(basename cat chattr chmod chown code diff diff3 dirname
-  editor javac ln ls node nodejs nvim prettier readlink realpath rm rsync
-  sh tail tar tee totem ts-node ts-node-esm uglifyjs vim vim.tiny vsce wc)
+path_completeds=(chattr code editor node nodejs prettier readlink realpath sh totem ts-node
+  ts-node-esm uglifyjs vim.tiny)
 
 for cmd in "${path_completeds[@]}"; do
   _fzf_setup_completion path "$cmd"
 done
-unset cmd dir_completeds path_completeds
+unset cmd path_completeds
