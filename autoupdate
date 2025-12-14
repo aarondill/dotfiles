@@ -51,13 +51,10 @@
 .local/share/applications/dunnet.desktop
 .local/share/applications/firestorm.desktop
 .local/share/applications/github.desktop
-.local/share/applications/gnome-boxes.desktop
 .local/share/applications/google-chrome.desktop
 .local/share/applications/mimeapps.list
-.local/share/applications/org.gnome.gedit.desktop
 .local/share/applications/restart.desktop
 .local/share/applications/shutdown.desktop
-.local/share/applications/snap-store_ubuntu-software.desktop
 .local/share/applications/galaxy.desktop
 .local/share/bash-completion/
 .local/share/icons/fslite.ico
