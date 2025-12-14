@@ -399,6 +399,7 @@ function list_packages() {
     }
 
     printf '%s\n' "${pkg_manager@Q} -S --needed --asexplicit -- \"\${explicit_deps[@]}\""
+    printf '%s\n' "${pkg_manager@Q} -D --asdeps -- \"\${explicit_deps[@]}\""
     printf '%s\n' "${pkg_manager@Q} -S --needed --asdeps -- \"\${auto_deps[@]}\""
     ;;
   apt)
