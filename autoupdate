@@ -86,3 +86,4 @@ code/rust/template
 .config/ideavim
 .config/clangd/.
 .local/bin/backup
+.local/share/applications/bitwarden.desktop
