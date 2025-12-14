@@ -6,25 +6,10 @@
 #
 #
 
-FZF_KEY_BIND_FILE=~/.config/readline/fzf-key-bindings.bash
-FZF_COMPLETION_FILE=~/.local/share/bash-completion/completions/fzf
-
-# Ensure fzf is installed, and key-bindings are reachable
+# Ensure fzf is installed
 has fzf || return
 
-# Add fzf key bindings
-if [ -r "$FZF_KEY_BIND_FILE" ]; then
-  # shellcheck source=/home/aaron/.config/readline/fzf-key-bindings.bash
-  source "$FZF_KEY_BIND_FILE"
-fi
-
-# Stop if can't access completion. Everything after this relies on it
-[ -r "$FZF_COMPLETION_FILE" ] || return
-
-# This would be done automatically, but only on fzf<tab>, includes kill **<tab>, etc
-# TODO, seperate fzf<tab> from kill **<tab>
-# shellcheck source=/home/aaron/.local/share/bash-completion/completions/fzf
-source "$FZF_COMPLETION_FILE"
+source <(fzf --bash)
 
 # CTRL-/ to toggle small preview window to see the full command
 # CTRL-Y to copy the command into clipboard using pbcopy
