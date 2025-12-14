@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+set -euC -o pipefail && shopt -s nullglob globstar
+utils=script_utils.sh dir=$(dirname -- "${BASH_SOURCE[0]}") || true
+if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
+# shellcheck source=./script_utils.sh
+. "$utils"
+
+function usage() {
+  cat <<EOF || true
+Usage: $THIS -t <seconds> input_file [output_file]
+
+Trims seconds off the end of input_file and saves it to output_file.
+if output_file is not provided, it will be input_file-cut.ext
+
+Options:
+  -v, --verbose     verbose output
+  -h, --help        show this help message
+  -e, --end         trim from end of input_file instead of beginning
+  -t, --time <sec>  trim SECONDS off of INPUT_FILE
+EOF
+  return 0
+}
+
+LONGOPTS=help,verbose,time: SHORTOPTS=h,v,t:
+ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
+
+trim_seconds=
+end=false
+USE_VERBOSE=0 # default to non-verbose output
+for arg in "$@"; do
+  case "$arg" in
+  -h | --help) usage && exit 0 ;;
+  -v | --verbose) USE_VERBOSE=1 && shift ;;
+  -t | --time) trim_seconds="$2" && shift 2 ;;
+  -e | --end) end=true && shift ;;
+  --) shift && break ;;
+  *) abort 'This is a bug' 3 ;;
+  esac
+done
+[ -n "$trim_seconds" ] || abort '-t/--time is required' 2
+[ "$#" -gt 0 ] || abort 'input_file is required' 2
+input_file="$1"
+output_file="${2:-}"
+if [ -z "$output_file" ]; then
+  output_file="${input_file%.*}-cut.${input_file##*.}"
+fi
+
+if "$end"; then
+  duration_seconds=$(ffprobe -v warning -of csv=p=0 -show_entries format=duration "$input_file")
+  end=$(printf '%s\n' "$duration_seconds - $trim_seconds" | bc)
+  ffmpeg -ss 00:00:00 -to "$end" -i "$input_file" -c copy "$output_file"
+else
+  ffmpeg -ss "$trim_seconds" -i "$input_file" -c copy "$output_file"
+fi
