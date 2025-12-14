@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
+set -euC -o pipefail
+dir=$(dirname -- "${BASH_SOURCE[0]}") || true
+rustfmt="$dir/rustfmt.toml.tmpl"
+
 # This file is called by ~/.local/bin/new
 # It is passed directory names as arguments
 for name in "$@"; do
   cargo new --bin -- "$name"
+  cp -- "$rustfmt" "$name/rustfmt.toml"
 done
