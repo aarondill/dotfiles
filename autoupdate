@@ -85,3 +85,4 @@ code/rust/template
 .config/rg/.
 .config/ideavim
 .config/clangd/.
+.local/bin/backup
