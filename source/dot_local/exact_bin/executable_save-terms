@@ -44,17 +44,25 @@ lines=(
 )
 for pid in /proc/[0-9]*/; do
   pid=$(basename "$pid")
+  case "$pid" in # Skip this script.
+  self) continue ;;
+  "$$") continue ;;
+  esac
   mapfile -d '' -t cmdline </proc/"$pid"/cmdline
   [ "${#cmdline[@]}" -gt 0 ] || continue
   zero="${cmdline[0]}"
   case "$zero" in
   -bash) ;; -fish) ;; -zsh) ;; -dash) ;; -sh) ;;
+  # only login shells
+  # bash) ;; fish) ;; zsh) ;; dash) ;; sh) ;;
   *) continue ;;
   esac
 
   cwd=$(readlink /proc/"$pid"/cwd)
   [ -n "$cwd" ] || continue
   exe=$(readlink /proc/"$pid"/exe)
+  # Remove " (deleted)" suffix (good luck starting it if it's actually deleted)
+  exe=${exe%" (deleted)"}
   [ -n "$exe" ] || continue
   cmdline[0]="$exe"
 
