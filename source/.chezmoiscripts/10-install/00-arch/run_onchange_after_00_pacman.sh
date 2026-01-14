@@ -11,17 +11,17 @@ if ! has_pacman; then
   abort "pacman is not installed, skipping pacman installation" 0
 fi
 PACKAGES=(
-  age base-devel bash-completion bat bluez-utils cheese cmake cronie curl
-  dconf-editor ddrescue dosfstools duf duplicity dust e2fsprogs exfatprogs expac
-  eza fastfetch ffmpeg fuse2 gdb git git-delta github-cli grep hexedit
+  7zip age base-devel bash-completion bat bluez-utils cmake cronie curl
+  dconf-editor ddrescue dosfstools duf duplicity dust e2fsprogs exfatprogs
+  expac eza fastfetch ffmpeg fuse2 gdb git git-delta github-cli grep hexedit
   imagemagick inetutils inotify-tools jq lazygit less libpulse lsof lua luajit
-  make mdcat moreutils neovim net-tools networkmanager-openvpn nnn noto-fonts-cjk
-  noto-fonts-emoji noto-fonts-extra openssh openvpn os-prober 7zip
-  pacman-contrib pacutils pigz pkgfile plocate posix progress pipewire-pulse pv
-  python-pip reflector renameutils ripgrep ripgrep-all rlwrap rsync shfmt silicon
-  speedtest-cli strace sudo tlp trash-cli tree ttf-font-awesome ttf-liberation
-  ttf-nerd-fonts-symbols-mono unzip util-linux vivaldi wezterm wget xdg-user-dirs
-  zip zoxide
+  make mdcat moreutils neovim net-tools networkmanager-openvpn nnn
+  noto-fonts-cjk noto-fonts-emoji noto-fonts-extra openssh openvpn os-prober
+  pacman-contrib pacutils pigz pipewire-pulse pkgfile plocate posix progress pv
+  python-pip reflector renameutils ripgrep ripgrep-all rlwrap rsync shfmt
+  silicon speedtest-cli strace sudo tlp trash-cli tree ttf-font-awesome
+  ttf-liberation ttf-nerd-fonts-symbols-mono unzip util-linux vivaldi wezterm
+  wget xdg-user-dirs zip zoxide
 )
 VIRTUAL_MACHINE_PACKAGES=(
   virt-manager qemu-desktop # VM management. Technically, only virt-manager is graphical, but they are used together
@@ -32,9 +32,9 @@ GRAPHICAL_PACKAGES=(
   arandr dconf-editor eog evince file-roller firefox firejail gimp
   gnome-calculator gnome-calendar gnome-font-viewer gnome-power-manager
   gnome-system-monitor gparted gucharmap hplip libreoffice-fresh mpv mpv-mpris
-  pavucontrol qtqr screenkey seahorse simple-scan spotify-launcher sqlitebrowser
-  thunderbird transmission-gtk wmctrl xclip xdg-desktop-portal-gtk xdg-utils
-  xdotool xorg-xinit zeal
+  pavucontrol screenkey seahorse simple-scan snapshot spotify-launcher
+  sqlitebrowser thunderbird transmission-gtk wmctrl xclip
+  xdg-desktop-portal-gtk xdg-utils xdotool xorg-xinit zeal
 )
 GNOME_PACKAGES=(gnome-shell-extension-manager gnome-tweaks gnome-software gnome-software-plugin-flatpak)
 
