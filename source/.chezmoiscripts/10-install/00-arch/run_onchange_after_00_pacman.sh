@@ -19,9 +19,9 @@ PACKAGES=(
   noto-fonts-cjk noto-fonts-emoji noto-fonts-extra openssh openvpn os-prober
   pacman-contrib pacutils pigz pipewire-pulse pkgfile plocate posix progress pv
   python-pip reflector renameutils ripgrep ripgrep-all rlwrap rsync shfmt
-  silicon speedtest-cli strace sudo tlp trash-cli tree ttf-font-awesome
-  ttf-liberation ttf-nerd-fonts-symbols-mono unzip util-linux vivaldi wezterm
-  wget xdg-user-dirs zip zoxide
+  silicon speedtest-cli strace sudo tlp trash-cli tree ttf-liberation
+  ttf-nerd-fonts-symbols-mono unzip util-linux vivaldi wezterm wget
+  woff2-font-awesome xdg-user-dirs zip zoxide
 )
 VIRTUAL_MACHINE_PACKAGES=(
   virt-manager qemu-desktop # VM management. Technically, only virt-manager is graphical, but they are used together
