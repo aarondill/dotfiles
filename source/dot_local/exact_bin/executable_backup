@@ -5,6 +5,16 @@ if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
 # shellcheck source=./script_utils.sh
 . "$utils"
 
+if [ "${BACKUP_SKIP_INHIBIT:-}" != 1 ]; then
+  export BACKUP_SKIP_INHIBIT=1 # avoid infinite recursion
+  exec systemd-inhibit \
+    --what=shutdown \
+    --who="$THIS" \
+    --why="To run the system backup" \
+    --mode=block \
+    "${BASH_SOURCE[0]}" "$@"
+fi
+
 # Calls duplicity to run a backup. Passes user arguments to first arguments of duplicity.
 # Requires duplicity to be installed
 

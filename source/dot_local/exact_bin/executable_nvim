@@ -1,12 +1,22 @@
 #!/usr/bin/env bash
 set -euC -o pipefail
-neovim_path=~/code/repos/neovim
-neovim="$neovim_path/build/bin/nvim"
-if [ -x "$neovim" ]; then
+source_path=~/code/repos/neovim
+nvim="$source_path/build/bin/nvim"
+
+if [ -x "$nvim" ]; then
   # echo "Running git version!"
-  export VIMRUNTIME="$neovim_path/runtime/"
-  exec -- "$neovim" "$@"
+  export VIMRUNTIME="$source_path/runtime/"
+  exec -- "$nvim" "$@"
 fi
+
+tar_path=~/.local/neovim
+nvim="$tar_path/bin/nvim"
+
+if [ -x "$nvim" ]; then
+  # echo "Running tar version!"
+  exec -- "$nvim" "$@"
+fi
+
 function find_in_path() {
   local path cmd exclude="${2:-${BASH_SOURCE[0]}}"
   cmd=${1%/} cmd="${1##*/}" # remove trailing slash -- then get basename

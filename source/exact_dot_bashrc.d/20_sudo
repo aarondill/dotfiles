@@ -8,4 +8,8 @@
 # Allow environment
 alias sudo='sudo -EA '
 [ -z "${SUDO_ASKPASS:-}" ] || return # don't override existing value
-export SUDO_ASKPASS="$HOME/.local/bin/zenity-pass"
+if SUDO_ASKPASS=$(command -v systemd-ask-password) && [ -x "${SUDO_ASKPASS}" ]; then
+  export SUDO_ASKPASS
+else
+  unset SUDO_ASKPASS
+fi
