@@ -4,3 +4,7 @@ ControlPath ~/.ssh/control:%h:%p:%r
 Host raspberrypi
   HostName 10.0.0.2
   User aaron
+
+Host utd
+  HostName cs1.utdallas.edu
+  User dal377225
