@@ -127,7 +127,8 @@ if has tldr; then
 fi
 
 # Shorter lazygit
-if has lazygit; then alias lg='lazygit'; fi
+alias lg='lazygit'
+alias lzd='lazydocker'
 
 # Shorter git
 if has git; then
