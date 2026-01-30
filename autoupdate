@@ -10,7 +10,6 @@
 .config/.prettierrc.mjs
 .config/autorandr/
 .config/clangd/
-.config/crontab
 .config/dircolors
 .config/fastfetch
 .config/firejail/
@@ -35,8 +34,7 @@
 .config/screenkey.json
 .config/shellcheckrc
 .config/starship.toml
-.config/systemd/user/default.target.wants/google-chrome-profile.service
-.config/systemd/user/google-chrome-profile.service
+.config/systemd/user/
 .config/tabtab/
 .config/udiskie/
 .config/user-dirs.conf
