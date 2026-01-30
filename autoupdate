@@ -45,7 +45,6 @@
 .config/xdg-desktop-portal/awesome-portals.conf
 .config/yay/
 .local/bin/
-.local/etc/
 .local/share/applications/dunnet.desktop
 .local/share/applications/firestorm.desktop
 .local/share/applications/github.desktop
