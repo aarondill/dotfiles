@@ -1,0 +1,11 @@
+[Unit]
+Description=Network Manager Wait Online
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/nm-online -q
+RemainAfterExit=yes
+Environment=NM_ONLINE_TIMEOUT=60
+
+[Install]
+WantedBy=default.target

@@ -249,7 +249,6 @@ while true; do
   arg="$1" && shift 1 # Shift to remove the option - if it has an argument, it will be in $1
   case "$arg" in
   --full | --incr) command=("${arg#--}") ;;
-  --no-verify) BACKUP_VERIFY=0 ;;
   # These three are intentionally long options so they aren't accidentally passed by users
   # These are very dangerous if used incorrectly
   --force-destination-uri) force_destination_uri=1 ;;

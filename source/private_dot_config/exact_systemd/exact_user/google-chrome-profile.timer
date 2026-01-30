@@ -1,0 +1,11 @@
+[Unit]
+Description=Hourly Chrome Sync Timer
+
+[Timer]
+OnCalendar=hourly
+Persistent=false
+RandomizedDelaySec=1min
+Unit=google-chrome-profile.service
+
+[Install]
+WantedBy=timers.target
