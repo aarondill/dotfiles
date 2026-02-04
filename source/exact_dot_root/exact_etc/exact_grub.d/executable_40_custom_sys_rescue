@@ -2,7 +2,7 @@
 # Create a "rescue mode" grub entry that boots into a /boot/systemrescue.iso file
 
 # Source grub library
-# shellcheck source=/usr/lib/grub/grub-mkconfig_lib
+# shellcheck source=/usr/share/grub/grub-mkconfig_lib
 . "$pkgdatadir/grub-mkconfig_lib"
 
 set -eC # HACK: -u is disabled because the grub libraries don't expect it.
@@ -21,6 +21,7 @@ if ! [ -f "$system_rescue_iso" ]; then
 fi
 
 mount=$("$grub_probe" --target=device "$system_rescue_iso")
+fs_uuid=$("$grub_probe" --target=fs_uuid "$system_rescue_iso")
 
 CLASS="--class rescue --class gnu-linux --class gnu --class os"
 
@@ -44,6 +45,16 @@ $(prepare_grub_to_access_device "$mount" | grub_add_tab)
 	rmmod tpm
 	loopback loop "\$iso_path"
 	set root=(loop)
+
+  # Fix for a bug in grub's \`search -f\`: https://savannah.gnu.org/bugs/?66994
+  if ! search --file --set=archiso_grub_dev --no-floppy \$iso_path
+  then
+    echo "Failed to find the archiso GRUB device. Defaulting to uuid from build."
+    # ideally,  this is set by loopback.cfg, but we need to set it here since it can't find the device
+    archiso_param="img_dev=/dev/disk/by-uuid/$fs_uuid img_loop=\$iso_path"
+  fi
+
+
 	configfile /boot/grub/loopback.cfg
 }
 EOF
