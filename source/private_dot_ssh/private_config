@@ -2,7 +2,7 @@ ControlMaster auto
 ControlPath ~/.ssh/control:%h:%p:%r
 
 Host raspberrypi
-  HostName 10.0.0.2
+  HostName pihole
   User aaron
 
 Host utd
