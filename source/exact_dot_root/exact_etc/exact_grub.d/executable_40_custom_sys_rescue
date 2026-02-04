@@ -11,13 +11,13 @@ set -eC # HACK: -u is disabled because the grub libraries don't expect it.
 log() { printf '%s\n' "$@" >&2; }
 err() { printf '%s\n' "$@" >&2; }
 abort() {
-  log "$1"
-  exit "${2:-1}"
+	log "$1"
+	exit "${2:-1}"
 }
 
 system_rescue_iso=${SYSTEM_RESCUE_ISO:-/boot/systemrescue.iso}
 if ! [ -f "$system_rescue_iso" ]; then
-  abort "'$system_rescue_iso' not found. Not creating rescue entry." 0
+	abort "'$system_rescue_iso' not found. Not creating rescue entry." 0
 fi
 
 mount=$("$grub_probe" --target=device "$system_rescue_iso")
@@ -36,7 +36,7 @@ log "Found rescue mode linux: $system_rescue_iso"
 
 cat <<EOF
 menuentry "systemrescue.iso" $CLASS {
-$(prepare_grub_to_access_device "$mount" | grub_add_tab)
+	$(prepare_grub_to_access_device "$mount" | grub_add_tab)
 	iso_path="$system_rescue_iso"
 	export iso_path
 	kernelopts="   "
@@ -46,15 +46,17 @@ $(prepare_grub_to_access_device "$mount" | grub_add_tab)
 	loopback loop "\$iso_path"
 	set root=(loop)
 
-  # Fix for a bug in grub's \`search -f\`: https://savannah.gnu.org/bugs/?66994
-  if ! search --file --set=archiso_grub_dev --no-floppy \$iso_path
-  then
-    echo "Failed to find the archiso GRUB device. Defaulting to uuid from build."
-    # ideally,  this is set by loopback.cfg, but we need to set it here since it can't find the device
-    archiso_param="img_dev=/dev/disk/by-uuid/$fs_uuid img_loop=\$iso_path"
-  fi
-
+	# Fix for a bug in grub's \`search -f\`: https://savannah.gnu.org/bugs/?66994
+	if ! search --file --set=archiso_grub_dev --no-floppy \$iso_path
+	then
+		echo "Failed to find the archiso GRUB device. Defaulting to uuid from build."
+		# ideally,  this is set by loopback.cfg, but we need to set it here since it can't find the device
+		archiso_param="img_dev=/dev/disk/by-uuid/$fs_uuid img_loop=\$iso_path"
+		export archiso_param
+	fi
 
 	configfile /boot/grub/loopback.cfg
 }
 EOF
+
+# vim: set ft=sh ts=2 sw=2 noet:
