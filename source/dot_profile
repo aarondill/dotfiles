@@ -204,7 +204,9 @@ fi
 if has luarocks; then eval "$(luarocks path --append)" || true; fi
 
 _will_startx=
-if has startx && [ -z "$DISPLAY" ] && [ "$TERM" = "linux" ] && [ "$(tty)" = /dev/tty1 ] && [ -z "$SKIP_STARTX_LOGIN" ]; then
+# only run startx on tty1 if `login` started this session. This avoids starting xorg if a display manager opened this shell.
+_session_service="$(loginctl show-session -P Service "$XDG_SESSION_ID" 2>/dev/null)" || _session_service=login
+if has startx && [ -z "$DISPLAY" ] && [ "$TERM" = "linux" ] && [ "$(tty)" = /dev/tty1 ] && [ -z "$SKIP_STARTX_LOGIN" ] && [ "$_session_service" = login ]; then
   _will_startx=1
 fi
 
