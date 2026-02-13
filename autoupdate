@@ -81,3 +81,4 @@ code/rust/template
 .config/clangd/.
 .local/bin/backup
 .local/share/applications/bitwarden.desktop
+.config/tmux/.
