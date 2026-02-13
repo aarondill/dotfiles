@@ -76,9 +76,9 @@ code/perl
 code/repos/.awesome-scripts/
 code/repos/.nvim/
 code/rust/template
-.config/rg/.
+.config/rg
 .config/ideavim
-.config/clangd/.
+.config/clangd
 .local/bin/backup
 .local/share/applications/bitwarden.desktop
-.config/tmux/.
+.config/tmux
