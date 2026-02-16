@@ -9,7 +9,7 @@
 *.tmp
 
 ### dotenv ###
-.env
+# .env
 
 ### Firebase ###
 .idea
