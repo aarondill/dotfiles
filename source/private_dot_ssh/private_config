@@ -1,5 +1,6 @@
 ControlMaster auto
 ControlPath ~/.ssh/control:%h:%p:%r
+ControlPersist 10
 
 Host raspberrypi
   HostName pihole

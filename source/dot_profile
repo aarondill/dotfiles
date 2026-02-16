@@ -82,7 +82,7 @@ unset _cores
 # Stop less from saving it's history
 export LESSHISTFILE=-
 # Make search case insensitive -- Support colors
-export LESS="-IR"
+export LESS="-IR --mouse"
 # Make less show icons in PUA areas
 export LESSUTFCHARDEF='E000-F8FF:p,F0000-FFFFD:p,100000-10FFFD:p'
 # Move some files from my $HOME directory

@@ -184,4 +184,18 @@ if [ "${BASH_VERSINFO[0]}" -lt 5 ] || { [ "${BASH_VERSINFO[0]}" -eq 5 ] && [ "${
   } && _join_prompt_command
 fi
 export -n PROMPT_COMMAND # This should *not* be exported. Stop subshells from double appending.
+
+if [ -z "${TMUX:-}" ] && [ -n "${SSH_TTY:-}" ] && [[ $- =~ i ]] && command -v tmux &>/dev/null; then
+  ID="$(tmux 'ls' 2>/dev/null | grep -vm1 attached | cut -d: -f1)" # get the id of a deattached session
+  if [[ -z "$ID" ]]; then                                          # if not available attach to a new one
+    exec tmux new-session
+  else
+    extra=()
+    if [ "$(tmux 'ls' | grep -cv attached)" -gt 1 ]; then
+      extra=(';' choose-tree -sZ) # if there's more than one detached session, choose between them
+    fi
+    exec tmux attach-session -t "$ID" "${extra[@]}" # if available attach to it
+  fi
+fi
+
 # ------------------------------END OF FILE------------------------------
