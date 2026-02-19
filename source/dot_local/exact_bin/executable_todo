@@ -84,6 +84,13 @@ case "$name" in
 .*) abort "Name can't start with a dot (hidden files)!" 2 ;;
 esac
 
+main="$name" # The "main" todo file
+# If the name is a directory, or doesn't exist and ends in a slash, then use it as a directory
+if [ -d "$name" ] || { ! [ -e "$name" ] && [ -n "${name##*[^/]}" ]; }; then
+  bname=$(basename -- "$name")
+  main="${name%/}/$bname"
+fi
+
 case "$action" in
 count | wc)
   dir="$todo_dir/$name"
@@ -95,7 +102,7 @@ add | edit | new)
   # Add and edit are the same, EXCEPT add can not double create a todo
   if [ "$action" == add ] && [ -e "$name" ]; then abort "Todo already exists: $name"; fi
   mkdirname "$name" || abort "Could not create directory for todo file"
-  edit "$name"
+  edit "$main"
   ;;
 list | ls) ;&
 show | cat)
@@ -103,8 +110,9 @@ show | cat)
   # If empty, or directory, list
   if [ -z "$name" ] || [ -d "$name" ]; then
     show_directory "$todo_dir/$name"
-  else
-    page "$name"
+  fi
+  if [ -e "$main" ]; then
+    page "$main"
   fi
   ;;
 rm | remove | done)
@@ -116,11 +124,13 @@ path | dir)
   [ -z "$name" ] || [ -e "$name" ] || abort "Todo doesn't exist: $name"
   ret=${todo_dir}/${name}
   ret=${ret//\/\//\/} ret="${ret%/}" # remove double slashes and trailing slash
+  if [ -d "$ret" ]; then ret+="/"; fi
   log "$ret"
   ;;
 cd | chdir)
   [ -z "$name" ] || [ -e "$name" ] || abort "Todo doesn't exist: $name"
   dir="${todo_dir}/${name}"
+  [ -d "$dir" ] || abort "Todo is not a directory: $dir"
   cd -- "$dir" || abort "Couldn't change to directory: $dir"
   shell=$(cmdpath "$SHELL" || getent passwd "$USER" | cut -d : -f 7)
   exec "$shell"
