@@ -5,8 +5,22 @@
 #
 
 _remove_lla_alias=''
-alias lla &>/dev/null || _remove_lla_alias=1
-[ -z "$_remove_lla_alias" ] || alias lla='ls -lA'
+alias lla &>/dev/null || {
+  _remove_lla_alias=1
+  alias lla='ls -lA'
+}
+_remove_mdcat_alias=''
+alias mdcat &>/dev/null || {
+  _remove_mdcat_alias=1
+  # If bat is installed, we're already paging, so paginate mdcat
+  if type bat &>/dev/null; then
+    alias mdcat='mdless'
+  elif command -v mdcat &>/dev/null; then
+    alias mdcat='mdcat'
+  else
+    alias mdcat='cat' # this will be recusively expanded in the function
+  fi
+}
 alias cat &>/dev/null || alias cat='command cat' # ensure no recursive call of cat function
 
 # This needs the function keyword to ensure the alias isn't expanded in the
@@ -23,7 +37,14 @@ function cat() {
     if [ -d "$f" ]; then
       lla "$f" || exit="$?"
     else
-      cat "$f" || exit="$?"
+      case "$f" in
+      *.md)
+        # This is only used if mdcat is mdless, which means the above checked for bat
+        MDCAT_PAGER="bat --file-name '$f' -l txt" \
+          mdcat "$f" || exit="$?"
+        ;;
+      *) cat "$f" || exit="$?" ;;
+      esac
     fi
   done
   return "$exit"
@@ -33,3 +54,5 @@ function cat() {
 unalias cat &>/dev/null
 [ -z "$_remove_lla_alias" ] || unalias lla
 unset -v _remove_lla_alias
+[ -z "$_remove_mdcat_alias" ] || unalias mdcat
+unset -v _remove_mdcat_alias
