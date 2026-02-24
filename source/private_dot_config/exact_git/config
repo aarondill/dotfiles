@@ -26,6 +26,8 @@
 [diff]
     colorMoved = default
 # END DELTA SETUP
+[clone]
+	filterSubmodules = true
 [init]
   defaultBranch = main # not master
   # Disable the templatedir to save storage (this is copied into *every* .git directory)
@@ -142,4 +144,3 @@
   # URL shorthands
   insteadOf = "gh:"
   insteadOf = "github:"
-
