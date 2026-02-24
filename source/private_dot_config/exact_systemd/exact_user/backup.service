@@ -1,11 +1,10 @@
 [Unit]
 Description=File Backups
-Requires=NetworkManager-wait-online.service
-After=NetworkManager-wait-online.service
+After=nas-ping.service
+Requires=nas-ping.service
 
 [Service]
 Type=oneshot
-User=aaron
-ExecStart=/home/aaron/.local/bin/backup
+ExecStart=%h/.local/bin/backup
 # Don't verify backups, makes it much faster.
-Environment="BACKUP_VERIFY=0"
+Environment="BACKUP_VERIFY=0 BACKUP_VERBOSE=1"

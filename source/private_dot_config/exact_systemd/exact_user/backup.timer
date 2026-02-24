@@ -6,6 +6,7 @@ OnCalendar=daily
 Persistent=true
 RandomizedDelaySec=15min
 Unit=backup.service
+DeferReactivation=true
 
 [Install]
 WantedBy=timers.target
