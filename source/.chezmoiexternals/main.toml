@@ -1,23 +1,24 @@
 [".config/awesome"]
 type = "git-repo"
 url = "https://github.com/aarondill/awesome.git"
-# refreshPeriod = "12h"
 clone.args = ['--filter=tree:0']
 
 [".config/nvim"]
 type = "git-repo"
 url = "https://github.com/aarondill/nvim.git"
-# refreshPeriod = "12h"
 clone.args = ['--filter=tree:0']
 
 [".config/wezterm"]
 type = "git-repo"
 url = "https://github.com/aarondill/wezterm.git"
-# refreshPeriod = "12h"
 clone.args = ['--filter=tree:0']
 
 [".config/mpv"]
 type = "git-repo"
 url = "https://github.com/aarondill/mpv.git"
-# refreshPeriod = "12h"
 clone.args = ['--filter=tree:0']
+
+[".config/yazi"]
+type = "git-repo"
+url = "https://github.com/aarondill/yazi.git"
+clone.args = ['--filter=tree:0', "--recurse-submodules", "--shallow-submodules"]
