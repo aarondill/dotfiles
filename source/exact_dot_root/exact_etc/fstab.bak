@@ -15,4 +15,4 @@ UUID=B860-F1BD      	/boot/efi     	vfat      	rw,relatime,fmask=0022,dmask=0022
 UUID=e6c25ba3-1d59-4277-9a2c-fcd6418ac89d	none      	swap      	defaults  	0 0
 
 # NFS Backup mount, local IP 10.0.0.2
-pihole:/backup      	/mnt/backup/       	nfs      	nofail,x-systemd.automount,x-systemd.requires=network-online.target,x-systemd.mount-timeout=10s,retry=1,x-systemd.idle-timeout=1min,max_connect=2      	0 0
+pihole:/backup      	/mnt/backup/       	nfs      	nofail,x-systemd.automount,x-systemd.requires=network-online.target,x-systemd.mount-timeout=10s,retry=1,x-systemd.idle-timeout=1min,max_connect=2,soft,timeo=10,retrans=3       	0 0
