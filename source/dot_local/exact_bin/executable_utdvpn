@@ -40,17 +40,19 @@ while true; do
   esac
 done
 [ "$#" -ge 1 ] || abort "action is required" 2
+check_dependencies sshfs fusermount gpclient mkdir realpath
+
 action="$1"
 mount_dir="${2:-$DEFAULT_MOUNT_DIR}"
-
-check_dependencies sshfs fusermount gpclient mkdir
+mount_dir="$(realpath -m -- "$mount_dir")" # canonicalize, but don't require existance
 
 # Don't re-enable if going down
 if [ "$action" == "up" ] && has tailscale && tailscale status &>/dev/null; then
-  if ! confirm "Connected to Tailscale, disconnect?"; then
-    abort "Cancelled" 1
+  if confirm "Connected to Tailscale, disconnect?"; then
+    verbose tailscale down
+  else
+    warn "The vpn may not work correctly with tailscale dns enabled!"
   fi
-  verbose tailscale down
 # TODO: check for other vpns through nmcli
 fi
 
@@ -88,8 +90,10 @@ up)
   if ! grep -qF "$mount_dir" /etc/mtab; then
     log "Creating sshfs mount at $mount_dir..."
     if ! [ -d "$mount_dir" ]; then
-      sudo_cmd mkdir -p "$mount_dir"
-      sudo_cmd chown "$USER:$USER" "$mount_dir"
+      mkdir -p "$mount_dir" 2>/dev/null || sudo_cmd mkdir -p "$mount_dir"
+      if ! [ -w "$mount_dir" ]; then
+        sudo_cmd chown "$USER:$USER" "$mount_dir"
+      fi
     fi
     sshfs -o reconnect,idmap=user,ServerAliveInterval=15,ServerAliveCountMax=3 "$host:" "$mount_dir"
   elif ! grep -qF "$host: $mount_dir" /etc/mtab; then
@@ -100,7 +104,11 @@ up)
 down)
   if grep -qF "$mount_dir" /etc/mtab; then
     log "Unmounting sshfs at $mount_dir..."
-    fusermount -u "$mount_dir" && sudo_cmd rmdir --ignore-fail-on-non-empty "$mount_dir" || true
+    fusermount -u "$mount_dir" && {
+      _sudo=()
+      [ -w "$mount_dir/.." ] || _sudo=(sudo_cmd)
+      "${_sudo[@]}" rmdir --ignore-fail-on-non-empty "$mount_dir" || true
+    }
   fi
 
   if [ -f /var/run/gpclient.lock ]; then
