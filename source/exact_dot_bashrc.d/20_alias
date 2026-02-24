@@ -12,9 +12,6 @@ alias d='cd'
 if ! has totem && has mpv; then
   alias totem='echo "maybe you meant mpv?" >&2 && mpv'
 fi
-if has nnn && ! has fff; then
-  alias fff='echo "maybe you meant nnn?" >&2 && nnn'
-fi
 alias fd="fd -uu" # Unrestrict fd by default
 if has fdfind; then alias fd="fdfind -uu"; fi
 alias rd='ripdrag -r'
