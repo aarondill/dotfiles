@@ -104,7 +104,8 @@ up)
 down)
   if grep -qF "$mount_dir" /etc/mtab; then
     log "Unmounting sshfs at $mount_dir..."
-    fusermount -u "$mount_dir" && {
+    # lazy unmount
+    fusermount -uz "$mount_dir" && {
       _sudo=()
       [ -w "$mount_dir/.." ] || _sudo=(sudo_cmd)
       "${_sudo[@]}" rmdir --ignore-fail-on-non-empty "$mount_dir" || true
