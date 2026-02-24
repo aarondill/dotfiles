@@ -1,3 +1,4 @@
+# vim: set ft=systemd:
 [Unit]
 Description=Network Manager Wait Online
 

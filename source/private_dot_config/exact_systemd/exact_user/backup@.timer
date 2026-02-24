@@ -1,0 +1,13 @@
+# vim: set ft=systemd:
+[Unit]
+Description=Daily Backup Timer (@ %i)
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+RandomizedDelaySec=15min
+Unit=backup@%i.service
+DeferReactivation=true
+
+[Install]
+WantedBy=timers.target
