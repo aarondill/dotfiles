@@ -55,8 +55,8 @@ function pacyay() {
   esac
   _pacman_exec "${args[@]}"
 }
-function pacman_is_installed() { for pac; do pacyay -Q -- "$pac" &>/dev/null || return 1; done; }
-function pacman_is_available() { for pac; do pacyay -Si -- "$pac" &>/dev/null || return 1; done; }
+function pacman_is_installed() { pacyay -Q -- "$@" &>/dev/null; }
+function pacman_is_available() { pacyay -Si -- "$@" &>/dev/null; }
 function pacman_mark_explicit() { pacyay -qD --asexplicit -- "$@"; }
 function pacman_mark_deps() { pacyay -qD --asdeps -- "$@"; }
 # usage: pacman_install package

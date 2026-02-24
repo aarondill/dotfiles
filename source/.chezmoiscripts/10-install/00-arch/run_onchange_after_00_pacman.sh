@@ -11,7 +11,7 @@ if ! has_pacman; then
   abort "pacman is not installed, skipping pacman installation" 0
 fi
 PACKAGES=(
-  7zip age base-devel bash-completion bat bluez-utils cmake cronie curl
+  7zip age base-devel bash-completion bat bluez-utils cmake curl
   dconf-editor ddrescue dosfstools duf duplicity dust e2fsprogs exfatprogs
   expac eza fastfetch ffmpeg fuse2 gdb git git-delta github-cli grep hexedit
   imagemagick inetutils inotify-tools jq lazygit less libpulse lsof lua luajit
@@ -40,10 +40,14 @@ GNOME_PACKAGES=(gnome-shell-extension-manager gnome-tweaks gnome-software gnome-
 
 function install_if_available() {
   local packages=()
-  local package && for package; do
-    pacman_is_available "$package" || { err "Could not find '$package'" && continue; }
-    packages+=("$package")
-  done
+  if pacman_is_available "$@"; then # usually, everything is available, do the fast thing
+    packages+=("$@")
+  else
+    local package && for package; do
+      pacman_is_available "$package" || { err "Could not find '$package'" && continue; }
+      packages+=("$package")
+    done
+  fi
   [ ${#packages[@]} -gt 0 ] || return 0
   pacman_install "${packages[@]}"
 }
