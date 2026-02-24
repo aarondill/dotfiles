@@ -6,8 +6,7 @@ Requires=ping@%i.service
 
 [Service]
 Type=oneshot
-# Note: doesn't use %i. Make sure the backup script is setup right, or change this and pass in the hostname.
-ExecStart=%h/.local/bin/backup
+ExecStart=%h/.local/bin/backup %i
 # Don't verify backups, makes it much faster.
 Environment="BACKUP_VERIFY=0"
 Environment="BACKUP_VERBOSE=1"

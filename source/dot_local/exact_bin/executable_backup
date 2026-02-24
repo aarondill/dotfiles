@@ -127,38 +127,6 @@ exclude_if_present=(
 # Change the volume size to number MB. Default is 200MB.
 VOLSIZE=200
 
-# Searching for usb drive
-external=
-
-# maj:min, LABEL=label, UUID=uuid, PARTLABEL=label, PARTUUID=uuid
-usbdevice=UUID=e9dff24c-bba3-424e-9855-79e4b2883488
-usbname=Backup # The directory name it is automounted under
-usbdirectory=/mnt/backup/
-
-# Search for a mountpoint - uuid, label, or partition label
-if [ -z "$external" ] && [ -n "$usbdevice" ] && command -v findmnt &>/dev/null; then
-  external=$(findmnt -nr -o target -S "$usbdevice") || true
-fi
-# Search by name - automounted (label)
-if [ -z "$external" ] && [ -n "$usbname" ]; then
-  for dir in "/media/$USER" "/run/media/$USER"; do
-    [ -d "$dir/$usbname" ] || continue
-    external="$dir/$usbname" && break
-  done
-fi
-# Search by mounted directory - automounted (constant directory)
-if [ -z "$external" ] && [ -d "$usbdirectory" ]; then
-  if findmnt -M "$usbdirectory" &>/dev/null; then
-    external="$usbdirectory"
-  fi
-fi
-
-# Exit 75 indicates that this is a temporary error, and the backup should be retried later. (EX_TEMPFAIL in `man sysexits.h(3)`)
-[ -n "$external" ] || abort "$(date): Could not find usb drive for backup. Please check that it's mounted." 75
-
-# The destination directory to backup *to* (usually a remote location or external storage)
-DESTINATION_URI=file://$external/duplicity_backup/$host-$os
-
 # Currently only 'no' is fully supported.
 ENCRYPTION_TYPE=no
 
@@ -221,7 +189,7 @@ Options:
   -v, --verbose             Show all duplicity commands before running them
   --force-destination-uri   Force the passed destination URI to be used to backup without user confirmation.
                             It is an error to pass this option without --destination-uri.
-  --destination-uri <uri>   The directory to backup to (default: $DESTINATION_URI).
+  --destination-uri <uri>   The directory to backup to.
                             This should only be used when you *really* know what you're doing.
                             To change the destination URI in a script, you *must* pass --force-destination-uri.
                             Note that this is only allowed when mode != 'backup' or the user is present to confirm or --force-destination-uri is passed.
@@ -243,7 +211,7 @@ SHORTOPTS=h,c,i,n,p,s,v
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 mode=backup
 command=() # an array for the sake of empty strings (allows to skip the command and dynamically create full backups)
-_default_destination_uri=$DESTINATION_URI
+_changed_destination_uri=
 force_destination_uri=0
 while true; do
   arg="$1" && shift 1 # Shift to remove the option - if it has an argument, it will be in $1
@@ -253,7 +221,7 @@ while true; do
   # These are very dangerous if used incorrectly
   --force-destination-uri) force_destination_uri=1 ;;
   # If a url is passed, don't set the name (duplicity will hash the url as the name)
-  --destination-uri) DESTINATION_URI="$1" NAME="" && shift 1 ;; # Shift to remove the value
+  --destination-uri) _changed_destination_uri="$1" NAME="" && shift 1 ;; # Shift to remove the value
   ## End of dangerous options
   --help | -h) usage && exit 0 ;;
   --print | -p) mode=print ;;
@@ -267,7 +235,49 @@ while true; do
   *) abort "this is a bug" 3 ;;
   esac
 done
-[ "$#" -eq 0 ] || abort "This script does not support positional arguments" 2
+[ "$#" -le 1 ] || abort "usage: $THIS [opts]... [host]" 2
+
+if [ -n "$_changed_destination_uri" ]; then
+  DESTINATION_URI="$_changed_destination_uri"
+else
+  if [ "$#" -eq 0 ]; then
+    # Searching for usb drive
+    external=
+
+    # maj:min, LABEL=label, UUID=uuid, PARTLABEL=label, PARTUUID=uuid
+    usbdevice=UUID=e9dff24c-bba3-424e-9855-79e4b2883488
+    usbname=Backup # The directory name it is automounted under
+    usbdirectory=/mnt/backup/
+
+    # Search for a mountpoint - uuid, label, or partition label
+    if [ -z "$external" ] && [ -n "$usbdevice" ] && command -v findmnt &>/dev/null; then
+      external=$(findmnt -nr -o target -S "$usbdevice") || true
+    fi
+    # Search by name - automounted (label)
+    if [ -z "$external" ] && [ -n "$usbname" ]; then
+      for dir in "/media/$USER" "/run/media/$USER"; do
+        [ -d "$dir/$usbname" ] || continue
+        external="$dir/$usbname" && break
+      done
+    fi
+    # Search by mounted directory - automounted (constant directory)
+    if [ -z "$external" ] && [ -d "$usbdirectory" ]; then
+      if findmnt -M "$usbdirectory" &>/dev/null; then
+        external="$usbdirectory"
+      fi
+    fi
+
+    if ! [ -d "$external" ]; then
+      abort "Could not find the backup directory!" 1
+    fi
+    log "Found external backup directory: $external"
+    uri_base=file://$external
+  else
+    uri_base=rsync://$1//backup
+  fi
+  # The destination directory to backup *to* (usually a remote location or external storage)
+  DESTINATION_URI=$uri_base/duplicity_backup/$host-$os
+fi
 
 DUPLICITY="${DUPLICITY:-"$(cmdpath duplicity || true)"}"
 # Ensure duplicity can be accessed
@@ -432,8 +442,8 @@ function list_packages() {
 
 case "$mode" in
 backup)
-  if [ "$DESTINATION_URI" != "$_default_destination_uri" ]; then
-    warn "WARNING: The destination URI was changed from $_default_destination_uri to $DESTINATION_URI"
+  if [ -n "$_changed_destination_uri" ]; then
+    warn "WARNING: The destination URI was changed to $DESTINATION_URI"
     warn "If this is not the correct URI, you will lose data from the old backup!"
     if [ "$force_destination_uri" -eq 0 ]; then
       # Ensure stdin is a terminal and the user wants to continue

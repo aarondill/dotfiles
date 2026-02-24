@@ -4,6 +4,11 @@
 #
 
 function yazi() {
+  local _installed_file=${XDG_CONFIG_HOME:-$HOME/.config}/yazi/.plugins-installed
+  if ! [ -f "$_installed_file" ]; then
+    echo "Installing yazi plugins..."
+    ya pkg install && touch "$_installed_file"
+  fi
   local tmp cwd code=0
   tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
   command yazi "$@" --cwd-file="$tmp" || code=$?
