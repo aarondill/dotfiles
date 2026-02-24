@@ -47,7 +47,9 @@
     { "type": "gpu", "temp": true },
     "memory",
     "swap",
-    "disk",
+    // Don't show sshfs or nfs cause they might hang
+    // If it attempts to display a disconnected drive, it will hang and block terminal access
+    { "type": "disk", "hideFS": ["fuse.sshfs", "nfs"] },
     "battery",
     "player",
     "media",
