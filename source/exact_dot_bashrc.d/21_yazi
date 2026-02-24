@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# ~/.bashrc.d/21_yazi
+#
+
+function yazi() {
+  local tmp cwd code=0
+  tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
+  command yazi "$@" --cwd-file="$tmp" || code=$?
+  IFS= read -r -d '' cwd <"$tmp"
+  [ "$cwd" != "$PWD" ] && [ -d "$cwd" ] && builtin cd -- "$cwd" || true
+  rm -f -- "$tmp"
+  return "$code"
+}
