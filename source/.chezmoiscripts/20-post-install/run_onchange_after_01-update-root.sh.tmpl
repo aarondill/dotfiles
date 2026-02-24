@@ -71,7 +71,7 @@ if [ "$BACKUP" -ne 0 ]; then
     fi
   done
   if ! sudo_cmd test -d "$BACKUPDIR"; then # Didn't even create the directory
-    log "No files will be overwritten! :)"
+    abort "No files will be overwritten! :)" 0
   fi
 fi
 
