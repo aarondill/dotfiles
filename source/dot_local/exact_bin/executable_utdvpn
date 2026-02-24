@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+# ~/.local/bin/utdvpn
+set -euC -o pipefail && shopt -s nullglob globstar
+utils=script_utils.sh dir=$(dirname -- "${BASH_SOURCE[0]}") || true
+if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
+# shellcheck source=./script_utils.sh
+. "$utils"
+
+DEFAULT_HOST=utd
+DEFAULT_VPN_SERVER=utdvpn.utdallas.edu
+DEFAULT_MOUNT_DIR=/mnt/utd
+function usage() {
+  cat <<EOF || true
+Usage: $THIS [opts] -- <action> [dir]
+Starts a gpclient VPN connection (if necessary), then mounts sshfs to dir (default: $DEFAULT_MOUNT_DIR)
+Action is one of:
+  up - Connect to VPN server and mount sshfs
+  down - Disconnect from VPN server and unmount sshfs
+
+Options:
+    --help, -h           Show this message
+    --host, -H hostname  Connect to this host [default: $DEFAULT_HOST]
+    --vpn-server, -s     Connect to this VPN server [default: $DEFAULT_VPN_SERVER]
+
+EOF
+}
+
+host=$DEFAULT_HOST
+vpn_server=$DEFAULT_VPN_SERVER
+
+LONGOPTS=help,host:,vpn-server: SHORTOPTS=h,H:,s:
+ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
+while true; do
+  case "$1" in
+  -h | --help) usage && exit 0 ;;
+  -H | --host) host=$2 && shift 2 ;;
+  -s | --vpn-server) vpn_server=$2 && shift 2 ;;
+  --) shift && break ;;
+  *) abort "This is a bug" 3 ;;
+  esac
+done
+[ "$#" -ge 1 ] || abort "action is required" 2
+action="$1"
+mount_dir="${2:-$DEFAULT_MOUNT_DIR}"
+
+check_dependencies sshfs fusermount gpclient mkdir
+
+# Don't re-enable if going down
+if [ "$action" == "up" ] && has tailscale && tailscale status &>/dev/null; then
+  if ! confirm "Connected to Tailscale, disconnect?"; then
+    abort "Cancelled" 1
+  fi
+  verbose tailscale down
+# TODO: check for other vpns through nmcli
+fi
+
+# Check if a host is reachable via ssh, expands the hostname from ssh config
+ssh_is_reachable() {
+  log "Checking if $1 is reachable..."
+  local hostname
+  hostname="$(ssh -G "$1" | awk '/^hostname / { print $2 }')"
+  ping -c1 -t30 "$hostname" &>/dev/null
+}
+
+case "$action" in
+up)
+  if ssh_is_reachable "$host"; then
+    log "$host is reachable, no vpn needed"
+  elif ! [ -f /var/run/gpclient.lock ]; then
+    log "Starting gpclient..."
+    sudo_cmd true # Cache the sudo password
+    verbose sudo_cmd gpclient --fix-openssl connect --default-browser "$vpn_server" >|/tmp/gpclient.log 2>&1 &
+    disown
+    # output the log until the lock file is created
+    tail -f /tmp/gpclient.log &
+    pid=$!
+    until [ -f /var/run/gpclient.lock ]; do
+      sleep 1
+    done
+    kill "$pid"
+    # wait until the tail command exits, but ignore the exit code
+    wait "$pid" || true
+  else
+    log "gpclient is already running, skipping"
+    warn "Was unable to connect to $host! Is the server down?"
+  fi
+
+  if ! grep -qF "$mount_dir" /etc/mtab; then
+    log "Creating sshfs mount at $mount_dir..."
+    if ! [ -d "$mount_dir" ]; then
+      sudo_cmd mkdir -p "$mount_dir"
+      sudo_cmd chown "$USER:$USER" "$mount_dir"
+    fi
+    sshfs -o reconnect,idmap=user,ServerAliveInterval=15,ServerAliveCountMax=3 "$host:" "$mount_dir"
+  elif ! grep -qF "$host: $mount_dir" /etc/mtab; then
+    warn "sshfs mount at $mount_dir doesn't match expected host"
+    warn "$(grep -F "$mount_dir" /etc/mtab)"
+  fi
+  ;;
+down)
+  if grep -qF "$mount_dir" /etc/mtab; then
+    log "Unmounting sshfs at $mount_dir..."
+    fusermount -u "$mount_dir" && sudo_cmd rmdir --ignore-fail-on-non-empty "$mount_dir" || true
+  fi
+
+  if [ -f /var/run/gpclient.lock ]; then
+    log "Disconnecting from VPN..."
+    verbose sudo_cmd gpclient disconnect
+  fi
+  ;;
+esac
