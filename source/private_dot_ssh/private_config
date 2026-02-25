@@ -9,3 +9,7 @@ Host raspberrypi
 Host utd
   HostName cs1.utdallas.edu
   User dal377225
+
+Host rsync
+  HostName fm2836.rsync.net
+  User fm2836
