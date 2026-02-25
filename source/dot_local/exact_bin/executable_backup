@@ -115,6 +115,13 @@ if [ "$SOURCE_DIR" = / ]; then
   )
 fi
 
+# A mapping of hostname to the root of the backup destination. If a hostname is not found, defaults to ${HOST_DESTINATION_ROOT[_]}
+# This is a hack. Really, I need to write a config file / profiles
+declare -A HOST_DESTINATION_ROOT=(
+  [rsync]='backup'
+  [_]='/backup'
+)
+
 # Exclude directories if filename is present. Allows the user to specify folders
 # that they do not wish to backup by adding a specified file (e.g. ".nobackup")
 # instead of maintaining a comprehensive exclude/include list.
@@ -235,48 +242,26 @@ while true; do
   *) abort "this is a bug" 3 ;;
   esac
 done
-[ "$#" -le 1 ] || abort "usage: $THIS [opts]... [host]" 2
 
 if [ -n "$_changed_destination_uri" ]; then
   DESTINATION_URI="$_changed_destination_uri"
 else
-  if [ "$#" -eq 0 ]; then
-    # Searching for usb drive
-    external=
-
-    # maj:min, LABEL=label, UUID=uuid, PARTLABEL=label, PARTUUID=uuid
-    usbdevice=UUID=e9dff24c-bba3-424e-9855-79e4b2883488
-    usbname=Backup # The directory name it is automounted under
-    usbdirectory=/mnt/backup/
-
-    # Search for a mountpoint - uuid, label, or partition label
-    if [ -z "$external" ] && [ -n "$usbdevice" ] && command -v findmnt &>/dev/null; then
-      external=$(findmnt -nr -o target -S "$usbdevice") || true
-    fi
-    # Search by name - automounted (label)
-    if [ -z "$external" ] && [ -n "$usbname" ]; then
-      for dir in "/media/$USER" "/run/media/$USER"; do
-        [ -d "$dir/$usbname" ] || continue
-        external="$dir/$usbname" && break
-      done
-    fi
-    # Search by mounted directory - automounted (constant directory)
-    if [ -z "$external" ] && [ -d "$usbdirectory" ]; then
-      if findmnt -M "$usbdirectory" &>/dev/null; then
-        external="$usbdirectory"
-      fi
-    fi
-
-    if ! [ -d "$external" ]; then
-      abort "Could not find the backup directory!" 1
-    fi
-    log "Found external backup directory: $external"
-    uri_base=file://$external
+  _destination_path=/duplicity_backup/$host-$os
+  # only error if a destination URI is not passed
+  [ -n "${1:-}" ] || abort "usage: $THIS [opts]... host" 2
+  if [ -d "$1" ]; then
+    log "Found backup directory: $1"
+    uri_base=file://$1
+    mkdir -p "$1/$_destination_path"
   else
-    uri_base=rsync://$1//backup
+    _remote_host=$1
+    _remote_root="${HOST_DESTINATION_ROOT[$_remote_host]:-${HOST_DESTINATION_ROOT[_]}}"
+    # HACK: make sure the destination URI exists. Only works if using ssh
+    ssh "$_remote_host" mkdir -p "$_remote_root/$_destination_path"
+    uri_base=rsync://$_remote_host/$_remote_root
   fi
   # The destination directory to backup *to* (usually a remote location or external storage)
-  DESTINATION_URI=$uri_base/duplicity_backup/$host-$os
+  DESTINATION_URI=$uri_base/$_destination_path
 fi
 
 DUPLICITY="${DUPLICITY:-"$(cmdpath duplicity || true)"}"

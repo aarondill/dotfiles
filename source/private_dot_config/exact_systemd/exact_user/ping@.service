@@ -9,5 +9,6 @@ Environment=POLL_INTERVAL=30
 Type=oneshot
 # Intentionally not RemainAfterExit=yes so that it runs each time (since it may later become inaccessible)
 ExecStartPre=echo "Waiting for %i to become accessible..."
-ExecStart=bash -c 'while ! ping -c1 "$HOST" &>/dev/null; do sleep "$POLL_INTERVAL"; done'
+# Evaluate HOST through ssh, since it may be an alias
+ExecStart=bash -c 'HOST=$(ssh -G "$HOST" | awk "/^hostname / { print \$2 }") && while ! ping -c1 "$HOST" &>/dev/null; do sleep "$POLL_INTERVAL"; done'
 ExecStartPost=echo "%i is accessible!"
