@@ -2,8 +2,14 @@ ControlMaster auto
 ControlPath ~/.ssh/control:%h:%p:%r
 ControlPersist 10
 
-Host raspberrypi
-  HostName pihole
+Host pihole
+  User aaron
+
+Host jellyfin
+  User aaron
+
+Host thinkpad
+  HostName aaron-thinkpad
   User aaron
 
 Host utd
