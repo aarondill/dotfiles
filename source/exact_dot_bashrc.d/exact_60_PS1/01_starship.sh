@@ -42,11 +42,11 @@ unset PS1
 
 # HACK: Starship overwrites the PROMPT_COMMAND, so we must move it out of it's view, and restore it afterwards
 OLD_PROMPT_COMMAND=("${PROMPT_COMMAND[@]}")
-PROMPT_COMMAND="" # only overwrites PROMPT_COMMAND[0], but it doesn't matter
+PROMPT_COMMAND=()
 
 eval "$(starship init bash)" # Init starship
 
-PROMPT_COMMAND=("$PROMPT_COMMAND" "${OLD_PROMPT_COMMAND[@]}") # prepend, since it's trying to prepend anyways
+PROMPT_COMMAND=("${PROMPT_COMMAND[@]}" "${OLD_PROMPT_COMMAND[@]}") # prepend, since it's trying to prepend anyways
 unset OLD_PROMPT_COMMAND
 
 # Starship assumes these exist. This fails on `set -u`
