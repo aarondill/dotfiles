@@ -32,6 +32,9 @@
   defaultBranch = main # not master
   # Disable the templatedir to save storage (this is copied into *every* .git directory)
 	templatedir = 
+[submodule]
+	recurse = true
+	fetchJobs = 0
 [fetch]
   prune = true
 [push]
