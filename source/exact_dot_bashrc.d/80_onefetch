@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# ~/.bashrc.d/80_onefetch
+_onefetch_last_repository=''
+_onefetch_last_pwd=''
+_onefetch_promptcmd() {
+  # Only after cd
+  [ "${_onefetch_last_pwd:=$PWD}" != "$PWD" ] || return 0
+  _onefetch_last_pwd=$PWD
+  # Try finding the superproject root (if we're in a submodule)
+  # If that's empty, we're not in a submodule, so we can use the toplevel
+  local current_repository
+  # This command only fails if the current directory is not a git repo. It succeeds with empty output if not a submodule
+  if ! current_repository=$(git rev-parse --show-superproject-working-tree 2>/dev/null); then
+    _onefetch_last_repository=''
+    return 0
+  fi
+  [ -n "$current_repository" ] || current_repository=$(git rev-parse --show-toplevel 2>/dev/null)
+  [ -n "$current_repository" ] && [ "$current_repository" != "$_onefetch_last_repository" ] || return 0
+  _onefetch_last_repository=$current_repository
+
+  local types=(programming markup)
+  [ -n "$(onefetch -o json | jq '.infoFields[].LanguagesInfo.languagesWithPercentage | select(.)')" ] || types=(programming markup prose data)
+  onefetch --no-bots --no-color-palette --nerd-fonts -T "${types[@]}" -- "$current_repository"
+}
+
+if has onefetch; then
+  PROMPT_COMMAND+=(_onefetch_promptcmd)
+fi
