@@ -4,7 +4,7 @@ _onefetch_last_repository=''
 _onefetch_last_pwd=''
 _onefetch_promptcmd() {
   # Only after cd
-  [ "${_onefetch_last_pwd:=$PWD}" != "$PWD" ] || return 0
+  [ "${_onefetch_last_pwd:-}" != "$PWD" ] || return 0
   _onefetch_last_pwd=$PWD
   # Try finding the superproject root (if we're in a submodule)
   # If that's empty, we're not in a submodule, so we can use the toplevel
