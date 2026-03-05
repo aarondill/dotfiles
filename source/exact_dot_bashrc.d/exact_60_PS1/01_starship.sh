@@ -56,3 +56,6 @@ if ! [ -v "_PRESERVED_PROMPT_COMMAND" ]; then declare _PRESERVED_PROMPT_COMMAND=
 # Force first load to ensure that PS1 gets set
 # or true, I don't care if this fails, starship should handle itself.
 starship_precmd || true
+
+# Don't let virtualenv overwrite the prompt
+export VIRTUAL_ENV_DISABLE_PROMPT=1

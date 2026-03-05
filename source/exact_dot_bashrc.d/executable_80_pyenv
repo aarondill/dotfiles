@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# ~/.bashrc.d/80_pyenv
+_pyenv_last_venv=''
+_pyenv_last_pwd=''
+_pyenv_promptcmd() {
+  # Only after cd
+  [ "${_pyenv_last_pwd:-}" != "$PWD" ] || return 0
+  _pyenv_last_pwd=$PWD
+  # Search up for .venv/ or venv/
+  local dir=$PWD name venv
+  while [ "$dir" != "/" ]; do
+    local name
+    for name in .venv venv; do
+      if [ -e "$dir/$name/bin/activate" ]; then
+        venv=$dir/$name/bin/activate
+        break 2
+      fi
+    done
+    dir=$(dirname "$dir")
+  done
+  [ "$venv" != "$_pyenv_last_venv" ] || return 0
+  # venv has changed, deactivate the old one
+  if command -v deactivate &>/dev/null; then
+    echo "Deactivating venv ${_pyenv_last_venv/#"$HOME"/'~'}"
+    deactivate
+  fi
+  # Delay the assignment to allow printing the path in deactivate
+
+  _pyenv_last_venv=$venv
+  # if we're exiting a venv, don't activate it
+  [ -n "$venv" ] || return 0
+  echo "Activating venv ${venv/#"$HOME"/'~'}"
+  # shellcheck disable=SC1090
+  source "$venv"
+}
+
+if has python; then
+  PROMPT_COMMAND+=(
+    _pyenv_promptcmd
+  )
+fi
