@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+# ~/.bashrc.d/80_pyenv
+_pyenv_last_root=''
+_pyenv_last_pwd=''
+_pyenv_promptcmd() {
+  # Only after cd
+  [ "${_pyenv_last_pwd:-}" != "$PWD" ] || return 0
+  _pyenv_last_pwd=$PWD
+  # Search up for .venv/ or venv/
+  # `venv` points to the venv directory, `root` points to the project root (contianing requirements.txt)
+  local dir=$PWD name venv root
+  while [ "$dir" != "/" ]; do
+    local name
+    for name in .venv venv; do
+      if [ -e "$dir/$name/bin/activate" ]; then
+        venv=$dir/$name
+        root=$dir
+        break 2
+      fi
+    done
+    if [ -f "$dir/requirements.txt" ]; then
+      root=$dir
+      break
+    fi
+    dir=$(dirname "$dir")
+  done
+  [ "$root" != "$_pyenv_last_root" ] || return 0
+  # venv has changed, deactivate the old one
+  if command -v deactivate &>/dev/null; then
+    echo "Deactivating venv ${_pyenv_last_root/#"$HOME"/'~'}"
+    deactivate
+  fi
+  # Delay the assignment to allow printing the path in deactivate
+  _pyenv_last_root=$root
+
+  # There's no venv, but theres a requirements.txt, create a venv
+  if [ -n "$root" ] && [ -z "$venv" ]; then
+    venv=$root/.venv
+    echo "Creating venv ${venv/#"$HOME"/'~'}"
+    python3 -m venv "$venv"
+  fi
+
+  # if we're exiting a venv, don't activate it
+  [ -n "$venv" ] || return 0
+  echo "Activating venv ${venv/#"$HOME"/'~'}"
+  # shellcheck disable=SC1091
+  source "$venv/bin/activate"
+}
+
+if has python; then
+  # Note: we need to prepend so that this happens before startship generates PS1
+  PROMPT_COMMAND=(_pyenv_promptcmd "${PROMPT_COMMAND[@]}")
+fi
