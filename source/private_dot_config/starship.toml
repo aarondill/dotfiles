@@ -324,7 +324,7 @@ format = "[$symbol]($style)"
 
 [python]
 symbol = "py "
-format = "[$symbol]($style)"
+format = "[$symbol(${version} )(\\($virtualenv\\) )]($style)"
 
 [raku]
 symbol = "raku "
