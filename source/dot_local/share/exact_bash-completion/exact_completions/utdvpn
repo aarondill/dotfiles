@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# vim:set ft=sh ts=2 sw=2 sts=2 et nospell:
+# shellcheck disable=SC2207
+_utdvpn() {
+  local _cmd=$1 cur=$2 _pre=$3
+  COMPREPLY=()
+
+  case "$cur" in
+  -*) COMPREPLY=($(compgen -W "$(utdvpn --handle-completion-options)" -- "$cur")) && return 0 ;;
+  esac
+
+  # complete the actions
+  COMPREPLY=($(compgen -W "$(utdvpn --handle-completion-actions)" -- "$cur"))
+}
+complete -o bashdefault -F _utdvpn utdvpn

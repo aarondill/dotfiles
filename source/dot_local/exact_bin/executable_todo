@@ -55,20 +55,7 @@ while true; do
     join " " "${COMPLETION_ACTIONS[@]}"
     exit 0
     ;;
-  --handle-completion-options)
-    long=("${LONGOPTS[@]}") short=("${SHORTOPTS[@]}")
-    for opt in "${long[@]%:}"; do      # Strip trailing colons
-      [ "--$opt" != "$1" ] || continue # skip --handle-completion-options
-      [ -n "$opt" ] || continue        # skip empty
-      printf -- '--%s ' "$opt"
-    done
-    for opt in "${short[@]%:}"; do # Strip trailing colons
-      [ -n "$opt" ] || continue    # skip empty
-      printf -- '-%s ' "$opt"
-    done
-    printf '\n'
-    exit 0
-    ;;
+  --handle-completion-options) handle_completion_flags ;;
   --) shift && break ;;
   *) abort "This is a bug" 3 ;;
   esac

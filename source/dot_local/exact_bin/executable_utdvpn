@@ -28,13 +28,20 @@ EOF
 host=$DEFAULT_HOST
 vpn_server=$DEFAULT_VPN_SERVER
 
-LONGOPTS=help,host:,vpn-server: SHORTOPTS=h,H:,s:
+COMPLETION_ACTIONS=(up down)
+LONGOPTS=help,host:,vpn-server:,handle-completion-actions,handle-completion-options
+SHORTOPTS=h,H:,s:
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 while true; do
   case "$1" in
   -h | --help) usage && exit 0 ;;
   -H | --host) host=$2 && shift 2 ;;
   -s | --vpn-server) vpn_server=$2 && shift 2 ;;
+  --handle-completion-actions)
+    join " " "${COMPLETION_ACTIONS[@]}"
+    exit 0
+    ;;
+  --handle-completion-options) handle_completion_flags ;;
   --) shift && break ;;
   *) abort "This is a bug" 3 ;;
   esac
@@ -45,6 +52,12 @@ check_dependencies sshfs fusermount gpclient mkdir realpath
 action="$1"
 mount_dir="${2:-$DEFAULT_MOUNT_DIR}"
 mount_dir="$(realpath -m -- "$mount_dir")" # canonicalize, but don't require existance
+
+# check that action is in COMPLETION_ACTIONS
+for _a in "${COMPLETION_ACTIONS[@]}"; do
+  [ "$_a" != "$action" ] || break
+done
+[ "$_a" = "$action" ] || abort "Invalid action: $action" 2
 
 # Don't re-enable if going down
 if [ "$action" == "up" ] && has tailscale && tailscale status &>/dev/null; then

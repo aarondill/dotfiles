@@ -25,6 +25,7 @@ rm_rf=( # These will be removed forcefully.
   ~/.python_history
   ~/explicit_filter.restore
   ~/.nuget/NuGet/NuGet.Config
+  ~/.varlock/
   # ~/.vmware/
 )
 # rmdir will happen *after* rm_rf.

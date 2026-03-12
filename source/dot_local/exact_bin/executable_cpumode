@@ -71,13 +71,7 @@ while true; do
     [ -z "$print_only" ] || abort "--available and --current are mutually exclusive" 2
     print_only=current && shift
     ;;
-  --handle-completion-options) # note: no short option!
-    # Remove the current option (the completion handling)
-    # Remove double commas, remove trailing commas, remove leading commas
-    LONGOPTS=${LONGOPTS/${1#--}/} LONGOPTS=${LONGOPTS/,,/} LONGOPTS=${LONGOPTS%,} LONGOPTS=${LONGOPTS#,}
-    printf '%s\n' "--${LONGOPTS//,/ --} -${SHORTOPTS//,/ -}"
-    exit 0
-    ;;
+  --handle-completion-options) handle_completion_flags ;;
   --) shift && break ;;
   *) abort "This is a bug" 1 ;;
   esac

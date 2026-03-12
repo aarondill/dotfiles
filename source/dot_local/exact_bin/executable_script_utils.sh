@@ -524,6 +524,32 @@ function parse_args() {
   printf '%s' "set -- $parsed" # output getopt’s output this way to handle the quoting right
 }
 
+# handles arguments for flag completion and then exits
+# Input: $LONGOPTS,$SHORTOPTS - Arrays or comma-separated strings
+function handle_completion_flags() {
+  local _completion_flag=${1:-'handle-completion-options'}
+  local long=("${LONGOPTS[@]}") short=("${SHORTOPTS[@]}")
+  # if not an array, split by comma
+  if ! [[ "$(declare -p LONGOPTS)" =~ "declare -a" ]]; then
+    split long "," "${LONGOPTS[@]}"
+  fi
+  if ! [[ "$(declare -p SHORTOPTS)" =~ "declare -a" ]]; then
+    split short "," "${SHORTOPTS[@]}"
+  fi
+  local opt
+  for opt in "${long[@]%:}"; do                     # Strip trailing colons
+    [ "--$opt" != "$_completion_flag" ] || continue # skip --handle-completion-options
+    [ -n "$opt" ] || continue                       # skip empty
+    printf -- '--%s ' "$opt"
+  done
+  for opt in "${short[@]%:}"; do # Strip trailing colons
+    [ -n "$opt" ] || continue    # skip empty
+    printf -- '-%s ' "$opt"
+  done
+  printf '\n'
+  exit 0
+}
+
 # If this file is being sourced, stop now!
 if [ "$0" != "${BASH_SOURCE[0]}" ]; then return 0; fi
 
