@@ -43,7 +43,6 @@ packages=(
   downgrade                      # downgrades packages
   informant                      # arch news through pacman
   isomaster                      # unpack/edit .isos
-  proton-vpn-gtk-app             # ProtonVPN
   ripdrag-git                    # Drag and drop from terminal
   simplescreenrecorder           # screen recording
   yaru-gtk-theme yaru-icon-theme # Yaru themeing

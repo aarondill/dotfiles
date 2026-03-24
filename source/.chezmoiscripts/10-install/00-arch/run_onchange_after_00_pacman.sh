@@ -32,8 +32,8 @@ GRAPHICAL_PACKAGES=(
   arandr dconf-editor eog evince file-roller firefox firejail gimp
   gnome-calculator gnome-calendar gnome-font-viewer gnome-power-manager
   gnome-system-monitor gparted gucharmap hplip libreoffice-fresh mpv mpv-mpris
-  pavucontrol qbittorrent screenkey seahorse simple-scan snapshot
-  spotify-launcher sqlitebrowser thunderbird wmctrl xclip
+  pavucontrol proton-vpn-gtk-app qbittorrent screenkey seahorse simple-scan
+  snapshot spotify-launcher sqlitebrowser thunderbird wmctrl xclip
   xdg-desktop-portal-gtk xdg-utils xdotool xorg-xinit zeal
 )
 GNOME_PACKAGES=(gnome-shell-extension-manager gnome-tweaks gnome-software gnome-software-plugin-flatpak)
