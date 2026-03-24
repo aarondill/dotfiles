@@ -39,15 +39,15 @@ fi
 packages=(
   # google-chrome      # Replaced with vivaldi
   consolation                    # cursor in tty
+  dashbinsh                      # Use dash as /bin/sh
+  downgrade                      # downgrades packages
   informant                      # arch news through pacman
   isomaster                      # unpack/edit .isos
+  proton-vpn-gtk-app             # ProtonVPN
   ripdrag-git                    # Drag and drop from terminal
   simplescreenrecorder           # screen recording
-  zeal                           # Documentation reader
-  dashbinsh                      # Use dash as /bin/sh
   yaru-gtk-theme yaru-icon-theme # Yaru themeing
-  downgrade                      # downgrades packages
-  proton-vpn-gtk-app             # ProtonVPN
+  zeal                           # Documentation reader
 )
 for p in "${packages[@]}"; do
   ! pacman_is_installed "$p" || continue
