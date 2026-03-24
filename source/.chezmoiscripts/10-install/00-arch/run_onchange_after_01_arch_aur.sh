@@ -46,7 +46,6 @@ packages=(
   ripdrag-git                    # Drag and drop from terminal
   simplescreenrecorder           # screen recording
   yaru-gtk-theme yaru-icon-theme # Yaru themeing
-  zeal                           # Documentation reader
 )
 for p in "${packages[@]}"; do
   ! pacman_is_installed "$p" || continue
