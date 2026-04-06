@@ -5,17 +5,17 @@ if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
 # shellcheck source=./script_utils.sh
 . "$utils"
 
-default_sink='@DEFAULT_SINK@' default_source='@DEFAULT_SOURCE@'
+default_sink='@DEFAULT_SINK@' default_source='@DEFAULT_SOURCE@' default_device="$default_sink"
 function usage() {
   cat <<EOF || true
-Usage: $THIS [OPTS]... [PERCENT|'mute']
+Usage: $THIS [OPTS]... PERCENT
 Sets the volume to the specified PERCENT. Use n{+,-} to incremenet the volume.
 Call with no positional arguments to output the current volume.
 
 Options:
   -h, --help           Show this help message.
-  -m, --mute           Toggle mute on the device (PERCENT is ignored).
-  -d, --device=dev     pactl sink/source to set the volume on (default: $default_sink)
+  -m, --mute           Toggle mute on the device.
+  -d, --device=dev     pactl sink/source to set the volume on (default: $default_device)
   -s, --source         Treat device as a source instead. (default: $default_source)
 EOF
 }
@@ -23,7 +23,7 @@ EOF
 LONGOPTS="help,device:,mute,source" SHORTOPTS="h,d:,m,s"
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 
-device="$default_sink" device_type=sink
+device_type=sink device=
 mute=0
 while true; do
   case "$1" in
@@ -32,33 +32,40 @@ while true; do
   -m | --mute) mute=1 && shift ;;
   -s | --source)
     device_type=source
-    # Don't change if the user specified a source
-    if [ "$device" = "$default_sink" ]; then
-      device="$default_source"
-    fi
+    default_device="$default_source"
     shift
     ;;
   --) shift && break ;;
   *) abort "This is a bug" 3 ;;
   esac
 done
+device="${device:-$default_device}" # Don't change if the user specified a source
 
-case "${1:-}" in
-mute | m) mute=1 ;;
-esac
-
-if [ "$mute" -eq 1 ]; then
-  pactl "set-$device_type-mute" "$device" toggle
-elif [ "$#" -eq 0 ]; then
-  pactl "get-$device_type-volume" "$device"
-else
-  suf='' vol=${1}
+vol=${1:-} suf=''
+if [ -n "$vol" ]; then
   case "$vol" in
   +* | *+) suf=+ ;;
   -* | *-) suf=- ;;
   esac
   # all valid: 20-, -20, 20+, +20, +20%, 20%+, 20%
   vol=${vol%-} vol=${vol#-} vol=${vol%+} vol=${vol#+} vol=${vol%\%}
-  pactl "set-$device_type-volume" "$device" "$suf$vol%"
-  pactl "set-$device_type-mute" "$device" false # user experience! :)
 fi
+
+# If volume passed, set it and unmute (or mute if -m passed)
+# else if -m passed, toggle mute
+# This allows to call
+#  - `volume mute` to toggle mute
+#  - `volume 20` to set volume and unmute
+#  - `volume 20 -m` to set volume and mute
+
+if [ -n "${vol:-}" ]; then
+  pactl "set-$device_type-volume" "$device" "$suf$vol%"
+  case "$mute" in
+  0) pactl "set-$device_type-mute" "$device" false ;; # user experience! :)
+  1) pactl "set-$device_type-mute" "$device" true ;;
+  esac
+elif [ "$mute" -eq 1 ]; then
+  pactl "set-$device_type-mute" "$device" toggle
+fi
+
+pactl "get-$device_type-volume" "$device"
