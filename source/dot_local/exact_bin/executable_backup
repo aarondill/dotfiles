@@ -28,6 +28,8 @@ fi
 # may use "home_daily_s3" for the daily backup of a home directory to Amazon S3. The structure of the name is up to the user, it is only important that
 # the names be distinct. The symbolic name is currently only used to affect the expansion of --archive-dir , but may be used for additional features in
 # the future. Users running more than one distinct backup are encouraged to use this option. If not specified, the default value is a hash of the backend URL.
+
+# If set, will append a hash of destination URI to the name
 os=$(. /etc/os-release 2>/dev/null && printf '%s\n' "${ID:-${NAME:-}}") || true
 host=$(uname -n 2>/dev/null) || true
 machine_id=$(md5sum /etc/machine-id 2>/dev/null | cut -f1 -d' ') || true # added differential
@@ -262,6 +264,10 @@ else
   fi
   # The destination directory to backup *to* (usually a remote location or external storage)
   DESTINATION_URI=$uri_base/$_destination_path
+fi
+
+if [ -n "${NAME:-}" ]; then
+  NAME="${NAME}-$(md5sum <<<"$DESTINATION_URI" | cut -f1 -d' ')"
 fi
 
 DUPLICITY="${DUPLICITY:-"$(cmdpath duplicity || true)"}"
