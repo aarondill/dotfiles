@@ -215,8 +215,8 @@ EOF
 # Slightly safer options
 args=(--exclude-other-filesystems --exclude-device-files)
 
-LONGOPTS=incr,full,help,cleanup,info,dry-run,print,status,verbose,destination-uri:,force-destination-uri,no-verify
-SHORTOPTS=h,c,i,n,p,s,v
+LONGOPTS=incr,full,help,cleanup,info,dry-run,print,status,verbose,destination-uri:,force-destination-uri,no-verify,verify
+SHORTOPTS=h,c,i,n,p,s,v,V
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 mode=backup
 command=() # an array for the sake of empty strings (allows to skip the command and dynamically create full backups)
@@ -237,6 +237,7 @@ while true; do
   --cleanup | -c) mode=cleanup ;;
   --info | -i) ;& # fallthrough
   --status | -s) mode=status ;;
+  --verify | -V) mode=verify ;;
   --dry-run | -n) BACKUP_DRY_RUN=1 ;; # overrides environment variables
   --verbose | -v) BACKUP_VERBOSE=1 ;; # overrides environment variables
   --no-verify) BACKUP_VERIFY=0 ;;
@@ -265,7 +266,6 @@ else
   # The destination directory to backup *to* (usually a remote location or external storage)
   DESTINATION_URI=$uri_base/$_destination_path
 fi
-
 if [ -n "${NAME:-}" ]; then
   NAME="${NAME}-$(md5sum <<<"$DESTINATION_URI" | cut -f1 -d' ')"
 fi
@@ -431,6 +431,13 @@ function list_packages() {
   esac
 }
 
+verify() {
+  [ "$BACKUP_VERIFY" -ne 0 ] || return 0 # We're done here.
+  log
+  log "Verifying $DESTINATION_URI"
+  verbose "$DUPLICITY" verify "${verify_args[@]}" "$DESTINATION_URI" "$SOURCE_DIR"
+}
+
 case "$mode" in
 backup)
   if [ -n "$_changed_destination_uri" ]; then
@@ -497,11 +504,12 @@ print)
   log "Duplicity Options:" "${args[@]}"
   exit 0
   ;;
+verify) # Allow to pass --verify to only verify the backup
+  verify
+  exit 0
+  ;;
 *) abort "Unknown mode '$mode'. This is most likely a bug." 3 ;;
 esac
+# Verify after everything is done
 [ "$did_something" -eq 1 ] || abort "Didn't do anything. Please check your configuration and try again." 2
-[ "$BACKUP_VERIFY" -ne 0 ] || exit 0 # We're done here.
-
-log
-log "Verifying $DESTINATION_URI"
-verbose "$DUPLICITY" verify "${verify_args[@]}" "$DESTINATION_URI" "$SOURCE_DIR"
+verify
