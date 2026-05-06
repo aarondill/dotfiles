@@ -38,7 +38,7 @@ rmdir=( # These will only be removed if empty
   ~/.vmware/
   ~/tmp/
   ~/.cups
-  ~/Thunderbird/
+  ~/{T,t}hunderbird/
   ~/.cert/{nm-openvpn/,}
   ~/.nuget/{NuGet/,}
 )

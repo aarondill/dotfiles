@@ -84,7 +84,7 @@ up)
   elif ! [ -f /var/run/gpclient.lock ]; then
     log "Starting gpclient..."
     sudo_cmd true # Cache the sudo password
-    verbose sudo_cmd gpclient --fix-openssl connect --default-browser "$vpn_server" >|/tmp/gpclient.log 2>&1 &
+    verbose sudo_cmd gpclient --ignore-tls-errors --fix-openssl connect --default-browser "$vpn_server" >|/tmp/gpclient.log 2>&1 &
     disown
     # output the log until the lock file is created
     tail -f /tmp/gpclient.log &
