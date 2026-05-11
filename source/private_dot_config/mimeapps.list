@@ -182,6 +182,7 @@ application/zip=org.gnome.FileRoller.desktop;
 application/vnd.openxmlformats-officedocument.wordprocessingml.document=libreoffice-base.desktop
 x-scheme-handler/magnet=userapp-transmission-gtk-GJQA52.desktop
 x-scheme-handler/vscode=nvim.desktop
+x-scheme-handler/jetbrains=jetbrainsd.desktop
 
 [Added Associations]
 x-scheme-handler/magnet=userapp-transmission-gtk-GJQA52.desktop;
