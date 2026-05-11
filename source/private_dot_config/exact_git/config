@@ -98,6 +98,7 @@
   hist = log --graph '--pretty=format:%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
   history = hist
   yesterday = alias-wrapper yesterday
+  time-between = alias-wrapper time-between
   diff-origin = alias-wrapper diff-origin
 
   # Things I forget
