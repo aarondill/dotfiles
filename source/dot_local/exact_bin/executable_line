@@ -79,8 +79,17 @@ for range in "${ranges_input[@]}"; do
   ns=() && split ns "-" "$range"
   [ "${#ns[@]}" -le 2 ] || abort "Invalid range: $range" 3
   # if only one number, then equal
-  starts+=("${ns[0]}")
-  ends+=("${ns[-1]}")
+  start="${ns[0]}" end="${ns[-1]}"
+  case "$end" in +*) # if end is +n, then it should be the previous number + n -- This is an extension of the GNU sed range syntax
+    if [ "$end" != "$start" ]; then
+      end=$((start + end)) # 90-+100 -> 90-190
+    else                   # 90,+100 -> 90,190
+      [ -n "${ends[-1]:-}" ] || abort "Increment requires a previous range" 3
+      end=$((ends[-1] + end)) start=$end
+    fi
+    ;;
+  esac
+  starts+=("$start") ends+=("$end")
 done
 
 max_end= # The last line to be printed
