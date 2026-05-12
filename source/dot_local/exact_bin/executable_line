@@ -1,0 +1,130 @@
+#!/usr/bin/env bash
+# ~/.local/bin/line
+# Outputs specific lines from a file
+set -euC -o pipefail && shopt -s nullglob globstar
+utils=script_utils.sh dir=$(dirname -- "${BASH_SOURCE[0]}") || true
+if [ -f "$dir/$utils" ]; then utils="$dir/$utils"; fi
+# shellcheck source=./script_utils.sh
+. "$utils"
+
+# Line number comparisons
+function max() {
+  local a="$1" b="$2"
+  if [ "$a" == '$' ] || [ "$b" == '$' ]; then
+    printf '$\n'
+  else
+    printf '%s\n' "$((a > b ? a : b))"
+  fi
+}
+function min() {
+  local a="$1" b="$2"
+  if [ "$a" == '$' ]; then
+    printf '%s\n' "$b"
+  elif [ "$b" == '$' ]; then
+    printf '%s\n' "$a"
+  else
+    printf '%s\n' "$((a < b ? a : b))"
+  fi
+}
+function le() { [ "$(min "$1" "$2")" == "$1" ]; }   # a <= b
+function lt() { [ "$1" != "$2" ] && le "$1" "$2"; } # a < b
+function ge() { [ "$(max "$1" "$2")" == "$1" ]; }   # a >e b
+function gt() { [ "$1" != "$2" ] && ge "$1" "$2"; } # a > b
+
+function usage() {
+  cat <<EOF || true
+Usage: $THIS [opts] -- <LINES> FILE
+Outputs specific lines from a file
+LINES is a comma-seperated list of line number ranges
+Each range is inclusive, e.g. 1-3,5,7-9
+A range may not have one of the numbers, in which case it is treated as the first or last line
+
+Options:
+    --help, -h    Show this message
+
+EOF
+}
+
+LONGOPTS=help SHORTOPTS=h
+ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
+while true; do
+  case "$1" in
+  -h | --help) usage && exit 0 ;;
+  --) shift && break ;;
+  *) abort "This is a bug" 3 ;;
+  esac
+done
+
+[ "$#" -ge 1 ] || abort "LINES is required" 2
+[ "$#" -eq 2 ] || abort "FILE is required" 2
+file="$2"
+
+ranges_input=() # either n, n-, -n, or n-m
+split ranges_input "," "$1"
+tmp=() && for range in "${ranges_input[@]}"; do
+  if [ -n "$range" ]; then tmp+=("$range"); fi
+done
+ranges_input=("${tmp[@]}")
+
+# a range is starts[i],ends[i]
+starts=()
+ends=()
+for range in "${ranges_input[@]}"; do
+  [ "${range:0:1}" != "-" ] || range="0$range" # range is -n -> 0-n
+  [ "${range: -1}" != "-" ] || range+="$"      # range is n- -> n-$
+
+  ns=() && split ns "-" "$range"
+  [ "${#ns[@]}" -le 2 ] || abort "Invalid range: $range" 3
+  # if only one number, then equal
+  starts+=("${ns[0]}")
+  ends+=("${ns[-1]}")
+done
+
+max_end= # The last line to be printed
+for e in "${ends[@]}"; do
+  le "$e" "${max_end:-0}" || max_end="$e"
+done
+[ -n "$max_end" ] || abort "No lines to print" 3
+
+# consolidate ranges
+for ((i = 0; i < ${#starts[@]}; i++)); do
+  [ -n "${starts[i]:-}" ] || continue
+  for ((j = 0; j < ${#starts[@]}; j++)); do
+    [ "$i" -ne "$j" ] || continue
+    [ -n "${starts[j]:-}" ] || continue
+
+    is="${starts[i]}" ie="${ends[i]}"
+    js="${starts[j]}" je="${ends[j]}"
+
+    ie_1=$ie && [ "$ie" == '$' ] || ie_1=$((ie + 1))
+    je_1=$je && [ "$je" == '$' ] || je_1=$((je + 1))
+    # disjoint
+    if lt "$ie_1" "$js" || lt "$je_1" "$is"; then
+      continue
+    fi
+
+    # merge overlapping/adjacent ranges
+    new_start=$(min "$is" "$js") new_end=$(max "$ie" "$je")
+
+    starts[i]="$new_start" ends[i]="$new_end" # expand i
+    starts[j]='' ends[j]=''                   # delete j
+  done
+done
+
+ranges=() # compact arrays
+for i in "${!starts[@]}"; do
+  [ -n "${starts[i]:-}" ] || continue
+  if [ "${starts[i]}" == "${ends[i]}" ]; then
+    ranges+=("${starts[i]}")
+  else
+    ranges+=("${starts[i]},${ends[i]}")
+  fi
+done
+
+args=()
+for range in "${ranges[@]}"; do
+  args+=("-e" "$range p")
+done
+# run `n,m p` or `n p` for each range
+# run `m q` after the last range
+sed -n "${args[@]}" -e "$max_end q" "$file"
