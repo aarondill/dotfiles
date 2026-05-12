@@ -33,31 +33,34 @@ function gt() { [ "$1" != "$2" ] && ge "$1" "$2"; } # a > b
 
 function usage() {
   cat <<EOF || true
-Usage: $THIS [opts] -- <LINES> FILE
-Outputs specific lines from a file
+Usage: $THIS [opts] -- <LINES> [FILE]
+Outputs specific lines from a file. If FILE is not specified, stdin is used.
 LINES is a comma-seperated list of line number ranges
 Each range is inclusive, e.g. 1-3,5,7-9
 A range may not have one of the numbers, in which case it is treated as the first or last line
 
 Options:
     --help, -h    Show this message
+    --number, -n  Print line numbers
 
 EOF
 }
 
-LONGOPTS=help SHORTOPTS=h
+LONGOPTS=help,number SHORTOPTS=h,n
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
+print_number=false
 while true; do
   case "$1" in
   -h | --help) usage && exit 0 ;;
+  -n | --number) print_number=true && shift ;;
   --) shift && break ;;
   *) abort "This is a bug" 3 ;;
   esac
 done
 
 [ "$#" -ge 1 ] || abort "LINES is required" 2
-[ "$#" -eq 2 ] || abort "FILE is required" 2
-file="$2"
+
+file="${2:--}"
 
 ranges_input=() # either n, n-, -n, or n-m
 split ranges_input "," "$1"
@@ -70,7 +73,7 @@ ranges_input=("${tmp[@]}")
 starts=()
 ends=()
 for range in "${ranges_input[@]}"; do
-  [ "${range:0:1}" != "-" ] || range="0$range" # range is -n -> 0-n
+  [ "${range:0:1}" != "-" ] || range="1$range" # range is -n -> 1-n
   [ "${range: -1}" != "-" ] || range+="$"      # range is n- -> n-$
 
   ns=() && split ns "-" "$range"
@@ -121,10 +124,18 @@ for i in "${!starts[@]}"; do
   fi
 done
 
-args=()
+args=(-n)
+# run `n,m p` or `n p` for each range
 for range in "${ranges[@]}"; do
   args+=("-e" "$range p")
 done
-# run `n,m p` or `n p` for each range
 # run `m q` after the last range
-sed -n "${args[@]}" -e "$max_end q" "$file"
+args+=(-e "$max_end q")
+
+if [ "$print_number" = true ]; then
+  # -ba -p means number every line and treat them as the same
+  # -d $'\n' makes it impossible to have a "logical page section" (since it has to be a line containing "\n:")
+  nl -ba -p -w3 -d $'\n' "$file" | sed "${args[@]}"
+else
+  sed "${args[@]}" "$file"
+fi
