@@ -21,11 +21,10 @@ function install_java() {
   sudo_cmd tar -xz -C "$destination" -f "$tmp"
   rm_exit_cleanup "$tmp"
 }
-base_url="https://download.java.net/java" update_version="22.0.1"
+base_url="https://download.java.net/java" update_version="26.0.1"
 declare -A versions=(
-  [21.0.2]="$base_url/GA/jdk21.0.2/f2283984656d49d69e91c558476027ac/13/GPL/openjdk-21.0.2_linux-x64_bin.tar.gz" # Outdated version for UIL use
-  [22.0.1]="$base_url/GA/jdk22.0.1/c7ec1332f7bb44aeba2eb341ae18aca4/8/GPL/openjdk-22.0.1_linux-x64_bin.tar.gz"
-  [24]="$base_url/early_access/jdk24/1/GPL/openjdk-24-ea+1_linux-x64_bin.tar.gz"
+  [26]="$base_url/early_access/jdk27/21/GPL/openjdk-27-ea+21_linux-x64_bin.tar.gz"
+  [26.0.1]="$base_url/GA/jdk26.0.1/458fda22e4c54d5ba572ab8d2b22eb83/8/GPL/openjdk-26.0.1_linux-x64_bin.tar.gz"
 )
 
 if [ -z "${versions[$update_version]:-}" ]; then
