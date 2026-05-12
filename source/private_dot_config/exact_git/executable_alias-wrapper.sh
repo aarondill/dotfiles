@@ -52,16 +52,22 @@ unalias)
   ;;
 yesterday) git hist --since "${1:-yesterday}" '--branches=*' --author="$(git config user.name)" ;;
 time-between)
+  use_seconds=false
+  if [ "$1" = -s ]; then
+    use_seconds=true
+    shift 1
+  fi
   s1=$(git log "$1" -n 1 --format=%at) s2=$(git log "${2:-HEAD}" -n 1 --format=%at)
   diff=$((s2 - s1))
   if [ "$diff" -lt 0 ]; then
     diff=$((-diff))
   fi
-  # (ab)use python to format the diff in seconds
-  if command -v python3 &>/dev/null; then
+  if [ "$use_seconds" = true ]; then
+    printf "%d\n" "$diff"
+  elif command -v python3 &>/dev/null; then # (ab)use python to format the diff in seconds
     python3 -c 'import datetime; import sys; print(str(datetime.timedelta(seconds=int(sys.argv[1]))))' "$diff"
   else
-    printf 'Install python3 to format the diff in seconds\n' >&2
+    printf 'Install python3 to format the diff\n' >&2
     printf '%s seconds\n' "$diff"
   fi
   ;;
