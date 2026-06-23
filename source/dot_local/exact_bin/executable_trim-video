@@ -21,14 +21,14 @@ EOF
   return 0
 }
 
-LONGOPTS=help,verbose,time: SHORTOPTS=h,v,t:
+LONGOPTS=help,verbose,time:,e SHORTOPTS=h,v,t:,e
 ARGSTRING="$(parse_args "$@")" && eval "$ARGSTRING" || exit
 
 trim_seconds=
 end=false
 USE_VERBOSE=0 # default to non-verbose output
-for arg in "$@"; do
-  case "$arg" in
+while true; do
+  case "$1" in
   -h | --help) usage && exit 0 ;;
   -v | --verbose) USE_VERBOSE=1 && shift ;;
   -t | --time) trim_seconds="$2" && shift 2 ;;
