@@ -73,11 +73,15 @@ done
 
 log "Cleaning the trash"
 if has_cmd trash-list trash-empty; then
-  if [ -n "$(trash-list)" ]; then
+  trash-empty --dry-run -f
+  if [ -n "$(trash-list)" ] && confirm "Empty the trash?"; then
     verbose trash-empty || true
   fi
 elif has_cmd gio; then
-  verbose gio trash --empty || true
+  gio trash --list
+  if [ -n "$(gio trash --list)" ] && confirm "Empty the trash?"; then
+    verbose gio trash --empty || true
+  fi
 else
   err "Could not find a command to clean the trash"
 fi

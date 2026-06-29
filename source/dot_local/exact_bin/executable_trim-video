@@ -48,7 +48,7 @@ fi
 if "$end"; then
   duration_seconds=$(ffprobe -v warning -of csv=p=0 -show_entries format=duration "$input_file")
   end=$(printf '%s\n' "$duration_seconds - $trim_seconds" | bc)
-  ffmpeg -ss 00:00:00 -to "$end" -i "$input_file" -c copy "$output_file"
+  verbose ffmpeg -ss 00:00:00 -to "$end" -i "$input_file" -c copy "$output_file"
 else
-  ffmpeg -ss "$trim_seconds" -i "$input_file" -c copy "$output_file"
+  verbose ffmpeg -ss "$trim_seconds" -i "$input_file" -c copy "$output_file"
 fi
