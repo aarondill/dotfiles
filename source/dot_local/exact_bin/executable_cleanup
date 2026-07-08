@@ -75,7 +75,7 @@ log "Cleaning the trash"
 if has_cmd trash-list trash-empty; then
   trash-empty --dry-run -f
   if [ -n "$(trash-list)" ] && confirm "Empty the trash?"; then
-    verbose trash-empty || true
+    verbose trash-empty -f || true
   fi
 elif has_cmd gio; then
   gio trash --list
