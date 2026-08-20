@@ -143,6 +143,16 @@ if command -v starship &>/dev/null; then
   export DISABLE_CUSTOM_PS1=${DISABLE_CUSTOM_PS1-1}
 fi
 
+# Saved terminals
+if [ -f ~/.terms ]; then
+  printf '%s\n' "Loading saved terminals" >&2
+  # Move first to ensure child processes don't try to load it
+  # Store in case i need it
+  mv -f -- ~/.terms "$XDG_CACHE_HOME"/.terms
+  # If it fails, move it back
+  bash "$XDG_CACHE_HOME"/.terms || mv -i -- "$XDG_CACHE_HOME"/.terms ~/.terms
+fi
+
 # Initialize `~/.bashrc.d`
 if [ -d ~/.bashrc.d ]; then
   stty -echo 2>/dev/null # disable keyboard echo until bashrc is done
