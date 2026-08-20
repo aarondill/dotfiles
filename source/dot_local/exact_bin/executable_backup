@@ -195,6 +195,7 @@ Options:
   -n, --dry-run             Do not run any duplicity commands, just show them
   -p, --print               Print information about the backup without querying it
   -s, --status              Get the collection-status
+  -V, --verify              Verify the backup
   -v, --verbose             Show all duplicity commands before running them
   --force-destination-uri   Force the passed destination URI to be used to backup without user confirmation.
                             It is an error to pass this option without --destination-uri.
