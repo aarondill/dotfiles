@@ -82,3 +82,4 @@ code/rust/template
 .local/bin/backup
 .local/share/applications/bitwarden.desktop
 .config/tmux
+code/asm/template
