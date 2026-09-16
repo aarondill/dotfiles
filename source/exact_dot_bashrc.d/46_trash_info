@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+# ~/.bashrc.d/46_trash_info
+#
+# Displays count and total size of files in trash if SHLVL=1
+#
+[ "$SHLVL" -eq 1 ] || return 0
+# function wrapper so we can use local
+function _trash_count() {
+  unset -f "${FUNCNAME[0]}" # self destruct
+  local dir=~/.local/share/Trash/files
+  local -i count=0
+
+  local dotglob=-s
+  shopt -q dotglob || dotglob=-u
+  shopt -s dotglob # enable dotglob
+  for _ in "$dir"/*; do count+=1; done
+  shopt "$dotglob" dotglob # restore dotglob
+
+  local size
+  size=$(du -sh "$dir" | awk '{print $1}')
+
+  [ "$count" -gt 0 ] || return 0
+  printf '%s\n' "$count files in trash ($size)"
+} && _trash_count
