@@ -103,6 +103,7 @@ if has tty-clock; then alias clock='tty-clock  -sScbtrn'; fi
 if has n; then alias n='sudo "$(which n)"'; fi
 
 alias battery='upower -i $(upower -e | grep BAT)'   # Show battery information
+alias zip='zip -r'                                  # Zip should be recursive by default
 if has zip; then alias secret-zip='zip -9ruvoe'; fi # alias for zipping files that should be hidden
 
 if has chezmoi; then

@@ -172,11 +172,10 @@ function update_method() {
     success
     ;;
   pnpm)
-    # NOTE: nodejs < 20.x.x is broken on my machine, as this corepack can't access npm.org
-    #This is fixed by updating to latest before updating pnpm - see above.
-    if has_cmd corepack; then
-      log "Updating pnpm!"
-      repeat "$(cmdpath corepack)" prepare pnpm@latest --activate
+    if ! has_cmd pnpm; then
+      log "Installing pnpm via npm!"
+      npm config set allow-scripts=pnpm --location=user
+      repeat npm i -g pnpm
       success
     fi
 
