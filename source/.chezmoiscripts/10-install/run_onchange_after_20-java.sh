@@ -23,9 +23,9 @@ function install_java() {
 }
 base_url="https://download.java.net/java" update_version="26.0.1"
 declare -A versions=(
-  [27]="$base_url/early_access/jdk27/21/GPL/openjdk-27-ea+21_linux-x64_bin.tar.gz"
+  [28]="$base_url/early_access/jdk28/25/GPL/openjdk-28-ea+25_linux-x64_bin.tar.gz"
   [22.0.1]="$base_url/GA/jdk22.0.1/c7ec1332f7bb44aeba2eb341ae18aca4/8/GPL/openjdk-22.0.1_linux-x64_bin.tar.gz"
-  [26.0.1]="$base_url/GA/jdk26.0.1/458fda22e4c54d5ba572ab8d2b22eb83/8/GPL/openjdk-26.0.1_linux-x64_bin.tar.gz"
+  [27.0.1]="$base_url/GA/jdk27.0.1.1/c3a705caf5044be8aa0b09e62be69b20/4/GPL/openjdk-27.0.1.1_linux-x64_bin.tar.gz"
 )
 
 if [ -z "${versions[$update_version]:-}" ]; then
