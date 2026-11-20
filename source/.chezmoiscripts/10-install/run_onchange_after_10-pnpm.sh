@@ -1,10 +1,6 @@
 #! /usr/bin/env bash
 set -euC -o pipefail
 
-# Find package.json and include it's hash to update when it does
-# {{ $files_arr := glob ( joinPath .chezmoi.sourceDir "*dot_local" "*share" "*pnpm" "*global" "*5" "*package.json" ) }}
-# package.json hash: {{ include ( first $files_arr ) | sha256sum }}
-
 # Source utils
 SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-"$(chezmoi source-path)"}"
 # shellcheck source=../.utils.sh
@@ -46,11 +42,6 @@ function install_pnpm_and_node() {
   pnpm i -g n
 }
 
-install_pnpm_global_packages() {
-  add_global_dir_to_path || [ -n "$PNPM_HOME" ]
-  pnpm i -g n
-}
-
 # if ! has_cmd wget; then
 #   err "wget is not present, attempting to install."
 #   if has_apt; then
@@ -63,4 +54,3 @@ install_pnpm_global_packages() {
 # fi
 
 has_cmd pnpm || log_and_run 'Installing NodeJS and pnpm' install_pnpm_and_node
-has_cmd pnpm && log_and_run 'Installing pnpm global packages' install_pnpm_global_packages
